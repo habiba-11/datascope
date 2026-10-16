@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Part 1 (done)**
+- Current part: **Part 2 (done)**
 - Last updated: 16 Oct 2026
 
 ## Done
@@ -9,9 +9,10 @@
 - Setup confirmed: Windows 11, VS Code, Git, Node.js, GitHub account.
 - Part 0: Git repo initialised, Live Server installed, first page pushed to github.com/habiba-11/datascope.
 - Part 1: design tokens (css/theme.css) for the "Explorer's Toolkit" palette; Investigation Shell (logo, 5-step bar, Pip sidebar) built once in js/app.js and reused by 4 placeholder room pages (Question Studio, Data Hub, Graph Lab, Evidence Board).
+- Part 2: stats engine (js/helpers/stats.js: mean, median, mode, range), tested with `node --test` (tests/stats.test.js, 11 passing cases: even-length median, unsorted numeric median, bimodal data, category-only mode, no-mode case, extreme-value range).
 
 ## Next
-- Part 2: stats engine (mean, median, mode, range) with tests for tricky cases.
+- Part 3: scenario recipes (JSON), seeded data generator, self-check, with tests.
 
 ## Known bugs
 - none yet
