@@ -1,0 +1,12 @@
+{
+  "id": "shoe-sizes",
+  "title": "Shoe sizes in the class",
+  "question": "What shoe size do you wear?",
+  "answerType": "number",
+  "unit": "EU size",
+  "classSize": 16,
+  "valuePool": [34, 35, 36, 37],
+  "mustInclude": [],
+  "target": { "mean": 35.3, "median": 35, "mode": [34, 35], "range": 3 },
+  "teaches": "A dataset can have more than one mode."
+}

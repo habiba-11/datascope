@@ -1,0 +1,11 @@
+{
+  "id": "playground-game",
+  "title": "Favourite playground game",
+  "question": "What is your favourite game to play at recess this week?",
+  "answerType": "category",
+  "classSize": 15,
+  "valuePool": ["Football", "Football", "Football", "Tag", "Hopscotch", "Swings", "Basketball"],
+  "mustInclude": [],
+  "target": { "mode": ["Football"] },
+  "teaches": "The mode is the only 'typical value' that makes sense for categories."
+}

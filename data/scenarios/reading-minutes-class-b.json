@@ -1,0 +1,12 @@
+{
+  "id": "reading-minutes-class-b",
+  "title": "Reading minutes: Class B",
+  "question": "How many minutes did you read yesterday?",
+  "answerType": "number",
+  "unit": "minutes",
+  "classSize": 18,
+  "valuePool": [5, 10, 15, 20, 25, 30, 35],
+  "mustInclude": [],
+  "target": { "mean": 20, "median": 20, "mode": [15, 30], "range": 30 },
+  "teaches": "Same mean as Class A, but a much wider spread."
+}

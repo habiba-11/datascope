@@ -1,0 +1,12 @@
+{
+  "id": "sleep-hours",
+  "title": "Hours of sleep in Grade 5",
+  "question": "How many hours did you sleep last night?",
+  "answerType": "number",
+  "unit": "hours",
+  "classSize": 20,
+  "valuePool": [7, 8, 9, 10],
+  "mustInclude": [3],
+  "target": { "mean": 8.4, "median": 9, "mode": [9], "range": 7 },
+  "teaches": "One extreme value drags the mean down, but barely moves the median."
+}
