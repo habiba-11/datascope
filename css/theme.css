@@ -1,0 +1,39 @@
+/* Design tokens: Explorer's Toolkit palette.
+   Change a look here once, and the whole app follows. */
+:root {
+  /* colours */
+  --color-bg: #E6F4FF;
+  --color-text: #17324D;
+  --color-navy: #17324D;
+  --color-card-bg: #FFFFFF;
+
+  --color-ask: #FF7A6B;
+  --color-plan: #FFC531;
+  --color-collect: #38B6FF;
+  --color-explore: #4CC26B;
+  --color-conclude: #8E7CFF;
+
+  --color-hill-back: #BEEAC0;
+  --color-hill-front: #8FD79B;
+
+  --color-btn-main-bg: #2E9A4F;
+  --color-btn-main-text: #FFFFFF;
+  --color-btn-run-bg: #FFC531;
+  --color-btn-run-text: #17324D;
+
+  /* fonts */
+  --font-heading: 'Baloo 2', sans-serif;
+  --font-body: 'Nunito', sans-serif;
+  --font-size-base: 18px;
+  --font-size-h1: 32px;
+
+  /* shapes */
+  --border-width: 3px;
+  --radius-card: 20px;
+  --radius-button: 14px;
+
+  /* bouncy navy shadows */
+  --shadow-card: 8px 8px 0 var(--color-navy);
+  --shadow-button: 4px 4px 0 var(--color-navy);
+  --shadow-button-active: 1px 1px 0 var(--color-navy);
+}

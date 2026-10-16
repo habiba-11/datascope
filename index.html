@@ -6,33 +6,19 @@
   <title>DataScope: The Evidence Lab</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/base.css">
   <style>
-    body {
-      margin: 0;
+    .welcome {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #E6F4FF;
-      color: #17324D;
-      font-family: 'Nunito', sans-serif;
-      font-size: 18px;
     }
 
     .card {
-      background: white;
-      border: 3px solid #17324D;
-      border-radius: 20px;
-      box-shadow: 8px 8px 0 #17324D;
-      padding: 32px 40px;
       text-align: center;
       max-width: 420px;
-    }
-
-    h1 {
-      font-family: 'Baloo 2', sans-serif;
-      font-size: 32px;
-      margin: 8px 0;
     }
 
     .mascot {
@@ -50,47 +36,37 @@
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      border: 2px solid #17324D;
+      border: 2px solid var(--color-navy);
     }
 
-    .ask { background: #FF7A6B; }
-    .plan { background: #FFC531; }
-    .collect { background: #38B6FF; }
-    .explore { background: #4CC26B; }
-    .conclude { background: #8E7CFF; }
-
-    button {
-      font-family: 'Baloo 2', sans-serif;
-      font-size: 18px;
-      font-weight: 600;
-      color: white;
-      background: #2E9A4F;
-      border: 3px solid #17324D;
-      border-radius: 14px;
-      box-shadow: 4px 4px 0 #17324D;
-      padding: 10px 24px;
-      cursor: pointer;
-    }
-
-    button:active {
-      box-shadow: 1px 1px 0 #17324D;
-      transform: translate(3px, 3px);
-    }
+    .dot.ask { background: var(--color-ask); }
+    .dot.plan { background: var(--color-plan); }
+    .dot.collect { background: var(--color-collect); }
+    .dot.explore { background: var(--color-explore); }
+    .dot.conclude { background: var(--color-conclude); }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="mascot">🦉</div>
-    <h1>Hello, DataScope!</h1>
-    <p>I'm Pip, your data-detective guide. Let's go find some evidence!</p>
-    <div class="dots">
-      <span class="dot ask"></span>
-      <span class="dot plan"></span>
-      <span class="dot collect"></span>
-      <span class="dot explore"></span>
-      <span class="dot conclude"></span>
+  <div class="welcome">
+    <div class="card">
+      <div class="mascot">🦉</div>
+      <h1>Hello, DataScope!</h1>
+      <p>I'm Pip, your data-detective guide. Let's go find some evidence!</p>
+      <div class="dots">
+        <span class="dot ask"></span>
+        <span class="dot plan"></span>
+        <span class="dot collect"></span>
+        <span class="dot explore"></span>
+        <span class="dot conclude"></span>
+      </div>
+      <a class="btn btn-main" href="rooms/question-studio.html">Start exploring →</a>
     </div>
-    <button type="button">Say hi to Pip</button>
+  </div>
+  <div class="hills" aria-hidden="true">
+    <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <path class="hill-back" d="M0,100 C150,60 300,140 450,100 C600,60 750,140 900,100 C1050,60 1150,120 1200,100 L1200,200 L0,200 Z"></path>
+      <path class="hill-front" d="M0,150 C150,110 300,180 450,140 C600,100 750,170 900,140 C1050,110 1150,160 1200,140 L1200,200 L0,200 Z"></path>
+    </svg>
   </div>
 </body>
 </html>
