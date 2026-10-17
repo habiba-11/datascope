@@ -1,8 +1,8 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Part 3 (done)**
-- Last updated: 17 Oct 2026
+- Current part: **Part 4 (done)**
+- Last updated: 18 Oct 2026
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -11,9 +11,14 @@
 - Part 1: design tokens (css/theme.css) for the "Explorer's Toolkit" palette; Investigation Shell (logo, 5-step bar, Pip sidebar) built once in js/app.js and reused by 4 placeholder room pages (Question Studio, Data Hub, Graph Lab, Evidence Board).
 - Part 2: stats engine (js/helpers/stats.js: mean, median, mode, range), tested with `node --test` (tests/stats.test.js, 11 passing cases: even-length median, unsorted numeric median, bimodal data, category-only mode, no-mode case, extreme-value range).
 - Part 3: seeded synthetic data generator (js/helpers/generator.js, mulberry32 PRNG) + 5 scenario recipes in data/scenarios/ (sleep-hours, shoe-sizes, playground-game, reading-minutes-class-a/-b). Generator retries seeds until generated data exactly matches the recipe's target mean/median/mode/range. 7 new tests in tests/generator.test.js (18 total passing), including proof the retry loop actually runs (sleep-hours needs seed 5, not 1).
+- Part 4: Data Hub room (rooms/data-hub.html, js/rooms/data-hub.js, css/data-hub.css) wired to the sleep-hours scenario. "Run survey" reveals the 20 synthetic classmates one at a time (paced, reduced-motion aware), with a live progress bar and a growing tally of bars per value.
 
 ## Next
-- Part 4: Data Hub room ("Run survey" reveals answers one by one; table and tally grow).
+- Part 5: Graph Lab (Chart.js, switch chart types, direct labels, "What does this graph NOT tell us?").
+
+## Known bugs/open items
+- Data Hub currently only uses the sleep-hours scenario; the other 4 recipes aren't wired into any room UI yet (will revisit once Question Studio lets a child pick a scenario, Part 7).
+- Open question still pending (see CLAUDE.md): how to let a child survey a small group before the full class.
 
 ## Known bugs
 - none yet
