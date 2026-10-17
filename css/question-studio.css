@@ -1,3 +1,35 @@
+.phase-badge {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--phase-color, var(--color-ask));
+  border: 2px solid var(--color-navy);
+  border-radius: 999px;
+  padding: 4px 12px;
+  margin-bottom: 8px;
+}
+
+.predict-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.predict-row input[type="number"] {
+  width: 100px;
+  font-size: 18px;
+  font-family: var(--font-body);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 10px;
+  padding: 8px;
+}
+
+#go-collect-btn {
+  margin-top: 12px;
+}
+
 .scenario-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

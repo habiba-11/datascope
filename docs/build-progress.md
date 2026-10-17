@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Part 8 (done)**
+- Current part: **Part 9 (done)**
 - Last updated: 18 Oct 2026
 
 ## Done
@@ -17,14 +17,16 @@
 - Part 6: Number Lab room (rooms/number-lab.html, js/rooms/number-lab.js, css/number-lab.css). A 4-step task flow: predict then reveal mean/median/mode/range (reuses Part 2 stats engine); "Build it" (5 numbers with mean 6); "Find the mistake" (Mia's unsorted-median error); real-life mode (shoe sizes). Next/Back navigation gates progress on completing each task.
 - Part 7: Question Studio room (rooms/question-studio.html, js/rooms/question-studio.js, css/question-studio.css) with a 2-task flow: (1) scenario picker — 4 cards for sleep-hours/shoe-sizes/playground-game/reading-minutes, selecting one saves it via the new js/storage/save.js (localStorage); (2) question checker (js/helpers/checker.js) — live warnings for "not", leading words, missing timeframe, and yes/no-only questions, applied to 2 flawed example questions the child must fix, plus a free-practice box. 5 new tests in tests/checker.test.js (23 total passing). Data Hub and Graph Lab now read the selected scenario via getSelectedScenarioId() instead of hardcoding sleep-hours. Extracted shared task-flow styles into css/tasks.css (used by both Number Lab and Question Studio).
 - Part 8: Chance Lab room (rooms/chance-lab.html, js/rooms/chance-lab.js, css/chance-lab.css), replacing its Part-1 placeholder. 3-task flow: pick a device (fair coin/dice/fair spinner/unfair spinner) and see all outcomes listed first; rate one outcome's likelihood on a 5-point certainty scale (impossible to certain); run 10/50/500 trials with Theoretical vs. Experimental bar charts side by side. Trials use plain Math.random() (not the seeded generator) since the point is genuine run-to-run variability converging toward theory, not reproducible synthetic data.
+- Part 9: Evidence Board room (rooms/evidence-board.html, js/rooms/evidence-board.js, css/evidence-board.css). 4-task flow: Claim ("I think ___ because ___"), Evidence (pick which real stats from the selected scenario back it up), Certainty (5-point scale + required "why"), Audience + Form (principal/class/parent evening; prediction/problem solved/recommendation) — ending in an assembled "Evidence Card" with a link back to Question Studio to start a new investigation.
+- Resolved the open "small group vs whole class" question (decision: skip small-group sampling for now, flagged as future work). Added a Plan task (Task 3) to Question Studio: a phase badge (❓ Ask / 🗺️ Plan) distinguishes the two phases sharing one room; Plan asks the child to predict the answer before collecting data (number input or category chips depending on scenario), then links to Data Hub.
 
 ## Next
-- Part 9: Evidence Board (Claim + Evidence + Certainty, choose an audience).
+- Part 10: reasoning log, saving, CSV/JSON export.
 
 ## Known bugs/open items
-- Number Lab's predict/reveal task and meaning tasks are still hardcoded to sleep-hours/fixed examples (by design — the "Build it"/"Mia"/shoe-size tasks are scenario-independent skill practice, not meant to follow the Question Studio pick). Only Data Hub and Graph Lab follow the selected scenario so far.
-- Open question still pending (see CLAUDE.md): how to let a child survey a small group before the full class.
-- Graph Lab's reflection textareas and Number Lab's task answers don't persist anywhere yet; wiring to the reasoning log is Part 10.
+- Number Lab's predict/reveal task and meaning tasks are still hardcoded to sleep-hours/fixed examples (by design — the "Build it"/"Mia"/shoe-size tasks are scenario-independent skill practice, not meant to follow the Question Studio pick). Only Data Hub, Graph Lab, and Evidence Board follow the selected scenario so far.
+- Small-group sampling (surveying a few classmates before the whole class) is explicitly out of scope for now — Plan only collects a prediction; decided with Habiba on 18 Oct 2026.
+- Graph Lab's reflection textareas, Number Lab's task answers, Chance Lab's predictions, Question Studio's Plan prediction, and Evidence Board's claim/evidence/certainty don't persist anywhere yet — this is exactly what Part 10's reasoning log is for.
 - Chart appearance for category-type scenarios (e.g. playground-game) in Graph Lab hasn't been specifically polish-tested yet; revisit in Part 11.
 
 ## Known bugs

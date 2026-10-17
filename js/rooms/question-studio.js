@@ -9,8 +9,12 @@ const SCENARIO_CARDS = [
   { id: 'reading-minutes-class-a', emoji: '📖', displayTitle: 'Reading minutes' },
 ];
 
-const taskComplete = { 1: false, 2: false };
+const PHASE_BY_TASK = { 1: 'ask', 2: 'ask', 3: 'plan' };
+
+const taskComplete = { 1: false, 2: false, 3: false };
 let currentTask = 1;
+let selectedScenario = null;
+let predictRendered = false;
 
 async function init() {
   const scenarios = await Promise.all(
@@ -27,7 +31,8 @@ async function init() {
     pipMessage: "Hoo-hoo! I'm Pip. Let's pick a question to investigate!",
     contentHTML: `
       <h2>❓ Question Studio</h2>
-      <p class="task-progress" id="task-progress">Task 1 of 2</p>
+      <span class="phase-badge" id="phase-badge"></span>
+      <p class="task-progress" id="task-progress">Task 1 of 3</p>
 
       <section class="task" data-task="1">
         <h3>Pick your investigation</h3>
@@ -67,6 +72,15 @@ async function init() {
         </div>
       </section>
 
+      <section class="task" data-task="3" hidden>
+        <h3>Predict first!</h3>
+        <p id="predict-question"></p>
+        <div class="predict-row" id="predict-row"></div>
+        <button class="btn btn-main" id="predict-save-btn" type="button">Save my prediction</button>
+        <p class="feedback" id="predict-feedback" hidden></p>
+        <a class="btn btn-main" id="go-collect-btn" href="data-hub.html" hidden>Let's collect the data →</a>
+      </section>
+
       <div class="task-nav">
         <button class="btn" id="back-btn" type="button">← Back</button>
         <button class="btn btn-main" id="next-btn" type="button" disabled>Next →</button>
@@ -74,7 +88,7 @@ async function init() {
     `,
   });
 
-  setupScenarioPicker();
+  setupScenarioPicker(scenarios);
   setupFixIt();
   setupTaskNav();
 }
@@ -83,18 +97,25 @@ function showTask(n) {
   document.querySelectorAll('.task').forEach((el) => {
     el.hidden = Number(el.dataset.task) !== n;
   });
-  document.getElementById('task-progress').textContent = `Task ${n} of 2`;
+  document.getElementById('task-progress').textContent = `Task ${n} of 3`;
   document.getElementById('back-btn').disabled = n === 1;
   const nextBtn = document.getElementById('next-btn');
-  nextBtn.disabled = !taskComplete[n] || n === 2;
-  nextBtn.textContent = n === 2 ? 'All done! 🎉' : 'Next →';
+  nextBtn.disabled = !taskComplete[n] || n === 3;
+  nextBtn.textContent = n === 3 ? 'All done! 🎉' : 'Next →';
   currentTask = n;
+
+  const phase = PHASE_BY_TASK[n];
+  const badge = document.getElementById('phase-badge');
+  badge.textContent = phase === 'plan' ? '🗺️ Plan' : '❓ Ask';
+  badge.style.setProperty('--phase-color', `var(--color-${phase})`);
+
+  if (n === 3) renderPredictTask();
 }
 
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
   if (currentTask === taskNum) {
-    document.getElementById('next-btn').disabled = taskNum === 2;
+    document.getElementById('next-btn').disabled = taskNum === 3;
   }
 }
 
@@ -103,12 +124,12 @@ function setupTaskNav() {
     showTask(Math.max(1, currentTask - 1));
   });
   document.getElementById('next-btn').addEventListener('click', () => {
-    if (currentTask < 2) showTask(currentTask + 1);
+    if (currentTask < 3) showTask(currentTask + 1);
   });
   showTask(1);
 }
 
-function setupScenarioPicker() {
+function setupScenarioPicker(scenarios) {
   const cards = document.querySelectorAll('.scenario-card');
   const feedback = document.getElementById('scenario-feedback');
 
@@ -117,6 +138,7 @@ function setupScenarioPicker() {
       cards.forEach((c) => c.classList.remove('selected'));
       card.classList.add('selected');
       setSelectedScenarioId(card.dataset.id);
+      selectedScenario = scenarios.find((s) => s.id === card.dataset.id);
 
       const title = card.querySelector('.scenario-title').textContent;
       feedback.textContent = `Great choice! We'll investigate "${title}" in Data Hub.`;
@@ -124,6 +146,60 @@ function setupScenarioPicker() {
       markComplete(1);
     });
   });
+}
+
+function renderPredictTask() {
+  if (predictRendered || !selectedScenario) return;
+  predictRendered = true;
+
+  const { recipe } = selectedScenario;
+  document.getElementById('predict-question').textContent =
+    `What do you think most classmates will say for: "${recipe.question}"`;
+
+  const row = document.getElementById('predict-row');
+  if (recipe.answerType === 'number') {
+    row.innerHTML = '<input type="number" id="predict-input">';
+  } else {
+    const uniqueValues = [...new Set(recipe.valuePool)];
+    row.innerHTML = uniqueValues
+      .map((v) => `<button class="btn choice-btn predict-choice" data-value="${v}" type="button">${v}</button>`)
+      .join('');
+    document.getElementById('predict-save-btn').hidden = true;
+  }
+
+  wirePredictTask(recipe);
+}
+
+function wirePredictTask(recipe) {
+  const feedback = document.getElementById('predict-feedback');
+  const goCollectBtn = document.getElementById('go-collect-btn');
+
+  function savePrediction(guessText) {
+    feedback.textContent = `Got it! You predicted ${guessText}. Let's go collect the data and see!`;
+    feedback.hidden = false;
+    goCollectBtn.hidden = false;
+    markComplete(3);
+  }
+
+  if (recipe.answerType === 'number') {
+    document.getElementById('predict-save-btn').addEventListener('click', () => {
+      const input = document.getElementById('predict-input');
+      if (input.value === '') {
+        feedback.textContent = 'Type a number first!';
+        feedback.hidden = false;
+        return;
+      }
+      savePrediction(input.value);
+    });
+  } else {
+    document.querySelectorAll('.predict-choice').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.predict-choice').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        savePrediction(`"${btn.dataset.value}"`);
+      });
+    });
+  }
 }
 
 function setupFixIt() {
