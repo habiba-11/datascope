@@ -1,0 +1,46 @@
+.chart-type-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0 16px;
+}
+
+.chart-type-btn {
+  background: white;
+  color: var(--color-text);
+}
+
+.chart-type-btn.active {
+  background: var(--color-btn-main-bg);
+  color: var(--color-btn-main-text);
+}
+
+.chart-wrap {
+  position: relative;
+  height: 320px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 0 20px;
+}
+
+.reflection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 500px;
+}
+
+.reflection label {
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+.reflection textarea {
+  font-family: var(--font-body);
+  font-size: 16px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 12px;
+  padding: 8px 12px;
+  resize: vertical;
+  margin-bottom: 12px;
+}

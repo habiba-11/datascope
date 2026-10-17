@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Part 4 (done)**
+- Current part: **Part 5 (done)**
 - Last updated: 18 Oct 2026
 
 ## Done
@@ -12,13 +12,15 @@
 - Part 2: stats engine (js/helpers/stats.js: mean, median, mode, range), tested with `node --test` (tests/stats.test.js, 11 passing cases: even-length median, unsorted numeric median, bimodal data, category-only mode, no-mode case, extreme-value range).
 - Part 3: seeded synthetic data generator (js/helpers/generator.js, mulberry32 PRNG) + 5 scenario recipes in data/scenarios/ (sleep-hours, shoe-sizes, playground-game, reading-minutes-class-a/-b). Generator retries seeds until generated data exactly matches the recipe's target mean/median/mode/range. 7 new tests in tests/generator.test.js (18 total passing), including proof the retry loop actually runs (sleep-hours needs seed 5, not 1).
 - Part 4: Data Hub room (rooms/data-hub.html, js/rooms/data-hub.js, css/data-hub.css) wired to the sleep-hours scenario. "Run survey" reveals the 20 synthetic classmates one at a time (paced, reduced-motion aware), with a live progress bar and a growing tally of bars per value.
+- Part 5: Graph Lab room (rooms/graph-lab.html, js/rooms/graph-lab.js, css/graph-lab.css) using Chart.js (CDN). Shared chart helper (js/helpers/charts.js) builds frequency data and a custom "direct labels" plugin so values are written on the chart, not just in tooltips. Bar/Line/Pie/Dot-plot are switchable on the same sleep-hours data. "What does this graph tell/NOT tell you?" reflection boxes are present but not yet saved (Part 10).
 
 ## Next
-- Part 5: Graph Lab (Chart.js, switch chart types, direct labels, "What does this graph NOT tell us?").
+- Part 6: Number Lab (predict, reveal mean/median/mode/range, meaning tasks).
 
 ## Known bugs/open items
-- Data Hub currently only uses the sleep-hours scenario; the other 4 recipes aren't wired into any room UI yet (will revisit once Question Studio lets a child pick a scenario, Part 7).
+- Data Hub and Graph Lab currently only use the sleep-hours scenario; the other 4 recipes aren't wired into any room UI yet (will revisit once Question Studio lets a child pick a scenario, Part 7).
 - Open question still pending (see CLAUDE.md): how to let a child survey a small group before the full class.
+- Graph Lab's reflection textareas don't persist anywhere yet; wiring to the reasoning log is Part 10.
 
 ## Known bugs
 - none yet
