@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Part 7 (done)**
+- Current part: **Part 8 (done)**
 - Last updated: 18 Oct 2026
 
 ## Done
@@ -16,9 +16,10 @@
 - Added an "Explore rooms" sub-nav to the shell (js/app.js, css/shell.css) since Explore spans 3 rooms; added a Chance Lab placeholder (Part 1 pattern) so the sub-nav has somewhere to go until Part 8.
 - Part 6: Number Lab room (rooms/number-lab.html, js/rooms/number-lab.js, css/number-lab.css). A 4-step task flow: predict then reveal mean/median/mode/range (reuses Part 2 stats engine); "Build it" (5 numbers with mean 6); "Find the mistake" (Mia's unsorted-median error); real-life mode (shoe sizes). Next/Back navigation gates progress on completing each task.
 - Part 7: Question Studio room (rooms/question-studio.html, js/rooms/question-studio.js, css/question-studio.css) with a 2-task flow: (1) scenario picker — 4 cards for sleep-hours/shoe-sizes/playground-game/reading-minutes, selecting one saves it via the new js/storage/save.js (localStorage); (2) question checker (js/helpers/checker.js) — live warnings for "not", leading words, missing timeframe, and yes/no-only questions, applied to 2 flawed example questions the child must fix, plus a free-practice box. 5 new tests in tests/checker.test.js (23 total passing). Data Hub and Graph Lab now read the selected scenario via getSelectedScenarioId() instead of hardcoding sleep-hours. Extracted shared task-flow styles into css/tasks.css (used by both Number Lab and Question Studio).
+- Part 8: Chance Lab room (rooms/chance-lab.html, js/rooms/chance-lab.js, css/chance-lab.css), replacing its Part-1 placeholder. 3-task flow: pick a device (fair coin/dice/fair spinner/unfair spinner) and see all outcomes listed first; rate one outcome's likelihood on a 5-point certainty scale (impossible to certain); run 10/50/500 trials with Theoretical vs. Experimental bar charts side by side. Trials use plain Math.random() (not the seeded generator) since the point is genuine run-to-run variability converging toward theory, not reproducible synthetic data.
 
 ## Next
-- Part 8: Chance Lab (list outcomes, predict, run 10/50/500 trials, theoretical vs experimental probability, unfair spinners, certainty scale).
+- Part 9: Evidence Board (Claim + Evidence + Certainty, choose an audience).
 
 ## Known bugs/open items
 - Number Lab's predict/reveal task and meaning tasks are still hardcoded to sleep-hours/fixed examples (by design — the "Build it"/"Mia"/shoe-size tasks are scenario-independent skill practice, not meant to follow the Question Studio pick). Only Data Hub and Graph Lab follow the selected scenario so far.
