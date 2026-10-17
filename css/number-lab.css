@@ -1,14 +1,3 @@
-.task-progress {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  color: var(--color-explore);
-  margin-top: 0;
-}
-
-.task h3 {
-  margin-top: 0;
-}
-
 .predict-row {
   display: flex;
   gap: 10px;
@@ -56,15 +45,6 @@
   color: var(--color-explore);
 }
 
-.feedback {
-  background: white;
-  border: 2px dashed var(--color-navy);
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-weight: 700;
-  margin-top: 10px;
-}
-
 .build-row {
   display: flex;
   gap: 8px;
@@ -91,28 +71,4 @@
   border-radius: 12px;
   display: inline-block;
   padding: 8px 16px;
-}
-
-.choice-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 12px 0;
-}
-
-.choice-btn {
-  background: white;
-  color: var(--color-text);
-}
-
-.choice-btn.active {
-  background: var(--color-explore);
-}
-
-.task-nav {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 2px dashed var(--color-navy);
 }

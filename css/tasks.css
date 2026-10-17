@@ -1,0 +1,43 @@
+.task-progress {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--accent, var(--color-explore));
+  margin-top: 0;
+}
+
+.task h3 {
+  margin-top: 0;
+}
+
+.feedback {
+  background: white;
+  border: 2px dashed var(--color-navy);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.choice-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.choice-btn {
+  background: white;
+  color: var(--color-text);
+}
+
+.choice-btn.active {
+  background: var(--accent, var(--color-explore));
+}
+
+.task-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 2px dashed var(--color-navy);
+}

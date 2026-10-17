@@ -1,8 +1,9 @@
 import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
+import { getSelectedScenarioId } from '../storage/save.js';
 
 async function init() {
-  const response = await fetch('../data/scenarios/sleep-hours.json');
+  const response = await fetch(`../data/scenarios/${getSelectedScenarioId()}.json`);
   const recipe = await response.json();
   const { values } = generateClassData(recipe);
 
