@@ -6,7 +6,13 @@ const STEPS = [
   { id: 'conclude', label: 'Conclude', icon: '🚩', color: 'conclude', href: 'evidence-board.html' },
 ];
 
-export function mountShell({ step, accent, pipMessage, contentHTML, badgeCount = 0 }) {
+const EXPLORE_ROOMS = [
+  { id: 'graph', label: '📊 Graph Lab', href: 'graph-lab.html' },
+  { id: 'number', label: '🔢 Number Lab', href: 'number-lab.html' },
+  { id: 'chance', label: '🎲 Chance Lab', href: 'chance-lab.html' },
+];
+
+export function mountShell({ step, accent, pipMessage, contentHTML, badgeCount = 0, explorePage }) {
   const root = document.getElementById('shell');
 
   const stepBar = STEPS.map((s, i) => {
@@ -21,6 +27,16 @@ export function mountShell({ step, accent, pipMessage, contentHTML, badgeCount =
     `;
   }).join('');
 
+  const exploreSubnav = step === 'explore'
+    ? `
+      <nav class="explore-subnav" aria-label="Explore rooms">
+        ${EXPLORE_ROOMS.map((r) => `
+          <a class="explore-tab${r.id === explorePage ? ' active' : ''}" href="${r.href}">${r.label}</a>
+        `).join('')}
+      </nav>
+    `
+    : '';
+
   root.innerHTML = `
     <header class="shell-header">
       <a class="logo" href="../index.html">🔎 <span>DataScope</span></a>
@@ -33,6 +49,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, badgeCount =
         <div class="badge-counter">⭐ Explorer badges: ${badgeCount}</div>
       </aside>
       <main class="room-content" style="--accent: var(--color-${accent})">
+        ${exploreSubnav}
         ${contentHTML}
       </main>
     </div>

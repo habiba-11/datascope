@@ -13,6 +13,7 @@ async function init() {
   mountShell({
     step: 'explore',
     accent: 'explore',
+    explorePage: 'graph',
     pipMessage: "Hoo-hoo! Same data, different graphs. Try each button and see what changes!",
     contentHTML: `
       <h2>📊 Graph Lab</h2>

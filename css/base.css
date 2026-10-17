@@ -47,6 +47,13 @@ h1 {
   transform: translate(3px, 3px);
 }
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: var(--shadow-button);
+  transform: none;
+}
+
 .btn-main {
   background: var(--color-btn-main-bg);
   color: var(--color-btn-main-text);
