@@ -1,3 +1,5 @@
+import { getExplorerCode } from './storage/save.js';
+
 const STEPS = [
   { id: 'ask', label: 'Ask', icon: '❓', color: 'ask', href: 'question-studio.html' },
   { id: 'plan', label: 'Plan', icon: '🗺️', color: 'plan', href: 'question-studio.html' },
@@ -47,6 +49,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, badgeCount =
         <div class="speech-bubble">${pipMessage}</div>
         <div class="pip-mascot" aria-hidden="true">🦉</div>
         <div class="badge-counter">⭐ Explorer badges: ${badgeCount}</div>
+        ${codeBadge()}
       </aside>
       <main class="room-content" style="--accent: var(--color-${accent})">
         ${exploreSubnav}
@@ -54,6 +57,15 @@ export function mountShell({ step, accent, pipMessage, contentHTML, badgeCount =
       </main>
     </div>
   `;
+}
+
+// Shows whose work this is (by code only). Without a code, the work can't be
+// matched to a child later, so we point them back to the start page.
+function codeBadge() {
+  const code = getExplorerCode();
+  return code
+    ? `<div class="code-badge">🔑 ${code}</div>`
+    : '<a class="code-badge missing" href="../index.html">🔑 No code yet: tap here</a>';
 }
 
 // Moves the step-bar highlight without rebuilding the shell.

@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Part 9.5 bug-fix pass (done)**
+- Current part: **Part 10 (done: 10a, 10b, hints, 10c)**
 - Last updated: 22 Oct 2026
 
 ## Done
@@ -27,9 +27,14 @@
   - Chance Lab: required "Why?" with the certainty rating; honest trial feedback (only says "closer" if it is); theory shown as "1 in 6 (about 16.7%)".
   - Graph Lab: all 4 scenarios x 4 chart types checked in a headless browser; fixed the empty playground dot plot (category axis), clipped top labels, curved lines overshooting the data, colour-only pie legend, cluttered dot labels. Chart.js pinned to 4.5.1.
   - Evidence Card built with textContent (typed text can't become HTML).
+- Part 10 (22 Oct 2026), 51 tests passing:
+  - 10a: welcome page asks for a teacher-issued explorer code (e.g. OWL-07; must contain a digit, so names are refused); sidebar shows the code. js/helpers/log.js (makeEntry/logEvent, fixed event types); save.js gained shared readItem/writeItem with in-memory fallback.
+  - 10b: every room writes to the log: Q-Studio prediction, Data Hub data-seen (scenario + seed), Graph Lab reflections, Number Lab prediction + meaning tasks (correct / after-hint / incorrect via trackMeaningTask, incl. leaving unsolved), Chance Lab certainty + trials, Evidence Board claim (logged once unless changed).
+  - Hints: js/helpers/prompts.js (prompt engine): "💡 Need a hint?" with up to 3 escalating hints/sentence starters on Graph Lab tell/NOT tell, Chance Lab why, Evidence Board claim and why. Hint use is logged.
+  - 10c: js/storage/export.js. Evidence Board "📤 Save my work for my teacher" downloads datascope-CODE-DATE.json (with a synthetic-data note); a small link saves the same log as CSV (formula-safe). Needs a code first.
 
 ## Next
-- Part 10: reasoning log, saving, CSV/JSON export.
+- Part 11: polish, accessibility, teacher view (import the children's JSON files), testing on a Chromebook or tablet.
 
 ## Known bugs/open items
 - Number Lab's predict/reveal task and meaning tasks are still hardcoded to sleep-hours/fixed examples (by design — the "Build it"/"Mia"/shoe-size tasks are scenario-independent skill practice, not meant to follow the Question Studio pick). Only Data Hub, Graph Lab, and Evidence Board follow the selected scenario so far.
@@ -38,6 +43,8 @@
 - Graph Lab: all 16 scenario x chart-type combinations were checked in Part 9.5. Still open for Part 11: a line chart for categories (playground) joins unrelated games; bar colours are by position, so in the pie the same colour repeats after 5 values.
 - Number Lab meaning tasks now follow wrong click -> hint -> correct click. Part 10 should log this as correct / correct after a hint / incorrect (architecture section 7).
 - Not yet tested on a real Chromebook/tablet (Part 11).
+- The "revision" log event (changed a prediction after seeing data) has no screen yet. Suggested place: after Number Lab's Reveal ("Has the data changed your mind?"). Decide in Part 11.
+- Shared devices: the log is never cleared, but each child's export contains only the entries under their own code. Decide in Part 11 whether a teacher "clear this device" button is needed.
 
 ## Known bugs
 - none yet
@@ -47,6 +54,7 @@
 - 15 Oct 2026: short explanations by default.
 - 15 Oct 2026: deliverables are GitHub source, a live link, a demo video and an offline copy.
 - 16 Oct 2026: UI direction chosen: "Explorer's Toolkit" (sky-blue background, navy outlines/shadows, room colours Ask/Plan/Collect/Explore/Conclude = coral/yellow/blue/green/purple, Baloo 2 + Nunito, mascot "Pip" the owl explorer). Exact hex values are in css/theme.css.
+- 22 Oct 2026 (Part 10): codes are handed out by the teacher; the child saves a file for the teacher (no backend); on reload only the code and the log are kept (rooms start fresh). Hints are on-demand and logged, never penalised.
 - 22 Oct 2026 (Part 9.5): reading minutes is ONE card that compares Class A and Class B side by side (option 1 for B5), not a separate Class B card.
 - 22 Oct 2026 (Part 9.5): Number Lab's real-life shoe data changed to 36, 34, 35, 34, 37, 36, 34 (mode 34, median 35), so the median question can't be passed by repeating the mode.
 - 22 Oct 2026 (Part 9.5): meaning tasks complete only on a correct answer; a wrong answer gets a kind hint and a retry.

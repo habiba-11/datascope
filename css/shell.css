@@ -101,6 +101,24 @@
   font-size: 14px;
 }
 
+/* The child's anonymous code, under the badge counter. */
+.code-badge {
+  background: var(--color-plan);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.code-badge.missing {
+  background: white;
+  border-style: dashed;
+}
+
 .explore-subnav {
   display: flex;
   gap: 10px;

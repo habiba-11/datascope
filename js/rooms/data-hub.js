@@ -2,6 +2,7 @@ import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { compareValues } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
+import { logEvent } from '../helpers/log.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 
 const NEXT_ROOM_LINK =
@@ -26,12 +27,12 @@ async function init() {
 
   if (partner) {
     // Class B unlocks when Class A is done; the next-room link appears after Class B.
-    wireUpSurvey(recipe, generateClassData(recipe).values, 'a', () => {
+    wireUpSurvey(recipe, generateClassData(recipe), 'a', () => {
       document.getElementById('b-run').disabled = false;
     });
-    wireUpSurvey(partner, generateClassData(partner).values, 'b', showNextRoom);
+    wireUpSurvey(partner, generateClassData(partner), 'b', showNextRoom);
   } else {
-    wireUpSurvey(recipe, generateClassData(recipe).values, 'a', showNextRoom);
+    wireUpSurvey(recipe, generateClassData(recipe), 'a', showNextRoom);
   }
 }
 
@@ -88,7 +89,9 @@ function compareLayout(recipe, partner) {
   `;
 }
 
-function wireUpSurvey(recipe, values, p, onDone) {
+// `classData` is what the generator returned: { scenarioId, seed, values }.
+function wireUpSurvey(recipe, classData, p, onDone) {
+  const { values } = classData;
   const button = document.getElementById(`${p}-run`);
   const list = document.getElementById(`${p}-list`);
   const progressFill = document.getElementById(`${p}-fill`);
@@ -143,6 +146,10 @@ function wireUpSurvey(recipe, values, p, onDone) {
         setTimeout(revealNext, reduceMotion ? 0 : 400);
       } else {
         button.textContent = 'Survey complete!';
+        // Scenario + seed recreate exactly the data this child saw (architecture section 5).
+        logEvent('data-hub', 'data-seen', {
+          scenarioId: classData.scenarioId, seed: classData.seed, classSize: values.length,
+        });
         onDone();
       }
     }

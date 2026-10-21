@@ -1,6 +1,7 @@
 import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
+import { logEvent, trackMeaningTask } from '../helpers/log.js';
 
 const taskComplete = { 1: false, 2: false, 3: false, 4: false };
 let currentTask = 1;
@@ -160,6 +161,9 @@ function setupPredict(values) {
       : `You said ${guess}. The mean is ${meanVal} — one classmate (3 hours) pulled it down!`;
     feedback.hidden = false;
     revealBtn.disabled = true;
+    logEvent('number-lab', 'prediction', {
+      about: 'typical hours of sleep', guess, mean: meanVal, median: medianVal,
+    });
     markComplete(1);
   });
 }
@@ -168,6 +172,7 @@ function setupBuildIt() {
   const inputs = [...document.querySelectorAll('.build-input')];
   const checkBtn = document.getElementById('check-build-btn');
   const feedback = document.getElementById('build-feedback');
+  const tracker = trackMeaningTask('number-lab', 'build-mean-6');
 
   checkBtn.addEventListener('click', () => {
     if (inputs.some((input) => input.value === '')) {
@@ -181,8 +186,10 @@ function setupBuildIt() {
 
     if (actualMean === 6) {
       feedback.textContent = "Yes! Your numbers' mean is exactly 6. 🎉";
+      tracker.solved();
       markComplete(2);
     } else {
+      tracker.wrong();
       feedback.textContent = `Your numbers' mean is ${actualMean.toFixed(2)}. Try adjusting them to reach exactly 6.`;
     }
     feedback.hidden = false;
@@ -191,8 +198,10 @@ function setupBuildIt() {
 
 // A multiple-choice question the child can retry: a wrong answer shows a
 // kind hint, the right answer shows the explanation and calls onCorrect().
-function wireRetryChoices(container, feedback, { isCorrect, correctText, hintText, onCorrect }) {
+// `task` names it in the reasoning log (correct / after-hint / incorrect).
+function wireRetryChoices(container, feedback, { task, isCorrect, correctText, hintText, onCorrect }) {
   const buttons = container.querySelectorAll('.choice-btn');
+  const tracker = trackMeaningTask('number-lab', task);
   let solved = false;
 
   buttons.forEach((btn) => {
@@ -204,9 +213,11 @@ function wireRetryChoices(container, feedback, { isCorrect, correctText, hintTex
       if (isCorrect(btn.dataset.answer)) {
         solved = true;
         feedback.textContent = correctText;
+        tracker.solved();
         onCorrect();
       } else {
         feedback.textContent = hintText;
+        tracker.wrong();
       }
       feedback.hidden = false;
     });
@@ -217,6 +228,7 @@ function setupFindMistake() {
   const correctMedian = median([9, 3, 20, 5, 7]);
 
   wireRetryChoices(document.querySelector('.task[data-task="3"] .choice-row'), document.getElementById('mistake-feedback'), {
+    task: 'find-mias-mistake',
     isCorrect: (answer) => answer === 'no',
     correctText: `Correct! Mia forgot to put the numbers in order first. In order, they are 3, 5, 7, 9, 20. The number in the centre is ${correctMedian}, not 20.`,
     hintText: 'Hmm, not quite. Try again! Hint: what must we always do to the numbers before finding the median?',
@@ -232,6 +244,7 @@ function setupRealLife() {
 
   // Question 1: the mode. Getting it right opens question 2.
   wireRetryChoices(document.getElementById('mode-choices'), document.getElementById('shoe-feedback'), {
+    task: 'shoe-shop-mode',
     isCorrect: (answer) => correctMode.includes(Number(answer)),
     correctText: `Yes! Size ${correctMode.join(', ')} sold 3 pairs, more than any other size. That's the mode.`,
     hintText: 'Not quite. Try again! Hint: count how many times each size appears in the list.',
@@ -242,6 +255,7 @@ function setupRealLife() {
 
   // Question 2: the median of the same shoes.
   wireRetryChoices(document.getElementById('median-choices'), document.getElementById('median-feedback'), {
+    task: 'shoe-shop-median',
     isCorrect: (answer) => Number(answer) === correctMedian,
     correctText: `Yes! In order, the sizes are ${inOrder}. After putting them in order, the size in the centre (the 4th of 7) is ${correctMedian}. That's the median.`,
     hintText: 'Not quite. Try again! Hint: first put the sizes in order from smallest to biggest.',

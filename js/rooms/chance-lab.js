@@ -1,4 +1,6 @@
 import { mountShell } from '../app.js';
+import { logEvent } from '../helpers/log.js';
+import { addHintButton } from '../helpers/prompts.js';
 
 const DEVICES = {
   coin: { label: 'Fair coin', emoji: '🪙', outcomes: ['Heads', 'Tails'], weights: [1, 1], target: 'Heads' },
@@ -87,6 +89,7 @@ function init() {
 
   setupDevicePicker();
   setupPredict();
+  addHintButton(document.getElementById('predict-reason'), 'chance-why', 'chance-lab');
   setupTrials();
   setupTaskNav();
 }
@@ -165,16 +168,27 @@ function setupPredict() {
     markComplete(2);
   }
 
+  // Logged when a rating is picked (if a reason exists) or when the child
+  // leaves the reason box, so a changed mind shows up as a new entry.
+  function logCertainty() {
+    if (!chosen || !reasonInput.value.trim()) return;
+    logEvent('chance-lab', 'certainty', {
+      device: selectedDevice.label, outcome: selectedDevice.target, rating: chosen, reason: reasonInput.value.trim(),
+    });
+  }
+
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       buttons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       chosen = btn.textContent;
       checkComplete();
+      logCertainty();
     });
   });
 
   reasonInput.addEventListener('input', checkComplete);
+  reasonInput.addEventListener('change', logCertainty);
 }
 
 function runTrial(device) {
@@ -261,6 +275,10 @@ function setupTrials() {
         count, selectedDevice.target, timesHit, experimentPct, theoryText(targetIndex), previousRun, gap
       );
       feedback.hidden = false;
+      logEvent('chance-lab', 'trials', {
+        device: selectedDevice.label, outcome: selectedDevice.target, trials: count, timesHit,
+        experimentalPct: experimentPct, theory: theoryText(targetIndex),
+      });
       previousRun = { count, pct: experimentPct, gap };
 
       markComplete(3);

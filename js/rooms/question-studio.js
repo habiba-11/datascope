@@ -1,5 +1,6 @@
 import { mountShell, setCurrentStep } from '../app.js';
 import { checkQuestion } from '../helpers/checker.js';
+import { logEvent } from '../helpers/log.js';
 import { setSelectedScenarioId } from '../storage/save.js';
 
 const SCENARIO_CARDS = [
@@ -183,15 +184,21 @@ function renderPredictTask() {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.predict-choice').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
-        savePrediction(`"${btn.dataset.value}"`);
+        savePrediction(btn.dataset.value);
       });
     });
   }
 }
 
-function savePrediction(guessText) {
+// `guess` is a number (typed) or a category such as "Football" (chosen).
+function savePrediction(guess) {
+  const { recipe } = selectedScenario;
+  const shown = recipe.answerType === 'number' ? guess : `"${guess}"`;
   const feedback = document.getElementById('predict-feedback');
-  feedback.textContent = `Got it! You predicted ${guessText}. Let's go collect the data and see!`;
+  feedback.textContent = `Got it! You predicted ${shown}. Let's go collect the data and see!`;
+  logEvent('question-studio', 'prediction', {
+    about: recipe.question, scenarioId: recipe.id, guess: recipe.answerType === 'number' ? Number(guess) : guess,
+  });
   feedback.hidden = false;
   document.getElementById('go-collect-btn').hidden = false;
   markComplete(3);

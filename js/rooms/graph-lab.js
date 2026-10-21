@@ -3,6 +3,8 @@ import { generateClassData } from '../helpers/generator.js';
 import { compareValues } from '../helpers/stats.js';
 import { buildFrequencyData, makeChartConfig, directLabelsPlugin } from '../helpers/charts.js';
 import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
+import { logEvent } from '../helpers/log.js';
+import { addHintButton } from '../helpers/prompts.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 
 Chart.register(directLabelsPlugin);
@@ -63,8 +65,10 @@ async function init() {
   });
 
   let charts = [];
+  let currentType = 'bar';
 
   function renderCharts(type) {
+    currentType = type;
     charts.forEach((chart) => chart.destroy());
     charts = classes.map((c) => new Chart(
       document.getElementById(c.canvasId),
@@ -79,6 +83,19 @@ async function init() {
   document.querySelectorAll('.chart-type-btn').forEach((btn) => {
     btn.addEventListener('click', () => renderCharts(btn.dataset.type));
   });
+
+  // "change" fires when the child leaves the box after editing it,
+  // so we log the finished answer, not every key press.
+  ['tell', 'not-tell'].forEach((id) => {
+    document.getElementById(id).addEventListener('change', (event) => {
+      logEvent('graph-lab', 'reflection', {
+        scenarioId: recipe.id, chartType: currentType, prompt: id, text: event.target.value.trim(),
+      });
+    });
+  });
+
+  addHintButton(document.getElementById('tell'), 'graph-tell', 'graph-lab');
+  addHintButton(document.getElementById('not-tell'), 'graph-not-tell', 'graph-lab');
 
   renderCharts('bar');
 }

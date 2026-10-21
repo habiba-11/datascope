@@ -70,6 +70,38 @@ h1 {
   margin-top: 16px;
 }
 
+/* "Need a hint?" under an open question (js/helpers/prompts.js). */
+.hint-box {
+  margin: 6px 0 12px;
+}
+
+.hint-btn {
+  background: white;
+  color: var(--color-text);
+  font-size: 16px;
+  min-height: 48px;
+  padding: 6px 16px;
+}
+
+.hint-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 500px;
+}
+
+.hint-list li {
+  background: #FFF6D9;
+  border: 2px solid var(--color-plan);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
 .btn-run {
   background: var(--color-btn-run-bg);
   color: var(--color-btn-run-text);

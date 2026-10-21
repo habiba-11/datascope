@@ -2,7 +2,10 @@ import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
-import { getSelectedScenarioId } from '../storage/save.js';
+import { logEvent, readLog } from '../helpers/log.js';
+import { addHintButton } from '../helpers/prompts.js';
+import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
+import { buildExport, exportFileName, toCSV, downloadFile } from '../storage/export.js';
 
 const taskComplete = { 1: false, 2: false, 3: false, 4: false };
 let currentTask = 1;
@@ -10,9 +13,12 @@ const selectedEvidence = new Set();
 let selectedCertainty = null;
 let selectedAudience = null;
 let selectedForm = null;
+let scenarioId = null;
+let lastLoggedClaim = null; // so the same card is not logged twice
 
 async function init() {
   const recipe = await loadRecipe(getSelectedScenarioId());
+  scenarioId = recipe.id;
   const partner = await loadPartnerRecipe(recipe);
   const { values } = generateClassData(recipe);
   const title = partner ? recipe.compareTitle : recipe.title;
@@ -96,6 +102,12 @@ async function init() {
           <button class="btn choice-btn" data-value="a recommendation" type="button">💡 A recommendation</button>
         </div>
         <div class="evidence-card" id="evidence-card" hidden></div>
+        <div class="save-work" id="save-work" hidden>
+          <button class="btn btn-main" id="save-work-btn" type="button">📤 Save my work for my teacher</button>
+          <button class="link-btn" id="save-csv-btn" type="button">or save it as a table (CSV)</button>
+          <p class="feedback" id="save-feedback" hidden></p>
+          <a class="btn" href="question-studio.html">Start a new investigation →</a>
+        </div>
       </section>
 
       <div class="task-nav">
@@ -106,9 +118,12 @@ async function init() {
   });
 
   setupClaim();
+  addHintButton(document.querySelector('.sentence-starter'), 'claim', 'evidence-board');
+  addHintButton(document.getElementById('certainty-reason'), 'certainty-why', 'evidence-board');
   setupEvidence();
   setupCertainty();
   setupAudienceForm();
+  setupSaveWork();
   setupTaskNav();
 }
 
@@ -210,6 +225,44 @@ function setupCertainty() {
   reasonInput.addEventListener('input', checkComplete);
 }
 
+// Logs the finished card. Picking a different audience or form re-builds
+// the card, so it is logged again only if something actually changed.
+function logClaim(details) {
+  const asText = JSON.stringify(details);
+  if (asText === lastLoggedClaim) return;
+  lastLoggedClaim = asText;
+  logEvent('evidence-board', 'claim', details);
+}
+
+// "Save my work for my teacher": downloads the whole reasoning log.
+// JSON is the main file (the teacher view will import it); CSV opens in a spreadsheet.
+function setupSaveWork() {
+  const feedback = document.getElementById('save-feedback');
+
+  function save(extension) {
+    const code = getExplorerCode();
+    if (!code) {
+      // Without a code the teacher can't tell whose file it is. The log stays saved.
+      feedback.textContent = 'You need your explorer code first! Go to the start page, type it, then come back.';
+      feedback.hidden = false;
+      return;
+    }
+    // Only this child's entries: on a shared device, another child's work stays out of the file.
+    const entries = readLog().filter((entry) => entry.code === code);
+    const fileName = exportFileName(code, extension);
+    if (extension === 'json') {
+      downloadFile(fileName, JSON.stringify(buildExport(code, entries), null, 2), 'application/json');
+    } else {
+      downloadFile(fileName, toCSV(entries), 'text/csv');
+    }
+    feedback.textContent = `Saved! 🎉 Look in Downloads for "${fileName}" and hand it in to your teacher.`;
+    feedback.hidden = false;
+  }
+
+  document.getElementById('save-work-btn').addEventListener('click', () => save('json'));
+  document.getElementById('save-csv-btn').addEventListener('click', () => save('csv'));
+}
+
 // One line of the Evidence Card: a bold label, then plain text.
 function cardLine(label, text) {
   const line = document.createElement('p');
@@ -235,20 +288,19 @@ function setupAudienceForm() {
     const heading = document.createElement('h4');
     heading.textContent = 'Your Evidence Card';
 
-    const newInvestigation = document.createElement('a');
-    newInvestigation.className = 'btn btn-main';
-    newInvestigation.href = 'question-studio.html';
-    newInvestigation.textContent = 'Start a new investigation →';
-
     card.replaceChildren(
       heading,
       cardLine('Claim:', `I think ${subject} because ${reason}.`),
       cardLine('Evidence:', evidenceLabels.join(', ')),
       cardLine('How sure:', `${selectedCertainty} — ${certaintyReason}`),
-      cardLine('For:', `${selectedAudience}, as ${selectedForm}`),
-      newInvestigation
+      cardLine('For:', `${selectedAudience}, as ${selectedForm}`)
     );
     card.hidden = false;
+    document.getElementById('save-work').hidden = false;
+    logClaim({
+      scenarioId, claim: subject, because: reason, evidence: evidenceLabels,
+      certainty: selectedCertainty, certaintyReason, audience: selectedAudience, form: selectedForm,
+    });
   }
 
   function checkComplete() {
