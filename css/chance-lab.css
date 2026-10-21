@@ -121,8 +121,26 @@
   background: var(--color-explore);
 }
 
+.reason-label {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+.reason-input {
+  width: 100%;
+  max-width: 500px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 12px;
+  padding: 8px 12px;
+  resize: vertical;
+  margin-top: 6px;
+}
+
 .bar-pct {
-  width: 90px;
+  width: 150px;
   font-size: 13px;
   font-weight: 700;
   flex-shrink: 0;

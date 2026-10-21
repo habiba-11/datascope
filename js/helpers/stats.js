@@ -1,6 +1,20 @@
+// Sorts numbers by size and text alphabetically (use as .sort(compareValues)).
+export function compareValues(a, b) {
+  if (a > b) return 1;
+  if (a < b) return -1;
+  return 0;
+}
+
 export function mean(numbers) {
   const total = numbers.reduce((sum, n) => sum + n, 0);
   return total / numbers.length;
+}
+
+// Rounds a mean to 1 decimal place for showing to children.
+// The generator uses this too, so the app always shows the recipe's mean
+// (e.g. 8.35 shows as 8.4, while toFixed(1) would show 8.3).
+export function formatMean(value) {
+  return Math.round(value * 10) / 10;
 }
 
 export function median(numbers) {
@@ -29,7 +43,7 @@ export function mode(values) {
   return [...counts.entries()]
     .filter(([, count]) => count === maxCount)
     .map(([value]) => value)
-    .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
+    .sort(compareValues);
 }
 
 export function range(numbers) {

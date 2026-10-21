@@ -1,6 +1,7 @@
 import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
-import { mean, median, mode, range } from '../helpers/stats.js';
+import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
+import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 
 const taskComplete = { 1: false, 2: false, 3: false, 4: false };
@@ -11,19 +12,32 @@ let selectedAudience = null;
 let selectedForm = null;
 
 async function init() {
-  const scenarioId = getSelectedScenarioId();
-  const response = await fetch(`../data/scenarios/${scenarioId}.json`);
-  const recipe = await response.json();
+  const recipe = await loadRecipe(getSelectedScenarioId());
+  const partner = await loadPartnerRecipe(recipe);
   const { values } = generateClassData(recipe);
+  const title = partner ? recipe.compareTitle : recipe.title;
 
-  const evidenceChips = recipe.answerType === 'number'
-    ? [
-        { id: 'mean', label: `Mean: ${mean(values).toFixed(1)}` },
-        { id: 'median', label: `Median: ${median(values)}` },
-        { id: 'mode', label: `Mode: ${mode(values).join(', ')}` },
-        { id: 'range', label: `Range: ${range(values)}` },
-      ]
-    : [{ id: 'mode', label: `Most common: ${mode(values).join(', ')}` }];
+  let evidenceChips;
+  if (partner) {
+    // Class A vs Class B: the lesson is "same mean, different spread",
+    // so the chips show the mean and range of each class.
+    const partnerValues = generateClassData(partner).values;
+    evidenceChips = [
+      { id: 'mean-a', label: `Class A mean: ${formatMean(mean(values))}` },
+      { id: 'mean-b', label: `Class B mean: ${formatMean(mean(partnerValues))}` },
+      { id: 'range-a', label: `Class A range: ${range(values)}` },
+      { id: 'range-b', label: `Class B range: ${range(partnerValues)}` },
+    ];
+  } else if (recipe.answerType === 'number') {
+    evidenceChips = [
+      { id: 'mean', label: `Mean: ${formatMean(mean(values))}` },
+      { id: 'median', label: `Median: ${median(values)}` },
+      { id: 'mode', label: `Mode: ${mode(values).join(', ')}` },
+      { id: 'range', label: `Range: ${range(values)}` },
+    ];
+  } else {
+    evidenceChips = [{ id: 'mode', label: `Most common: ${mode(values).join(', ')}` }];
+  }
 
   mountShell({
     step: 'conclude',
@@ -35,7 +49,7 @@ async function init() {
 
       <section class="task" data-task="1">
         <h3>Make your claim</h3>
-        <p>What do you think, based on "${recipe.title}"?</p>
+        <p>What do you think, based on "${title}"?</p>
         <p class="sentence-starter">
           I think <input type="text" id="claim-subject" class="inline-input" placeholder="...">
           because <input type="text" id="claim-reason" class="inline-input" placeholder="...">
@@ -196,6 +210,15 @@ function setupCertainty() {
   reasonInput.addEventListener('input', checkComplete);
 }
 
+// One line of the Evidence Card: a bold label, then plain text.
+function cardLine(label, text) {
+  const line = document.createElement('p');
+  const strong = document.createElement('strong');
+  strong.textContent = label;
+  line.append(strong, ' ', text);
+  return line;
+}
+
 function setupAudienceForm() {
   const audienceButtons = document.querySelectorAll('#audience-choices .choice-btn');
   const formButtons = document.querySelectorAll('#form-choices .choice-btn');
@@ -207,14 +230,24 @@ function setupAudienceForm() {
     const certaintyReason = document.getElementById('certainty-reason').value.trim();
     const evidenceLabels = [...document.querySelectorAll('.evidence-chip.active')].map((c) => c.textContent);
 
-    card.innerHTML = `
-      <h4>Your Evidence Card</h4>
-      <p><strong>Claim:</strong> I think ${subject} because ${reason}.</p>
-      <p><strong>Evidence:</strong> ${evidenceLabels.join(', ')}</p>
-      <p><strong>How sure:</strong> ${selectedCertainty} — ${certaintyReason}</p>
-      <p><strong>For:</strong> ${selectedAudience}, as ${selectedForm}</p>
-      <a class="btn btn-main" href="question-studio.html">Start a new investigation →</a>
-    `;
+    // Built with textContent, not innerHTML: whatever the child typed is shown
+    // as plain text and can never be read by the browser as HTML code.
+    const heading = document.createElement('h4');
+    heading.textContent = 'Your Evidence Card';
+
+    const newInvestigation = document.createElement('a');
+    newInvestigation.className = 'btn btn-main';
+    newInvestigation.href = 'question-studio.html';
+    newInvestigation.textContent = 'Start a new investigation →';
+
+    card.replaceChildren(
+      heading,
+      cardLine('Claim:', `I think ${subject} because ${reason}.`),
+      cardLine('Evidence:', evidenceLabels.join(', ')),
+      cardLine('How sure:', `${selectedCertainty} — ${certaintyReason}`),
+      cardLine('For:', `${selectedAudience}, as ${selectedForm}`),
+      newInvestigation
+    );
     card.hidden = false;
   }
 

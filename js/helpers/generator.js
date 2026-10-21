@@ -1,4 +1,4 @@
-import { mean, median, mode, range } from './stats.js';
+import { mean, median, mode, range, formatMean } from './stats.js';
 
 const MAX_ATTEMPTS = 2000;
 
@@ -45,8 +45,7 @@ function matchesTarget(scenario, values) {
   const target = scenario.target;
 
   if (scenario.answerType === 'number') {
-    const roundedMean = Math.round(mean(values) * 10) / 10;
-    if (roundedMean !== target.mean) return false;
+    if (formatMean(mean(values)) !== target.mean) return false;
     if (median(values) !== target.median) return false;
     if (range(values) !== target.range) return false;
   }

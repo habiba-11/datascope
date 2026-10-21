@@ -2,6 +2,12 @@
   box-sizing: border-box;
 }
 
+/* Our display rules (e.g. .btn's inline-block) would otherwise beat the
+   browser's built-in [hidden] rule and show "hidden" elements anyway. */
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -57,6 +63,11 @@ h1 {
 .btn-main {
   background: var(--color-btn-main-bg);
   color: var(--color-btn-main-text);
+}
+
+/* The big "go to the next room" link at the end of a room. */
+.next-room-btn {
+  margin-top: 16px;
 }
 
 .btn-run {

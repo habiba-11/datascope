@@ -19,7 +19,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, badgeCount =
     const current = s.id === step ? ' current' : '';
     const connector = i < STEPS.length - 1 ? '<span class="connector"></span>' : '';
     return `
-      <a class="step${current}" href="${s.href}" style="--step-color: var(--color-${s.color})">
+      <a class="step${current}" data-step="${s.id}" href="${s.href}" style="--step-color: var(--color-${s.color})">
         <span class="step-icon">${s.icon}</span>
         <span class="step-label">${s.label}</span>
       </a>
@@ -54,4 +54,12 @@ export function mountShell({ step, accent, pipMessage, contentHTML, badgeCount =
       </main>
     </div>
   `;
+}
+
+// Moves the step-bar highlight without rebuilding the shell.
+// Used by Question Studio, where one room covers two steps (Ask, then Plan).
+export function setCurrentStep(stepId) {
+  document.querySelectorAll('.step-bar .step').forEach((link) => {
+    link.classList.toggle('current', link.dataset.step === stepId);
+  });
 }

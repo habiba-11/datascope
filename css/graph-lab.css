@@ -15,6 +15,19 @@
   color: var(--color-btn-main-text);
 }
 
+/* Holds one chart, or two side by side when comparing classes. */
+.chart-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.chart-block {
+  flex: 1;
+  min-width: 280px;
+  max-width: 600px;
+}
+
 .chart-wrap {
   position: relative;
   height: 320px;

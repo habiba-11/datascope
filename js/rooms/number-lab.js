@@ -1,6 +1,6 @@
 import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
-import { mean, median, mode, range } from '../helpers/stats.js';
+import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
 
 const taskComplete = { 1: false, 2: false, 3: false, 4: false };
 let currentTask = 1;
@@ -62,15 +62,27 @@ async function init() {
 
       <section class="task" data-task="4" hidden>
         <h3>Real-life median and mode</h3>
-        <p>A shoe shop sold these sizes this week: <strong>34, 35, 35, 36, 34, 35, 37</strong></p>
-        <p>Which size should the shop order the MOST of?</p>
-        <div class="choice-row">
+        <p>A shoe shop sold these sizes this week: <strong>36, 34, 35, 34, 37, 36, 34</strong></p>
+        <p><strong>1.</strong> Which size should the shop order the MOST of?</p>
+        <div class="choice-row" id="mode-choices">
           <button class="btn choice-btn" data-answer="34" type="button">34</button>
           <button class="btn choice-btn" data-answer="35" type="button">35</button>
           <button class="btn choice-btn" data-answer="36" type="button">36</button>
           <button class="btn choice-btn" data-answer="37" type="button">37</button>
         </div>
         <p class="feedback" id="shoe-feedback" hidden></p>
+
+        <div id="median-question" hidden>
+          <p><strong>2.</strong> The shop wants the <strong>median</strong> size: half of the shoes sold are this size or smaller, and half are this size or bigger. Which size is it?</p>
+          <div class="choice-row" id="median-choices">
+            <button class="btn choice-btn" data-answer="34" type="button">34</button>
+            <button class="btn choice-btn" data-answer="35" type="button">35</button>
+            <button class="btn choice-btn" data-answer="36" type="button">36</button>
+            <button class="btn choice-btn" data-answer="37" type="button">37</button>
+          </div>
+          <p class="feedback" id="median-feedback" hidden></p>
+        </div>
+        <a class="btn btn-main next-room-btn" id="next-room-btn" href="chance-lab.html" hidden>🎲 Next: Chance Lab →</a>
       </section>
 
       <div class="task-nav">
@@ -101,6 +113,7 @@ function showTask(n) {
 
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
+  if (taskNum === 4) document.getElementById('next-room-btn').hidden = false;
   if (currentTask === taskNum) {
     document.getElementById('next-btn').disabled = taskNum === 4;
   }
@@ -123,26 +136,28 @@ function setupPredict(values) {
   const feedback = document.getElementById('predict-feedback');
 
   revealBtn.addEventListener('click', () => {
+    // Predict first: the numbers stay hidden until the child has made a guess.
+    if (predictInput.value === '') {
+      feedback.textContent = 'Type your guess first, then press Reveal!';
+      feedback.hidden = false;
+      return;
+    }
     const guess = Number(predictInput.value);
-    const meanVal = mean(values);
+    const meanVal = formatMean(mean(values));
     const medianVal = median(values);
     const modeVal = mode(values);
     const rangeVal = range(values);
 
-    document.getElementById('stat-mean').textContent = meanVal.toFixed(1);
+    document.getElementById('stat-mean').textContent = meanVal;
     document.getElementById('stat-median').textContent = medianVal;
     document.getElementById('stat-mode').textContent = modeVal.join(', ');
     document.getElementById('stat-range').textContent = rangeVal;
     statsGrid.hidden = false;
 
-    if (predictInput.value !== '' && !Number.isNaN(guess)) {
-      const diff = Math.abs(guess - meanVal);
-      feedback.textContent = diff <= 1
-        ? `Nice guess! You said ${guess}, and the mean is ${meanVal.toFixed(1)}.`
-        : `You said ${guess}. The mean is ${meanVal.toFixed(1)} — one classmate (3 hours) pulled it down!`;
-    } else {
-      feedback.textContent = `The mean is ${meanVal.toFixed(1)}.`;
-    }
+    const diff = Math.abs(guess - meanVal);
+    feedback.textContent = diff <= 1
+      ? `Nice guess! You said ${guess}, and the mean is ${meanVal}.`
+      : `You said ${guess}. The mean is ${meanVal} — one classmate (3 hours) pulled it down!`;
     feedback.hidden = false;
     revealBtn.disabled = true;
     markComplete(1);
@@ -174,44 +189,63 @@ function setupBuildIt() {
   });
 }
 
-function setupFindMistake() {
-  const section = document.querySelector('.task[data-task="3"]');
-  const buttons = section.querySelectorAll('.choice-btn');
-  const feedback = document.getElementById('mistake-feedback');
-  const correctMedian = median([9, 3, 20, 5, 7]);
+// A multiple-choice question the child can retry: a wrong answer shows a
+// kind hint, the right answer shows the explanation and calls onCorrect().
+function wireRetryChoices(container, feedback, { isCorrect, correctText, hintText, onCorrect }) {
+  const buttons = container.querySelectorAll('.choice-btn');
+  let solved = false;
 
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
+      if (solved) return;
       buttons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
 
-      const prefix = btn.dataset.answer === 'no' ? 'Correct!' : 'Not quite.';
-      feedback.textContent = `${prefix} Mia forgot to put the numbers in order first. Sorted, they are 3, 5, 7, 9, 20 — the middle one is ${correctMedian}, not 20.`;
+      if (isCorrect(btn.dataset.answer)) {
+        solved = true;
+        feedback.textContent = correctText;
+        onCorrect();
+      } else {
+        feedback.textContent = hintText;
+      }
       feedback.hidden = false;
-      markComplete(3);
     });
   });
 }
 
+function setupFindMistake() {
+  const correctMedian = median([9, 3, 20, 5, 7]);
+
+  wireRetryChoices(document.querySelector('.task[data-task="3"] .choice-row'), document.getElementById('mistake-feedback'), {
+    isCorrect: (answer) => answer === 'no',
+    correctText: `Correct! Mia forgot to put the numbers in order first. In order, they are 3, 5, 7, 9, 20. The number in the centre is ${correctMedian}, not 20.`,
+    hintText: 'Hmm, not quite. Try again! Hint: what must we always do to the numbers before finding the median?',
+    onCorrect: () => markComplete(3),
+  });
+}
+
 function setupRealLife() {
-  const section = document.querySelector('.task[data-task="4"]');
-  const buttons = section.querySelectorAll('.choice-btn');
-  const feedback = document.getElementById('shoe-feedback');
-  const shoeSizes = [34, 35, 35, 36, 34, 35, 37];
+  const shoeSizes = [36, 34, 35, 34, 37, 36, 34]; // mode 34, median 35: different answers
   const correctMode = mode(shoeSizes);
+  const correctMedian = median(shoeSizes);
+  const inOrder = [...shoeSizes].sort((a, b) => a - b).join(', ');
 
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      buttons.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
+  // Question 1: the mode. Getting it right opens question 2.
+  wireRetryChoices(document.getElementById('mode-choices'), document.getElementById('shoe-feedback'), {
+    isCorrect: (answer) => correctMode.includes(Number(answer)),
+    correctText: `Yes! Size ${correctMode.join(', ')} sold 3 pairs, more than any other size. That's the mode.`,
+    hintText: 'Not quite. Try again! Hint: count how many times each size appears in the list.',
+    onCorrect: () => {
+      document.getElementById('median-question').hidden = false;
+    },
+  });
 
-      const chosen = Number(btn.dataset.answer);
-      feedback.textContent = correctMode.includes(chosen)
-        ? `Yes! Size ${chosen} sold 3 pairs — more than any other size. That's the mode.`
-        : `Not quite. Size ${correctMode.join(', ')} sold the most (3 pairs) — that's the mode.`;
-      feedback.hidden = false;
-      markComplete(4);
-    });
+  // Question 2: the median of the same shoes.
+  wireRetryChoices(document.getElementById('median-choices'), document.getElementById('median-feedback'), {
+    isCorrect: (answer) => Number(answer) === correctMedian,
+    correctText: `Yes! In order, the sizes are ${inOrder}. After putting them in order, the size in the centre (the 4th of 7) is ${correctMedian}. That's the median.`,
+    hintText: 'Not quite. Try again! Hint: first put the sizes in order from smallest to biggest.',
+    onCorrect: () => markComplete(4),
   });
 }
 

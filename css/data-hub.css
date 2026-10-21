@@ -102,7 +102,12 @@
   transition: width 0.3s ease;
 }
 
-#progress-text {
+/* Reading minutes: the shared question box above the two class panels. */
+.compare-intro {
+  margin-bottom: 24px;
+}
+
+.progress-text {
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;

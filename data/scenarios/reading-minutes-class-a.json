@@ -1,6 +1,8 @@
 {
   "id": "reading-minutes-class-a",
   "title": "Reading minutes: Class A",
+  "compareWith": "reading-minutes-class-b",
+  "compareTitle": "Reading minutes: Class A vs Class B",
   "question": "How many minutes did you read yesterday?",
   "answerType": "number",
   "unit": "minutes",

@@ -1,4 +1,4 @@
-import { mountShell } from '../app.js';
+import { mountShell, setCurrentStep } from '../app.js';
 import { checkQuestion } from '../helpers/checker.js';
 import { setSelectedScenarioId } from '../storage/save.js';
 
@@ -6,7 +6,7 @@ const SCENARIO_CARDS = [
   { id: 'sleep-hours', emoji: '😴' },
   { id: 'shoe-sizes', emoji: '👟' },
   { id: 'playground-game', emoji: '⚽' },
-  { id: 'reading-minutes-class-a', emoji: '📖', displayTitle: 'Reading minutes' },
+  { id: 'reading-minutes-class-a', emoji: '📖' },
 ];
 
 const PHASE_BY_TASK = { 1: 'ask', 2: 'ask', 3: 'plan' };
@@ -14,7 +14,8 @@ const PHASE_BY_TASK = { 1: 'ask', 2: 'ask', 3: 'plan' };
 const taskComplete = { 1: false, 2: false, 3: false };
 let currentTask = 1;
 let selectedScenario = null;
-let predictRendered = false;
+// Which scenario Task 3 was last built for, so it rebuilds if the child picks another one.
+let predictScenarioId = null;
 
 async function init() {
   const scenarios = await Promise.all(
@@ -41,7 +42,7 @@ async function init() {
           ${scenarios.map((s) => `
             <button class="scenario-card" data-id="${s.id}" type="button">
               <span class="scenario-emoji">${s.emoji}</span>
-              <span class="scenario-title">${s.displayTitle || s.recipe.title}</span>
+              <span class="scenario-title">${s.recipe.compareTitle || s.recipe.title}</span>
               <span class="scenario-question">${s.recipe.question}</span>
             </button>
           `).join('')}
@@ -90,6 +91,7 @@ async function init() {
 
   setupScenarioPicker(scenarios);
   setupFixIt();
+  setupPredictSave();
   setupTaskNav();
 }
 
@@ -108,6 +110,7 @@ function showTask(n) {
   const badge = document.getElementById('phase-badge');
   badge.textContent = phase === 'plan' ? '🗺️ Plan' : '❓ Ask';
   badge.style.setProperty('--phase-color', `var(--color-${phase})`);
+  setCurrentStep(phase);
 
   if (n === 3) renderPredictTask();
 }
@@ -148,50 +151,34 @@ function setupScenarioPicker(scenarios) {
   });
 }
 
+// Builds Task 3 for the selected scenario. If the child went back and picked
+// a different scenario, the old prediction is cleared and the task is rebuilt.
 function renderPredictTask() {
-  if (predictRendered || !selectedScenario) return;
-  predictRendered = true;
+  if (!selectedScenario || predictScenarioId === selectedScenario.id) return;
+  predictScenarioId = selectedScenario.id;
+
+  // Clear any prediction made for the previous scenario.
+  taskComplete[3] = false;
+  document.getElementById('predict-feedback').hidden = true;
+  document.getElementById('go-collect-btn').hidden = true;
 
   const { recipe } = selectedScenario;
   document.getElementById('predict-question').textContent =
     `What do you think most classmates will say for: "${recipe.question}"`;
 
   const row = document.getElementById('predict-row');
+  const saveBtn = document.getElementById('predict-save-btn');
   if (recipe.answerType === 'number') {
-    row.innerHTML = '<input type="number" id="predict-input">';
+    row.innerHTML = '<input type="number" id="predict-input" aria-label="Your prediction">';
+    saveBtn.hidden = false;
   } else {
     const uniqueValues = [...new Set(recipe.valuePool)];
     row.innerHTML = uniqueValues
       .map((v) => `<button class="btn choice-btn predict-choice" data-value="${v}" type="button">${v}</button>`)
       .join('');
-    document.getElementById('predict-save-btn').hidden = true;
-  }
+    saveBtn.hidden = true;
 
-  wirePredictTask(recipe);
-}
-
-function wirePredictTask(recipe) {
-  const feedback = document.getElementById('predict-feedback');
-  const goCollectBtn = document.getElementById('go-collect-btn');
-
-  function savePrediction(guessText) {
-    feedback.textContent = `Got it! You predicted ${guessText}. Let's go collect the data and see!`;
-    feedback.hidden = false;
-    goCollectBtn.hidden = false;
-    markComplete(3);
-  }
-
-  if (recipe.answerType === 'number') {
-    document.getElementById('predict-save-btn').addEventListener('click', () => {
-      const input = document.getElementById('predict-input');
-      if (input.value === '') {
-        feedback.textContent = 'Type a number first!';
-        feedback.hidden = false;
-        return;
-      }
-      savePrediction(input.value);
-    });
-  } else {
+    // These buttons are new each time, so they get fresh click listeners.
     document.querySelectorAll('.predict-choice').forEach((btn) => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.predict-choice').forEach((b) => b.classList.remove('active'));
@@ -200,6 +187,29 @@ function wirePredictTask(recipe) {
       });
     });
   }
+}
+
+function savePrediction(guessText) {
+  const feedback = document.getElementById('predict-feedback');
+  feedback.textContent = `Got it! You predicted ${guessText}. Let's go collect the data and see!`;
+  feedback.hidden = false;
+  document.getElementById('go-collect-btn').hidden = false;
+  markComplete(3);
+}
+
+// The "Save my prediction" button (number scenarios) is wired up only once,
+// so going back and forth never adds a second click listener.
+function setupPredictSave() {
+  document.getElementById('predict-save-btn').addEventListener('click', () => {
+    const input = document.getElementById('predict-input');
+    const feedback = document.getElementById('predict-feedback');
+    if (input.value === '') {
+      feedback.textContent = 'Type a number first!';
+      feedback.hidden = false;
+      return;
+    }
+    savePrediction(input.value);
+  });
 }
 
 function setupFixIt() {

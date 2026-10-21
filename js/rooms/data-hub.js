@@ -1,45 +1,99 @@
 import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
+import { compareValues } from '../helpers/stats.js';
+import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 
+const NEXT_ROOM_LINK =
+  '<a class="btn btn-main next-room-btn" id="next-room-btn" href="graph-lab.html" hidden>📊 Let\'s draw a graph! →</a>';
+
 async function init() {
-  const response = await fetch(`../data/scenarios/${getSelectedScenarioId()}.json`);
-  const recipe = await response.json();
-  const { values } = generateClassData(recipe);
+  const recipe = await loadRecipe(getSelectedScenarioId());
+  const partner = await loadPartnerRecipe(recipe);
 
   mountShell({
     step: 'collect',
     accent: 'collect',
-    pipMessage: "Hoo-hoo! Our pretend class is ready. Press Run survey to see their answers!",
-    contentHTML: `
-      <div class="two-panel">
-        <section class="panel" style="--panel-accent: var(--color-collect)">
-          <header class="panel-header">Data Hub · ${recipe.title}</header>
-          <p class="room-question">${recipe.question}</p>
-          <button id="run-survey-btn" class="btn btn-run" type="button">▶ Run survey</button>
-          <ol id="reveal-list" class="reveal-list" aria-live="polite"></ol>
-          <div class="progress-row">
-            <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
-            <span id="progress-text">0 of ${recipe.classSize} classmates</span>
-          </div>
-        </section>
-        <section class="panel" style="--panel-accent: var(--color-explore)">
-          <header class="panel-header">Our tally</header>
-          <div id="tally" class="tally"></div>
-        </section>
-      </div>
-    `,
+    pipMessage: partner
+      ? 'Hoo-hoo! Two pretend classes answered the same question. Survey Class A first, then Class B!'
+      : 'Hoo-hoo! Our pretend class is ready. Press Run survey to see their answers!',
+    contentHTML: partner ? compareLayout(recipe, partner) : singleLayout(recipe),
   });
 
-  wireUpSurvey(recipe, values);
+  const showNextRoom = () => {
+    document.getElementById('next-room-btn').hidden = false;
+  };
+
+  if (partner) {
+    // Class B unlocks when Class A is done; the next-room link appears after Class B.
+    wireUpSurvey(recipe, generateClassData(recipe).values, 'a', () => {
+      document.getElementById('b-run').disabled = false;
+    });
+    wireUpSurvey(partner, generateClassData(partner).values, 'b', showNextRoom);
+  } else {
+    wireUpSurvey(recipe, generateClassData(recipe).values, 'a', showNextRoom);
+  }
 }
 
-function wireUpSurvey(recipe, values) {
-  const button = document.getElementById('run-survey-btn');
-  const list = document.getElementById('reveal-list');
-  const progressFill = document.getElementById('progress-fill');
-  const progressText = document.getElementById('progress-text');
-  const tally = document.getElementById('tally');
+// The run button, answer list and progress bar for one class.
+// `p` is a short prefix ('a' or 'b') so two classes can share one page.
+function surveyHTML(p, recipe, buttonText, disabled = false) {
+  return `
+    <button id="${p}-run" class="btn btn-run" type="button"${disabled ? ' disabled' : ''}>${buttonText}</button>
+    <ol id="${p}-list" class="reveal-list" aria-live="polite"></ol>
+    <div class="progress-row">
+      <div class="progress-track"><div id="${p}-fill" class="progress-fill"></div></div>
+      <span id="${p}-text" class="progress-text">0 of ${recipe.classSize} classmates</span>
+    </div>
+  `;
+}
+
+function singleLayout(recipe) {
+  return `
+    <div class="two-panel">
+      <section class="panel" style="--panel-accent: var(--color-collect)">
+        <header class="panel-header">Data Hub · ${recipe.title}</header>
+        <p class="room-question">${recipe.question}</p>
+        ${surveyHTML('a', recipe, '▶ Run survey')}
+        ${NEXT_ROOM_LINK}
+      </section>
+      <section class="panel" style="--panel-accent: var(--color-explore)">
+        <header class="panel-header">Our tally</header>
+        <div id="a-tally" class="tally"></div>
+      </section>
+    </div>
+  `;
+}
+
+// Reading minutes: one panel per class, each with its own survey and tally.
+function compareLayout(recipe, partner) {
+  return `
+    <div class="compare-intro panel" style="--panel-accent: var(--color-collect)">
+      <header class="panel-header">Data Hub · ${recipe.compareTitle}</header>
+      <p class="room-question">${recipe.question}</p>
+    </div>
+    <div class="two-panel">
+      <section class="panel" style="--panel-accent: var(--color-collect)">
+        <header class="panel-header">${recipe.title}</header>
+        ${surveyHTML('a', recipe, '▶ Survey Class A')}
+        <div id="a-tally" class="tally"></div>
+      </section>
+      <section class="panel" style="--panel-accent: var(--color-explore)">
+        <header class="panel-header">${partner.title}</header>
+        ${surveyHTML('b', partner, '▶ Now survey Class B', true)}
+        <div id="b-tally" class="tally"></div>
+      </section>
+    </div>
+    ${NEXT_ROOM_LINK}
+  `;
+}
+
+function wireUpSurvey(recipe, values, p, onDone) {
+  const button = document.getElementById(`${p}-run`);
+  const list = document.getElementById(`${p}-list`);
+  const progressFill = document.getElementById(`${p}-fill`);
+  const progressText = document.getElementById(`${p}-text`);
+  const tally = document.getElementById(`${p}-tally`);
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const counts = new Map();
@@ -48,7 +102,8 @@ function wireUpSurvey(recipe, values) {
 
   function renderTally() {
     const maxCount = Math.max(1, ...counts.values());
-    const sortedKeys = [...counts.keys()].sort((a, b) => a - b);
+    // Works for numbers (3, 7, 8...) and text (Basketball, Football...).
+    const sortedKeys = [...counts.keys()].sort(compareValues);
     tally.innerHTML = sortedKeys
       .map((key) => {
         const count = counts.get(key);
@@ -88,6 +143,7 @@ function wireUpSurvey(recipe, values) {
         setTimeout(revealNext, reduceMotion ? 0 : 400);
       } else {
         button.textContent = 'Survey complete!';
+        onDone();
       }
     }
 

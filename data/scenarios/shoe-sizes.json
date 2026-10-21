@@ -1,7 +1,7 @@
 {
   "id": "shoe-sizes",
   "title": "Shoe sizes in the class",
-  "question": "What shoe size do you wear?",
+  "question": "What shoe size do you wear this year?",
   "answerType": "number",
   "unit": "EU size",
   "classSize": 16,

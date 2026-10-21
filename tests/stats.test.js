@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mean, median, mode, range } from '../js/helpers/stats.js';
+import { mean, median, mode, range, compareValues } from '../js/helpers/stats.js';
 
 test('mean of whole numbers', () => {
   assert.equal(mean([1, 2, 3, 4, 5]), 3);
@@ -47,4 +47,9 @@ test('range is the gap between the smallest and largest value', () => {
 test('range is pulled wide by one extreme value', () => {
   // Sleep-hours scenario: most classmates cluster at 8-10, one outlier at 3.
   assert.equal(range([8, 9, 9, 10, 3]), 7);
+});
+
+test('compareValues sorts numbers by size and text alphabetically', () => {
+  assert.deepEqual([10, 3, 9, 7].sort(compareValues), [3, 7, 9, 10]);
+  assert.deepEqual(['Tag', 'Football', 'Swings'].sort(compareValues), ['Football', 'Swings', 'Tag']);
 });

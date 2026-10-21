@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mean, median, mode, range } from '../js/helpers/stats.js';
+import { mean, median, mode, range, formatMean } from '../js/helpers/stats.js';
 import { generateClassData } from '../js/helpers/generator.js';
 
 import sleepHours from '../data/scenarios/sleep-hours.json' with { type: 'json' };
@@ -55,4 +55,24 @@ test('reading minutes: Class A and B share a mean but differ in spread', () => {
     range(classB.values) > range(classA.values),
     'Class B should look more spread out than Class A, even with the same mean'
   );
+});
+
+test('reading minutes: Class A is paired with Class B, which asks the same question', () => {
+  // Data Hub, Graph Lab and Evidence Board show both classes because of this link.
+  assert.equal(readingMinutesA.compareWith, readingMinutesB.id);
+  assert.equal(readingMinutesA.question, readingMinutesB.question);
+  assert.equal(readingMinutesA.target.mean, readingMinutesB.target.mean);
+});
+
+// The mean a child sees (formatMean) must equal the recipe's target mean.
+test('formatMean: sleep-hours shows 8.4 (not 8.3)', () => {
+  assert.equal(formatMean(mean(generateClassData(sleepHours).values)), 8.4);
+});
+
+test('formatMean: shoe-sizes shows 35.3', () => {
+  assert.equal(formatMean(mean(generateClassData(shoeSizes).values)), 35.3);
+});
+
+test('formatMean: reading-minutes shows 20', () => {
+  assert.equal(formatMean(mean(generateClassData(readingMinutesA).values)), 20);
 });

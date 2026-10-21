@@ -1,8 +1,8 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Part 9 (done)**
-- Last updated: 18 Oct 2026
+- Current part: **Part 9.5 bug-fix pass (done)**
+- Last updated: 22 Oct 2026
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -19,6 +19,14 @@
 - Part 8: Chance Lab room (rooms/chance-lab.html, js/rooms/chance-lab.js, css/chance-lab.css), replacing its Part-1 placeholder. 3-task flow: pick a device (fair coin/dice/fair spinner/unfair spinner) and see all outcomes listed first; rate one outcome's likelihood on a 5-point certainty scale (impossible to certain); run 10/50/500 trials with Theoretical vs. Experimental bar charts side by side. Trials use plain Math.random() (not the seeded generator) since the point is genuine run-to-run variability converging toward theory, not reproducible synthetic data.
 - Part 9: Evidence Board room (rooms/evidence-board.html, js/rooms/evidence-board.js, css/evidence-board.css). 4-task flow: Claim ("I think ___ because ___"), Evidence (pick which real stats from the selected scenario back it up), Certainty (5-point scale + required "why"), Audience + Form (principal/class/parent evening; prediction/problem solved/recommendation) — ending in an assembled "Evidence Card" with a link back to Question Studio to start a new investigation.
 - Resolved the open "small group vs whole class" question (decision: skip small-group sampling for now, flagged as future work). Added a Plan task (Task 3) to Question Studio: a phase badge (❓ Ask / 🗺️ Plan) distinguishes the two phases sharing one room; Plan asks the child to predict the answer before collecting data (number input or category chips depending on scenario), then links to Data Hub.
+- Part 9.5 (bug-fix pass, batches A-D, 19-22 Oct 2026). Full details in docs/change-summary-part-9-5.md. 33 tests passing.
+  - Numbers: one shared formatMean() (sleep mean now 8.4 everywhere); shoe question gets "this year" + a test that every scenario question passes the checker; text-safe sort (compareValues) for tallies.
+  - Shell/navigation: Question Studio Task 3 rebuilds when the scenario changes; the step bar follows Ask/Plan (setCurrentStep); localStorage wrapped in try/catch; one "next room" link per room; found and fixed: [hidden] was overridden by .btn's display.
+  - Reading minutes now compares Class A and Class B side by side (Data Hub, Graph Lab on a shared scale, Evidence Board chips), via "compareWith" in Class A's recipe and the new js/helpers/scenarios.js.
+  - Number Lab: Task 1 needs a guess; Tasks 3-4 complete only on a correct answer (kind hint + retry); new real-life median question (shoe data changed so mode 34 ≠ median 35); "centre" instead of "middle".
+  - Chance Lab: required "Why?" with the certainty rating; honest trial feedback (only says "closer" if it is); theory shown as "1 in 6 (about 16.7%)".
+  - Graph Lab: all 4 scenarios x 4 chart types checked in a headless browser; fixed the empty playground dot plot (category axis), clipped top labels, curved lines overshooting the data, colour-only pie legend, cluttered dot labels. Chart.js pinned to 4.5.1.
+  - Evidence Card built with textContent (typed text can't become HTML).
 
 ## Next
 - Part 10: reasoning log, saving, CSV/JSON export.
@@ -27,7 +35,9 @@
 - Number Lab's predict/reveal task and meaning tasks are still hardcoded to sleep-hours/fixed examples (by design — the "Build it"/"Mia"/shoe-size tasks are scenario-independent skill practice, not meant to follow the Question Studio pick). Only Data Hub, Graph Lab, and Evidence Board follow the selected scenario so far.
 - Small-group sampling (surveying a few classmates before the whole class) is explicitly out of scope for now — Plan only collects a prediction; decided with Habiba on 18 Oct 2026.
 - Graph Lab's reflection textareas, Number Lab's task answers, Chance Lab's predictions, Question Studio's Plan prediction, and Evidence Board's claim/evidence/certainty don't persist anywhere yet — this is exactly what Part 10's reasoning log is for.
-- Chart appearance for category-type scenarios (e.g. playground-game) in Graph Lab hasn't been specifically polish-tested yet; revisit in Part 11.
+- Graph Lab: all 16 scenario x chart-type combinations were checked in Part 9.5. Still open for Part 11: a line chart for categories (playground) joins unrelated games; bar colours are by position, so in the pie the same colour repeats after 5 values.
+- Number Lab meaning tasks now follow wrong click -> hint -> correct click. Part 10 should log this as correct / correct after a hint / incorrect (architecture section 7).
+- Not yet tested on a real Chromebook/tablet (Part 11).
 
 ## Known bugs
 - none yet
@@ -37,4 +47,7 @@
 - 15 Oct 2026: short explanations by default.
 - 15 Oct 2026: deliverables are GitHub source, a live link, a demo video and an offline copy.
 - 16 Oct 2026: UI direction chosen: "Explorer's Toolkit" (sky-blue background, navy outlines/shadows, room colours Ask/Plan/Collect/Explore/Conclude = coral/yellow/blue/green/purple, Baloo 2 + Nunito, mascot "Pip" the owl explorer). Exact hex values are in css/theme.css.
+- 22 Oct 2026 (Part 9.5): reading minutes is ONE card that compares Class A and Class B side by side (option 1 for B5), not a separate Class B card.
+- 22 Oct 2026 (Part 9.5): Number Lab's real-life shoe data changed to 36, 34, 35, 34, 37, 36, 34 (mode 34, median 35), so the median question can't be passed by repeating the mode.
+- 22 Oct 2026 (Part 9.5): meaning tasks complete only on a correct answer; a wrong answer gets a kind hint and a retry.
 - 16 Oct 2026: the Investigation Shell is shared code (js/app.js), not copy-pasted per room — each room page is a thin script that calls mountShell() with its own step, accent colour and message. Keeps Parts 4-9 focused on room content only.

@@ -10,6 +10,9 @@ const DEVICES = {
 const taskComplete = { 1: false, 2: false, 3: false };
 let currentTask = 1;
 let selectedDevice = null;
+// The last trial run for the selected device, so feedback can honestly say
+// whether a bigger run came out closer to the theory or not.
+let previousRun = null;
 
 function init() {
   mountShell({
@@ -48,6 +51,8 @@ function init() {
           <button class="btn certainty-btn" data-value="likely" type="button">Likely</button>
           <button class="btn certainty-btn" data-value="certain" type="button">Certain</button>
         </div>
+        <label for="predict-reason" class="reason-label">Why?</label>
+        <textarea id="predict-reason" class="reason-input" rows="2" placeholder="Because..."></textarea>
         <p class="feedback" id="predict-feedback" hidden></p>
       </section>
 
@@ -70,6 +75,7 @@ function init() {
           </div>
         </div>
         <p class="feedback" id="trial-feedback" hidden></p>
+        <a class="btn btn-main next-room-btn" id="next-room-btn" href="evidence-board.html" hidden>🚩 Next: Evidence Board →</a>
       </section>
 
       <div class="task-nav">
@@ -104,6 +110,7 @@ function showTask(n) {
 
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
+  if (taskNum === 3) document.getElementById('next-room-btn').hidden = false;
   if (currentTask === taskNum) {
     document.getElementById('next-btn').disabled = taskNum === 3;
   }
@@ -129,6 +136,7 @@ function setupDevicePicker() {
       cards.forEach((c) => c.classList.remove('selected'));
       card.classList.add('selected');
       selectedDevice = DEVICES[card.dataset.key];
+      previousRun = null;
 
       chips.innerHTML = selectedDevice.outcomes.map((o) => `<span class="outcome-chip">${o}</span>`).join('');
       outcomesBox.hidden = false;
@@ -138,19 +146,35 @@ function setupDevicePicker() {
   });
 }
 
+// The child needs both a certainty rating AND a reason ("answer + why").
 function setupPredict() {
   const buttons = document.querySelectorAll('.certainty-btn');
+  const reasonInput = document.getElementById('predict-reason');
   const feedback = document.getElementById('predict-feedback');
+  let chosen = null;
+
+  function checkComplete() {
+    if (!chosen) return;
+    if (!reasonInput.value.trim()) {
+      feedback.textContent = 'Now tell us why you think so!';
+      feedback.hidden = false;
+      return;
+    }
+    feedback.textContent = `You think it's ${chosen.toLowerCase()} that we'll land on ${selectedDevice.target}. Let's test it!`;
+    feedback.hidden = false;
+    markComplete(2);
+  }
 
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       buttons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
-      feedback.textContent = `You think it's ${btn.textContent.toLowerCase()} that we'll land on ${selectedDevice.target}. Let's test it!`;
-      feedback.hidden = false;
-      markComplete(2);
+      chosen = btn.textContent;
+      checkComplete();
     });
   });
+
+  reasonInput.addEventListener('input', checkComplete);
 }
 
 function runTrial(device) {
@@ -163,14 +187,37 @@ function runTrial(device) {
   return device.outcomes[device.outcomes.length - 1];
 }
 
-function barRow(label, pct, countLabel, fillClass) {
+// Percentages with one decimal place (16.7, 30, 57.1).
+function toPct(part, whole) {
+  return Math.round((part / whole) * 1000) / 10;
+}
+
+function barRow(label, pct, text, fillClass) {
   return `
     <div class="bar-row">
       <span class="bar-label">${label}</span>
       <div class="bar-track"><div class="bar-fill ${fillClass}" style="width:${pct}%"></div></div>
-      <span class="bar-pct">${pct}%${countLabel}</span>
+      <span class="bar-pct">${text}</span>
     </div>
   `;
+}
+
+// Honest feedback: says what this run really showed. "Closer" is only
+// claimed if this bigger run really is closer to the theory than the last one.
+function trialMessage(count, target, timesHit, experimentPct, theoryText, previous, gap) {
+  const times = timesHit === 1 ? 'time' : 'times';
+  let message = `After ${count} trials, ${target} came up ${timesHit} ${times} (${experimentPct}%). Theory says ${theoryText}.`;
+
+  if (previous && count > previous.count) {
+    message += gap < previous.gap
+      ? ` That's closer to the theory than your ${previous.count}-trial run (${previous.pct}%).`
+      : ` This time it was NOT closer than your ${previous.count}-trial run (${previous.pct}%). Chance can surprise us! Bigger runs are usually closer, but not every time.`;
+  } else if (count < 500) {
+    message += ' Try a bigger run. Do you think it will get closer?';
+  } else {
+    message += ' Run 500 again. Does it stay close?';
+  }
+  return message;
 }
 
 function setupTrials() {
@@ -191,23 +238,30 @@ function setupTrials() {
         results.set(outcome, results.get(outcome) + 1);
       }
 
+      // Theory as "1 in 6 (about 16.7%)", so six rounded numbers never look like 102%.
+      const theoryText = (i) => `${selectedDevice.weights[i]} in ${totalWeight} (about ${toPct(selectedDevice.weights[i], totalWeight)}%)`;
+
       theoryBars.innerHTML = selectedDevice.outcomes
-        .map((o, i) => barRow(o, Math.round((selectedDevice.weights[i] / totalWeight) * 100), '', 'theory'))
+        .map((o, i) => barRow(o, toPct(selectedDevice.weights[i], totalWeight), theoryText(i), 'theory'))
         .join('');
 
+      // For 10, 50 and 500 trials one decimal place is always exact, so these add up to 100%.
       experimentBars.innerHTML = selectedDevice.outcomes
-        .map((o) => barRow(o, Math.round((results.get(o) / count) * 100), ` (${results.get(o)})`, 'experiment'))
+        .map((o) => barRow(o, toPct(results.get(o), count), `${toPct(results.get(o), count)}% (${results.get(o)})`, 'experiment'))
         .join('');
 
       compareGrid.hidden = false;
 
       const targetIndex = selectedDevice.outcomes.indexOf(selectedDevice.target);
-      const theoryPct = Math.round((selectedDevice.weights[targetIndex] / totalWeight) * 100);
-      const experimentPct = Math.round((results.get(selectedDevice.target) / count) * 100);
-      feedback.textContent = `After ${count} trials, ${selectedDevice.target} came up ${experimentPct}% of the time. Theory says ${theoryPct}%. ${
-        count >= 500 ? 'With more trials, it gets closer to theory!' : 'Try more trials to see it get even closer to theory!'
-      }`;
+      const timesHit = results.get(selectedDevice.target);
+      const experimentPct = toPct(timesHit, count);
+      const gap = Math.abs(timesHit / count - selectedDevice.weights[targetIndex] / totalWeight);
+
+      feedback.textContent = trialMessage(
+        count, selectedDevice.target, timesHit, experimentPct, theoryText(targetIndex), previousRun, gap
+      );
       feedback.hidden = false;
+      previousRun = { count, pct: experimentPct, gap };
 
       markComplete(3);
     });
