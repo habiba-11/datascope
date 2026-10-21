@@ -11,12 +11,12 @@
   --color-plan: #FFC531;
   --color-collect: #38B6FF;
   --color-explore: #4CC26B;
-  --color-conclude: #8E7CFF;
+  --color-conclude: #A596FF; /* lighter purple: navy text on it passes contrast (5.25:1) */
 
   --color-hill-back: #BEEAC0;
   --color-hill-front: #8FD79B;
 
-  --color-btn-main-bg: #2E9A4F;
+  --color-btn-main-bg: #217A3B; /* white text on it passes contrast (5.37:1) */
   --color-btn-main-text: #FFFFFF;
   --color-btn-run-bg: #FFC531;
   --color-btn-run-text: #17324D;

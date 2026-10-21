@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   normalizeCode, isValidCode, makeEntry, logEvent, readLog, meaningTaskResult, trackMeaningTask,
 } from '../js/helpers/log.js';
-import { setExplorerCode } from '../js/storage/save.js';
+import { setExplorerCode, getExplorerCode, clearChildData, getLogEntries } from '../js/storage/save.js';
 
 test('codes are tidied: spaces removed, capital letters', () => {
   assert.equal(normalizeCode('  owl-07 '), 'OWL-07');
@@ -54,6 +54,14 @@ test('a tracked task logs one result, even if solved() is called twice', () => {
   assert.equal(added.length, 1);
   assert.equal(added[0].result, 'after-hint');
   assert.equal(added[0].wrongTries, 1);
+});
+
+test('clearing a shared device removes the code and the log', () => {
+  setExplorerCode('OWL-07');
+  logEvent('number-lab', 'revision', { changed: true, oldGuess: 7, newGuess: 9, reason: 'most kids said 9' });
+  clearChildData();
+  assert.equal(getExplorerCode(), null);
+  assert.deepEqual(getLogEntries(), []);
 });
 
 test('logEvent adds entries in order, under the current code', () => {

@@ -1,7 +1,7 @@
 import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { compareValues } from '../helpers/stats.js';
-import { buildFrequencyData, makeChartConfig, directLabelsPlugin } from '../helpers/charts.js';
+import { buildFrequencyData, makeChartConfig, directLabelsPlugin, describeChart } from '../helpers/charts.js';
 import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
 import { logEvent } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
@@ -32,8 +32,8 @@ async function init() {
 
   const chartBlocks = classes.map((c) => `
     <div class="chart-block">
-      ${partner ? `<h3>📖 ${c.recipe.title}</h3>` : ''}
-      <div class="chart-wrap"><canvas id="${c.canvasId}"></canvas></div>
+      ${partner ? `<h2 class="chart-title">📖 ${c.recipe.title}</h2>` : ''}
+      <div class="chart-wrap"><canvas id="${c.canvasId}" role="img"></canvas></div>
     </div>
   `).join('');
 
@@ -45,7 +45,7 @@ async function init() {
       ? 'Hoo-hoo! Two classes, same question. Switch the graph type and compare them!'
       : 'Hoo-hoo! Same data, different graphs. Try each button and see what changes!',
     contentHTML: `
-      <h2>📊 Graph Lab</h2>
+      <h1 class="room-title">📊 Graph Lab</h1>
       <p class="room-question">${recipe.question}</p>
       <div class="chart-type-row">
         <button class="btn chart-type-btn" data-type="bar" type="button">Bar</button>
@@ -70,10 +70,13 @@ async function init() {
   function renderCharts(type) {
     currentType = type;
     charts.forEach((chart) => chart.destroy());
-    charts = classes.map((c) => new Chart(
-      document.getElementById(c.canvasId),
-      makeChartConfig(type, c.labels, c.data, c.recipe.unit, sharedMax)
-    ));
+    charts = classes.map((c) => {
+      const canvas = document.getElementById(c.canvasId);
+      // Screen readers read this label instead of the (silent) picture.
+      const who = partner ? `${c.recipe.title}. ` : '';
+      canvas.setAttribute('aria-label', who + describeChart(type, c.labels, c.data, c.recipe.unit));
+      return new Chart(canvas, makeChartConfig(type, c.labels, c.data, c.recipe.unit, sharedMax));
+    });
 
     document.querySelectorAll('.chart-type-btn').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.type === type);

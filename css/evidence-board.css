@@ -4,6 +4,7 @@
 }
 
 .inline-input {
+  min-height: 48px;
   font-family: var(--font-body);
   font-size: 16px;
   border: none;
@@ -44,7 +45,8 @@
   margin-top: 20px;
 }
 
-.evidence-card h4 {
+.evidence-card h3 {
+  font-size: 18px;
   margin-top: 0;
 }
 

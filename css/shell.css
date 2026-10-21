@@ -16,6 +16,7 @@
   font-weight: 700;
   color: var(--color-btn-main-bg);
   text-decoration: none;
+  min-height: 48px; /* tap target */
 }
 
 .step-bar {
@@ -136,10 +137,18 @@
   border: 2px solid var(--color-navy);
   border-radius: 999px;
   padding: 6px 14px;
+  min-height: 48px; /* tap target: at least 48px tall */
+  display: inline-flex;
+  align-items: center;
 }
 
 .explore-tab.active {
   background: var(--color-explore);
+}
+
+/* Each room's title is its page's h1 (for screen readers), sized like before. */
+.room-title {
+  font-size: 28px;
 }
 
 .room-content {

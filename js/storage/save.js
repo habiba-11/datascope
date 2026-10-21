@@ -58,3 +58,45 @@ export function addLogEntry(entry) {
   entries.push(entry);
   writeItem(LOG_KEY, JSON.stringify(entries));
 }
+
+// For shared devices: removes the child's code, chosen scenario and reasoning
+// log from THIS device, so the next child starts clean. Teacher data is kept.
+export function clearChildData() {
+  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY]) {
+    memory.delete(key);
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // Storage is blocked: nothing was stored there anyway.
+    }
+  }
+}
+
+// Teacher view: the children's imported files and the teacher's tags,
+// both stored as { code: ... } objects on the teacher's device.
+const IMPORTS_KEY = 'datascope:teacherImports';
+const TAGS_KEY = 'datascope:teacherTags';
+
+function readObject(key) {
+  try {
+    return JSON.parse(readItem(key)) || {};
+  } catch {
+    return {};
+  }
+}
+
+export function getTeacherImports() {
+  return readObject(IMPORTS_KEY);
+}
+
+export function setTeacherImports(imports) {
+  writeItem(IMPORTS_KEY, JSON.stringify(imports));
+}
+
+export function getTeacherTags() {
+  return readObject(TAGS_KEY);
+}
+
+export function setTeacherTags(tags) {
+  writeItem(TAGS_KEY, JSON.stringify(tags));
+}

@@ -50,11 +50,11 @@ async function init() {
     accent: 'conclude',
     pipMessage: "Hoo-hoo! Time to share what we found. What do you think, and why?",
     contentHTML: `
-      <h2>🚩 Evidence Board</h2>
+      <h1 class="room-title">🚩 Evidence Board</h1>
       <p class="task-progress" id="task-progress">Task 1 of 4</p>
 
       <section class="task" data-task="1">
-        <h3>Make your claim</h3>
+        <h2 class="task-title">Make your claim</h2>
         <p>What do you think, based on "${title}"?</p>
         <p class="sentence-starter">
           I think <input type="text" id="claim-subject" class="inline-input" placeholder="...">
@@ -65,7 +65,7 @@ async function init() {
       </section>
 
       <section class="task" data-task="2" hidden>
-        <h3>Pick your evidence</h3>
+        <h2 class="task-title">Pick your evidence</h2>
         <p>Which numbers back up your claim? Choose at least one.</p>
         <div class="evidence-grid" id="evidence-grid">
           ${evidenceChips.map((c) => `<button class="btn choice-btn evidence-chip" data-id="${c.id}" type="button">${c.label}</button>`).join('')}
@@ -74,7 +74,7 @@ async function init() {
       </section>
 
       <section class="task" data-task="3" hidden>
-        <h3>How sure are you?</h3>
+        <h2 class="task-title">How sure are you?</h2>
         <div class="certainty-scale" id="certainty-scale">
           <button class="btn certainty-btn choice-btn" data-value="impossible" type="button">Impossible</button>
           <button class="btn certainty-btn choice-btn" data-value="unlikely" type="button">Unlikely</button>
@@ -88,7 +88,7 @@ async function init() {
       </section>
 
       <section class="task" data-task="4" hidden>
-        <h3>Who is this for?</h3>
+        <h2 class="task-title">Who is this for?</h2>
         <p>Pick an audience:</p>
         <div class="choice-row" id="audience-choices">
           <button class="btn choice-btn" data-value="the principal" type="button">🧑‍💼 The principal</button>
@@ -134,8 +134,9 @@ function showTask(n) {
   document.getElementById('task-progress').textContent = `Task ${n} of 4`;
   document.getElementById('back-btn').disabled = n === 1;
   const nextBtn = document.getElementById('next-btn');
-  nextBtn.disabled = !taskComplete[n] || n === 4;
-  nextBtn.textContent = n === 4 ? 'All done! 🎉' : 'Next →';
+  nextBtn.disabled = !taskComplete[n];
+  // Last task: the room's own big button (next room / save) is the one clear action.
+  nextBtn.hidden = n === 4;
   currentTask = n;
 }
 
@@ -285,7 +286,7 @@ function setupAudienceForm() {
 
     // Built with textContent, not innerHTML: whatever the child typed is shown
     // as plain text and can never be read by the browser as HTML code.
-    const heading = document.createElement('h4');
+    const heading = document.createElement('h3');
     heading.textContent = 'Your Evidence Card';
 
     card.replaceChildren(

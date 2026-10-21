@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher view · DataScope</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/teacher.css">
+</head>
+<body>
+  <main class="teacher card">
+    <a class="back-link" href="index.html">← Back to DataScope</a>
+    <h1>🧑‍🏫 Teacher view</h1>
+    <p>Import the files your children saved (<code>datascope-CODE-DATE.json</code>). Everything stays on this device: nothing is uploaded.</p>
+
+    <div class="teacher-actions">
+      <label class="btn btn-main file-btn">
+        📂 Import children's files
+        <input type="file" id="file-input" accept=".json,application/json" multiple>
+      </label>
+      <button class="btn" id="export-class-btn" type="button">📊 Download class CSV</button>
+      <button class="btn" id="clear-btn" type="button">🗑️ Remove all imported files</button>
+    </div>
+    <p class="feedback" id="teacher-feedback" aria-live="polite" hidden></p>
+
+    <p class="class-totals" id="class-totals"></p>
+    <div class="table-wrap">
+      <table class="class-table">
+        <thead>
+          <tr>
+            <th scope="col">Code</th>
+            <th scope="col">Scenario</th>
+            <th scope="col">Meaning tasks</th>
+            <th scope="col">Hints used</th>
+            <th scope="col">Chance Lab reasons</th>
+            <th scope="col">Final claim</th>
+            <th scope="col">Misconception tags</th>
+          </tr>
+        </thead>
+        <tbody id="class-rows"></tbody>
+      </table>
+    </div>
+    <p class="note">Meaning tasks: ✅ right first time · 💡 right after a hint · ❌ left unsolved. The survey data children worked with is synthetic (a pretend class).</p>
+
+    <h2>Shared device?</h2>
+    <p>After a child has saved their file, you can clear their code and work from <strong>this</strong> device so the next child starts fresh. Make sure the file was saved first!</p>
+    <button class="btn" id="clear-device-btn" type="button">🧹 Clear children's work on THIS device</button>
+  </main>
+  <script type="module" src="js/teacher.js"></script>
+</body>
+</html>

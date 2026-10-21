@@ -17,11 +17,11 @@ async function init() {
     explorePage: 'number',
     pipMessage: "Hoo-hoo! Make a guess first, then let's see what the numbers really say!",
     contentHTML: `
-      <h2>🔢 Number Lab</h2>
+      <h1 class="room-title">🔢 Number Lab</h1>
       <p class="task-progress" id="task-progress">Task 1 of 4</p>
 
       <section class="task" data-task="1">
-        <h3>Predict first!</h3>
+        <h2 class="task-title">Predict first!</h2>
         <p>Before we check, what do you think is the typical number of hours of sleep in our pretend class?</p>
         <div class="predict-row">
           <input type="number" id="predict-input" min="0" max="24" aria-label="Your prediction">
@@ -34,10 +34,26 @@ async function init() {
           <div class="stat-card"><span class="stat-label">Range</span><span class="stat-value" id="stat-range"></span></div>
         </div>
         <p class="feedback" id="predict-feedback" hidden></p>
+
+        <div class="revise-box" id="revise-box" hidden>
+          <p><strong>🤔 Has the data changed your mind?</strong></p>
+          <div class="choice-row">
+            <button class="btn choice-btn" id="keep-guess-btn" type="button">👍 Keep my guess</button>
+            <button class="btn choice-btn" id="change-guess-btn" type="button">✏️ Change my guess</button>
+          </div>
+          <div class="revise-form" id="revise-form" hidden>
+            <label for="new-guess-input">My new guess:</label>
+            <input type="number" id="new-guess-input" min="0" max="24">
+            <label for="revise-reason">because</label>
+            <input type="text" id="revise-reason" class="revise-reason" placeholder="...">
+            <button class="btn btn-main" id="save-revision-btn" type="button">Save my new guess</button>
+          </div>
+          <p class="feedback" id="revise-feedback" hidden></p>
+        </div>
       </section>
 
       <section class="task" data-task="2" hidden>
-        <h3>Build it!</h3>
+        <h2 class="task-title">Build it!</h2>
         <p>Can you think of 5 numbers whose <strong>mean is 6</strong>?</p>
         <div class="build-row">
           <input type="number" class="build-input" aria-label="Number 1">
@@ -51,7 +67,7 @@ async function init() {
       </section>
 
       <section class="task" data-task="3" hidden>
-        <h3>Find the mistake</h3>
+        <h2 class="task-title">Find the mistake</h2>
         <p>Mia looked at these numbers and said: <strong>"The median is 20."</strong></p>
         <p class="number-list">9, 3, 20, 5, 7</p>
         <div class="choice-row">
@@ -62,7 +78,7 @@ async function init() {
       </section>
 
       <section class="task" data-task="4" hidden>
-        <h3>Real-life median and mode</h3>
+        <h2 class="task-title">Real-life median and mode</h2>
         <p>A shoe shop sold these sizes this week: <strong>36, 34, 35, 34, 37, 36, 34</strong></p>
         <p><strong>1.</strong> Which size should the shop order the MOST of?</p>
         <div class="choice-row" id="mode-choices">
@@ -107,8 +123,9 @@ function showTask(n) {
   document.getElementById('task-progress').textContent = `Task ${n} of 4`;
   document.getElementById('back-btn').disabled = n === 1;
   const nextBtn = document.getElementById('next-btn');
-  nextBtn.disabled = !taskComplete[n] || n === 4;
-  nextBtn.textContent = n === 4 ? 'All done! 🎉' : 'Next →';
+  nextBtn.disabled = !taskComplete[n];
+  // Last task: the room's own big button (next room / save) is the one clear action.
+  nextBtn.hidden = n === 4;
   currentTask = n;
 }
 
@@ -164,7 +181,58 @@ function setupPredict(values) {
     logEvent('number-lab', 'prediction', {
       about: 'typical hours of sleep', guess, mean: meanVal, median: medianVal,
     });
+    predictInput.disabled = true;
+    document.getElementById('revise-box').hidden = false; // Task 1 completes after the child decides
+  });
+
+  setupRevision(() => Number(predictInput.value));
+}
+
+// Predict -> Test -> Compare -> Refine: after seeing the numbers, the child
+// keeps or changes their guess. Both choices are logged as a "revision".
+function setupRevision(getOldGuess) {
+  const keepBtn = document.getElementById('keep-guess-btn');
+  const changeBtn = document.getElementById('change-guess-btn');
+  const form = document.getElementById('revise-form');
+  const newGuessInput = document.getElementById('new-guess-input');
+  const reasonInput = document.getElementById('revise-reason');
+  const feedback = document.getElementById('revise-feedback');
+
+  function finish(message) {
+    feedback.textContent = message;
+    feedback.hidden = false;
+    keepBtn.disabled = true;
+    changeBtn.disabled = true;
+    form.hidden = true;
     markComplete(1);
+    // The choice buttons are now locked, so keyboard users jump straight to Next.
+    document.getElementById('next-btn').focus();
+  }
+
+  keepBtn.addEventListener('click', () => {
+    keepBtn.classList.add('active');
+    logEvent('number-lab', 'revision', { about: 'typical hours of sleep', changed: false, oldGuess: getOldGuess() });
+    finish(`You kept your guess of ${getOldGuess()}. Can you see a number above that backs it up?`);
+  });
+
+  changeBtn.addEventListener('click', () => {
+    changeBtn.classList.add('active');
+    form.hidden = false;
+    newGuessInput.focus();
+  });
+
+  document.getElementById('save-revision-btn').addEventListener('click', () => {
+    const reason = reasonInput.value.trim();
+    if (newGuessInput.value === '' || !reason) {
+      feedback.textContent = 'Type your new guess AND why you changed it.';
+      feedback.hidden = false;
+      return;
+    }
+    const newGuess = Number(newGuessInput.value);
+    logEvent('number-lab', 'revision', {
+      about: 'typical hours of sleep', changed: true, oldGuess: getOldGuess(), newGuess, reason,
+    });
+    finish(`You changed your guess from ${getOldGuess()} to ${newGuess} because ${reason}. Changing your mind when you see new evidence is what data detectives do! 🔎`);
   });
 }
 

@@ -1,11 +1,25 @@
+/* Navy text (room colours are too light to read as text on white);
+   the room colour is kept as a dot in front. */
 .task-progress {
   font-family: var(--font-heading);
   font-weight: 700;
-  color: var(--accent, var(--color-explore));
+  color: var(--color-text);
   margin-top: 0;
 }
 
-.task h3 {
+.task-progress::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border-radius: 50%;
+  border: 2px solid var(--color-navy);
+  background: var(--accent, var(--color-explore));
+}
+
+.task-title {
+  font-size: 21px; /* looks like the old h3; it is an h2 so headings go h1 > h2 > h3 */
   margin-top: 0;
 }
 

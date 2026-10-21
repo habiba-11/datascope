@@ -18,6 +18,7 @@
 }
 
 .predict-row input[type="number"] {
+  min-height: 48px;
   width: 100px;
   font-size: 18px;
   font-family: var(--font-body);

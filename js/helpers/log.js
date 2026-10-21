@@ -13,6 +13,7 @@ export const EVENT_TYPES = [
   'hint',         // the child asked for a hint on an open question
   'reflection',   // what a graph tells / does NOT tell
   'claim',        // the final Evidence Board claim
+  'teacher-tag',  // a misconception the teacher tagged (teacher view)
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];

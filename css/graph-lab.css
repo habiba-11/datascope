@@ -57,3 +57,8 @@
   resize: vertical;
   margin-bottom: 12px;
 }
+
+/* "📖 Reading minutes: Class A" above each compared chart. */
+.chart-title {
+  font-size: 21px;
+}

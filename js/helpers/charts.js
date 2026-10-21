@@ -14,6 +14,21 @@ export function buildFrequencyData(values, allLabels) {
   return { labels, data };
 }
 
+const CHART_NAMES = { bar: 'Bar chart', line: 'Line chart', pie: 'Pie chart', dot: 'Dot plot' };
+
+// A chart drawn on a <canvas> is invisible to screen readers, so we also say
+// what it shows in words, e.g. "Bar chart. 3 hours: 1 classmate. 9 hours: 6 classmates."
+export function describeChart(type, labels, data, unitLabel) {
+  const parts = labels
+    .map((label, i) => ({ label, count: data[i] }))
+    .filter(({ count }) => count > 0)
+    .map(({ label, count }) => {
+      const value = typeof label === 'number' && unitLabel ? `${label} ${unitLabel}` : label;
+      return `${value}: ${count} classmate${count === 1 ? '' : 's'}`;
+    });
+  return `${CHART_NAMES[type] || 'Chart'}. ${parts.join('. ')}.`;
+}
+
 // Draws each value's number directly on the chart, so kids don't have to
 // hover to read it (Shah & Hoeffner, Paper 20: label directly, not a legend).
 export const directLabelsPlugin = {

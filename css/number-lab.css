@@ -7,6 +7,7 @@
 }
 
 .predict-row input[type="number"] {
+  min-height: 48px;
   width: 80px;
   font-size: 18px;
   font-family: var(--font-body);
@@ -42,7 +43,7 @@
   font-family: var(--font-heading);
   font-size: 26px;
   font-weight: 700;
-  color: var(--color-explore);
+  color: var(--color-text); /* green text on light blue was too faint (2:1) */
 }
 
 .build-row {
@@ -71,4 +72,37 @@
   border-radius: 12px;
   display: inline-block;
   padding: 8px 16px;
+}
+
+/* "Has the data changed your mind?" after the reveal (the Refine step). */
+.revise-box {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 2px dashed var(--color-navy);
+}
+
+.revise-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.revise-form input {
+  min-height: 48px;
+  font-size: 18px;
+  font-family: var(--font-body);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.revise-form input[type="number"] {
+  width: 80px;
+}
+
+.revise-reason {
+  flex: 1;
+  min-width: 200px;
 }

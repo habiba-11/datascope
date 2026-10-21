@@ -41,7 +41,7 @@ async function init() {
 function surveyHTML(p, recipe, buttonText, disabled = false) {
   return `
     <button id="${p}-run" class="btn btn-run" type="button"${disabled ? ' disabled' : ''}>${buttonText}</button>
-    <ol id="${p}-list" class="reveal-list" aria-live="polite"></ol>
+    <ol id="${p}-list" class="reveal-list" aria-live="polite" tabindex="0" aria-label="Answers so far"></ol>
     <div class="progress-row">
       <div class="progress-track"><div id="${p}-fill" class="progress-fill"></div></div>
       <span id="${p}-text" class="progress-text">0 of ${recipe.classSize} classmates</span>
@@ -53,7 +53,7 @@ function singleLayout(recipe) {
   return `
     <div class="two-panel">
       <section class="panel" style="--panel-accent: var(--color-collect)">
-        <header class="panel-header">Data Hub · ${recipe.title}</header>
+        <h1 class="panel-header">Data Hub · ${recipe.title}</h1>
         <p class="room-question">${recipe.question}</p>
         ${surveyHTML('a', recipe, '▶ Run survey')}
         ${NEXT_ROOM_LINK}
@@ -70,7 +70,7 @@ function singleLayout(recipe) {
 function compareLayout(recipe, partner) {
   return `
     <div class="compare-intro panel" style="--panel-accent: var(--color-collect)">
-      <header class="panel-header">Data Hub · ${recipe.compareTitle}</header>
+      <h1 class="panel-header">Data Hub · ${recipe.compareTitle}</h1>
       <p class="room-question">${recipe.question}</p>
     </div>
     <div class="two-panel">

@@ -57,6 +57,10 @@ export function mountShell({ step, accent, pipMessage, contentHTML, badgeCount =
       </main>
     </div>
   `;
+
+  // Screen readers read out new feedback ("Correct!", hints...) without the
+  // child having to look for it. Done here once for every room.
+  root.querySelectorAll('.feedback').forEach((el) => el.setAttribute('aria-live', 'polite'));
 }
 
 // Shows whose work this is (by code only). Without a code, the work can't be

@@ -81,7 +81,8 @@
   min-width: 220px;
 }
 
-.compare-col h4 {
+.compare-col h3 {
+  font-size: 18px;
   font-family: var(--font-heading);
   margin: 0 0 8px;
 }

@@ -48,6 +48,23 @@ h1 {
   cursor: pointer;
 }
 
+/* A thick, clear outline shows where you are when using the keyboard (Tab).
+   :focus-visible means mouse/touch taps don't show it, only keyboard use. */
+:focus-visible {
+  outline: 4px solid var(--color-collect);
+  outline-offset: 3px;
+}
+
+/* Children (or teachers) who turn on "reduce motion" get no slides or pops. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 .btn:active {
   box-shadow: var(--shadow-button-active);
   transform: translate(3px, 3px);

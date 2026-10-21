@@ -32,12 +32,12 @@ async function init() {
     accent: 'ask',
     pipMessage: "Hoo-hoo! I'm Pip. Let's pick a question to investigate!",
     contentHTML: `
-      <h2>❓ Question Studio</h2>
+      <h1 class="room-title">❓ Question Studio</h1>
       <span class="phase-badge" id="phase-badge"></span>
       <p class="task-progress" id="task-progress">Task 1 of 3</p>
 
       <section class="task" data-task="1">
-        <h3>Pick your investigation</h3>
+        <h2 class="task-title">Pick your investigation</h2>
         <p>Which question do you want to investigate with our pretend class?</p>
         <div class="scenario-grid" id="scenario-grid">
           ${scenarios.map((s) => `
@@ -52,7 +52,7 @@ async function init() {
       </section>
 
       <section class="task" data-task="2" hidden>
-        <h3>Fix these flawed questions</h3>
+        <h2 class="task-title">Fix these flawed questions</h2>
         <p>Each one has a problem. Edit it until Pip gives it a green light! ✅</p>
 
         <div class="fixit">
@@ -75,7 +75,7 @@ async function init() {
       </section>
 
       <section class="task" data-task="3" hidden>
-        <h3>Predict first!</h3>
+        <h2 class="task-title">Predict first!</h2>
         <p id="predict-question"></p>
         <div class="predict-row" id="predict-row"></div>
         <button class="btn btn-main" id="predict-save-btn" type="button">Save my prediction</button>
@@ -103,8 +103,9 @@ function showTask(n) {
   document.getElementById('task-progress').textContent = `Task ${n} of 3`;
   document.getElementById('back-btn').disabled = n === 1;
   const nextBtn = document.getElementById('next-btn');
-  nextBtn.disabled = !taskComplete[n] || n === 3;
-  nextBtn.textContent = n === 3 ? 'All done! 🎉' : 'Next →';
+  nextBtn.disabled = !taskComplete[n];
+  // Last task: the room's own big button (next room / save) is the one clear action.
+  nextBtn.hidden = n === 3;
   currentTask = n;
 
   const phase = PHASE_BY_TASK[n];

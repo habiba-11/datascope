@@ -1,0 +1,126 @@
+/* Teacher view: same look as the app, a bit denser for adults. */
+.teacher {
+  max-width: 1150px;
+  margin: 24px auto 120px;
+}
+
+/* Keeps a 16px gap at the screen edges on small tablets. */
+body {
+  padding: 0 16px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.teacher-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.teacher-actions .btn:not(.btn-main) {
+  background: white;
+  color: var(--color-text);
+}
+
+/* The real file picker is hidden; the big label button opens it. */
+.file-btn input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.file-btn:focus-within {
+  outline: 3px solid var(--color-collect);
+  outline-offset: 3px;
+}
+
+.feedback {
+  background: white;
+  border: 2px dashed var(--color-navy);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.class-totals {
+  font-weight: 700;
+}
+
+/* Wide table scrolls sideways on small screens instead of squashing. */
+.table-wrap {
+  overflow-x: auto;
+}
+
+.class-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 900px;
+  font-size: 16px;
+}
+
+.class-table th,
+.class-table td {
+  border: 2px solid var(--color-navy);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.class-table thead th {
+  background: var(--color-navy);
+  color: white;
+  font-family: var(--font-heading);
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.claim-cell {
+  max-width: 280px;
+}
+
+.class-table summary {
+  cursor: pointer;
+  font-weight: 700;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* display: flex hides the ▶ arrow in some browsers, so we draw our own. */
+.class-table summary::before {
+  content: '▶';
+  font-size: 12px;
+}
+
+.class-table details[open] summary::before {
+  content: '▼';
+}
+
+.tag-option {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  font-size: 14px;
+  margin: 6px 0;
+}
+
+.tag-option input {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.note {
+  font-size: 14px;
+}

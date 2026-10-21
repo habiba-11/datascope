@@ -23,11 +23,11 @@ function init() {
     explorePage: 'chance',
     pipMessage: "Hoo-hoo! Let's test our predictions with real trials!",
     contentHTML: `
-      <h2>🎲 Chance Lab</h2>
+      <h1 class="room-title">🎲 Chance Lab</h1>
       <p class="task-progress" id="task-progress">Task 1 of 3</p>
 
       <section class="task" data-task="1">
-        <h3>Pick a device</h3>
+        <h2 class="task-title">Pick a device</h2>
         <p>Choose something to test, then see every possible outcome.</p>
         <div class="device-grid" id="device-grid">
           ${Object.entries(DEVICES).map(([key, d]) => `
@@ -44,7 +44,7 @@ function init() {
       </section>
 
       <section class="task" data-task="2" hidden>
-        <h3>Predict</h3>
+        <h2 class="task-title">Predict</h2>
         <p id="predict-question"></p>
         <div class="certainty-scale" id="certainty-scale">
           <button class="btn certainty-btn" data-value="impossible" type="button">Impossible</button>
@@ -59,7 +59,7 @@ function init() {
       </section>
 
       <section class="task" data-task="3" hidden>
-        <h3>Run trials</h3>
+        <h2 class="task-title">Run trials</h2>
         <p>Let's test it! Run some trials and compare what happened to the theory.</p>
         <div class="trial-row">
           <button class="btn btn-run" data-count="10" type="button">Run 10</button>
@@ -68,11 +68,11 @@ function init() {
         </div>
         <div class="compare-grid" id="compare-grid" hidden>
           <div class="compare-col">
-            <h4>Theoretical (what should happen)</h4>
+            <h3>Theoretical (what should happen)</h3>
             <div id="theory-bars" class="bars"></div>
           </div>
           <div class="compare-col">
-            <h4>Experimental (what did happen)</h4>
+            <h3>Experimental (what did happen)</h3>
             <div id="experiment-bars" class="bars"></div>
           </div>
         </div>
@@ -101,8 +101,9 @@ function showTask(n) {
   document.getElementById('task-progress').textContent = `Task ${n} of 3`;
   document.getElementById('back-btn').disabled = n === 1;
   const nextBtn = document.getElementById('next-btn');
-  nextBtn.disabled = !taskComplete[n] || n === 3;
-  nextBtn.textContent = n === 3 ? 'All done! 🎉' : 'Next →';
+  nextBtn.disabled = !taskComplete[n];
+  // Last task: the room's own big button (next room / save) is the one clear action.
+  nextBtn.hidden = n === 3;
   currentTask = n;
 
   if (n === 2 && selectedDevice) {
