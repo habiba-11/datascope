@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Part 10 (done: 10a, 10b, hints, 10c)**
+- Current part: **Part 11 (11a-c done; 11d = real-device test by Habiba)**
 - Last updated: 22 Oct 2026
 
 ## Done
@@ -33,18 +33,26 @@
   - Hints: js/helpers/prompts.js (prompt engine): "💡 Need a hint?" with up to 3 escalating hints/sentence starters on Graph Lab tell/NOT tell, Chance Lab why, Evidence Board claim and why. Hint use is logged.
   - 10c: js/storage/export.js. Evidence Board "📤 Save my work for my teacher" downloads datascope-CODE-DATE.json (with a synthetic-data note); a small link saves the same log as CSV (formula-safe). Needs a code first.
 
+- Part 11 (22 Oct 2026), 58 tests passing:
+  - 11a: teacher view (teacher.html, js/teacher.js, js/helpers/summary.js), linked from the start page. Imports children's JSON files (newest file per code wins, foreign files skipped with a reason), one row per child (meaning tasks first time / after hint / unsolved, hints, Chance Lab reasons, final claim), 8 misconception tags from the literature with paper numbers, class CSV with tags as rows, two-tap remove.
+  - 11b: Number Lab "Has the data changed your mind?" (keep / change with a reason), logged as revision; disabled "All done" hidden on last tasks; teacher view "clear children's work on THIS device" (clearChildData).
+  - 11c: accessibility: axe-core audit to 0 violations on all pages (headless only, nothing added to the app); contrast fixed via tokens (main green #217A3B, Conclude purple #A596FF, navy task-progress text with a colour dot); h1 > h2 > h3; <main>; keyboard-reachable answer list; chart descriptions for screen readers (describeChart); feedback announced; focus ring; global reduced motion; all tap targets >= 48px; checked at iPad portrait (768px) and Chromebook (1366x768) with no sideways scroll.
+  - Also: every chosen answer shows a ✓ (colour is never the only signal); aria-current on the step bar and Explore tabs; the unfair spinner is now drawn with weighted slices and "Red: 4 of 7 parts" chips (before, it looked identical to the fair spinner, so "equally likely" was the reasonable answer).
+  - docs/device-test-checklist.md: printable checklist for 11d.
+  - 11e: badges for reasoning (js/helpers/badges.js, js/celebrate.js). Badges are counted from the log, once per reasoning moment: a certainty reason (per device), changing your mind with a reason, a meaning task solved (also after a hint), a real answer to "what does this graph NOT tell us?", a full claim card. Never for trials, hints, predictions or speed. A new badge: counter goes up, Pip says what was good, Pip hops, 8 stars burst (none with reduce motion), optional ding. "🔇 Sound: off" toggle in the sidebar, off by default (Web Audio, no sound files). 65 tests passing.
+
 ## Next
-- Part 11: polish, accessibility, teacher view (import the children's JSON files), testing on a Chromebook or tablet.
+- 11d (Habiba): run docs/device-test-checklist.md on a real Chromebook or tablet and report back.
+- Part 12: deploy to GitHub Pages, offline copy (fonts + Chart.js local), demo video, thesis screenshots.
 
 ## Known bugs/open items
 - Number Lab's predict/reveal task and meaning tasks are still hardcoded to sleep-hours/fixed examples (by design — the "Build it"/"Mia"/shoe-size tasks are scenario-independent skill practice, not meant to follow the Question Studio pick). Only Data Hub, Graph Lab, and Evidence Board follow the selected scenario so far.
 - Small-group sampling (surveying a few classmates before the whole class) is explicitly out of scope for now — Plan only collects a prediction; decided with Habiba on 18 Oct 2026.
-- Graph Lab's reflection textareas, Number Lab's task answers, Chance Lab's predictions, Question Studio's Plan prediction, and Evidence Board's claim/evidence/certainty don't persist anywhere yet — this is exactly what Part 10's reasoning log is for.
-- Graph Lab: all 16 scenario x chart-type combinations were checked in Part 9.5. Still open for Part 11: a line chart for categories (playground) joins unrelated games; bar colours are by position, so in the pie the same colour repeats after 5 values.
-- Number Lab meaning tasks now follow wrong click -> hint -> correct click. Part 10 should log this as correct / correct after a hint / incorrect (architecture section 7).
-- Not yet tested on a real Chromebook/tablet (Part 11).
-- The "revision" log event (changed a prediction after seeing data) has no screen yet. Suggested place: after Number Lab's Reveal ("Has the data changed your mind?"). Decide in Part 11.
-- Shared devices: the log is never cleared, but each child's export contains only the entries under their own code. Decide in Part 11 whether a teacher "clear this device" button is needed.
+- Graph Lab: a line chart for categories (playground) joins unrelated games (kept as a "what changes?" talking point); bar/pie colours are by position, so they repeat after 5 values (labels carry the meaning).
+- Not yet tested on a real Chromebook/tablet (11d) or with a real screen reader.
+- Selected answers show a ✓ for sighted users, but buttons don't yet announce "pressed" to screen readers (aria-pressed); feedback text announces the choice in most places.
+- Chance Lab Task 2 asks "how likely?" without repeating the spinner picture from Task 1 (the child just saw it one tap earlier).
+- The app needs the internet for fonts and Chart.js until the offline copy (Part 12).
 
 ## Known bugs
 - none yet
@@ -54,6 +62,8 @@
 - 15 Oct 2026: short explanations by default.
 - 15 Oct 2026: deliverables are GitHub source, a live link, a demo video and an offline copy.
 - 16 Oct 2026: UI direction chosen: "Explorer's Toolkit" (sky-blue background, navy outlines/shadows, room colours Ask/Plan/Collect/Explore/Conclude = coral/yellow/blue/green/purple, Baloo 2 + Nunito, mascot "Pip" the owl explorer). Exact hex values are in css/theme.css.
+- 22 Oct 2026 (Part 11e): badges only for reasoning moments already in the log, counted once each; sound off by default.
+- 22 Oct 2026 (Part 11): teacher view linked from the start page; misconception tags fixed to 8 from the literature; revision step after Number Lab's Reveal; English only for the pilot (Arabic RTL = future work). Accessibility changed two colour tokens: main green #2E9A4F -> #217A3B and Conclude purple #8E7CFF -> #A596FF (contrast).
 - 22 Oct 2026 (Part 10): codes are handed out by the teacher; the child saves a file for the teacher (no backend); on reload only the code and the log are kept (rooms start fresh). Hints are on-demand and logged, never penalised.
 - 22 Oct 2026 (Part 9.5): reading minutes is ONE card that compares Class A and Class B side by side (option 1 for B5), not a separate Class B card.
 - 22 Oct 2026 (Part 9.5): Number Lab's real-life shoe data changed to 36, 34, 35, 34, 37, 36, 34 (mode 34, median 35), so the median question can't be passed by repeating the mode.

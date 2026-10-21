@@ -39,6 +39,7 @@ function init() {
         </div>
         <div class="outcomes-box" id="outcomes-box" hidden>
           <p><strong>Possible outcomes:</strong></p>
+          <div class="spinner-picture" id="spinner-picture" role="img" hidden></div>
           <div class="outcome-chips" id="outcome-chips"></div>
         </div>
       </section>
@@ -142,7 +143,7 @@ function setupDevicePicker() {
       selectedDevice = DEVICES[card.dataset.key];
       previousRun = null;
 
-      chips.innerHTML = selectedDevice.outcomes.map((o) => `<span class="outcome-chip">${o}</span>`).join('');
+      showOutcomes(selectedDevice, chips);
       outcomesBox.hidden = false;
 
       markComplete(1);
@@ -151,6 +152,37 @@ function setupDevicePicker() {
 }
 
 // The child needs both a certainty rating AND a reason ("answer + why").
+// Lists every outcome. Spinners are also drawn, with each part sized by its
+// weight, so the unfair spinner LOOKS unfair (Papers 12, 13: "everything is
+// equally likely" is the hardest misconception to fix).
+const SPINNER_COLOURS = { Red: '#FF7A6B', Blue: '#38B6FF', Green: '#4CC26B', Yellow: '#FFC531' };
+
+function showOutcomes(device, chips) {
+  const picture = document.getElementById('spinner-picture');
+  const isSpinner = device.outcomes.every((o) => SPINNER_COLOURS[o]);
+  const total = device.weights.reduce((a, b) => a + b, 0);
+
+  chips.innerHTML = device.outcomes
+    .map((o, i) => (isSpinner
+      ? `<span class="outcome-chip">${o}: ${device.weights[i]} of ${total} parts</span>`
+      : `<span class="outcome-chip">${o}</span>`))
+    .join('');
+
+  picture.hidden = !isSpinner;
+  if (!isSpinner) return;
+
+  // conic-gradient draws pie slices: each colour runs from where the last one stopped.
+  let start = 0;
+  const slices = device.outcomes.map((o, i) => {
+    const end = start + (device.weights[i] / total) * 360;
+    const slice = `${SPINNER_COLOURS[o]} ${start}deg ${end}deg`;
+    start = end;
+    return slice;
+  });
+  picture.style.background = `conic-gradient(${slices.join(', ')})`;
+  picture.setAttribute('aria-label', `Spinner: ${device.outcomes.map((o, i) => `${o} ${device.weights[i]} of ${total} parts`).join(', ')}`);
+}
+
 function setupPredict() {
   const buttons = document.querySelectorAll('.certainty-btn');
   const reasonInput = document.getElementById('predict-reason');

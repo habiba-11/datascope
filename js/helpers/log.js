@@ -43,7 +43,13 @@ export function makeEntry(code, room, type, details = {}, now = new Date()) {
 
 // Records one moment for the current child.
 export function logEvent(room, type, details) {
-  addLogEntry(makeEntry(getExplorerCode(), room, type, details));
+  const entry = makeEntry(getExplorerCode(), room, type, details);
+  addLogEntry(entry);
+  // Tell the page something was logged (the shell uses this for badges).
+  // Node tests have no window, so we only do this in the browser.
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('datascope:logged', { detail: entry }));
+  }
 }
 
 export function readLog() {

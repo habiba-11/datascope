@@ -59,6 +59,17 @@ export function addLogEntry(entry) {
   writeItem(LOG_KEY, JSON.stringify(entries));
 }
 
+// Sound effects are OFF unless the child turns them on (CLAUDE.md).
+const SOUND_KEY = 'datascope:sound';
+
+export function getSoundOn() {
+  return readItem(SOUND_KEY) === 'on';
+}
+
+export function setSoundOn(on) {
+  writeItem(SOUND_KEY, on ? 'on' : 'off');
+}
+
 // For shared devices: removes the child's code, chosen scenario and reasoning
 // log from THIS device, so the next child starts clean. Teacher data is kept.
 export function clearChildData() {

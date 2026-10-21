@@ -87,6 +87,38 @@ h1 {
   margin-top: 16px;
 }
 
+/* Colour is never the only signal (CLAUDE.md): anything chosen also gets a ✓.
+   .active / .selected are the classes the rooms already add when a child picks something. */
+.choice-btn.active::before,
+.certainty-btn.active::before,
+.chart-type-btn.active::before,
+.explore-tab.active::before {
+  content: '✓ ';
+  font-weight: 800;
+}
+
+.scenario-card.selected,
+.device-card.selected {
+  position: relative;
+}
+
+.scenario-card.selected::after,
+.device-card.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid var(--color-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
 /* "Need a hint?" under an open question (js/helpers/prompts.js). */
 .hint-box {
   margin: 6px 0 12px;

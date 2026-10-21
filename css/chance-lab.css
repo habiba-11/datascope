@@ -146,3 +146,27 @@
   font-weight: 700;
   flex-shrink: 0;
 }
+
+/* The spinner drawing: slice sizes come from the device's weights (chance-lab.js). */
+.spinner-picture {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: var(--border-width) solid var(--color-navy);
+  margin: 8px 0 12px;
+  position: relative;
+}
+
+/* The little arrow in the middle, so it reads as a spinner. */
+.spinner-picture::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 52px;
+  background: var(--color-navy);
+  border-radius: 3px;
+  transform: translate(-50%, -100%) rotate(30deg);
+  transform-origin: 50% 100%;
+}
