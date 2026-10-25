@@ -102,6 +102,68 @@
   background: var(--color-bg);
 }
 
+/* The maths recap (js/recap.js). */
+.recap-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.recap-tab {
+  min-height: 48px;
+  padding: 6px 14px;
+}
+
+.recap-card h3 {
+  margin: 0;
+}
+
+.recap-what {
+  margin: 4px 0 8px;
+  font-weight: 700;
+}
+
+.recap-numbers {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 4px 12px;
+  border: 2px solid var(--color-navy);
+  border-radius: 10px;
+  background: var(--color-bg);
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.recap-steps {
+  margin: 0 0 12px;
+  padding-left: 24px;
+}
+
+.recap-steps li {
+  margin: 8px 0;
+}
+
+/* The worked example under each step, e.g. "2 + 4 + 6 + 8 + 10 = 30". */
+.recap-example {
+  display: block;
+  font-family: var(--font-heading);
+  color: var(--color-btn-main-bg);
+}
+
+.recap-pop {
+  animation: modal-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.recap-next,
+.recap-btn {
+  min-height: 48px;
+}
+
+.recap-note {
+  font-weight: 700;
+}
+
 .modal-actions {
   display: flex;
   flex-wrap: wrap;

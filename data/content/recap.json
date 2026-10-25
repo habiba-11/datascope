@@ -1,0 +1,39 @@
+{
+  "note": "Example numbers are small and neutral on purpose: the recap must never show a scenario's real answers. The worked steps are computed with stats.js (js/helpers/recap.js).",
+  "cards": [
+    {
+      "id": "mean",
+      "icon": "⚖️",
+      "title": "Mean",
+      "what": "The fair share: what each one gets if we share equally.",
+      "steps": ["Add up all the numbers.", "Count how many numbers there are.", "Share the total fairly: divide."],
+      "example": [2, 4, 6, 8, 10]
+    },
+    {
+      "id": "median",
+      "icon": "📍",
+      "title": "Median",
+      "what": "The one in the centre, when the numbers are in order.",
+      "steps": ["Put the numbers in order.", "Find the one in the centre.", "Two in the centre? Take halfway between them."],
+      "example": [7, 3, 11, 1, 5]
+    },
+    {
+      "id": "mode",
+      "icon": "🏆",
+      "title": "Mode",
+      "what": "The answer that comes up the most.",
+      "steps": ["Count how often each answer comes up.", "Find the one that comes up the most.", "That is the mode. It can even be a word!"],
+      "example": [2, 3, 3, 4, 5],
+      "wordExample": ["Red", "Blue", "Red", "Green", "Red"]
+    },
+    {
+      "id": "range",
+      "icon": "📏",
+      "title": "Range",
+      "what": "How spread out the answers are.",
+      "steps": ["Find the biggest number.", "Find the smallest number.", "Take away: biggest minus smallest."],
+      "example": [3, 12, 5, 6]
+    }
+  ],
+  "wordsNote": "🤔 Mean, median and range need numbers. Games are words, so we use the mode."
+}

@@ -9,6 +9,8 @@ import { logEvent, trackMeaningTask } from '../helpers/log.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 import { cheer, encourage } from '../motion.js';
 import { finishPhase } from '../phase-progress.js';
+import { whenIntroClosed } from '../phase-intro.js';
+import { addRecapButton, autoOpenRecap } from '../recap.js';
 
 // Number Lab follows the scenario the child picked (Part 17b). The task list
 // depends on the kind of data: see TASKS_BY_KIND in helpers/number-tasks.js.
@@ -55,6 +57,11 @@ async function init() {
 
   tasks.forEach((task, i) => TASK_SETUP[task](i + 1, data));
   setupTaskNav();
+
+  // The maths recap (Part 18): a 📘 button, and the first time it opens by
+  // itself, right after the Number Lab intro is closed.
+  addRecapButton(document.querySelector('.room-title'), kind, 'number-lab');
+  whenIntroClosed().then(() => autoOpenRecap(kind));
 }
 
 // ---------- the task flow ----------

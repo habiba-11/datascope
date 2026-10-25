@@ -3,6 +3,8 @@ import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import { CERTAINTY, certaintyButtonsHTML } from '../helpers/certainty.js';
+import { numberLabKind } from '../helpers/number-tasks.js';
+import { addRecapButton } from '../recap.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { playSound } from '../sounds.js';
@@ -129,6 +131,8 @@ async function init() {
   setupAudienceForm();
   setupSaveWork();
   setupTaskNav();
+  // 📘 Maths recap, for checking a number before using it as proof (Part 18).
+  addRecapButton(document.querySelector('.room-title'), numberLabKind(recipe), 'evidence-board');
 }
 
 function showTask(n) {

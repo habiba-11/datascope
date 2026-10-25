@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-17 built, next is Part 18 (maths recap pop-up)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-18 built, next is Part 19 (student journey dashboard)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -119,8 +119,16 @@
   - Scanned Pip's other lines (badges, levels, welcome page) with the readability helper: all within 12 words per sentence.
   - Checked in headless Chrome (sleep, reading): no console errors.
 
+- Part 18 (25 Oct 2026, Prof comment 5), 138 tests passing:
+  - data/content/recap.json: 4 cards (⚖️ Mean "the fair share", 📍 Median "the one in the centre, when the numbers are in order", 🏆 Mode, 📏 Range), each with a meaning line, 3 steps and a small neutral example list.
+  - js/helpers/recap.js (pure, tests/recap.test.js): recapCardIds(kind), exampleLines (worked steps computed with stats.js, e.g. "30 ÷ 5 = 6. The mean is 6."), exampleAnswer.
+  - Test: the recap's example answers never equal any scenario's real mean / median / mode / range (both reading classes too), so it can't spoil "guess first". Games get only the Mode card, a note ("Mean, median and range need numbers. Games are words, so we use the mode.") and a word example (Red, Blue, Red...) that is neither a game nor a canteen lunch.
+  - js/recap.js: the pop-up with one tab per card (aria-pressed), "▶ Next step" shows each worked step with a pop-in. Opens by itself once per child in Number Lab, right after the Number Lab intro closes (phase-intro.js whenIntroClosed), so two pop-ups never fight. "📘 Maths recap" button in Number Lab and Evidence Board.
+  - New log event recap-viewed { auto, cardsViewed }.
+  - Checked in headless Chrome (sleep, games): intro then recap, steps appear one by one, no auto-open on reload, 📘 reopens, no console errors.
+
 ## Next
-- Part 18: mean / median / mode recap pop-up (neutral example numbers, never the scenario's real answers).
+- Part 19: student journey dashboard ("My journey" page, buildJourney shared with the teacher dashboard). Decide first: no time-per-phase on the child's page.
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.

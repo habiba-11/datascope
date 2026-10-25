@@ -18,6 +18,7 @@ export const EVENT_TYPES = [
   'phase-start',  // the child entered a phase not yet done (time per phase = first start to complete)
   'phase-complete', // the child finished a phase (logged once per code + scenario)
   'phase-feedback', // the feedback card shown at the end of a phase, with its stars
+  'recap-viewed', // the maths recap pop-up was opened (auto or 📘), and which cards were looked at
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];

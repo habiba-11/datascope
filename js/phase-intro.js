@@ -7,6 +7,9 @@ import { hasSeenIntro, markIntroSeen } from './storage/save.js';
 
 let phasesPromise = null;
 let currentPhase = null;
+// Resolves when the intro that opened by itself is closed (or straight away
+// if none opened), so another pop-up can wait its turn (e.g. the maths recap).
+let autoIntroClosed = Promise.resolve();
 
 // Loaded once per page, then reused.
 function loadPhases() {
@@ -43,7 +46,11 @@ export function setIntroPhase(phase) {
   currentPhase = phase;
   if (hasSeenIntro(phase)) return;
   markIntroSeen(phase);
-  showPhaseIntro(phase, true);
+  autoIntroClosed = showPhaseIntro(phase, true);
+}
+
+export function whenIntroClosed() {
+  return autoIntroClosed;
 }
 
 // The ℹ️ button always shows the intro of the phase the child is in now.
