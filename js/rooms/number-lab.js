@@ -7,7 +7,7 @@ import {
 } from '../helpers/number-tasks.js';
 import { logEvent, trackMeaningTask } from '../helpers/log.js';
 import { getSelectedScenarioId } from '../storage/save.js';
-import { cheer, encourage } from '../motion.js';
+import { cheer, encourage, stagger, countUp } from '../motion.js';
 import { finishPhase } from '../phase-progress.js';
 import { whenIntroClosed } from '../phase-intro.js';
 import { addRecapButton, autoOpenRecap } from '../recap.js';
@@ -304,6 +304,12 @@ const TASK_SETUP = {
       const box = document.getElementById('stats-box');
       box.innerHTML = statsHTML(stats);
       box.hidden = false;
+      // The numbers spring in one by one and count up, like a drum roll.
+      stagger(box.querySelectorAll('.stat-card'), { each: 0.15 });
+      box.querySelectorAll('.stat-value').forEach((value) => {
+        const text = value.textContent;
+        if (/^\d+(\.\d+)?$/.test(text)) countUp(value, Number(text), text.includes('.') ? 1 : 0);
+      });
       show(feedback, revealMessage(kind, guess, stats));
       event.target.disabled = true;
       document.querySelectorAll('.predict-row input, .predict-row button').forEach((el) => { el.disabled = true; });

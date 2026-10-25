@@ -1,10 +1,28 @@
 // Shell layer: small happy motions, paired with their sound.
-// The motions are CSS animations (base.css, shell.css), so "reduce motion"
-// switches them all off in one place (base.css). The sounds still follow the
-// sound toggle.
+// Simple ones are CSS animations (base.css, shell.css), so "reduce motion"
+// switches them all off in one place (base.css). Bigger ones (Part 21) use
+// GSAP (js/vendor/gsap.min.js, loaded by each room page): they also do nothing
+// with reduced motion, and if GSAP is missing the page still works, just still.
+// The sounds still follow the sound toggle.
 import { playSound } from './sounds.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// The same timings as the motion tokens in theme.css (seconds).
+export const MOTION = { fast: 0.25, medium: 0.45, slow: 0.8, spring: 'back.out(1.7)', out: 'power3.out' };
+
+// GSAP, or null when it may not or cannot run (reduced motion, or not loaded).
+function gsapOrNull() {
+  return !reduceMotion() && window.gsap ? window.gsap : null;
+}
+
+// A hidden tab does not need to animate: pause everything until it is back.
+if (typeof document !== 'undefined' && window.gsap) {
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) window.gsap.globalTimeline.pause();
+    else window.gsap.globalTimeline.resume();
+  });
+}
 
 // Plays a CSS animation class on an element, even if it is already playing.
 export function animate(element, name) {
@@ -19,6 +37,64 @@ export function animate(element, name) {
 export function pipReacts(name) {
   animate(document.querySelector('.pip-mascot'), name);
 }
+
+// ---------- GSAP helpers (Part 21a) ----------
+
+// Elements spring in one after another (stat cards, list items, stars...).
+export function stagger(elements, { each = 0.08, from = { y: 16, scale: 0.85 } } = {}) {
+  const gsap = gsapOrNull();
+  if (!gsap || !elements.length) return;
+  gsap.from(elements, { ...from, opacity: 0, duration: MOTION.medium, ease: MOTION.spring, stagger: each, clearProps: 'all' });
+}
+
+// One element pops in.
+export function pop(element) {
+  stagger(element ? [element] : []);
+}
+
+// A number counts up from 0 to `to` (e.g. the mean 8.4). With reduced motion,
+// or without GSAP, the final number is simply shown.
+export function countUp(element, to, decimals = 0) {
+  const gsap = gsapOrNull();
+  const show = (n) => { element.textContent = n.toFixed(decimals); };
+  if (!gsap) {
+    show(to);
+    return;
+  }
+  const counter = { value: 0 };
+  gsap.to(counter, { value: to, duration: MOTION.slow, ease: MOTION.out, onUpdate: () => show(counter.value), onComplete: () => show(to) });
+}
+
+// A gentle side-to-side shake (a kind "not yet", never an angry one).
+export function shake(element) {
+  const gsap = gsapOrNull();
+  if (!gsap || !element) return;
+  gsap.fromTo(element, { x: 0 }, { keyframes: { x: [-6, 6, -4, 4, 0] }, duration: MOTION.medium, ease: 'none', clearProps: 'x' });
+}
+
+// A short "look at me" pulse (e.g. a newly opened button).
+export function pulse(element) {
+  const gsap = gsapOrNull();
+  if (!gsap || !element) return;
+  gsap.fromTo(element, { scale: 1 }, { scale: 1.08, duration: MOTION.fast, yoyo: true, repeat: 3, ease: 'sine.inOut', clearProps: 'scale' });
+}
+
+// A slow, endless float up and down (e.g. Pip waiting). Returns the tween so
+// it can be stopped; nothing with reduced motion.
+export function float(element) {
+  const gsap = gsapOrNull();
+  if (!gsap || !element) return null;
+  return gsap.to(element, { y: -6, duration: 1.6, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+}
+
+// The room's content slides in when a page opens.
+export function enterRoom(element) {
+  const gsap = gsapOrNull();
+  if (!gsap || !element) return;
+  gsap.from(element, { y: 24, opacity: 0, duration: MOTION.medium, ease: MOTION.out, clearProps: 'all' });
+}
+
+// ---------- big moments ----------
 
 // Confetti in the five room colours falls over the page (big moments only:
 // leveling up, or a finished Evidence Card). Skipped with reduced motion.

@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-20b built, next is Part 21 (gamified motion); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-20b + 21a built, next is Part 21b (SVG Pip, unlock animation, rewards); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -161,9 +161,16 @@
   - Dev tool: playwright-core (devDependency, uses the installed Chrome, never shipped) + dev/shots.mjs: "npm run shots" saves screenshots of every main page at 1366x768 and 768x1024 into dev/screenshots/ (not in Git).
   - Checked with Playwright: button → PIN page, wrong PIN refused, right PIN opens the dashboard, reload keeps it open, no errors.
 
+- Part 21a (26 Oct 2026, Prof comment 8), 166 tests passing:
+  - GSAP 3.15.0 (Standard no-charge license) as a local copy js/vendor/gsap.min.js (works offline), loaded by every room page; npm devDependency only to fetch it.
+  - Motion tokens in theme.css (--duration-fast/medium/slow, --ease-spring, --ease-out) and the same values in motion.js (MOTION).
+  - motion.js helpers: stagger, pop, countUp, shake, pulse, float, enterRoom. All do nothing with reduced motion or without GSAP (the final state is shown); every animation pauses while the tab is hidden. The old CSS helpers (animate, cheer, encourage, confetti) are unchanged.
+  - Used: each room's content slides in; Number Lab's stat cards spring in one by one and their numbers count up (replaces the CSS pop-in); pages fade into each other with cross-page View Transitions where supported (progressive enhancement).
+  - Checked with Playwright: mid-animation the numbers are counting (6.9 → 8.4), with reduced motion they show at once; no errors.
+
 ## Next
 - Part 20c: rubric coding of each claim (later: waiting for the real levels from Papers 7 and 13).
-- Part 21: gamified motion and interaction (21a motion system first).
+- Part 21b: progress and rewards: original SVG Pip with moods, lock → key → open on the step bar, Pip walks the trail, badge card flip, confetti only for phase-complete and level-up.
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.

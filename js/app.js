@@ -3,7 +3,7 @@ import { countBadges, counterHTML, setupCelebrations } from './celebrate.js';
 import { setupInfoButton } from './phase-intro.js';
 import { guardPage, enterPhase } from './phase-progress.js';
 import { visibleSteps, isStepDone, isUnlocked } from './helpers/progress.js';
-import { pipReacts } from './motion.js';
+import { pipReacts, enterRoom } from './motion.js';
 
 const STEPS = [
   { id: 'ask', label: 'Ask', icon: '❓', color: 'ask', href: 'question-studio.html' },
@@ -73,6 +73,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
 
   setupCelebrations();
   setupInfoButton();
+  enterRoom(root.querySelector('.room-content'));
   window.addEventListener('datascope:phase-done', showUnlocked);
   if (phase) enterPhase(phase);
 }

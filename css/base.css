@@ -101,6 +101,14 @@ h1 {
   to { transform: translateY(105vh) rotate(var(--spin)); }
 }
 
+/* Part 21a: moving to another room fades the pages into each other, in
+   browsers that support cross-page View Transitions (others just change page). */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
 /* Children (or teachers) who turn on "reduce motion" get no slides or pops. */
 @media (prefers-reduced-motion: reduce) {
   *,

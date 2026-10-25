@@ -36,4 +36,12 @@
   --shadow-card: 8px 8px 0 var(--color-navy);
   --shadow-button: 4px 4px 0 var(--color-navy);
   --shadow-button-active: 1px 1px 0 var(--color-navy);
+
+  /* motion (Part 21a): CSS animations use these; js/motion.js has the same
+     values for GSAP, in its MOTION list. */
+  --duration-fast: 0.25s;
+  --duration-medium: 0.45s;
+  --duration-slow: 0.8s;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* overshoots a little: bouncy */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
