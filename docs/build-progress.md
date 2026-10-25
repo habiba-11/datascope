@@ -155,8 +155,14 @@
   - Charts (Chart.js 4.5.1, same pin as Graph Lab): completion funnel and average minutes per phase, numbers written on the bars (directLabelsPlugin), screen-reader descriptions, no animation (screenshot-friendly for thesis figures).
   - Checked in headless Chrome: DEMO on → banner, labelled rows, charts; thesis export with only DEMO refuses; with a real child + DEMO the CSV has the real row only; class CSV has no DEMO; after reload DEMO is off and was never stored. No console errors.
 
+- Teacher view with a PIN (26 Oct 2026, Habiba's decision: not hidden), 166 tests passing:
+  - "🧑‍🏫 Teacher's view" button back on the start page; teacher/index.html asks for the PIN first and only then loads the dashboard code (js/teacher/pin-gate.js); the PIN is remembered until the tab is closed (sessionStorage).
+  - js/helpers/pin.js (tests/pin.test.js): only the SHA-256 fingerprint of the PIN is in the code. Honest limit for the thesis: a browser-side PIN on a static site keeps children out but is NOT real security.
+  - Dev tool: playwright-core (devDependency, uses the installed Chrome, never shipped) + dev/shots.mjs: "npm run shots" saves screenshots of every main page at 1366x768 and 768x1024 into dev/screenshots/ (not in Git).
+  - Checked with Playwright: button → PIN page, wrong PIN refused, right PIN opens the dashboard, reload keeps it open, no errors.
+
 ## Next
-- Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13) and an optional PIN (waiting for Habiba).
+- Part 20c: rubric coding of each claim (later: waiting for the real levels from Papers 7 and 13).
 - Part 21: gamified motion and interaction (21a motion system first).
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
@@ -179,6 +185,7 @@
 - 25 Oct 2026 (Round 2 start): Prof's 8 comments planned as Parts 13 to 24 (docs/round-2-plan.md). Backend = optional bonus behind a flag; rewards for reasoning, never speed; DEMO data never exported; deploy locked until "Prof confirmed" (all in CLAUDE.md). Number Lab following the chosen scenario (Part 17b) reverses the earlier "by design" note in Known bugs.
 - 25 Oct 2026 (Part 17c): no extra scenario-linked Chance Lab device for now.
 - 25 Oct 2026 (Part 15): done rules as in the plan, but Conclude = card built (saving moves to My Journey); teacher "open all rooms" preview switch keeps the architecture's "a teacher can open any room"; progress per code + scenario (switching back restores it); Explore rooms open in order Graph → Number → Chance.
+- 26 Oct 2026: teacher view NOT hidden: a start-page button + PIN (teacher123, stored as a hash). Part 21: GSAP allowed (local copy), Playwright allowed as a dev tool, Pip becomes an original SVG.
 - 26 Oct 2026: Evidence Board audience/form task removed (Habiba); "My findings" summary replaces the maths recap in Conclude.
 - 25 Oct 2026 (Part 19): time per phase is for the teacher only, never shown to the child.
 - Still open (decide before the part that needs it): real rubric levels from the Paper 7 and 13 PDFs (Part 20).

@@ -1,8 +1,8 @@
-// Hidden teacher dashboard (Part 20, Prof's comment 6). Import the children's
-// saved files, see the class at a glance (completion funnel, averages), one row
-// per child per scenario, drill into one child, tag misconceptions, download CSVs.
-// Hidden = no link from any child page. On a static site that is a speed bump,
-// not security; real protection needs a login (optional Part 22).
+// Teacher dashboard (Part 20, Prof's comment 6). Import the children's saved
+// files, see the class at a glance (completion funnel, averages), one row per
+// child per scenario, drill into one child, tag misconceptions, download CSVs.
+// Loaded by pin-gate.js only after the right PIN (a speed bump, not security;
+// real protection needs a login, optional Part 22).
 // Imported text is shown with textContent only: a file can hold anything a child typed.
 import { parseExportFile, MISCONCEPTION_TAGS, tagEntries } from '../helpers/summary.js';
 import { childRows, classOverview } from '../helpers/metrics.js';

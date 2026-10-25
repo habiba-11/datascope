@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Hidden teacher dashboard (Part 20): no child page links here. This only
-       keeps children from wandering in; it is NOT security (static site). -->
-  <meta name="robots" content="noindex">
+  <!-- Teacher dashboard (Part 20). A PIN keeps children out; on a static site
+       that is a speed bump, NOT real security (see js/helpers/pin.js). -->
   <title>Teacher dashboard · DataScope</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
@@ -19,6 +18,17 @@
   <main class="teacher card">
     <a class="back-link" href="../index.html">← Back to DataScope</a>
     <h1>🧑‍🏫 Teacher dashboard</h1>
+
+    <section class="pin-gate" id="pin-gate">
+      <form id="pin-form" class="pin-form">
+        <label for="pin-input">🔒 Teacher PIN</label>
+        <input type="password" id="pin-input" autocomplete="off">
+        <button class="btn btn-main" type="submit">Open the dashboard</button>
+      </form>
+      <p class="feedback" id="pin-message" aria-live="polite" hidden></p>
+    </section>
+
+    <div id="dashboard" hidden>
     <p>Import the files your children saved (<code>datascope-CODE-DATE.json</code>). Everything stays on this device: nothing is uploaded. The survey data children worked with is synthetic (a pretend class).</p>
 
     <div class="teacher-actions">
@@ -88,7 +98,8 @@
     <h2>Preview the rooms</h2>
     <p>Children unlock the steps one at a time. To look at any room yourself, open them all on <strong>this</strong> device. Turn it off before a child uses this device.</p>
     <button class="btn" id="preview-btn" type="button" aria-pressed="false"></button>
+    </div>
   </main>
-  <script type="module" src="../js/teacher/dashboard.js"></script>
+  <script type="module" src="../js/teacher/pin-gate.js"></script>
 </body>
 </html>
