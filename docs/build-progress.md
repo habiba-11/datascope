@@ -99,7 +99,7 @@
   - Build-it hint now explains the idea of the mean: "5 × 8 = 40. Your 5 numbers must add up to 40."
   - Log: prediction / revision / meaning-task entries carry scenarioId and the real question; task names no longer depend on the scenario (badges count each puzzle once): build-mean, find-mias-mistake, real-life-mode, real-life-median, why-no-mean, compare-range. trackMeaningTask(room, task, extra).
   - Feedback card understands word guesses ("You guessed Football. That is the mode!").
-  - Found in the browser check and fixed: shoes said "a very big answer pulls it up" (35.3 vs 35, no extreme value) → the "pulls" message now needs a gap of at least 0.5; the reading  line now describes the comparison.
+  - Found in the browser check and fixed: shoes said "a very big answer pulls it up" (35.3 vs 35, no extreme value) → the "pulls" message now needs a gap of at least 0.5; the reading "teaches" line now describes the comparison.
   - Checked in headless Chrome for all 4 scenarios: every task solvable, wrong tries show kind hints, card appears, no console errors.
 
 ## Next
