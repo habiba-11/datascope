@@ -1,0 +1,76 @@
+/* The shared pop-up window (js/modal.js). Colours and shapes come from theme.css. */
+.modal {
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 0;
+  max-width: 560px;
+  width: calc(100% - 32px);
+  background: var(--color-card-bg);
+  color: var(--color-text);
+  animation: modal-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); /* overshoots a little: bouncy */
+}
+
+.modal::backdrop {
+  background: rgba(20, 30, 60, 0.5);
+}
+
+/* A coloured band in the room's colour, with Pip and the title. */
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--modal-accent);
+  border-bottom: var(--border-width) solid var(--color-navy);
+  padding: 12px 16px;
+}
+
+.modal-pip {
+  font-size: 44px;
+  line-height: 1;
+}
+
+.modal-title {
+  flex: 1;
+  font-size: 26px;
+  color: var(--color-navy);
+}
+
+/* At least 48px, so it is easy to tap. */
+.modal-close {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0;
+  background: var(--color-card-bg);
+  color: var(--color-navy);
+  font-size: 22px;
+}
+
+.modal-body {
+  padding: 16px 24px;
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 0 24px 24px;
+}
+
+.modal-actions .btn {
+  min-height: 48px;
+}
+
+/* The page behind a pop-up does not scroll. */
+body.modal-open {
+  overflow: hidden;
+}
+
+@keyframes modal-pop {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+/* Reduced motion: the global rule in base.css switches modal-pop off. */

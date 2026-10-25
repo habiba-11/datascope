@@ -132,3 +132,10 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 ## Session routine
 - **Start:** read `docs/build-progress.md`, then ask what part we're on, whether the last part worked, and how much time I have today.
 - **End:** update `docs/build-progress.md` with what's done, what's next, known bugs, and decisions made.
+
+## Round 2 (Prof feedback, 25 Oct 2026)
+- The Round 2 plan lives in `docs/round-2-plan.md` (Parts 13 to 24). Read it right after `docs/build-progress.md` at the start of every session. It replaces Parts 11 to 12 of the build plan above (deploy is now Part 24).
+- **Backend is an optional bonus (Part 22), behind a config flag** (`enabled: false` by default). This is an explicit exception to "no backend" above. The app must work fully with the flag off.
+- **Rewards stay about good reasoning, never speed.** No timers, no leaderboards, no comparing children.
+- **Demo data is labelled DEMO** everywhere it appears and is **never exported**.
+- **Deploy is locked** until I write "Prof confirmed".

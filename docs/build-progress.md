@@ -1,8 +1,10 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Part 12 (more gamification): 12a-d built, waiting for Habiba's test; 11d real-device test still open**
-- Last updated: 22 Oct 2026
+- Current part: **Round 2: Part 13 built (pop-up component), next is Part 14** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
+- Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
+- Last updated: 25 Oct 2026
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -47,12 +49,19 @@
   - 12c: 5 named kinds of badge in badges.js (BADGE_TYPES, badgeType, badgeShelf): 🧙 Why-Wizard, 🔄 Mind-Changer, 🧮 Number Cracker, 🔍 Graph Skeptic, 🏅 Data Detective. Counting is unchanged (same keys, once each); kinds only group them. The sidebar counter is now a button that opens js/badge-shelf.js (a <dialog>: earned cards "✓ Earned × 2" in yellow, locked cards "🔒 Still to find" + where to find it, dashed + grey icon). Pip names the badge when it's earned. 2 new tests (67 passing). Checked at 1366x768 and 768x1024.
   - 12d: explorer levels in badges.js (LEVELS, levelFor; tested): 🐣 Rookie Explorer (0) → 🔎 Junior Detective (2) → 🕵️ Super Detective (5) → 🏆 Master Detective (9 of 17 badges). The badge button shows level + count; the shelf says how many badges to the next level. Level-up: Pip announces it, confetti (motion.js confetti(): 40 pieces in room colours, removed by a timer, none with reduced motion), levelUp fanfare. Confetti also when the Evidence Card appears. 68 tests passing.
 
+- Part 13 (25 Oct 2026, Round 2, Prof comments 1, 3, 5), 72 tests passing:
+  - js/modal.js: openModal({ icon, title, body, buttons, accent, dismissible }) returns a promise with the pressed button's value. Built on <dialog> + showModal() (like the badge shelf): Tab stays inside, Esc and ✕ close it (unless dismissible: false), focus goes back to where it was, the page behind doesn't scroll. Pip and the room colour in the header. All text via textContent.
+  - js/helpers/modal-queue.js: one pop-up at a time, others wait in line (4 tests in tests/modal-queue.test.js).
+  - css/modal.css: bouncy pop-in (off with reduced motion), buttons and ✕ at least 48px. Linked in all 6 room pages. The temporary demo page was deleted.
+  - Put in js/ (next to motion.js), not a new js/ui/ folder as the plan said, to match the CLAUDE.md folder structure.
+
 ## Next
+- Part 14: phase intro pop-ups (data/content/phases.json, ℹ️ button, "seen" per child + phase, popup-seen log event).
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.
 - 11d (Habiba): run docs/device-test-checklist.md on a real Chromebook or tablet and report back.
-- Part 13 (was Part 12): deploy to GitHub Pages, offline copy (fonts + Chart.js local), demo video, thesis screenshots.
+- Round 2 (25 Oct 2026): Part 13 = pop-up component. Deploy moved to **Part 24**, locked until Habiba says "Prof confirmed". See docs/round-2-plan.md.
 
 ## Known bugs/open items
 - Number Lab's predict/reveal task and meaning tasks are still hardcoded to sleep-hours/fixed examples (by design — the "Build it"/"Mia"/shoe-size tasks are scenario-independent skill practice, not meant to follow the Question Studio pick). Only Data Hub, Graph Lab, and Evidence Board follow the selected scenario so far.
@@ -67,6 +76,8 @@
 - none yet
 
 ## Decisions log
+- 25 Oct 2026 (Round 2 start): Prof's 8 comments planned as Parts 13 to 24 (docs/round-2-plan.md). Backend = optional bonus behind a flag; rewards for reasoning, never speed; DEMO data never exported; deploy locked until "Prof confirmed" (all in CLAUDE.md). Number Lab following the chosen scenario (Part 17b) reverses the earlier "by design" note in Known bugs.
+- Still open (decide before the part that needs it): route guard vs "a teacher can open any room" (Part 15); Conclude done = card built, saving moves to My Journey (Parts 15/19); real rubric levels from the Paper 7 and 13 PDFs (Part 20); no "time per phase" on the child's page (Part 19).
 - 22 Oct 2026 (Part 12): more gamification, inserted before deployment (now Part 13). Every sound and motion is tied to a result or reasoning moment; no timers, leaderboards or point loss. No sound on ordinary button taps.
 - 15 Oct 2026: the UI must be colourful, playful, engaging and very simple for kids (see the UI section in CLAUDE.md).
 - 15 Oct 2026: short explanations by default.
