@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-20b + 21a built, next is Part 21b (SVG Pip, unlock animation, rewards); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-20b + 21a built, next is Part 21b step 2 (journey trail, XP bar, badge flip); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -168,9 +168,16 @@
   - Used: each room's content slides in; Number Lab's stat cards spring in one by one and their numbers count up (replaces the CSS pop-in); pages fade into each other with cross-page View Transitions where supported (progressive enhancement).
   - Checked with Playwright: mid-animation the numbers are counting (6.9 → 8.4), with reduced motion they show at once; no errors.
 
+- Part 21b, step 1 (26 Oct 2026), 166 tests passing:
+  - js/pip.js: Pip is now an original SVG owl explorer (yellow explorer hat, magnifying glass) with 3 moods: happy, think (eyes up, "?", glass raised), cheer (wings up, sparkles), and a blink. Used in the sidebar (floats gently), the pop-up header and the start page (with an aria-label there). pipReacts() also sets the mood for a moment.
+  - Unlock: a new step (or Explore tab) springs in while 🔒 shakes → 🔑 → 🔓 floats away (motion.js unlockStep), plus confetti for the finished phase. Replaces the CSS slide-in of Part 15.
+  - Found with Playwright and fixed: the unlock played hidden behind the next pop-up (e.g. the Plan intro). modal.js pauseNextModal: after a feedback card the next pop-up waits 1.8 s (0 with reduced motion).
+  - .gitattributes keeps js/vendor byte-for-byte.
+  - Checked with Playwright, normal and reduced motion: 🔒 → 🔑 → 🔓 and 40 confetti pieces normally, none with reduced motion; no errors.
+
 ## Next
 - Part 20c: rubric coding of each claim (later: waiting for the real levels from Papers 7 and 13).
-- Part 21b: progress and rewards: original SVG Pip with moods, lock → key → open on the step bar, Pip walks the trail, badge card flip, confetti only for phase-complete and level-up.
+- Part 21b, step 2: Pip walks the My journey trail, animated star/XP bar, badge card flip on the shelf, level-up moment.
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.

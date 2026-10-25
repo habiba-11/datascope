@@ -1,6 +1,10 @@
 // Welcome page: the child types the anonymous code their teacher gave them.
 import { normalizeCode, isValidCode } from './helpers/log.js';
 import { getExplorerCode, setExplorerCode } from './storage/save.js';
+import { pipSVG } from './pip.js';
+
+// Pip greets the child on the start page.
+document.getElementById('mascot').innerHTML = pipSVG('Pip the owl explorer');
 
 const form = document.getElementById('code-form');
 const input = document.getElementById('code-input');

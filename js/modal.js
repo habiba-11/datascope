@@ -2,9 +2,17 @@
 // Used later by the phase intros, the phase feedback and the maths recap.
 // All text goes in with textContent, so nothing typed can ever become HTML.
 import { createModalQueue } from './helpers/modal-queue.js';
+import { pipSVG } from './pip.js';
 
 const queue = createModalQueue();
 let idCounter = 0;
+// After the open pop-up closes, the next one in line waits this long (ms).
+// Used after a feedback card, so the child first sees the unlock animation.
+let pauseBeforeNext = 0;
+
+export function pauseNextModal(ms) {
+  pauseBeforeNext = ms;
+}
 
 // Opens a pop-up, or puts it in line if one is already open.
 // Returns a promise with the `value` of the button pressed ('close' for ✕ or Esc).
@@ -43,8 +51,7 @@ function show({ options, resolve }) {
   header.className = 'modal-header';
   const pip = document.createElement('span');
   pip.className = 'modal-pip';
-  pip.setAttribute('aria-hidden', 'true');
-  pip.textContent = '🦉';
+  pip.innerHTML = pipSVG(); // our own drawing, no child text
   const heading = document.createElement('h2');
   heading.id = titleId;
   heading.className = 'modal-title';
@@ -105,6 +112,8 @@ function show({ options, resolve }) {
     if (returnFocusTo && document.contains(returnFocusTo)) returnFocusTo.focus();
     resolve(value);
     const next = queue.done();
-    if (next) show(next);
+    const wait = pauseBeforeNext;
+    pauseBeforeNext = 0;
+    if (next) setTimeout(() => show(next), wait);
   }
 }

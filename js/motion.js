@@ -5,6 +5,7 @@
 // with reduced motion, and if GSAP is missing the page still works, just still.
 // The sounds still follow the sound toggle.
 import { playSound } from './sounds.js';
+import { pipMoodFor } from './pip.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -33,9 +34,10 @@ export function animate(element, name) {
   element.addEventListener('animationend', () => element.classList.remove(name), { once: true });
 }
 
-// Pip reacts: 'hop' (happy) or 'think' (a curious head tilt).
+// Pip reacts: 'hop' (a happy hop, wings up) or 'think' (a head tilt, eyes up, "?").
 export function pipReacts(name) {
   animate(document.querySelector('.pip-mascot'), name);
+  pipMoodFor(name === 'think' ? 'think' : 'cheer');
 }
 
 // ---------- GSAP helpers (Part 21a) ----------
@@ -94,10 +96,33 @@ export function enterRoom(element) {
   gsap.from(element, { y: 24, opacity: 0, duration: MOTION.medium, ease: MOTION.out, clearProps: 'all' });
 }
 
+// A step (or Explore tab) opens: it springs in while a 🔒 shakes, becomes a 🔑,
+// turns, becomes 🔓 and floats away (Part 21b). Without motion it just appears.
+export function unlockStep(element) {
+  const gsap = gsapOrNull();
+  if (!gsap || !element) return;
+  const holder = element.querySelector('.step-icon') || element;
+  const lock = document.createElement('span');
+  lock.className = 'unlock-badge';
+  lock.setAttribute('aria-hidden', 'true');
+  lock.textContent = '🔒';
+  holder.append(lock);
+
+  gsap.timeline({ onComplete: () => lock.remove() })
+    .from(element, { scale: 0.3, opacity: 0, duration: MOTION.medium, ease: MOTION.spring, clearProps: 'all' })
+    .to(lock, { keyframes: { x: [-4, 4, -3, 3, 0] }, duration: 0.4 })
+    .call(() => { lock.textContent = '🔑'; })
+    .to(lock, { rotation: 90, duration: MOTION.fast })
+    .call(() => { lock.textContent = '🔓'; })
+    .to(lock, { rotation: 0, scale: 1.4, duration: 0.2 })
+    .to(lock, { y: -24, opacity: 0, duration: 0.35 })
+    .fromTo(holder, { scale: 1 }, { scale: 1.25, duration: 0.18, yoyo: true, repeat: 1, clearProps: 'scale' }, '<');
+}
+
 // ---------- big moments ----------
 
 // Confetti in the five room colours falls over the page (big moments only:
-// leveling up, or a finished Evidence Card). Skipped with reduced motion.
+// a finished phase, or leveling up). Skipped with reduced motion.
 const CONFETTI_COLOURS = ['ask', 'plan', 'collect', 'explore', 'conclude'];
 
 export function confetti() {

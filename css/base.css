@@ -233,3 +233,83 @@ h1 {
 .hill-front {
   fill: var(--color-hill-front);
 }
+
+/* ---------- Pip, the SVG mascot (js/pip.js, Part 21b) ---------- */
+.pip {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.pip path,
+.pip ellipse,
+.pip circle,
+.pip line {
+  stroke: var(--color-navy);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.pip-body,
+.pip-tuft,
+.pip-wing ellipse { fill: #9A6334; }
+.pip-belly { fill: #FCE3B0; }
+.pip-feather { fill: none; stroke-width: 2.5 !important; }
+.pip-eye { fill: white; }
+.pip-pupil { fill: var(--color-navy); stroke: none !important; }
+.pip-shine { fill: white; stroke: none !important; }
+.pip-blush { fill: var(--color-ask); stroke: none !important; opacity: 0.55; }
+.pip-beak,
+.pip-foot { fill: #F59E0B; }
+.pip-hat-top,
+.pip-hat-brim { fill: var(--color-plan); }
+.pip-hat-band { fill: var(--color-ask); }
+.pip-glass circle { fill: #DFF3FF; }
+.pip-glass line { stroke-width: 5; }
+
+/* Moving parts turn around their own centre. */
+.pip-wing,
+.pip-pupils,
+.pip-lids,
+.pip-glass,
+.pip-sparkles,
+.pip-question {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform var(--duration-medium) var(--ease-spring), opacity var(--duration-fast);
+}
+
+.pip-wing-left { transform-origin: 80% 20%; }
+.pip-wing-right { transform-origin: 20% 20%; }
+
+/* The eyelids (body colour) are folded away, and close for a blink now and then. */
+.pip-lids ellipse { fill: #9A6334; }
+.pip-lids { transform: scaleY(0); animation: pip-blink 5s infinite; }
+
+@keyframes pip-blink {
+  0%, 94%, 100% { transform: scaleY(0); }
+  97% { transform: scaleY(1); }
+}
+
+.pip-question {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 700;
+  fill: var(--color-navy);
+  opacity: 0;
+}
+
+.pip-sparkles path { fill: var(--color-plan); stroke-width: 2 !important; }
+.pip-sparkles { opacity: 0; transform: scale(0.4); }
+
+/* Think: eyes look up, a "?" appears, the glass comes up to look closer. */
+.pip--think .pip-pupils { transform: translate(3px, -4px); }
+.pip--think .pip-question { opacity: 1; }
+.pip--think .pip-glass { transform: translate(-6px, -10px) rotate(-20deg); }
+
+/* Cheer: wings up, sparkles. */
+.pip--cheer .pip-wing-left { transform: rotate(55deg); }
+.pip--cheer .pip-wing-right { transform: rotate(-55deg); }
+.pip--cheer .pip-sparkles { opacity: 1; transform: scale(1); }

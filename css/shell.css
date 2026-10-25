@@ -69,14 +69,19 @@
   background-image: repeating-linear-gradient(to right, var(--color-navy) 0 6px, transparent 6px 12px);
 }
 
-/* Part 15: a newly unlocked step slides in, and its connector draws itself. */
-.step-new {
-  animation: step-slide-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* Part 15: a newly unlocked step's connector draws itself. The step itself
+   springs in with the lock -> key -> open animation (motion.js unlockStep). */
+.step-icon,
+.explore-tab {
+  position: relative;
 }
 
-@keyframes step-slide-in {
-  from { transform: translateX(-24px) scale(0.6); opacity: 0; }
-  to { transform: none; opacity: 1; }
+.unlock-badge {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  font-size: 22px;
+  pointer-events: none;
 }
 
 .connector-new {
@@ -142,9 +147,9 @@
   width: 100%;
 }
 
+/* Pip (SVG, js/pip.js) in the sidebar. */
 .pip-mascot {
-  font-size: 80px;
-  line-height: 1;
+  width: 110px;
 }
 
 .badge-counter {

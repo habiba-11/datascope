@@ -3,7 +3,8 @@ import { countBadges, counterHTML, setupCelebrations } from './celebrate.js';
 import { setupInfoButton } from './phase-intro.js';
 import { guardPage, enterPhase } from './phase-progress.js';
 import { visibleSteps, isStepDone, isUnlocked } from './helpers/progress.js';
-import { pipReacts, enterRoom } from './motion.js';
+import { pipReacts, enterRoom, float, unlockStep, confetti } from './motion.js';
+import { pipSVG } from './pip.js';
 
 const STEPS = [
   { id: 'ask', label: 'Ask', icon: '❓', color: 'ask', href: 'question-studio.html' },
@@ -49,7 +50,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
     <div class="shell-body">
       <aside class="sidebar">
         <div class="speech-bubble">${pipMessage}</div>
-        <div class="pip-mascot" aria-hidden="true">🦉</div>
+        <div class="pip-mascot">${pipSVG()}</div>
         <button class="btn badge-counter" id="badge-counter" type="button" aria-live="polite">${counterHTML(countBadges())}</button>
         ${codeBadge()}
         <button class="btn sound-toggle" id="sound-toggle" type="button" aria-pressed="false">🔇 Sound: off</button>
@@ -74,6 +75,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   setupCelebrations();
   setupInfoButton();
   enterRoom(root.querySelector('.room-content'));
+  float(root.querySelector('.pip-mascot .pip'));
   window.addEventListener('datascope:phase-done', showUnlocked);
   if (phase) enterPhase(phase);
 }
@@ -136,6 +138,8 @@ function showUnlocked() {
   if (name) {
     document.querySelector('.speech-bubble').textContent = `🔓 Hoo-hoo! You unlocked ${name}!`;
     pipReacts('hop');
+    unlockStep(document.querySelector('.step-bar .step-new, .explore-subnav .step-new'));
+    confetti(); // a phase is finished: a big moment
   }
 }
 

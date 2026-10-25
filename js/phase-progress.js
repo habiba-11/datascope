@@ -6,6 +6,10 @@ import { buildPhaseFeedback } from './helpers/feedback.js';
 import { getDonePhases, markPhaseDone, getPreviewAll, getSelectedScenarioId } from './storage/save.js';
 import { setIntroPhase } from './phase-intro.js';
 import { showFeedbackCard } from './feedback-card.js';
+import { pauseNextModal } from './modal.js';
+
+// How long the unlock animation (motion.js unlockStep) takes to be seen.
+const UNLOCK_SHOW_MS = 1800;
 
 // If this page's phase is still locked, sends the child to the furthest open
 // room (which shows a friendly Pip line). Returns true when it does.
@@ -54,6 +58,9 @@ export async function finishPhase(phase, facts = {}) {
     logEvent('shell', 'phase-complete', { phase, scenarioId });
     logEvent('shell', 'phase-feedback', { phase, scenarioId, stars: card.stars });
   }
+  // The next pop-up (e.g. the Plan intro) waits until the unlock has been seen.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  pauseNextModal(reduceMotion ? 0 : UNLOCK_SHOW_MS);
   await showFeedbackCard(phase, card);
   window.dispatchEvent(new CustomEvent('datascope:phase-done', { detail: { phase } }));
 }

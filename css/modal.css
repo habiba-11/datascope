@@ -26,8 +26,8 @@
 }
 
 .modal-pip {
-  font-size: 44px;
-  line-height: 1;
+  width: 52px;
+  flex-shrink: 0;
 }
 
 .modal-title {
