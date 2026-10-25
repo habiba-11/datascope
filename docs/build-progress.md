@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Part 13 built (pop-up component), next is Part 14** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-14 built (pop-up, phase intros), next is Part 15** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -55,8 +55,15 @@
   - css/modal.css: bouncy pop-in (off with reduced motion), buttons and ✕ at least 48px. Linked in all 6 room pages. The temporary demo page was deleted.
   - Put in js/ (next to motion.js), not a new js/ui/ folder as the plan said, to match the CLAUDE.md folder structure.
 
+- Part 14 (25 Oct 2026, Prof comment 1), 77 tests passing:
+  - data/content/phases.json: 7 intros (Ask, Plan, Collect, Graph Lab, Number Lab, Chance Lab, Conclude), the plan's draft texts, max 3 bullets under 10 words each (checked by tests/phase-intro.test.js).
+  - js/phase-intro.js: setIntroPhase(phase) opens the intro the first time a child reaches a phase; "seen" is saved per explorer code in save.js (hasSeenIntro / markIntroSeen, cleared by clearChildData). "ℹ️ What to do" in the header reopens the current phase's intro.
+  - mountShell({ intro }) in each room; Question Studio switches Ask → Plan intro on reaching Task 3.
+  - New log event popup-seen { phase, auto }.
+  - Checked in headless Chrome at 1366x768 (Data Hub) and 768x1024 (Question Studio): one pop-up, focus on "Let's go!".
+
 ## Next
-- Part 14: phase intro pop-ups (data/content/phases.json, ℹ️ button, "seen" per child + phase, popup-seen log event).
+- Part 15: progress engine + progressive step bar (confirm the completion rules and the open questions first).
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.

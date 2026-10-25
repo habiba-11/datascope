@@ -70,10 +70,27 @@ export function setSoundOn(on) {
   writeItem(SOUND_KEY, on ? 'on' : 'off');
 }
 
-// For shared devices: removes the child's code, chosen scenario and reasoning
-// log from THIS device, so the next child starts clean. Teacher data is kept.
+// Phase intro pop-ups each child has already seen (Part 14), kept per code:
+// { "OWL-07": ["ask", "plan"], ... }. Children without a code share "NO-CODE".
+const INTROS_KEY = 'datascope:introsSeen';
+
+export function hasSeenIntro(phase) {
+  const seen = readObject(INTROS_KEY)[getExplorerCode() || 'NO-CODE'] || [];
+  return seen.includes(phase);
+}
+
+export function markIntroSeen(phase) {
+  const all = readObject(INTROS_KEY);
+  const code = getExplorerCode() || 'NO-CODE';
+  all[code] = [...new Set([...(all[code] || []), phase])];
+  writeItem(INTROS_KEY, JSON.stringify(all));
+}
+
+// For shared devices: removes the child's code, chosen scenario, reasoning
+// log and seen pop-ups from THIS device, so the next child starts clean.
+// Teacher data is kept.
 export function clearChildData() {
-  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY]) {
+  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY, INTROS_KEY]) {
     memory.delete(key);
     try {
       localStorage.removeItem(key);

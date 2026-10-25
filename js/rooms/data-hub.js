@@ -16,6 +16,7 @@ async function init() {
 
   mountShell({
     step: 'collect',
+    intro: 'collect',
     accent: 'collect',
     pipMessage: partner
       ? 'Hoo-hoo! Two pretend classes answered the same question. Survey Class A first, then Class B!'

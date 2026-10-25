@@ -1,5 +1,6 @@
 import { getExplorerCode } from './storage/save.js';
 import { countBadges, counterHTML, setupCelebrations } from './celebrate.js';
+import { setIntroPhase, setupInfoButton } from './phase-intro.js';
 
 const STEPS = [
   { id: 'ask', label: 'Ask', icon: '❓', color: 'ask', href: 'question-studio.html' },
@@ -15,7 +16,9 @@ const EXPLORE_ROOMS = [
   { id: 'chance', label: '🎲 Chance Lab', href: 'chance-lab.html' },
 ];
 
-export function mountShell({ step, accent, pipMessage, contentHTML, explorePage }) {
+// `intro` is the phase whose intro pop-up belongs to this page
+// (see data/content/phases.json), e.g. 'collect' or 'graph'.
+export function mountShell({ step, accent, pipMessage, contentHTML, explorePage, intro }) {
   const root = document.getElementById('shell');
 
   const stepBar = STEPS.map((s, i) => {
@@ -48,6 +51,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage 
     <header class="shell-header">
       <a class="logo" href="../index.html">🔎 <span>DataScope</span></a>
       <nav class="step-bar" aria-label="Investigation steps">${stepBar}</nav>
+      <button class="btn info-btn" id="info-btn" type="button">ℹ️ What to do</button>
     </header>
     <div class="shell-body">
       <aside class="sidebar">
@@ -69,6 +73,8 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage 
   root.querySelectorAll('.feedback').forEach((el) => el.setAttribute('aria-live', 'polite'));
 
   setupCelebrations();
+  setupInfoButton();
+  if (intro) setIntroPhase(intro);
 }
 
 // Shows whose work this is (by code only). Without a code, the work can't be

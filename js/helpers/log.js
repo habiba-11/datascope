@@ -14,6 +14,7 @@ export const EVENT_TYPES = [
   'reflection',   // what a graph tells / does NOT tell
   'claim',        // the final Evidence Board claim
   'teacher-tag',  // a misconception the teacher tagged (teacher view)
+  'popup-seen',   // a phase intro pop-up was shown (auto: by itself, or via ℹ️)
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];

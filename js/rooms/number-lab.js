@@ -16,6 +16,7 @@ async function init() {
     step: 'explore',
     accent: 'explore',
     explorePage: 'number',
+    intro: 'number',
     pipMessage: "Hoo-hoo! Make a guess first, then let's see what the numbers really say!",
     contentHTML: `
       <h1 class="room-title">🔢 Number Lab</h1>

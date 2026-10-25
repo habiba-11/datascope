@@ -7,6 +7,14 @@
   gap: 12px;
 }
 
+/* ℹ️ reopens the phase intro pop-up (js/phase-intro.js). */
+.info-btn {
+  min-height: 48px;
+  background: var(--color-card-bg);
+  color: var(--color-navy);
+  padding: 8px 16px;
+}
+
 .logo {
   display: flex;
   align-items: center;

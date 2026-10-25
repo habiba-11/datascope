@@ -41,6 +41,7 @@ async function init() {
     step: 'explore',
     accent: 'explore',
     explorePage: 'graph',
+    intro: 'graph',
     pipMessage: partner
       ? 'Hoo-hoo! Two classes, same question. Switch the graph type and compare them!'
       : 'Hoo-hoo! Same data, different graphs. Try each button and see what changes!',

@@ -3,6 +3,7 @@ import { checkQuestion } from '../helpers/checker.js';
 import { logEvent } from '../helpers/log.js';
 import { setSelectedScenarioId } from '../storage/save.js';
 import { cheer } from '../motion.js';
+import { setIntroPhase } from '../phase-intro.js';
 
 const SCENARIO_CARDS = [
   { id: 'sleep-hours', emoji: '😴' },
@@ -114,6 +115,8 @@ function showTask(n) {
   badge.textContent = phase === 'plan' ? '🗺️ Plan' : '❓ Ask';
   badge.style.setProperty('--phase-color', `var(--color-${phase})`);
   setCurrentStep(phase);
+  // Ask and Plan share this page, so the Plan intro opens on reaching Task 3.
+  setIntroPhase(phase);
 
   if (n === 3) renderPredictTask();
 }

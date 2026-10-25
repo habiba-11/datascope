@@ -1,0 +1,44 @@
+{
+  "ask": {
+    "icon": "❓",
+    "title": "Ask a question",
+    "accent": "ask",
+    "bullets": ["Pick a question to explore.", "Check that it is a good question.", "Fix questions that are not clear."]
+  },
+  "plan": {
+    "icon": "🗺️",
+    "title": "Make a plan",
+    "accent": "plan",
+    "bullets": ["Guess the answer before you look.", "Scientists guess first, then check."]
+  },
+  "collect": {
+    "icon": "📋",
+    "title": "Collect data",
+    "accent": "collect",
+    "bullets": ["Ask our pretend class your question.", "Watch the answers pop in.", "This class is made up, just for learning."]
+  },
+  "graph": {
+    "icon": "📊",
+    "title": "Draw graphs",
+    "accent": "explore",
+    "bullets": ["Turn answers into pictures.", "Try different graphs.", "Ask: what can it NOT tell us?"]
+  },
+  "number": {
+    "icon": "🔢",
+    "title": "Find the numbers",
+    "accent": "explore",
+    "bullets": ["Find the mean, median, mode and range.", "Each one tells a different story."]
+  },
+  "chance": {
+    "icon": "🎲",
+    "title": "Test chance",
+    "accent": "explore",
+    "bullets": ["List everything that could happen.", "Guess, then test many times.", "Compare \"should happen\" with \"did happen\"."]
+  },
+  "conclude": {
+    "icon": "🚩",
+    "title": "Show your evidence",
+    "accent": "conclude",
+    "bullets": ["Say what you found.", "Show your proof.", "Say how sure you are."]
+  }
+}

@@ -52,6 +52,16 @@
   line-height: 1.5;
 }
 
+/* Phase intro bullets (js/phase-intro.js): big and airy. */
+.intro-list {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.intro-list li {
+  margin: 8px 0;
+}
+
 .modal-actions {
   display: flex;
   flex-wrap: wrap;

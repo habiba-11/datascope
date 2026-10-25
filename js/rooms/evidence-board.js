@@ -49,6 +49,7 @@ async function init() {
 
   mountShell({
     step: 'conclude',
+    intro: 'conclude',
     accent: 'conclude',
     pipMessage: "Hoo-hoo! Time to share what we found. What do you think, and why?",
     contentHTML: `

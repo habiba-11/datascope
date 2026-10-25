@@ -23,6 +23,7 @@ function init() {
     step: 'explore',
     accent: 'explore',
     explorePage: 'chance',
+    intro: 'chance',
     pipMessage: "Hoo-hoo! Let's test our predictions with real trials!",
     contentHTML: `
       <h1 class="room-title">🎲 Chance Lab</h1>
