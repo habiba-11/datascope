@@ -43,10 +43,15 @@ export function pipReacts(name) {
 // ---------- GSAP helpers (Part 21a) ----------
 
 // Elements spring in one after another (stat cards, list items, stars...).
-export function stagger(elements, { each = 0.08, from = { y: 16, scale: 0.85 } } = {}) {
+// `keepStyle`: true when the elements have their own inline style that must
+// stay afterwards (e.g. a bar's width); otherwise the motion styles are cleared.
+export function stagger(elements, { each = 0.08, from = { y: 16, scale: 0.85 }, keepStyle = false } = {}) {
   const gsap = gsapOrNull();
   if (!gsap || !elements.length) return;
-  gsap.from(elements, { ...from, opacity: 0, duration: MOTION.medium, ease: MOTION.spring, stagger: each, clearProps: 'all' });
+  gsap.from(elements, {
+    ...from, opacity: 0, duration: MOTION.medium, ease: MOTION.spring, stagger: each,
+    ...(keepStyle ? {} : { clearProps: 'all' }),
+  });
 }
 
 // One element pops in.

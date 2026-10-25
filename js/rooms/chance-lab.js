@@ -2,11 +2,11 @@ import { mountShell } from '../app.js';
 import { logEvent } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { playSound } from '../sounds.js';
-import { animate } from '../motion.js';
+import { stagger } from '../motion.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
 import { loadContent } from '../helpers/scenarios.js';
 import { getSelectedScenarioId } from '../storage/save.js';
-import { toPct, theoryText, trialMessage } from '../helpers/chance.js';
+import { toPct, theoryText, trialMessage, needleAngle } from '../helpers/chance.js';
 import { certaintyButtonsHTML } from '../helpers/certainty.js';
 
 // `verb` is the device's own word for one go, used in the messages.
@@ -75,6 +75,7 @@ async function init() {
         <h2 class="task-title">🔁 Test it many times</h2>
         <p>Run a test. Compare what should happen with what did happen.</p>
         <div class="trial-device" id="trial-device" aria-hidden="true"></div>
+        <p class="trial-result" id="trial-result"></p>
         <div class="trial-row">
           <button class="btn btn-run" data-count="10" type="button">▶ 10 times</button>
           <button class="btn btn-run" data-count="50" type="button">▶ 50 times</button>
@@ -171,7 +172,7 @@ function setupDevicePicker() {
       chanceFacts.pct500 = null;
 
       showOutcomes(selectedDevice, chips);
-      document.getElementById('trial-device').textContent = selectedDevice.emoji;
+      drawTrialDevice(selectedDevice);
       outcomesBox.hidden = false;
 
       markComplete(1);
@@ -187,19 +188,28 @@ const SPINNER_COLOURS = { Red: '#FF7A6B', Blue: '#38B6FF', Green: '#4CC26B', Yel
 
 function showOutcomes(device, chips) {
   const picture = document.getElementById('spinner-picture');
-  const isSpinner = device.outcomes.every((o) => SPINNER_COLOURS[o]);
+  const spinner = isSpinner(device);
   const total = device.weights.reduce((a, b) => a + b, 0);
 
   chips.innerHTML = device.outcomes
-    .map((o, i) => (isSpinner
+    .map((o, i) => (spinner
       ? `<span class="outcome-chip">${o}: ${device.weights[i]} of ${total} parts</span>`
       : `<span class="outcome-chip">${o}</span>`))
     .join('');
 
-  picture.hidden = !isSpinner;
-  if (!isSpinner) return;
+  picture.hidden = !spinner;
+  if (!spinner) return;
 
-  // conic-gradient draws pie slices: each colour runs from where the last one stopped.
+  picture.style.background = spinnerGradient(device);
+  picture.setAttribute('aria-label', `Spinner: ${device.outcomes.map((o, i) => `${o} ${device.weights[i]} of ${total} parts`).join(', ')}`);
+}
+
+const isSpinner = (device) => device.outcomes.every((o) => SPINNER_COLOURS[o]);
+
+// conic-gradient draws pie slices: each colour runs from where the last one
+// stopped, clockwise from the top (needleAngle in helpers/chance.js uses the same).
+function spinnerGradient(device) {
+  const total = device.weights.reduce((a, b) => a + b, 0);
   let start = 0;
   const slices = device.outcomes.map((o, i) => {
     const end = start + (device.weights[i] / total) * 360;
@@ -207,8 +217,59 @@ function showOutcomes(device, chips) {
     start = end;
     return slice;
   });
-  picture.style.background = `conic-gradient(${slices.join(', ')})`;
-  picture.setAttribute('aria-label', `Spinner: ${device.outcomes.map((o, i) => `${o} ${device.weights[i]} of ${total} parts`).join(', ')}`);
+  return `conic-gradient(${slices.join(', ')})`;
+}
+
+// The device in Task 3: a coin or dice emoji, or a small spinner with a needle.
+function drawTrialDevice(device) {
+  const box = document.getElementById('trial-device');
+  document.getElementById('trial-result').textContent = '';
+  if (isSpinner(device)) {
+    box.innerHTML = '<div class="mini-spinner"><div class="needle"></div></div>';
+    box.querySelector('.mini-spinner').style.background = spinnerGradient(device);
+  } else {
+    box.innerHTML = `<span class="device-face">${device.emoji}</span>`;
+  }
+}
+
+// Part 21c: the device moves, then shows the LAST trial's result. The coin
+// flips, the dice tumbles, the spinner's needle spins and stops inside the
+// slice of the real result. Reduced motion (or no GSAP): just the result.
+function playTrialDevice(device, lastOutcome) {
+  const result = document.getElementById('trial-result');
+  const showResult = () => { result.textContent = `Last one: ${lastOutcome}`; };
+  const gsap = window.gsap;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const needle = document.querySelector('#trial-device .needle');
+  const index = device.outcomes.indexOf(lastOutcome);
+
+  if (needle) {
+    const angle = needleAngle(device.weights, index, Math.random());
+    if (!gsap || reduceMotion) {
+      needle.style.transform = `rotate(${angle % 360}deg)`;
+      showResult();
+      return;
+    }
+    result.textContent = '';
+    gsap.fromTo(needle, { rotation: 0 }, {
+      rotation: angle, duration: 1.6, ease: 'power3.out', onComplete: showResult,
+    });
+    return;
+  }
+
+  const face = document.querySelector('#trial-device .device-face');
+  if (!gsap || reduceMotion || !face) {
+    showResult();
+    return;
+  }
+  result.textContent = '';
+  const coin = device.outcomes.length === 2;
+  gsap.timeline({ onComplete: showResult })
+    .to(face, coin
+      ? { rotationY: 1080, y: -40, duration: 0.5, ease: 'power2.out' } // a flip, up in the air
+      : { rotation: 720, y: -30, duration: 0.45, ease: 'power2.out' }) // the dice tumbles up
+    .to(face, { y: 0, duration: 0.45, ease: 'bounce.out' })
+    .set(face, { rotation: 0, rotationY: 0 });
 }
 
 function setupPredict() {
@@ -284,14 +345,15 @@ function setupTrials() {
     btn.addEventListener('click', () => {
       const count = Number(btn.dataset.count);
       playSound('spin');
-      animate(document.getElementById('trial-device'), 'roll');
       const totalWeight = selectedDevice.weights.reduce((a, b) => a + b, 0);
       const results = new Map(selectedDevice.outcomes.map((o) => [o, 0]));
 
+      let lastOutcome = null;
       for (let i = 0; i < count; i++) {
-        const outcome = runTrial(selectedDevice);
-        results.set(outcome, results.get(outcome) + 1);
+        lastOutcome = runTrial(selectedDevice);
+        results.set(lastOutcome, results.get(lastOutcome) + 1);
       }
+      playTrialDevice(selectedDevice, lastOutcome);
 
       const theoryFor = (i) => theoryText(selectedDevice.weights[i], totalWeight);
 
@@ -305,6 +367,8 @@ function setupTrials() {
         .join('');
 
       compareGrid.hidden = false;
+      // The "did happen" bars grow from nothing, one after another.
+      stagger(experimentBars.querySelectorAll('.bar-fill'), { each: 0.1, from: { width: 0 }, keepStyle: true });
 
       const targetIndex = selectedDevice.outcomes.indexOf(selectedDevice.target);
       const timesHit = results.get(selectedDevice.target);

@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-20b + 21a built, next is Part 21c step 2 (Chance Lab and Graph Lab motion); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-20b + 21a built, next is Part 21d (performance and accessibility pass); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -187,9 +187,15 @@
   - Evidence Board: a "✅ Checked!" stamp thumps onto the finished card (motion.js stamp; in words, not only a picture).
   - Checked with Playwright: a real mouse drag moves 6 to the front, the buttons finish the sort, centre = 8, Next unlocks; at 768px all 5 cards fit in one row (buttons stacked); no sideways scroll; no errors.
 
+- Part 21c, step 2 (26 Oct 2026), 172 tests passing:
+  - Chance Lab: the coin flips in 3D, the dice tumbles and bounces, the spinner (a small copy of the drawn spinner) spins its needle and stops INSIDE the slice of the last trial's real result (needleAngle in helpers/chance.js, tested), then "Last one: Red" in words. The "did happen" bars grow from 0 one by one. Reduced motion: no movement, the needle points at the result straight away.
+  - Graph Lab: a new chart grows in with a little bounce (Chart.js easeOutBack); Chart.js animation is switched off with reduced motion (it does not do that by itself).
+  - Found with Playwright and fixed: my stagger() cleared the bars' own widths after animating (bars ended empty); new keepStyle option.
+  - Checked with Playwright, normal and reduced: spinner needle angle → slice always matches the logged result; bar widths kept; no errors.
+
 ## Next
 - Part 20c: rubric coding of each claim (later: waiting for the real levels from Papers 7 and 13).
-- Part 21c, step 2: Chance Lab coin flip / dice roll / spinner that lands on the result, bars that grow live; Graph Lab smooth switch between chart types.
+- Part 21d: performance and accessibility pass (axe audit of every page, particle cap, no flashing, focus during animations), then Habiba tests on a Chromebook/tablet.
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.

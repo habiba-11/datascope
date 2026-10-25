@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { toPct, theoryText, trialMessage } from '../js/helpers/chance.js';
+import { toPct, theoryText, trialMessage, needleAngle } from '../js/helpers/chance.js';
 import { longestSentence } from '../js/helpers/readability.js';
 
 test('percentages have one decimal place', () => {
@@ -36,4 +36,15 @@ test('every message follows the Grade 5 rule (12 words or fewer per sentence)', 
     trialMessage({ ...base, count: 500, timesHit: 290, pct: 58, previous: null, gap: 0.01 }),
   ];
   for (const message of messages) assert.ok(longestSentence(message) <= 12, message);
+});
+
+test('the spinner needle always lands inside the slice of the real result', () => {
+  const weights = [4, 1, 1, 1]; // the unfair spinner: Red, Blue, Green, Yellow
+  for (const fraction of [0, 0.5, 1]) {
+    const red = needleAngle(weights, 0, fraction, 0);
+    assert.ok(red > 0 && red < (4 / 7) * 360, `Red at ${red}`);
+    const yellow = needleAngle(weights, 3, fraction, 0);
+    assert.ok(yellow > (6 / 7) * 360 && yellow < 360, `Yellow at ${yellow}`);
+  }
+  assert.equal(needleAngle([1, 1], 0, 0.5, 3), 3 * 360 + 90); // centre of the first half, after 3 turns
 });

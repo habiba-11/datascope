@@ -29,3 +29,16 @@ export function trialMessage({ count, verb, target, timesHit, pct, theory, previ
   }
   return message;
 }
+
+// Where a spinner's needle should stop so it points into the slice of
+// `outcomeIndex` (Part 21c). Slices go clockwise from the top, sized by weight,
+// like the conic-gradient picture. `fraction` (0 to 1) picks a spot inside the
+// slice, kept away from the edges so the needle never sits on a border line.
+// Returns degrees, plus `turns` full turns so it really spins first.
+export function needleAngle(weights, outcomeIndex, fraction, turns = 3) {
+  const total = weights.reduce((a, b) => a + b, 0);
+  const start = weights.slice(0, outcomeIndex).reduce((a, b) => a + b, 0);
+  const size = weights[outcomeIndex];
+  const inside = 0.15 + 0.7 * fraction; // between 15% and 85% of the slice
+  return turns * 360 + ((start + inside * size) / total) * 360;
+}

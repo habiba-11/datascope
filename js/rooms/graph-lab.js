@@ -86,7 +86,12 @@ async function init() {
       // Screen readers read this label instead of the (silent) picture.
       const who = partner ? `${c.recipe.title}. ` : '';
       canvas.setAttribute('aria-label', who + describeChart(type, c.labels, c.data, c.recipe.unit));
-      return new Chart(canvas, makeChartConfig(type, c.labels, c.data, c.recipe.unit, sharedMax));
+      const config = makeChartConfig(type, c.labels, c.data, c.recipe.unit, sharedMax);
+      // Part 21c: a new chart grows in with a little bounce. Chart.js does not
+      // follow "reduce motion" by itself, so we switch its animation off then.
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      config.options.animation = reduceMotion ? false : { duration: 800, easing: 'easeOutBack' };
+      return new Chart(canvas, config);
     });
 
     document.querySelectorAll('.chart-type-btn').forEach((btn) => {
