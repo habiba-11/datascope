@@ -166,8 +166,9 @@
   }
 }
 
-/* Pip hops down the trail to the last finished stop (Part 21b). */
-.trail {
+/* Pip hops down the trail to the last finished stop (Part 21b). Pip sits in
+   the box around the list, which starts exactly where the list starts. */
+#journey-trail {
   position: relative;
 }
 

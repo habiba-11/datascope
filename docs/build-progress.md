@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-20b + 21a built, next is Part 21d (performance and accessibility pass); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-20b + 21a built, Part 21 done; waiting for Habiba's tests, rubric levels (20c) and Prof (22); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -193,9 +193,17 @@
   - Found with Playwright and fixed: my stagger() cleared the bars' own widths after animating (bars ended empty); new keepStyle option.
   - Checked with Playwright, normal and reduced: spinner needle angle → slice always matches the logged result; bar widths kept; no errors.
 
+- Part 21d (26 Oct 2026), 172 tests passing:
+  - axe-core audit (loaded into the test browser only, nothing added to the app) of 14 page states: start page, all 7 rooms, Number Lab with the numbers and the card sort, the maths recap open, Chance Lab after a spin, the badge shelf open, the teacher dashboard with DEMO, the PIN page. One finding, fixed: the hopping Pip sat inside the My journey <ol> (a list may only hold <li>); it now sits in the box around the list. All 14 pass.
+  - Tap targets scanned on every page at 1366x768 and 768x1024: all at least 48px (the only smaller one is the teacher page's real file picker, hidden on purpose inside its 48px button).
+  - Motion rules: at most 48 moving particles at once (40 confetti + 8 badge stars, under the plan's 60); no flashing (Pip blinks every 5 s, pulses are size changes, not light flashes); all GSAP paused while the tab is hidden; every GSAP helper does nothing with reduced motion, Chart.js animation off too; the drag in the card sort has a button alternative. Known: the Chance Lab bars animate their width (not only transform/opacity); small and short, kept.
+  - Still to do by Habiba: try it on a real Chromebook or tablet (speed of the animations, touch drag).
+
 ## Next
+- Habiba: test Round 2 in Live Server and on a Chromebook/tablet (open items 11d, 12a-d too).
 - Part 20c: rubric coding of each claim (later: waiting for the real levels from Papers 7 and 13).
-- Part 21d: performance and accessibility pass (axe audit of every page, particle cap, no flashing, focus during animations), then Habiba tests on a Chromebook/tablet.
+- Part 22 (bonus backend): needs Prof's OK and an ethics check first (D5, D8).
+- Part 23: final QA, docs and thesis material. Part 24 (deploy): locked until "Prof confirmed".
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.

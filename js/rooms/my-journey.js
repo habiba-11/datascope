@@ -145,7 +145,8 @@ function walkPip() {
   if (!done.length) return;
   const pip = el('div', '', 'trail-pip');
   pip.innerHTML = pipSVG(); // our own drawing, no child text
-  trail.append(pip);
+  // In the box around the list, not in the list: an <ol> may only hold <li>s.
+  document.getElementById('journey-trail').append(pip);
 
   const y = (stop) => stop.offsetTop + 4;
   const gsap = window.gsap;
