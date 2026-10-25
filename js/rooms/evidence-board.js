@@ -9,7 +9,7 @@ import { buildFindings } from '../helpers/findings.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { playSound } from '../sounds.js';
-import { animate, pipReacts, confetti } from '../motion.js';
+import { animate, pipReacts, confetti, stamp } from '../motion.js';
 import { openModal } from '../modal.js';
 import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
@@ -264,6 +264,12 @@ function setupCertainty() {
   makeBtn.addEventListener('click', () => {
     renderCard();
     playSound('done');
+    // A "Checked!" stamp thumps onto the card (in words, not only a picture).
+    const mark = document.createElement('span');
+    mark.className = 'card-stamp';
+    mark.textContent = '✅ Checked!';
+    document.getElementById('evidence-card').append(mark);
+    stamp(mark);
     animate(document.getElementById('evidence-card'), 'cheer');
     confetti();
     pipReacts('hop');

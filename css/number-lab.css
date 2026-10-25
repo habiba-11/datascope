@@ -123,3 +123,68 @@
 .predict-unit {
   font-weight: 700;
 }
+
+/* "Sort the cards" (js/card-sort.js, Part 21c). */
+.sort-row {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0;
+  margin: 12px 0;
+}
+
+.sort-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px;
+  background: white;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 14px;
+  box-shadow: var(--shadow-button);
+  cursor: grab;
+  touch-action: none; /* a finger drags the card instead of scrolling the page */
+  user-select: none;
+}
+
+.sort-card.dragging {
+  cursor: grabbing;
+  z-index: 2;
+  box-shadow: var(--shadow-card);
+}
+
+.sort-value {
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 700;
+  min-width: 48px;
+  text-align: center;
+}
+
+/* The two buttons sit one above the other, so 5 cards fit in one row on a tablet. */
+.sort-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sort-arrows .btn {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--color-navy);
+}
+
+/* The centre card(s): the median. Shown by colour AND the word under it. */
+.sort-card.centre {
+  background: var(--color-plan);
+}
+
+.sort-card.centre::after {
+  content: 'centre';
+  font-weight: 700;
+  font-size: 14px;
+}

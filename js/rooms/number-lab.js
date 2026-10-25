@@ -11,6 +11,7 @@ import { cheer, encourage, stagger, countUp } from '../motion.js';
 import { finishPhase } from '../phase-progress.js';
 import { whenIntroClosed } from '../phase-intro.js';
 import { addRecapButton, autoOpenRecap } from '../recap.js';
+import { mountCardSort } from '../card-sort.js';
 
 // Number Lab follows the scenario the child picked (Part 17b). The task list
 // depends on the kind of data: see TASKS_BY_KIND in helpers/number-tasks.js.
@@ -247,6 +248,10 @@ const TASK_HTML = {
         <button class="btn choice-btn" data-answer="no" type="button">❌ Mia is wrong</button>
       </div>
       <p class="feedback" id="mistake-feedback" hidden></p>
+      <div class="sort-box" id="sort-box" hidden>
+        <p><strong>🃏 Now you fix it! Put Mia's numbers in order.</strong></p>
+      </div>
+      <p class="feedback" id="sort-feedback" hidden></p>
     </section>`,
 
   realLife: (n) => {
@@ -362,9 +367,20 @@ const TASK_SETUP = {
     wireRetryChoices(document.getElementById('mistake-choices'), document.getElementById('mistake-feedback'), {
       task: 'find-mias-mistake',
       isCorrect: (answer) => answer === (miaSays(numbers) === median(numbers) ? 'yes' : 'no'),
-      correctText: `✅ Right! Mia forgot to put them in order. In order: ${inOrder(numbers)}. The one in the centre is ${median(numbers)}.`,
+      correctText: '✅ Right! Mia forgot to put the numbers in order first.',
       hintText: '🤔 Not quite. What must we do first to find the median?',
-      onCorrect: () => markComplete(n),
+      // Then the child sorts the cards themselves; the task is done once sorted.
+      onCorrect: () => {
+        const box = document.getElementById('sort-box');
+        box.hidden = false;
+        mountCardSort(box, numbers, (centre) => {
+          const feedback = document.getElementById('sort-feedback');
+          feedback.textContent = `✅ In order! The one in the centre is ${centre.join(' and ')}. That is the median, not ${miaSays(numbers)}.`;
+          feedback.hidden = false;
+          cheer(feedback);
+          markComplete(n);
+        });
+      },
     });
   },
 

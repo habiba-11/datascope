@@ -133,6 +133,20 @@ export function flipIn(elements) {
   gsap.from(elements, { rotationY: 180, opacity: 0, duration: MOTION.slow, ease: MOTION.spring, stagger: 0.12, clearProps: 'all' });
 }
 
+// A bar bounces up from the bottom (e.g. a tally bar that just grew).
+export function bounceBar(element) {
+  const gsap = gsapOrNull();
+  if (!gsap || !element) return;
+  gsap.from(element, { scaleY: 0.6, transformOrigin: '50% 100%', duration: MOTION.medium, ease: 'elastic.out(1, 0.5)', clearProps: 'transform' });
+}
+
+// A rubber stamp thumps down onto a card (e.g. the finished Evidence Card).
+export function stamp(element) {
+  const gsap = gsapOrNull();
+  if (!gsap || !element) return;
+  gsap.from(element, { scale: 3, opacity: 0, rotation: -40, duration: MOTION.medium, ease: 'power4.in' });
+}
+
 // ---------- big moments ----------
 
 // Confetti in the five room colours falls over the page (big moments only:

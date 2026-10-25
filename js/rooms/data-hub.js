@@ -4,7 +4,7 @@ import { compareValues, mode } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { playSound } from '../sounds.js';
-import { animate, pipReacts } from '../motion.js';
+import { animate, pipReacts, pop, bounceBar } from '../motion.js';
 import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
 import { finishPhase } from '../phase-progress.js';
 
@@ -140,7 +140,7 @@ function wireUpSurvey(recipe, classData, p, onDone) {
         const count = counts.get(key);
         const height = (count / maxCount) * 140;
         return `
-          <div class="tally-col">
+          <div class="tally-col" data-key="${key}">
             <span class="tally-count">${count || ''}</span>
             <div class="tally-bar" style="height: ${height}px"></div>
             <span class="tally-label">${key}</span>
@@ -163,9 +163,11 @@ function wireUpSurvey(recipe, classData, p, onDone) {
       item.className = 'reveal-item';
       item.innerHTML = `<span class="badge">${revealed}</span> Classmate ${revealed}: ${value} ${recipe.unit || ''}`;
       list.prepend(item);
+      pop(item); // each classmate's answer springs in
 
       counts.set(value, (counts.get(value) || 0) + 1);
       renderTally();
+      bounceBar([...tally.querySelectorAll('.tally-col')].find((col) => col.dataset.key === String(value))?.querySelector('.tally-bar'));
 
       progressFill.style.width = `${(revealed / values.length) * 100}%`;
       progressText.textContent = `${revealed} of ${values.length} classmates`;

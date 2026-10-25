@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-20b + 21a built, next is Part 21c (interactive tasks); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-20b + 21a built, next is Part 21c step 2 (Chance Lab and Graph Lab motion); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -181,9 +181,15 @@
   - My journey: a small Pip hops down the trail, stop by stop, to the last finished phase, then cheers (stands still with reduced motion; hidden when printing).
   - Found with Playwright and fixed: the trail Pip stuck out of the room box; now 36 px, centred on the trail line.
 
+- Part 21c, step 1 (26 Oct 2026), 171 tests passing:
+  - "Sort the cards" (must-keep): after saying Mia is wrong, the child puts Mia's numbers in order by dragging the cards (pointer events: mouse and touch) OR with ◀ ▶ buttons on every card (keyboard, 48px). Cards glide to their new place (FLIP with GSAP). When sorted, the centre card lights up and says "centre" (colour + word); the feedback names the median; the task completes only then. js/helpers/sort-cards.js (moveItem, isSorted, centreIndexes, dropIndex; tests/sort-cards.test.js), js/card-sort.js.
+  - Data Hub: each classmate's answer springs in and the tally bar for that answer bounces (motion.js pop, bounceBar).
+  - Evidence Board: a "✅ Checked!" stamp thumps onto the finished card (motion.js stamp; in words, not only a picture).
+  - Checked with Playwright: a real mouse drag moves 6 to the front, the buttons finish the sort, centre = 8, Next unlocks; at 768px all 5 cards fit in one row (buttons stacked); no sideways scroll; no errors.
+
 ## Next
 - Part 20c: rubric coding of each claim (later: waiting for the real levels from Papers 7 and 13).
-- Part 21c: interactive tasks (median card sort with a button alternative, fair-share blocks for the mean, coin/dice/spinner animations, classmates popping into seats, evidence chips onto the card).
+- Part 21c, step 2: Chance Lab coin flip / dice roll / spinner that lands on the result, bars that grow live; Graph Lab smooth switch between chart types.
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.
