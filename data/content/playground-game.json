@@ -1,0 +1,10 @@
+{
+  "scenarioId": "playground-game",
+  "emoji": "⚽",
+  "cardTitle": "What do we play at recess?",
+  "fixIts": [
+    { "flawed": "Isn't football the best game?", "fix": "Which game did you play most at recess this week?" },
+    { "flawed": "Do you like games?", "fix": "What is your favourite recess game this week?" }
+  ],
+  "planPrompt": "🤔 Make a guess! Which game will most kids pick?"
+}

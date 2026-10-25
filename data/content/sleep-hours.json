@@ -1,0 +1,10 @@
+{
+  "scenarioId": "sleep-hours",
+  "emoji": "😴",
+  "cardTitle": "How much do we sleep?",
+  "fixIts": [
+    { "flawed": "Isn't staying up late bad for you?", "fix": "What time did you go to bed last night?" },
+    { "flawed": "Do you sleep a lot?", "fix": "How many hours did you sleep last night?" }
+  ],
+  "planPrompt": "🤔 Make a guess! How many hours did most kids sleep?"
+}

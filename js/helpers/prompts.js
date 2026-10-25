@@ -38,7 +38,9 @@ export function getHint(key, index) {
 }
 
 // Adds a "Need a hint?" button right after `anchor` (usually a text box).
-export function addHintButton(anchor, key, room) {
+// `key` names the question in the log; `hints` can replace the list in HINTS
+// (e.g. Question Studio's fix-it hints, which follow the chosen scenario).
+export function addHintButton(anchor, key, room, hints = HINTS[key] || []) {
   const box = document.createElement('div');
   box.className = 'hint-box';
 
@@ -53,7 +55,7 @@ export function addHintButton(anchor, key, room) {
 
   let shown = 0;
   button.addEventListener('click', () => {
-    const hint = getHint(key, shown);
+    const hint = hints[shown];
     if (!hint) return;
     shown += 1;
 
@@ -62,7 +64,7 @@ export function addHintButton(anchor, key, room) {
     list.append(item);
     logEvent(room, 'hint', { prompt: key, hintNumber: shown });
 
-    const more = getHint(key, shown) !== null;
+    const more = shown < hints.length;
     button.textContent = more ? '💡 Another hint' : 'No more hints. You can do it!';
     button.disabled = !more;
   });

@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { checkQuestion } from '../js/helpers/checker.js';
+import { longestSentence } from '../js/helpers/readability.js';
 
 test('a clear, well-formed question has no warnings', () => {
   assert.deepEqual(checkQuestion('What did you eat for breakfast this morning?'), []);
@@ -19,7 +20,7 @@ test('catches a negative, leading, yes/no question with no timeframe', () => {
 
 test('a missing question mark is the only warning on an otherwise good question', () => {
   const warnings = checkQuestion('How many hours did you sleep last night');
-  assert.deepEqual(warnings, ['Questions usually end with a "?".']);
+  assert.deepEqual(warnings, ['❓ Put a ? at the end.']);
 });
 
 test('every scenario question passes our own checker (zero warnings)', () => {
@@ -33,5 +34,12 @@ test('every scenario question passes our own checker (zero warnings)', () => {
 
 test('a number counts as a timeframe signal', () => {
   const warnings = checkQuestion('How many pets have you owned in the last 5 years?');
-  assert.ok(!warnings.some((w) => w.includes('Which time')));
+  assert.ok(!warnings.some((w) => w.includes('When?')));
+});
+
+test('every warning follows the Grade 5 rule (12 words or fewer per sentence)', () => {
+  const all = checkQuestion("Don't you think school is good") // not + leading + no time + yes/no + no ?
+    .concat(checkQuestion('Do you like pizza'));
+  assert.ok(all.length >= 5);
+  for (const warning of all) assert.ok(longestSentence(warning) <= 12, warning);
 });

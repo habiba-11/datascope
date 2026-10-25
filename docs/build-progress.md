@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-16 built (pop-up, phase intros, progressive step bar, phase feedback), next is Part 17a** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-16 and 17a built, next is Part 17b (Number Lab follows the scenario)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -82,8 +82,18 @@
   - Checked in headless Chrome: all 7 cards show the child's own numbers, no card while typing, a wrong try in Number Lab still 3 stars, the Plan intro waits behind the Ask card, no console errors.
   - Not done here (moved to Part 17, the Grade 5 rewrite): tightening the per-question feedback sentences.
 
+- Part 17a (25 Oct 2026, Prof comment 4), 107 tests passing:
+  - Content layer: data/content/<scenario>.json for the 4 pickable scenarios (emoji, cardTitle, 2 fix-its with one suggested fix each, planPrompt). Reading minutes Class B has no file of its own: it is part of Class A's card (one card, decided in Part 9.5). loadContent() + PICKABLE_SCENARIOS in helpers/scenarios.js.
+  - js/helpers/readability.js: sentences / wordCount (emoji are not words) / longestSentence / allStrings.
+  - tests/content.test.js: every scenario has every key; every sentence ≤ 12 words; each fix-it fails the checker and its fix passes; card questions follow the rule; no stat-with-a-number in content (answers come from stats.js).
+  - Question Studio rewritten in Grade 5 words (emoji cue first, short sentences): cards show the content title; fix-its follow the chosen scenario and rebuild if the child picks another; each fix-it has a 💡 hint button (1 tip, then one possible fix); the Plan question comes from content; checker tips now built with textContent.
+  - Checker warnings rewritten for Grade 5 (e.g. "⏰ When? Add a time, like 'this week' or 'last night'."), with a test that every warning follows the 12-word rule.
+  - addHintButton(anchor, key, room, hints) can take its own hint list.
+  - Found by the browser check and fixed: the playground Plan question said "like best" (a leading word by our own checker) → "Which game will most kids pick?".
+  - Known exception: the playground guess shows 5 games (the plan's rule says 3-4 options), because the choices must match the data's categories.
+
 ## Next
-- Part 17a: content layer (data/content/<scenario>.json) + Grade 5 rewrite of Question Studio.
+- Part 17b: Number Lab follows the chosen scenario (removes the sleep-hours hard-wiring), Grade 5 wording, mode-only for playground, Class A vs B for reading.
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.

@@ -1,0 +1,10 @@
+{
+  "scenarioId": "reading-minutes-class-a",
+  "emoji": "📖",
+  "cardTitle": "How long do two classes read?",
+  "fixIts": [
+    { "flawed": "Don't you think reading is great?", "fix": "How many minutes did you read yesterday?" },
+    { "flawed": "Do you read books?", "fix": "How many books did you read this month?" }
+  ],
+  "planPrompt": "🤔 Make a guess! How many minutes did most kids read?"
+}
