@@ -31,7 +31,7 @@ export function exportFileName(code, extension, now = new Date()) {
 // One CSV cell. Lists become "a; b", and text is wrapped in quotes when it
 // holds a comma, quote or new line. Text starting with = + - @ gets a ' in
 // front, so a spreadsheet never runs a child's typing as a formula.
-function csvCell(value) {
+export function csvCell(value) {
   if (value === null || value === undefined) return '';
   if (typeof value === 'number' || typeof value === 'boolean') return String(value);
   let text = Array.isArray(value) ? value.join('; ') : String(value);
@@ -52,6 +52,13 @@ export function toCSV(entries) {
   const columns = [...first, ...extra];
   const rows = entries.map((entry) => columns.map((col) => csvCell(entry[col])).join(','));
   return [columns.join(','), ...rows].join('\r\n');
+}
+
+// A CSV with fixed columns, in this order (the thesis metrics table, Part 20).
+// `columns` are keys; each row is an object with those keys.
+export function tableCSV(columns, rows) {
+  const lines = rows.map((row) => columns.map((col) => csvCell(row[col])).join(','));
+  return [columns.join(','), ...lines].join('\r\n');
 }
 
 // Saves text as a file in the browser's Downloads folder.

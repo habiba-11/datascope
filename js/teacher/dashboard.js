@@ -9,6 +9,9 @@ import { childRows, classOverview } from '../helpers/metrics.js';
 import { PHASES } from '../helpers/progress.js';
 import { PICKABLE_SCENARIOS, loadRecipe, loadContent } from '../helpers/scenarios.js';
 import { toCSV, downloadFile, exportFileName } from '../storage/export.js';
+import { thesisCSV, dictionaryCSV, exportableRows } from '../helpers/thesis.js';
+import { makeDemoFiles } from '../helpers/demo.js';
+import { directLabelsPlugin } from '../helpers/charts.js';
 import {
   getTeacherImports, setTeacherImports, getTeacherTags, setTeacherTags, clearChildData,
   getPreviewAll, setPreviewAll,
@@ -19,6 +22,12 @@ let imports = getTeacherImports(); // { "OWL-07": file, ... }
 let tags = getTeacherTags();       // { "OWL-07": ["equally-likely", ...], ... }
 const titles = {};                 // scenario id -> card title, e.g. "How much do we sleep?"
 const partners = {};               // reading Class A -> Class B (not a scenario of its own)
+// DEMO children: in memory only, never saved with the real imports, never exported.
+const demoFiles = makeDemoFiles();
+let showDemo = false;
+let charts = [];
+
+Chart.register(directLabelsPlugin);
 
 const PHASE_NAMES = {
   ask: '❓ Ask', plan: '🗺️ Plan', collect: '📋 Collect', graph: '📊 Graph Lab',
@@ -69,8 +78,13 @@ document.getElementById('file-input').addEventListener('change', async (event) =
 
 // ---------- the rows (one per child per scenario) ----------
 
+// The files on show: the real imports, plus the DEMO children when switched on.
+function shownFiles() {
+  return [...Object.values(imports), ...(showDemo ? demoFiles : [])];
+}
+
 function currentRows() {
-  const rows = childRows(Object.values(imports), partners).sort((a, b) => (a.code > b.code ? 1 : -1));
+  const rows = childRows(shownFiles(), partners).sort((a, b) => (a.code > b.code ? 1 : -1));
   return filter.value ? rows.filter((r) => r.scenarioId === filter.value) : rows;
 }
 
@@ -122,6 +136,33 @@ function renderOverview(rows) {
     tr.append(name, el('td', `${o.funnel[phase]} of ${o.investigations}`), el('td', show(o.avgMinutes[phase])));
     return tr;
   }));
+  renderCharts(o);
+}
+
+// Two bar charts for thesis figures: the funnel, and average minutes per phase.
+// Numbers are written on the bars (directLabelsPlugin), like in Graph Lab.
+function renderCharts(o) {
+  charts.forEach((chart) => chart.destroy());
+  const labels = PHASES.map((p) => PHASE_NAMES[p].split(' ').slice(1).join(' '));
+  const bar = (id, title, data, colour) => {
+    const canvas = document.getElementById(id);
+    canvas.setAttribute('aria-label', `${title}: ${labels.map((l, i) => `${l} ${data[i] ?? 'no data'}`).join(', ')}`);
+    return new Chart(canvas, {
+      type: 'bar',
+      data: { labels, datasets: [{ data, backgroundColor: colour, borderColor: '#17324D', borderWidth: 2 }] },
+      options: {
+        animation: false,
+        layout: { padding: { top: 24 } },
+        plugins: { legend: { display: false }, title: { display: true, text: title, font: { size: 16 } } },
+        // grace: room above the tallest bar, so its number never hits the title.
+        scales: { y: { beginAtZero: true, grace: '20%', ticks: { precision: 0 } } },
+      },
+    });
+  };
+  charts = [
+    bar('funnel-chart', `Investigations that finished each phase (of ${o.investigations})`, PHASES.map((p) => o.funnel[p]), '#38B6FF'),
+    bar('minutes-chart', 'Average minutes per phase', PHASES.map((p) => o.avgMinutes[p]), '#4CC26B'),
+  ];
 }
 
 function render() {
@@ -140,12 +181,13 @@ function render() {
 
   for (const row of rows) {
     const tr = el('tr');
-    const codeCell = el('th', row.code, 'no-wrap');
+    const codeCell = el('th', row.demo ? `${row.code} 🧪 DEMO` : row.code, 'no-wrap');
     codeCell.scope = 'row';
     const open = el('button', '🔍 Open', 'btn');
     open.type = 'button';
     open.addEventListener('click', () => {
-      renderDetail(document.getElementById('detail'), row, imports[row.code].entries, titles[row.scenarioId] || row.scenarioId);
+      const file = row.demo ? demoFiles.find((f) => f.code === row.code) : imports[row.code];
+      renderDetail(document.getElementById('detail'), row, file.entries, titles[row.scenarioId] || row.scenarioId);
     });
     const tagsTd = el('td');
     tagsTd.append(tagCell(row.code));
@@ -170,6 +212,36 @@ function render() {
 }
 
 filter.addEventListener('change', render);
+
+// ---------- thesis exports (real children only: DEMO rows are never exported) ----------
+
+document.getElementById('export-thesis-btn').addEventListener('click', () => {
+  // All scenarios, whatever the filter shows, so the file is always complete.
+  const rows = exportableRows(childRows(Object.values(imports), partners));
+  if (rows.length === 0) {
+    say("Import some children's files first. (DEMO children are never exported.)");
+    return;
+  }
+  downloadFile('thesis-metrics.csv', thesisCSV(rows), 'text/csv');
+  say(`Saved "thesis-metrics.csv" (${rows.length} row${rows.length === 1 ? '' : 's'}: one per child per scenario) to Downloads.`);
+});
+
+document.getElementById('export-dictionary-btn').addEventListener('click', () => {
+  downloadFile('thesis-metrics-dictionary.csv', dictionaryCSV(), 'text/csv');
+  say('Saved "thesis-metrics-dictionary.csv" (what every column means) to Downloads.');
+});
+
+// ---------- DEMO data (for showing the dashboard; never saved, never exported) ----------
+
+const demoBtn = document.getElementById('demo-btn');
+demoBtn.addEventListener('click', () => {
+  showDemo = !showDemo;
+  demoBtn.textContent = showDemo ? '🧪 Hide DEMO data' : '🧪 Show DEMO data';
+  demoBtn.setAttribute('aria-pressed', String(showDemo));
+  document.getElementById('demo-banner').hidden = !showDemo;
+  document.getElementById('detail').hidden = true;
+  render();
+});
 
 // ---------- class CSV (every log entry, plus the teacher's tags) ----------
 

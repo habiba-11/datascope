@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/base.css">
   <link rel="stylesheet" href="../css/teacher.css">
+  <!-- Chart.js pinned to the same exact version as Graph Lab. -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <main class="teacher card">
@@ -24,10 +26,14 @@
         📂 Import children's files
         <input type="file" id="file-input" accept=".json,application/json" multiple>
       </label>
+      <button class="btn" id="export-thesis-btn" type="button">📑 Download thesis-metrics.csv</button>
+      <button class="btn" id="export-dictionary-btn" type="button">📘 Download data dictionary</button>
       <button class="btn" id="export-class-btn" type="button">📊 Download class CSV (every log entry)</button>
+      <button class="btn" id="demo-btn" type="button" aria-pressed="false">🧪 Show DEMO data</button>
       <button class="btn" id="clear-btn" type="button">🗑️ Remove all imported files</button>
     </div>
     <p class="feedback" id="teacher-feedback" aria-live="polite" hidden></p>
+    <p class="demo-banner" id="demo-banner" hidden>🧪 DEMO: the DEMO-01 to DEMO-04 children are made up, only to show how the dashboard works. They are never saved with real files and never exported.</p>
 
     <div class="filter-row">
       <label for="scenario-filter">Scenario:</label>
@@ -44,6 +50,10 @@
         <thead><tr><th scope="col">Phase</th><th scope="col">Finished</th><th scope="col">Average minutes</th></tr></thead>
         <tbody id="funnel-rows"></tbody>
       </table>
+    </div>
+    <div class="chart-pair">
+      <div class="chart-box"><canvas id="funnel-chart" role="img"></canvas></div>
+      <div class="chart-box"><canvas id="minutes-chart" role="img"></canvas></div>
     </div>
 
     <h2>Each child</h2>

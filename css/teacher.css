@@ -211,3 +211,29 @@ body {
 .detail-list dd {
   margin: 2px 0 0 16px;
 }
+
+/* DEMO data is labelled in words AND colour (never only colour). */
+.demo-banner {
+  background: var(--color-plan);
+  border: 3px dashed var(--color-navy);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.chart-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 12px 0 20px;
+}
+
+.chart-box {
+  flex: 1;
+  min-width: 300px;
+  max-width: 540px;
+  background: white;
+  border: 2px solid var(--color-navy);
+  border-radius: 14px;
+  padding: 8px;
+}

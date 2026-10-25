@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-19 + 20a built, next is Part 20b (thesis exports, charts, demo mode)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-20b built, next is Part 21 (gamified motion); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -149,9 +149,15 @@
   - summarizeChild (old teacher table) removed with its test; metrics.js replaces it.
   - Checked in headless Chrome: a real child file (full sleep-hours run) + an unfinished reading child imported through the file picker, a junk file skipped with a reason, tiles/funnel/rows right, drill-down and filter work, start page has no teacher link, no console errors.
 
+- Part 20b (26 Oct 2026), 163 tests passing:
+  - js/helpers/thesis.js (tests/thesis.test.js): THESIS_COLUMNS = the fixed column order AND the data dictionary (every column with its meaning, one list so they can never drift apart). "📑 Download thesis-metrics.csv" (one row per child per scenario, all scenarios whatever the filter) and "📘 Download data dictionary" (thesis-metrics-dictionary.csv). export.js gained tableCSV (fixed columns, same formula-safe cells).
+  - DEMO mode: js/helpers/demo.js makes 4 made-up children (DEMO-01..04: two finished, one stopped in Number Lab, one after Collect). "🧪 Show DEMO data" shows them with a yellow banner in words and a "🧪 DEMO" label on every row; kept in memory only (never saved with real imports) and never exported (exportableRows; tested; the class CSV only uses real imports).
+  - Charts (Chart.js 4.5.1, same pin as Graph Lab): completion funnel and average minutes per phase, numbers written on the bars (directLabelsPlugin), screen-reader descriptions, no animation (screenshot-friendly for thesis figures).
+  - Checked in headless Chrome: DEMO on → banner, labelled rows, charts; thesis export with only DEMO refuses; with a real child + DEMO the CSV has the real row only; class CSV has no DEMO; after reload DEMO is off and was never stored. No console errors.
+
 ## Next
-- Part 20b: thesis-metrics.csv + data dictionary, Chart.js charts (funnel, minutes), DEMO mode that is never exported. Still waiting: rubric levels from Papers 7 and 13; PIN yes/no.
-- Part 20c: rubric coding of each claim. Needs from Habiba first: the real rubric levels from Papers 7 and 13 (they are not in docs/literature-key-findings.md).
+- Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13) and an optional PIN (waiting for Habiba).
+- Part 21: gamified motion and interaction (21a motion system first).
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.
