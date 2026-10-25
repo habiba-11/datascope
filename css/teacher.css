@@ -85,7 +85,8 @@ body {
 }
 
 .claim-cell {
-  max-width: 280px;
+  min-width: 220px;
+  max-width: 320px;
 }
 
 .class-table summary {
@@ -123,4 +124,90 @@ body {
 
 .note {
   font-size: 14px;
+}
+
+/* Part 20: scenario filter, overview tiles, funnel, drill-down. */
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 16px;
+  font-weight: 700;
+}
+
+.filter-row select {
+  min-height: 48px;
+  font-size: 16px;
+  font-family: var(--font-body);
+  border: 2px solid var(--color-navy);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.overview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  padding: 10px 14px;
+  border: 2px solid var(--color-navy);
+  border-radius: 14px;
+  background: var(--color-bg);
+}
+
+.tile-value {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.tile-label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.funnel-table {
+  border-collapse: collapse;
+  min-width: 420px;
+  margin-bottom: 12px;
+}
+
+.funnel-table caption {
+  text-align: left;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.funnel-table th,
+.funnel-table td {
+  border: 2px solid var(--color-navy);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.detail {
+  margin-top: 24px;
+  padding: 16px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+  background: var(--color-bg);
+}
+
+.detail .class-table {
+  min-width: 0;
+}
+
+.detail-list dt {
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.detail-list dd {
+  margin: 2px 0 0 16px;
 }

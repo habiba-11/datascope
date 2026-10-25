@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-19 built + fixes from Habiba's test (26 Oct), next is Part 20 (hidden teacher dashboard)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-19 + 20a built, next is Part 20b (thesis exports, charts, demo mode)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -142,8 +142,16 @@
   - Evidence Board's last task (audience + form) removed (Habiba's decision): 3 tasks now; "🏅 Make my Evidence Card" button on task 3 builds the card (so the feedback card never pops up mid-typing). Claim log entries no longer have audience/form; My journey still shows "For:" for older cards. CLAUDE.md and architecture.md updated with the change (mention to Prof).
   - Checked in headless Chrome with a full sleep-hours run: no console errors.
 
+- Part 20a (26 Oct 2026, Prof comment 6, teacher side), 156 tests passing:
+  - Hidden: the teacher page moved to teacher/index.html (git mv, history kept) and the "For teachers" link was removed from the start page; noindex meta. No child page links to it. On a static site this is a speed bump, not security (D6); no PIN yet (waiting for Habiba).
+  - js/helpers/metrics.js (pure, tests/metrics.test.js with two fixture children): childRows → one row per child per scenario, built on buildJourney (phases done, stars, minutes per phase, hints, puzzles first try / after hint / unsolved, first-try rate, guess vs mean and the error, changed mind + reason, graph words, chance rating + reason, biggest run, claim, evidence count, certainty); classOverview → children, investigations, finished, completion funnel, average minutes per phase, hints, first-try rate, average guess error, % who changed their mind. Reading's Class B is not counted as its own scenario.
+  - Dashboard (js/teacher/dashboard.js, js/teacher/detail.js, moved from js/teacher.js): scenario filter, overview tiles, funnel table, one row per child per scenario, misconception tags (kept), "🔍 Open" drill-down with phases (done, stars, minutes), the child's own words and numbers, and a timestamped timeline of every log entry; class CSV, clearing and preview switch kept.
+  - summarizeChild (old teacher table) removed with its test; metrics.js replaces it.
+  - Checked in headless Chrome: a real child file (full sleep-hours run) + an unfinished reading child imported through the file picker, a junk file skipped with a reason, tiles/funnel/rows right, drill-down and filter work, start page has no teacher link, no console errors.
+
 ## Next
-- Part 20: hidden teacher dashboard (local-first). Needs from Habiba first: the real rubric levels from Papers 7 and 13 (they are not in docs/literature-key-findings.md).
+- Part 20b: thesis-metrics.csv + data dictionary, Chart.js charts (funnel, minutes), DEMO mode that is never exported. Still waiting: rubric levels from Papers 7 and 13; PIN yes/no.
+- Part 20c: rubric coding of each claim. Needs from Habiba first: the real rubric levels from Papers 7 and 13 (they are not in docs/literature-key-findings.md).
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.

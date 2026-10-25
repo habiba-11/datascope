@@ -1,5 +1,6 @@
-// Layer 3: helpers for the teacher view. They read the files children saved
-// (js/storage/export.js) and summarise each child's reasoning log.
+// Layer 3: helpers for the teacher dashboard. They check the files children saved
+// (js/storage/export.js) and hold the misconception tags. The per-child numbers
+// come from helpers/metrics.js (Part 20).
 import { isValidCode, makeEntry } from './log.js';
 // Files from before Part 15 are version 1; newer ones are version 2.
 export const READABLE_VERSIONS = [1, 2];
@@ -38,26 +39,6 @@ export function parseExportFile(text) {
     return { ok: false, reason: 'entries from a different code' };
   }
   return { ok: true, file };
-}
-
-// The numbers for one child's row in the class table.
-export function summarizeChild(file) {
-  const of = (type) => file.entries.filter((entry) => entry.type === type);
-  const tasks = of('meaning-task');
-  const claims = of('claim');
-
-  return {
-    code: file.code,
-    scenarios: [...new Set(of('data-seen').map((entry) => entry.scenarioId))],
-    predictions: of('prediction').length,
-    revisions: of('revision').length,
-    tasksCorrect: tasks.filter((t) => t.result === 'correct').length,
-    tasksAfterHint: tasks.filter((t) => t.result === 'after-hint').length,
-    tasksIncorrect: tasks.filter((t) => t.result === 'incorrect').length,
-    hintsUsed: of('hint').length,
-    certaintyReasons: of('certainty').filter((entry) => entry.reason).length,
-    lastClaim: claims.length ? claims[claims.length - 1] : null, // the child's final card
-  };
 }
 
 // The teacher's tags become log entries too, so they appear in the class CSV.

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseExportFile, summarizeChild, tagEntries, MISCONCEPTION_TAGS } from '../js/helpers/summary.js';
+import { parseExportFile, tagEntries, MISCONCEPTION_TAGS } from '../js/helpers/summary.js';
 import { buildExport } from '../js/storage/export.js';
 
 const entries = [
@@ -39,17 +39,6 @@ test('other files are refused with a reason', () => {
   assert.equal(parseExportFile('{"app":"Something else"}').reason, 'not a DataScope file');
   const mixed = buildExport('OWL-07', [{ ...entries[0], code: 'FOX-12' }]);
   assert.equal(parseExportFile(JSON.stringify(mixed)).reason, 'entries from a different code');
-});
-
-test('summary counts meaning-task results, hints and reasons', () => {
-  const child = summarizeChild(JSON.parse(goodFile));
-  assert.deepEqual(child.scenarios, ['sleep-hours']);
-  assert.equal(child.tasksCorrect, 1);
-  assert.equal(child.tasksAfterHint, 1);
-  assert.equal(child.tasksIncorrect, 1);
-  assert.equal(child.hintsUsed, 1);
-  assert.equal(child.certaintyReasons, 1);
-  assert.equal(child.lastClaim.claim, 'final');
 });
 
 test('teacher tags become log entries with the readable label', () => {

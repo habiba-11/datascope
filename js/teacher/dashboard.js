@@ -1,17 +1,32 @@
-// Teacher view (shell layer): import the children's saved files, see one row
-// per child, tag misconceptions, and download one class CSV.
+// Hidden teacher dashboard (Part 20, Prof's comment 6). Import the children's
+// saved files, see the class at a glance (completion funnel, averages), one row
+// per child per scenario, drill into one child, tag misconceptions, download CSVs.
+// Hidden = no link from any child page. On a static site that is a speed bump,
+// not security; real protection needs a login (optional Part 22).
 // Imported text is shown with textContent only: a file can hold anything a child typed.
-import { parseExportFile, summarizeChild, MISCONCEPTION_TAGS, tagEntries } from './helpers/summary.js';
-import { toCSV, downloadFile, exportFileName } from './storage/export.js';
+import { parseExportFile, MISCONCEPTION_TAGS, tagEntries } from '../helpers/summary.js';
+import { childRows, classOverview } from '../helpers/metrics.js';
+import { PHASES } from '../helpers/progress.js';
+import { PICKABLE_SCENARIOS, loadRecipe, loadContent } from '../helpers/scenarios.js';
+import { toCSV, downloadFile, exportFileName } from '../storage/export.js';
 import {
   getTeacherImports, setTeacherImports, getTeacherTags, setTeacherTags, clearChildData,
   getPreviewAll, setPreviewAll,
-} from './storage/save.js';
+} from '../storage/save.js';
+import { renderDetail } from './detail.js';
 
 let imports = getTeacherImports(); // { "OWL-07": file, ... }
 let tags = getTeacherTags();       // { "OWL-07": ["equally-likely", ...], ... }
+const titles = {};                 // scenario id -> card title, e.g. "How much do we sleep?"
+const partners = {};               // reading Class A -> Class B (not a scenario of its own)
+
+const PHASE_NAMES = {
+  ask: '❓ Ask', plan: '🗺️ Plan', collect: '📋 Collect', graph: '📊 Graph Lab',
+  number: '🔢 Number Lab', chance: '🎲 Chance Lab', conclude: '🚩 Conclude',
+};
 
 const feedback = document.getElementById('teacher-feedback');
+const filter = document.getElementById('scenario-filter');
 
 function say(message) {
   feedback.textContent = message;
@@ -25,6 +40,8 @@ function el(tag, text = '', className = '') {
   if (className) element.className = className;
   return element;
 }
+
+const show = (value) => (value === null || value === undefined ? '–' : String(value));
 
 // ---------- importing ----------
 
@@ -50,7 +67,12 @@ document.getElementById('file-input').addEventListener('change', async (event) =
   render();
 });
 
-// ---------- the class table ----------
+// ---------- the rows (one per child per scenario) ----------
+
+function currentRows() {
+  const rows = childRows(Object.values(imports), partners).sort((a, b) => (a.code > b.code ? 1 : -1));
+  return filter.value ? rows.filter((r) => r.scenarioId === filter.value) : rows;
+}
 
 function tagCell(code) {
   const chosen = tags[code] || [];
@@ -76,49 +98,80 @@ function tagCell(code) {
   return details;
 }
 
-function claimText(claim) {
-  if (!claim) return '-';
-  return `I think ${claim.claim} because ${claim.because}. (${claim.certainty}: ${claim.certaintyReason})`;
+function renderOverview(rows) {
+  const o = classOverview(rows);
+  const tiles = [
+    ['👧 Children', o.children],
+    ['🔎 Investigations', o.investigations],
+    ['🏁 Finished', o.finished],
+    ['💡 Hints used', o.hintsUsed],
+    ['🧩 Puzzles right first time', o.firstTryRate === null ? null : `${o.firstTryRate}%`],
+    ['🎯 Average guess error', o.avgPredictionError],
+    ['🔄 Changed mind after data', o.revisedRate === null ? null : `${o.revisedRate}%`],
+  ];
+  document.getElementById('overview').replaceChildren(...tiles.map(([label, value]) => {
+    const tile = el('div', '', 'tile');
+    tile.append(el('span', show(value), 'tile-value'), el('span', label, 'tile-label'));
+    return tile;
+  }));
+
+  document.getElementById('funnel-rows').replaceChildren(...PHASES.map((phase) => {
+    const tr = el('tr');
+    const name = el('th', PHASE_NAMES[phase]);
+    name.scope = 'row';
+    tr.append(name, el('td', `${o.funnel[phase]} of ${o.investigations}`), el('td', show(o.avgMinutes[phase])));
+    return tr;
+  }));
 }
 
 function render() {
-  const rows = document.getElementById('class-rows');
-  const children = Object.values(imports).map(summarizeChild).sort((a, b) => (a.code > b.code ? 1 : -1));
+  const rows = currentRows();
+  renderOverview(rows);
 
-  rows.replaceChildren();
-  if (children.length === 0) {
+  const body = document.getElementById('class-rows');
+  body.replaceChildren();
+  if (rows.length === 0) {
     const emptyRow = el('tr');
     const emptyCell = el('td', 'No files yet. Import the files your children saved.');
-    emptyCell.colSpan = 7;
+    emptyCell.colSpan = 11;
     emptyRow.append(emptyCell);
-    rows.append(emptyRow);
+    body.append(emptyRow);
   }
 
-  for (const child of children) {
-    const row = el('tr');
-    const codeCell = el('th', child.code, 'no-wrap');
+  for (const row of rows) {
+    const tr = el('tr');
+    const codeCell = el('th', row.code, 'no-wrap');
     codeCell.scope = 'row';
-    row.append(
-      codeCell,
-      el('td', child.scenarios.join(', ') || '-'),
-      el('td', `✅ ${child.tasksCorrect} · 💡 ${child.tasksAfterHint} · ❌ ${child.tasksIncorrect}`, 'no-wrap'),
-      el('td', String(child.hintsUsed)),
-      el('td', String(child.certaintyReasons)),
-      el('td', claimText(child.lastClaim), 'claim-cell'),
-    );
+    const open = el('button', '🔍 Open', 'btn');
+    open.type = 'button';
+    open.addEventListener('click', () => {
+      renderDetail(document.getElementById('detail'), row, imports[row.code].entries, titles[row.scenarioId] || row.scenarioId);
+    });
     const tagsTd = el('td');
-    tagsTd.append(tagCell(child.code));
-    row.append(tagsTd);
-    rows.append(row);
-  }
+    tagsTd.append(tagCell(row.code));
+    const openTd = el('td');
+    openTd.append(open);
 
-  const sum = (key) => children.reduce((total, child) => total + child[key], 0);
-  document.getElementById('class-totals').textContent = children.length
-    ? `${children.length} children · meaning tasks: ✅ ${sum('tasksCorrect')} first time, 💡 ${sum('tasksAfterHint')} after a hint, ❌ ${sum('tasksIncorrect')} unsolved · hints used: ${sum('hintsUsed')}`
-    : '';
+    tr.append(
+      codeCell,
+      el('td', titles[row.scenarioId] || row.scenarioId),
+      el('td', `${row.finished ? '✅ ' : ''}${row.phasesDone} of 7`, 'no-wrap'),
+      el('td', String(row.totalStars)),
+      el('td', `✅ ${row.tasksFirstTry} · 💡 ${row.tasksAfterHint} · ❌ ${row.tasksUnsolved}`, 'no-wrap'),
+      el('td', String(row.hintsUsed)),
+      el('td', row.numberGuess === null ? '–' : `${row.numberGuess} → ${show(row.mean)}`, 'no-wrap'),
+      el('td', row.revised === null ? '–' : (row.revised ? '🔄 yes' : 'no')),
+      el('td', row.claim === null ? '–' : `I think ${row.claim} because ${row.because}.`, 'claim-cell'),
+      tagsTd,
+      openTd,
+    );
+    body.append(tr);
+  }
 }
 
-// ---------- class CSV ----------
+filter.addEventListener('change', render);
+
+// ---------- class CSV (every log entry, plus the teacher's tags) ----------
 
 document.getElementById('export-class-btn').addEventListener('click', () => {
   const codes = Object.keys(imports).sort();
@@ -126,7 +179,6 @@ document.getElementById('export-class-btn').addEventListener('click', () => {
     say('Import some files first.');
     return;
   }
-  // Every child's log, plus the teacher's tags as extra rows.
   const entries = codes.flatMap((code) => [...imports[code].entries, ...tagEntries(code, tags[code] || [])]);
   const fileName = exportFileName('class', 'csv');
   downloadFile(fileName, toCSV(entries), 'text/csv');
@@ -161,6 +213,7 @@ twoTapButton(document.getElementById('clear-btn'), '⚠️ Tap again to remove e
   tags = {};
   setTeacherImports(imports);
   setTeacherTags(tags);
+  document.getElementById('detail').hidden = true;
   say('All imported files and tags were removed from this device.');
   render();
 });
@@ -185,5 +238,19 @@ previewBtn.addEventListener('click', () => {
   showPreviewState();
 });
 
-showPreviewState();
-render();
+// ---------- start ----------
+
+async function init() {
+  // Scenario names for the table and the filter; partners so reading's
+  // Class B is not counted as a scenario of its own.
+  for (const id of PICKABLE_SCENARIOS) {
+    const [recipe, content] = await Promise.all([loadRecipe(id), loadContent(id)]);
+    titles[id] = content.cardTitle;
+    if (recipe.compareWith) partners[id] = recipe.compareWith;
+    filter.append(Object.assign(document.createElement('option'), { value: id, textContent: content.cardTitle }));
+  }
+  showPreviewState();
+  render();
+}
+
+init();
