@@ -77,7 +77,10 @@ function phaseEvents(mine, phase, scenarioId) {
 }
 
 // `partnerId` is the second class's scenario (reading minutes: Class B), or null.
-export function buildJourney(entries, code, scenarioId, partnerId = null) {
+// `savedDone` is the saved progress for this scenario (save.js / the file's
+// "progress"): a phase saved as done counts as done even if the log has no
+// phase-complete for it (e.g. work done in teacher preview before 26 Oct 2026).
+export function buildJourney(entries, code, scenarioId, partnerId = null, savedDone = []) {
   const mine = entries.filter((e) => e.code === code);
   const scenarioIds = [scenarioId, partnerId].filter(Boolean);
   const phases = {};
@@ -93,7 +96,7 @@ export function buildJourney(entries, code, scenarioId, partnerId = null) {
       && (!e.scenarioId || scenarioIds.includes(e.scenarioId)));
 
     phases[phase] = {
-      done: Boolean(end),
+      done: Boolean(end) || savedDone.includes(phase),
       stars,
       // For the teacher only (decided 25 Oct 2026): the child's page never shows time.
       durationMs: start && end ? Date.parse(end) - Date.parse(start) : null,

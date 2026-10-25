@@ -25,7 +25,7 @@ test('the thesis CSV keeps the column order, one row per child per scenario', ()
   const [header, ...lines] = thesisCSV(realRows).split('\r\n');
   assert.equal(header, THESIS_COLUMNS.map((c) => c.key).join(','));
   assert.equal(lines.length, 1);
-  assert.match(lines[0], /^OWL-07,sleep-hours,7,true,/);
+  assert.match(lines[0], /^OWL-07,sleep-hours,false,7,true,/);
 });
 
 test('DEMO children are never exported', () => {

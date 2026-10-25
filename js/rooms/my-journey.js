@@ -9,7 +9,7 @@ import { loadRecipe, loadContent } from '../helpers/scenarios.js';
 import { numberLabKind } from '../helpers/number-tasks.js';
 import { CERTAINTY } from '../helpers/certainty.js';
 import { readLog } from '../helpers/log.js';
-import { getSelectedScenarioId, getExplorerCode, getAllProgress } from '../storage/save.js';
+import { getSelectedScenarioId, getExplorerCode, getAllProgress, getDonePhases } from '../storage/save.js';
 import { buildExport, exportFileName, toCSV, downloadFile } from '../storage/export.js';
 import { guardJourney } from '../phase-progress.js';
 import { pipSVG, pipMoodFor } from '../pip.js';
@@ -169,7 +169,7 @@ async function init() {
   const recipe = await loadRecipe(getSelectedScenarioId());
   const { cardTitle, emoji } = await loadContent(recipe.id);
   const code = getExplorerCode();
-  const journey = buildJourney(readLog(), code, recipe.id, recipe.compareWith || null);
+  const journey = buildJourney(readLog(), code, recipe.id, recipe.compareWith || null, getDonePhases(recipe.id));
 
   mountShell({
     step: 'conclude',

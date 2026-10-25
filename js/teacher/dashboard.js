@@ -181,7 +181,8 @@ function render() {
 
   for (const row of rows) {
     const tr = el('tr');
-    const codeCell = el('th', row.demo ? `${row.code} 🧪 DEMO` : row.code, 'no-wrap');
+    const label = row.demo ? ' 🧪 DEMO' : (row.preview ? ' 👀 preview' : '');
+    const codeCell = el('th', `${row.code}${label}`, 'no-wrap');
     codeCell.scope = 'row';
     const open = el('button', '🔍 Open', 'btn');
     open.type = 'button';

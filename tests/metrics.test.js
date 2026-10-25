@@ -101,6 +101,12 @@ test('class overview: completion funnel, averages and rates', () => {
   assert.equal(o.revisedRate, 100);
 });
 
+test('a run done with the teacher preview on is marked', () => {
+  const previewChild = { code: 'H-0', entries: [{ code: 'H-0', time: '2026-10-26T09:00:00.000Z', room: 'shell', type: 'phase-start', phase: 'ask', scenarioId: 'shoe-sizes', preview: true }] };
+  assert.equal(childRows([previewChild])[0].preview, true);
+  assert.equal(rows.find((r) => r.code === 'OWL-07').preview, false);
+});
+
 test('an empty class gives zeros and nulls, not errors', () => {
   const o = classOverview([]);
   assert.equal(o.children, 0);

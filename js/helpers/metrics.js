@@ -22,7 +22,8 @@ export function childRows(files, partners = {}) {
   const rows = [];
   for (const file of files) {
     for (const scenarioId of scenariosIn(file.entries, partners)) {
-      const j = buildJourney(file.entries, file.code, scenarioId, partners[scenarioId] || null);
+      const saved = (file.progress && file.progress[scenarioId]) || [];
+      const j = buildJourney(file.entries, file.code, scenarioId, partners[scenarioId] || null, saved);
       const { plan, number, chance, graph, conclude } = j.phases;
       const tasks = number.tasks.length;
       const claim = conclude.claim;
@@ -32,6 +33,8 @@ export function childRows(files, partners = {}) {
         code: file.code,
         scenarioId,
         demo: Boolean(file.demo),
+        // Done with the teacher's "open all rooms" preview on (phase events marked preview).
+        preview: file.entries.some((e) => e.preview && e.scenarioId === scenarioId),
         phasesDone: j.phasesDone,
         finished: j.phases.conclude.done,
         totalStars: j.totalStars,

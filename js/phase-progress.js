@@ -30,15 +30,21 @@ export function guardJourney() {
 
 let lastPhase = null;
 
+// Phase events made while the teacher preview is on are marked, so the
+// teacher dashboard can tell them apart. They are still logged: My journey
+// needs them to show "Done" and the stars (bug found by Habiba, 26 Oct 2026).
+function phaseDetails(phase) {
+  const details = { phase, scenarioId: getSelectedScenarioId() };
+  if (getPreviewAll()) details.preview = true;
+  return details;
+}
+
 // The child is now in this phase: log the start (only while it is not done
 // yet) and show its intro pop-up the first time.
-// In teacher preview, phase events are not logged (they are not a child's work).
 export function enterPhase(phase) {
   if (phase === lastPhase) return;
   lastPhase = phase;
-  if (!getPreviewAll() && !isPhaseDone(phase)) {
-    logEvent('shell', 'phase-start', { phase, scenarioId: getSelectedScenarioId() });
-  }
+  if (!isPhaseDone(phase)) logEvent('shell', 'phase-start', phaseDetails(phase));
   setIntroPhase(phase);
 }
 
@@ -53,11 +59,8 @@ export function isPhaseDone(phase) {
 export async function finishPhase(phase, facts = {}) {
   if (!markPhaseDone(phase)) return; // done before: nothing new happens
   const card = buildPhaseFeedback(phase, facts);
-  if (!getPreviewAll()) {
-    const scenarioId = getSelectedScenarioId();
-    logEvent('shell', 'phase-complete', { phase, scenarioId });
-    logEvent('shell', 'phase-feedback', { phase, scenarioId, stars: card.stars });
-  }
+  logEvent('shell', 'phase-complete', phaseDetails(phase));
+  logEvent('shell', 'phase-feedback', { ...phaseDetails(phase), stars: card.stars });
   // The next pop-up (e.g. the Plan intro) waits until the unlock has been seen.
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   pauseNextModal(reduceMotion ? 0 : UNLOCK_SHOW_MS);

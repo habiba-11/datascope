@@ -95,3 +95,12 @@ test('My journey opens only after Conclude (or in teacher preview)', () => {
   assert.equal(journeyRedirect(['ask', 'plan', 'collect', 'graph', 'number', 'chance', 'conclude'], false), null);
   assert.equal(journeyRedirect([], true), null);
 });
+
+test('a phase saved as done counts as done, even with no phase-complete in the log', () => {
+  const noEvents = log.filter((entry) => !entry.type.startsWith('phase'));
+  const j = buildJourney(noEvents, 'OWL-07', S, null, ['ask', 'plan']);
+  assert.equal(j.phases.ask.done, true);
+  assert.equal(j.phases.plan.done, true);
+  assert.equal(j.phases.collect.done, false);
+  assert.equal(j.phases.ask.stars, null); // stars that were never logged stay empty
+});

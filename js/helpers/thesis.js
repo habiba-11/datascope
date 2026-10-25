@@ -14,6 +14,7 @@ const PHASE_NAMES = {
 export const THESIS_COLUMNS = [
   { key: 'code', meaning: 'Anonymous explorer code (no names).' },
   { key: 'scenarioId', meaning: 'Which synthetic scenario the child investigated.' },
+  { key: 'preview', meaning: 'true if this run was done with the teacher preview ("open all rooms") switched on: probably a teacher test, not a child.' },
   { key: 'phasesDone', meaning: 'How many of the 7 phases were finished (0-7).' },
   { key: 'finished', meaning: 'true if the child finished Conclude.' },
   ...PHASES.flatMap((p) => [

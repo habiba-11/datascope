@@ -199,6 +199,8 @@
   - Motion rules: at most 48 moving particles at once (40 confetti + 8 badge stars, under the plan's 60); no flashing (Pip blinks every 5 s, pulses are size changes, not light flashes); all GSAP paused while the tab is hidden; every GSAP helper does nothing with reduced motion, Chart.js animation off too; the drag in the card sort has a button alternative. Known: the Chance Lab bars animate their width (not only transform/opacity); small and short, kept.
   - Still to do by Habiba: try it on a real Chromebook or tablet (speed of the animations, touch drag).
 
+- Bug fix (26 Oct 2026, found by Habiba), 174 tests passing: My journey said "Not done yet" and 0 stars for every phase when the teacher preview was on, because phase-start/complete/feedback were not logged in preview. Now they are always logged (marked preview: true), and buildJourney also counts a phase as done if the saved progress says so (repairs runs already saved; stars that were never logged stay empty). Teacher dashboard shows "👀 preview" on such runs; thesis-metrics.csv has a new "preview" column (not excluded: Habiba decides).
+
 ## Next
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (open items 11d, 12a-d too).
 - Part 20c: rubric coding of each claim (later: waiting for the real levels from Papers 7 and 13).
