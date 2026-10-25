@@ -58,7 +58,7 @@
   margin-top: 12px;
 }
 
-/* "Save my work for my teacher" under the Evidence Card. */
+/* "See my journey" under the Evidence Card (saving moved to My journey, Part 19). */
 .save-work {
   display: flex;
   flex-direction: column;
@@ -67,21 +67,3 @@
   margin-top: 20px;
 }
 
-/* A quiet text button for the teacher's CSV copy (still 48px tall to tap). */
-.link-btn {
-  background: none;
-  border: none;
-  min-height: 48px;
-  padding: 0 4px;
-  font-family: var(--font-body);
-  font-size: 16px;
-  color: var(--color-text);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-/* "Start a new investigation": a plain white button, not a purple link. */
-.save-work a.btn {
-  background: white;
-  color: var(--color-text);
-}

@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-18 built, next is Part 19 (student journey dashboard)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-19 built, next is Part 20 (hidden teacher dashboard)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -127,8 +127,16 @@
   - New log event recap-viewed { auto, cardsViewed }.
   - Checked in headless Chrome (sleep, games): intro then recap, steps appear one by one, no auto-open on reload, 📘 reopens, no console errors.
 
+- Part 19 (25 Oct 2026, Prof comment 6, student side), 146 tests passing:
+  - js/helpers/journey.js (pure, tests/journey.test.js with a fixture log incl. a missing phase, another child's entries and an old v1-style log): buildJourney(entries, code, scenarioId, partnerId) → per phase { done, stars, durationMs, hints, + the child's own answers }, phasesDone, totalStars, hintsUsed, badgeCount, level. A phase's moments = its room's entries between its phase-start and phase-complete (so Ask and Plan, which share a room, stay apart). The teacher dashboard (Part 20) will use the same function.
+  - rooms/my-journey.html + js/rooms/my-journey.js + css/my-journey.css: a 7-stop trail (✅ Done / 🔒 Not done yet, stars, the child's own answers, typed text via textContent), a 🪪 Detective ID card (code, level, badges, stars), "🧠 What I learned" (the scenario's teaches line), print-friendly layout (🖨️ Print).
+  - "📤 Save my work for my teacher" (+ CSV) moved here from Evidence Board; Evidence Board now ends with "🗺️ See my journey →".
+  - Route guard: My journey opens only after Conclude is done (journeyRedirect in progress.js, guardJourney in phase-progress.js; teacher preview opens it).
+  - Decided with Habiba: time per phase is computed (for the teacher) but never shown to the child.
+  - Checked in headless Chrome with a full sleep-hours investigation the real way (no preview): fresh child bounced from My journey, every step unlocks, all 7 stops show the right answers, no time shown, save works, no console errors.
+
 ## Next
-- Part 19: student journey dashboard ("My journey" page, buildJourney shared with the teacher dashboard). Decide first: no time-per-phase on the child's page.
+- Part 20: hidden teacher dashboard (local-first). Needs from Habiba first: the real rubric levels from Papers 7 and 13 (they are not in docs/literature-key-findings.md).
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.
@@ -150,7 +158,8 @@
 - 25 Oct 2026 (Round 2 start): Prof's 8 comments planned as Parts 13 to 24 (docs/round-2-plan.md). Backend = optional bonus behind a flag; rewards for reasoning, never speed; DEMO data never exported; deploy locked until "Prof confirmed" (all in CLAUDE.md). Number Lab following the chosen scenario (Part 17b) reverses the earlier "by design" note in Known bugs.
 - 25 Oct 2026 (Part 17c): no extra scenario-linked Chance Lab device for now.
 - 25 Oct 2026 (Part 15): done rules as in the plan, but Conclude = card built (saving moves to My Journey); teacher "open all rooms" preview switch keeps the architecture's "a teacher can open any room"; progress per code + scenario (switching back restores it); Explore rooms open in order Graph → Number → Chance.
-- Still open (decide before the part that needs it): real rubric levels from the Paper 7 and 13 PDFs (Part 20); no "time per phase" on the child's page (Part 19).
+- 25 Oct 2026 (Part 19): time per phase is for the teacher only, never shown to the child.
+- Still open (decide before the part that needs it): real rubric levels from the Paper 7 and 13 PDFs (Part 20).
 - 22 Oct 2026 (Part 12): more gamification, inserted before deployment (now Part 13). Every sound and motion is tied to a result or reasoning moment; no timers, leaderboards or point loss. No sound on ordinary button taps.
 - 15 Oct 2026: the UI must be colourful, playful, engaging and very simple for kids (see the UI section in CLAUDE.md).
 - 15 Oct 2026: short explanations by default.

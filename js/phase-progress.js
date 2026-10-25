@@ -1,7 +1,7 @@
 // Shell layer: follows the child through the phases (Parts 15 and 16).
 // The rules are in helpers/progress.js; this file saves, logs and tells the page.
 import { logEvent } from './helpers/log.js';
-import { guardRedirect } from './helpers/progress.js';
+import { guardRedirect, journeyRedirect } from './helpers/progress.js';
 import { buildPhaseFeedback } from './helpers/feedback.js';
 import { getDonePhases, markPhaseDone, getPreviewAll, getSelectedScenarioId } from './storage/save.js';
 import { setIntroPhase } from './phase-intro.js';
@@ -11,6 +11,14 @@ import { showFeedbackCard } from './feedback-card.js';
 // room (which shows a friendly Pip line). Returns true when it does.
 export function guardPage(phase) {
   const target = guardRedirect(phase, getDonePhases(), getPreviewAll());
+  if (!target) return false;
+  location.replace(`${target}?locked=1`);
+  return true;
+}
+
+// "My journey" opens only after Conclude. Returns true when it sends the child away.
+export function guardJourney() {
+  const target = journeyRedirect(getDonePhases(), getPreviewAll());
   if (!target) return false;
   location.replace(`${target}?locked=1`);
   return true;

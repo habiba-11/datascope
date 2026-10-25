@@ -5,12 +5,11 @@ import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios
 import { CERTAINTY, certaintyButtonsHTML } from '../helpers/certainty.js';
 import { numberLabKind } from '../helpers/number-tasks.js';
 import { addRecapButton } from '../recap.js';
-import { logEvent, readLog } from '../helpers/log.js';
+import { logEvent } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { playSound } from '../sounds.js';
 import { animate, pipReacts, confetti } from '../motion.js';
-import { getSelectedScenarioId, getExplorerCode, getAllProgress } from '../storage/save.js';
-import { buildExport, exportFileName, toCSV, downloadFile } from '../storage/export.js';
+import { getSelectedScenarioId } from '../storage/save.js';
 import { finishPhase } from '../phase-progress.js';
 import { countWords } from '../helpers/feedback.js';
 
@@ -109,10 +108,7 @@ async function init() {
         </div>
         <div class="evidence-card" id="evidence-card" hidden></div>
         <div class="save-work" id="save-work" hidden>
-          <button class="btn btn-main" id="save-work-btn" type="button">📤 Save my work for my teacher</button>
-          <button class="link-btn" id="save-csv-btn" type="button">or save it as a table (CSV)</button>
-          <p class="feedback" id="save-feedback" hidden></p>
-          <a class="btn" href="question-studio.html">🔁 Start a new investigation →</a>
+          <a class="btn btn-main" href="my-journey.html">🗺️ See my journey →</a>
         </div>
       </section>
 
@@ -129,7 +125,6 @@ async function init() {
   setupEvidence();
   setupCertainty();
   setupAudienceForm();
-  setupSaveWork();
   setupTaskNav();
   // 📘 Maths recap, for checking a number before using it as proof (Part 18).
   addRecapButton(document.querySelector('.room-title'), numberLabKind(recipe), 'evidence-board');
@@ -253,35 +248,6 @@ function logClaim(details) {
   if (asText === lastLoggedClaim) return;
   lastLoggedClaim = asText;
   logEvent('evidence-board', 'claim', details);
-}
-
-// "Save my work for my teacher": downloads the whole reasoning log.
-// JSON is the main file (the teacher view will import it); CSV opens in a spreadsheet.
-function setupSaveWork() {
-  const feedback = document.getElementById('save-feedback');
-
-  function save(extension) {
-    const code = getExplorerCode();
-    if (!code) {
-      // Without a code the teacher can't tell whose file it is. The log stays saved.
-      feedback.textContent = 'You need your explorer code first! Go to the start page, type it, then come back.';
-      feedback.hidden = false;
-      return;
-    }
-    // Only this child's entries: on a shared device, another child's work stays out of the file.
-    const entries = readLog().filter((entry) => entry.code === code);
-    const fileName = exportFileName(code, extension);
-    if (extension === 'json') {
-      downloadFile(fileName, JSON.stringify(buildExport(code, entries, new Date(), getAllProgress()), null, 2), 'application/json');
-    } else {
-      downloadFile(fileName, toCSV(entries), 'text/csv');
-    }
-    feedback.textContent = `Saved! 🎉 Look in Downloads for "${fileName}" and hand it in to your teacher.`;
-    feedback.hidden = false;
-  }
-
-  document.getElementById('save-work-btn').addEventListener('click', () => save('json'));
-  document.getElementById('save-csv-btn').addEventListener('click', () => save('csv'));
 }
 
 // One line of the Evidence Card: a bold label, then plain text.

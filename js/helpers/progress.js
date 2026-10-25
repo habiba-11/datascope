@@ -55,3 +55,9 @@ export function guardRedirect(phase, done, previewAll = false) {
   if (previewAll || isUnlocked(phase, done)) return null;
   return PAGE_OF_PHASE[furthestPhase(done)];
 }
+
+// "My journey" (Part 19) opens only once Conclude is DONE.
+export function journeyRedirect(done, previewAll = false) {
+  if (previewAll || done.includes('conclude')) return null;
+  return PAGE_OF_PHASE[furthestPhase(done)];
+}

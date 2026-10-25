@@ -1,0 +1,167 @@
+/* "My journey" (Part 19): a trail of 7 stops, a Detective ID card, what I learned. */
+.journey-scenario {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.journey-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.id-card,
+.learned {
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-button);
+  padding: 12px 18px;
+}
+
+.id-card {
+  background: var(--color-plan);
+  min-width: 220px;
+}
+
+.id-card h2,
+.learned h2 {
+  font-size: 20px;
+  margin: 0 0 6px;
+}
+
+.id-card p {
+  margin: 4px 0;
+  font-weight: 700;
+}
+
+.id-code {
+  font-family: var(--font-heading);
+  font-size: 22px;
+}
+
+.learned {
+  flex: 1;
+  min-width: 240px;
+  background: var(--color-bg);
+}
+
+/* The trail: one stop per phase, joined by a dashed line like the step bar. */
+.trail {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 24px;
+  border-left: 4px dashed var(--color-navy);
+}
+
+.stop {
+  position: relative;
+  margin: 0 0 16px;
+  padding: 10px 16px;
+  background: white;
+  border: 2px solid var(--color-navy);
+  border-radius: var(--radius-card);
+  animation: pop-in 0.35s ease-out backwards; /* the stops pop in one by one */
+}
+
+/* A dot on the trail line; a done stop has a filled dot AND the word "Done". */
+.stop::before {
+  content: '';
+  position: absolute;
+  left: -38px;
+  top: 18px;
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--color-navy);
+  border-radius: 50%;
+  background: white;
+}
+
+.stop.done::before {
+  background: var(--color-explore);
+}
+
+.stop:not(.done) {
+  border-style: dashed;
+  background: var(--color-bg);
+}
+
+.stop-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stop-icon {
+  font-size: 28px;
+}
+
+.stop-name {
+  font-size: 20px;
+  margin: 0;
+  flex: 1;
+}
+
+.stop-status {
+  font-weight: 700;
+}
+
+.stop-stars {
+  margin: 4px 0;
+  font-size: 20px;
+}
+
+.stop-line {
+  margin: 4px 0;
+}
+
+.journey-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.journey-actions a.btn,
+.journey-actions .btn:not(.btn-main) {
+  background: white;
+  color: var(--color-text);
+}
+
+/* A quiet text button for the CSV copy (still 48px tall to tap). */
+.link-btn {
+  background: none;
+  border: none;
+  min-height: 48px;
+  padding: 0 4px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--color-text);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Printing: just the journey, no buttons, sidebar, step bar or hills. */
+@media print {
+  .shell-header,
+  .sidebar,
+  .hills,
+  .journey-actions,
+  .preview-banner {
+    display: none !important;
+  }
+
+  .room-content {
+    border: none;
+    box-shadow: none;
+  }
+
+  .stop {
+    animation: none;
+    break-inside: avoid;
+  }
+}
