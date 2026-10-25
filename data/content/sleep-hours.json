@@ -6,5 +6,17 @@
     { "flawed": "Isn't staying up late bad for you?", "fix": "What time did you go to bed last night?" },
     { "flawed": "Do you sleep a lot?", "fix": "How many hours did you sleep last night?" }
   ],
-  "planPrompt": "🤔 Make a guess! How many hours did most kids sleep?"
+  "planPrompt": "🤔 Make a guess! How many hours did most kids sleep?",
+  "numberLab": {
+    "kind": "number",
+    "predictPrompt": "🤔 Guess first! What is a typical number of hours?",
+    "build": "😴 5 friends slept some hours. Their mean is {target}. Type 5 numbers that fit.",
+    "mistake": { "story": "😴 Mia asked 5 friends how long they slept.", "numbers": [10, 7, 6, 9, 8] },
+    "realLife": {
+      "story": "⛺ At a camp, 7 kids slept these hours:",
+      "numbers": [8, 10, 8, 11, 9, 8, 12],
+      "modeQuestion": "Which sleep time came up the most?",
+      "medianQuestion": "Put the hours in order. Which one is in the middle?"
+    }
+  }
 }

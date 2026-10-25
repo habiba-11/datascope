@@ -73,7 +73,8 @@ const unsolvedTasks = new Set();
 
 // Follows one meaning task. Call wrong() after each wrong answer and
 // solved() when it is right. The result is logged only once.
-export function trackMeaningTask(room, task) {
+// `extra` is logged with it too (e.g. { scenarioId }).
+export function trackMeaningTask(room, task, extra = {}) {
   let wrongTries = 0;
   let done = false;
 
@@ -94,7 +95,7 @@ export function trackMeaningTask(room, task) {
     if (done) return;
     done = true;
     unsolvedTasks.delete(tracker);
-    logEvent(room, 'meaning-task', { task, result: meaningTaskResult(wrongTries, solved), wrongTries });
+    logEvent(room, 'meaning-task', { task, ...extra, result: meaningTaskResult(wrongTries, solved), wrongTries });
   }
 
   watchForLeaving();

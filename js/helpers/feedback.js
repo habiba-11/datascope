@@ -75,13 +75,17 @@ const RULES = {
     };
   },
 
-  // facts: { guess, mean, changedWithReason, teaches }
+  // facts: { guess, mean, changedWithReason, teaches }, or for words (games):
+  // { guess, mode (list), changedWithReason, teaches }
   number: (f) => {
-    const close = Math.abs(f.guess - f.mean) <= 1;
+    const isWords = Array.isArray(f.mode) && f.mean === undefined;
+    const close = isWords ? f.mode.includes(f.guess) : Math.abs(f.guess - f.mean) <= 1;
+    let guessWin = close ? `Your guess ${f.guess} was close to the mean ${f.mean}!` : `You guessed ${f.guess}. The mean was ${f.mean}.`;
+    if (isWords) guessWin = close ? `You guessed ${f.guess}. That is the mode!` : `You guessed ${f.guess}. The mode was ${f.mode.join(' and ')}.`;
     return {
       stars: 2 + (close || f.changedWithReason ? 1 : 0),
       wins: [
-        close ? `Your guess ${f.guess} was close to the mean ${f.mean}!` : `You guessed ${f.guess}. The mean was ${f.mean}.`,
+        guessWin,
         f.changedWithReason && 'You changed your mind because of the data.',
         'You solved all the number puzzles.',
       ],

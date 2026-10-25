@@ -10,5 +10,5 @@
   "valuePool": [18, 19, 20, 21, 22],
   "mustInclude": [],
   "target": { "mean": 20, "median": 20, "mode": [19, 21], "range": 4 },
-  "teaches": "Same mean as Class B, but a much narrower spread."
+  "teaches": "Two classes can have the same mean but a very different spread."
 }

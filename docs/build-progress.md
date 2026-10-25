@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-16 and 17a built, next is Part 17b (Number Lab follows the scenario)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-16 and 17a-b built, next is Part 17c (Graph Lab + Chance Lab wording)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -92,8 +92,18 @@
   - Found by the browser check and fixed: the playground Plan question said "like best" (a leading word by our own checker) → "Which game will most kids pick?".
   - Known exception: the playground guess shows 5 games (the plan's rule says 3-4 options), because the choices must match the data's categories.
 
+- Part 17b (25 Oct 2026, Prof comment 4), 122 tests passing:
+  - Number Lab now follows the chosen scenario (the sleep-hours hard-wiring and the hard-coded log text are gone). js/helpers/number-tasks.js (pure, tests/number-tasks.test.js): numberLabKind, TASKS_BY_KIND, buildTarget (class mean rounded), miaSays (middle number without sorting), choicesFor, revealMessage, classStats.
+  - Three kinds: number (sleep, shoes: guess → build it → find the mistake → real-life mode + median); category (playground: guess the mode, mean/median shown as "✖ not for words", "Why can't we find the mean of games?", real-life mode with lunches; Paper 7); compare (reading: Class A and B numbers side by side, build it, find the mistake, "Which class spreads out more?" computed from the ranges).
+  - Content: numberLab words + small example lists per scenario in data/content. Tests check that Mia is really wrong, each real-life list has one mode, and mode ≠ median (so repeating the mode can't pass the median question).
+  - Build-it hint now explains the idea of the mean: "5 × 8 = 40. Your 5 numbers must add up to 40."
+  - Log: prediction / revision / meaning-task entries carry scenarioId and the real question; task names no longer depend on the scenario (badges count each puzzle once): build-mean, find-mias-mistake, real-life-mode, real-life-median, why-no-mean, compare-range. trackMeaningTask(room, task, extra).
+  - Feedback card understands word guesses ("You guessed Football. That is the mode!").
+  - Found in the browser check and fixed: shoes said "a very big answer pulls it up" (35.3 vs 35, no extreme value) → the "pulls" message now needs a gap of at least 0.5; the reading  line now describes the comparison.
+  - Checked in headless Chrome for all 4 scenarios: every task solvable, wrong tries show kind hints, card appears, no console errors.
+
 ## Next
-- Part 17b: Number Lab follows the chosen scenario (removes the sleep-hours hard-wiring), Grade 5 wording, mode-only for playground, Class A vs B for reading.
+- Part 17c: Graph Lab + Chance Lab wording per scenario (Chance Lab keeps the 4 devices, gets a scenario story). Ask Habiba about the optional "draw a classmate card" device.
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.
@@ -101,7 +111,6 @@
 - Round 2 (25 Oct 2026): Part 13 = pop-up component. Deploy moved to **Part 24**, locked until Habiba says "Prof confirmed". See docs/round-2-plan.md.
 
 ## Known bugs/open items
-- Number Lab's predict/reveal task and meaning tasks are still hardcoded to sleep-hours/fixed examples (by design — the "Build it"/"Mia"/shoe-size tasks are scenario-independent skill practice, not meant to follow the Question Studio pick). Only Data Hub, Graph Lab, and Evidence Board follow the selected scenario so far.
 - Small-group sampling (surveying a few classmates before the whole class) is explicitly out of scope for now — Plan only collects a prediction; decided with Habiba on 18 Oct 2026.
 - Graph Lab: a line chart for categories (playground) joins unrelated games (kept as a "what changes?" talking point); bar/pie colours are by position, so they repeat after 5 values (labels carry the meaning).
 - Not yet tested on a real Chromebook/tablet (11d) or with a real screen reader.

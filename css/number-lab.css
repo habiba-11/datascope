@@ -112,3 +112,19 @@
   flex: 1;
   min-width: 200px;
 }
+
+/* Reading minutes: the numbers of Class A and Class B, one row each (Part 17b). */
+.stats-class-title {
+  font-size: 18px;
+  margin: 12px 0 0;
+}
+
+/* Long answers (e.g. "Why can't we find the mean of games?") stack, one per line. */
+.choice-column {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.predict-unit {
+  font-weight: 700;
+}

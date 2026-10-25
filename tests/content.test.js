@@ -11,7 +11,7 @@ const read = (path) => JSON.parse(readFileSync(new URL(`../data/${path}`, import
 const contents = PICKABLE_SCENARIOS.map((id) => ({ id, content: read(`content/${id}.json`) }));
 
 // Keys every content file must have. Parts 17b-d add more.
-const REQUIRED_KEYS = ['scenarioId', 'emoji', 'cardTitle', 'fixIts', 'planPrompt'];
+const REQUIRED_KEYS = ['scenarioId', 'emoji', 'cardTitle', 'fixIts', 'planPrompt', 'numberLab'];
 
 test('readability helper: sentences and words', () => {
   assert.deepEqual(sentences('Make a guess! How many? Go.'), ['Make a guess!', 'How many?', 'Go.']);

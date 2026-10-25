@@ -86,3 +86,12 @@ test('a card never has more than 3 wins, and always 1 to 3 stars and a nudge', (
 test('phase-feedback is a known log event', () => {
   assert.equal(makeEntry('OWL-07', 'shell', 'phase-feedback', { phase: 'ask', stars: 2 }).stars, 2);
 });
+
+test('Number Lab with words (games): a guess that matches the mode earns the third star', () => {
+  const right = buildPhaseFeedback('number', { guess: 'Football', mode: ['Football'], changedWithReason: false });
+  const wrong = buildPhaseFeedback('number', { guess: 'Tag', mode: ['Football'], changedWithReason: false });
+  assert.equal(right.stars, 3);
+  assert.match(right.wins[0], /That is the mode/);
+  assert.equal(wrong.stars, 2);
+  assert.match(wrong.wins[0], /The mode was Football/);
+});

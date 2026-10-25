@@ -59,8 +59,10 @@ export function badgeShelf(keys) {
 }
 
 // Explorer levels (Paper 30: levels). They only go up with badges, so a child
-// levels up by reasoning, never by speed. There are 17 badges in all: 4 devices,
-// 1 change of mind, 4 Number Lab puzzles, 4 graphs, 4 claim cards.
+// levels up by reasoning, never by speed. There are 19 badges in all: 4 devices,
+// 1 change of mind, 6 Number Lab puzzles (build-mean, find-mias-mistake,
+// real-life-mode, real-life-median, why-no-mean, compare-range; which ones a
+// child meets depends on the scenario), 4 graphs, 4 claim cards.
 export const LEVELS = [
   { min: 0, icon: '🐣', name: 'Rookie Explorer' },
   { min: 2, icon: '🔎', name: 'Junior Detective' },
