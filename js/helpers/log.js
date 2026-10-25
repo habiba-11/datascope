@@ -17,6 +17,7 @@ export const EVENT_TYPES = [
   'popup-seen',   // a phase intro pop-up was shown (auto: by itself, or via ℹ️)
   'phase-start',  // the child entered a phase not yet done (time per phase = first start to complete)
   'phase-complete', // the child finished a phase (logged once per code + scenario)
+  'phase-feedback', // the feedback card shown at the end of a phase, with its stars
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];

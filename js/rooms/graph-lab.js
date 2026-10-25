@@ -6,7 +6,8 @@ import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
 import { logEvent } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { getSelectedScenarioId } from '../storage/save.js';
-import { completePhase, isPhaseDone } from '../phase-progress.js';
+import { finishPhase, isPhaseDone } from '../phase-progress.js';
+import { countWords } from '../helpers/feedback.js';
 
 // A real answer, not just "ok": both reflections need at least this many characters.
 const MIN_REFLECTION = 10;
@@ -66,15 +67,18 @@ async function init() {
         <textarea id="not-tell" rows="2"></textarea>
       </div>
       <p class="feedback" id="graph-feedback">✏️ Write an answer in both boxes to open Number Lab.</p>
+      <button class="btn btn-main" id="graph-done-btn" type="button" disabled>✅ I'm done</button>
       <a class="btn btn-main next-room-btn" id="next-room-btn" href="number-lab.html" hidden>🔢 Next: Number Lab →</a>
     `,
   });
 
   let charts = [];
   let currentType = 'bar';
+  const typesTried = new Set(); // for the feedback card: "You tried 3 kinds of graph"
 
   function renderCharts(type) {
     currentType = type;
+    typesTried.add(type);
     charts.forEach((chart) => chart.destroy());
     charts = classes.map((c) => {
       const canvas = document.getElementById(c.canvasId);
@@ -103,22 +107,32 @@ async function init() {
     });
   });
 
-  // Graph Lab is done when both reflections have a real answer.
+  // Graph Lab is done when both reflections have a real answer and the child
+  // taps "I'm done" (so the feedback card never pops up mid-sentence).
   const nextLink = document.getElementById('next-room-btn');
+  const doneBtn = document.getElementById('graph-done-btn');
   const graphFeedback = document.getElementById('graph-feedback');
-  function checkDone() {
-    const answered = ['tell', 'not-tell']
+  function checkAnswered() {
+    doneBtn.disabled = !['tell', 'not-tell']
       .every((id) => document.getElementById(id).value.trim().length >= MIN_REFLECTION);
-    if (!answered) return;
-    nextLink.hidden = false;
-    graphFeedback.textContent = '✅ Great thinking! Number Lab is open.';
-    completePhase('graph');
   }
-  ['tell', 'not-tell'].forEach((id) => document.getElementById(id).addEventListener('input', checkDone));
+  ['tell', 'not-tell'].forEach((id) => document.getElementById(id).addEventListener('input', checkAnswered));
+
+  doneBtn.addEventListener('click', () => {
+    doneBtn.hidden = true;
+    graphFeedback.textContent = '✅ Great thinking! Number Lab is open.';
+    nextLink.hidden = false;
+    finishPhase('graph', {
+      typesTried: typesTried.size,
+      notTellWords: countWords(document.getElementById('not-tell').value),
+    });
+  });
+
   // Coming back after finishing: the way on is already open.
   if (isPhaseDone('graph')) {
-    nextLink.hidden = false;
+    doneBtn.hidden = true;
     graphFeedback.hidden = true;
+    nextLink.hidden = false;
   }
 
   addHintButton(document.getElementById('tell'), 'graph-tell', 'graph-lab');

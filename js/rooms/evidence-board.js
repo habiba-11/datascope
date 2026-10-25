@@ -8,7 +8,8 @@ import { playSound } from '../sounds.js';
 import { animate, pipReacts, confetti } from '../motion.js';
 import { getSelectedScenarioId, getExplorerCode, getAllProgress } from '../storage/save.js';
 import { buildExport, exportFileName, toCSV, downloadFile } from '../storage/export.js';
-import { completePhase } from '../phase-progress.js';
+import { finishPhase } from '../phase-progress.js';
+import { countWords } from '../helpers/feedback.js';
 
 const taskComplete = { 1: false, 2: false, 3: false, 4: false };
 let currentTask = 1;
@@ -17,11 +18,13 @@ let selectedCertainty = null;
 let selectedAudience = null;
 let selectedForm = null;
 let scenarioId = null;
+let scenarioTeaches = '';
 let lastLoggedClaim = null; // so the same card is not logged twice
 
 async function init() {
   const recipe = await loadRecipe(getSelectedScenarioId());
   scenarioId = recipe.id;
+  scenarioTeaches = recipe.teaches;
   const partner = await loadPartnerRecipe(recipe);
   const { values } = generateClassData(recipe);
   const title = partner ? recipe.compareTitle : recipe.title;
@@ -147,10 +150,20 @@ function showTask(n) {
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
   // The room's phase is done when every task is done.
-  if (Object.values(taskComplete).every(Boolean)) completePhase('conclude');
+  if (Object.values(taskComplete).every(Boolean)) finishPhase('conclude', concludeFacts());
   if (currentTask === taskNum) {
     document.getElementById('next-btn').disabled = taskNum === 4;
   }
+}
+
+// What the child put on the card, for the feedback card (Part 16).
+function concludeFacts() {
+  return {
+    evidenceCount: selectedEvidence.size,
+    certaintyReasonWords: countWords(document.getElementById('certainty-reason').value),
+    audience: selectedAudience,
+    teaches: scenarioTeaches,
+  };
 }
 
 function setupTaskNav() {

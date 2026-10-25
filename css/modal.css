@@ -62,6 +62,46 @@
   margin: 8px 0;
 }
 
+/* The end-of-phase feedback card (js/feedback-card.js). */
+.fb-stars {
+  margin: 0 0 8px;
+  font-size: 36px;
+}
+
+.fb-star {
+  display: inline-block;
+  animation: modal-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.fb-star.empty {
+  color: var(--color-navy);
+  opacity: 0.45;
+}
+
+.fb-star-text {
+  font-size: 18px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.fb-wins {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fb-wins li {
+  margin: 6px 0;
+}
+
+.fb-next,
+.fb-learned {
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border-radius: var(--radius-button);
+  background: var(--color-bg);
+}
+
 .modal-actions {
   display: flex;
   flex-wrap: wrap;

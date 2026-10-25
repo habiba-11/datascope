@@ -1,12 +1,12 @@
 import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
-import { compareValues } from '../helpers/stats.js';
+import { compareValues, mode } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
-import { logEvent } from '../helpers/log.js';
+import { logEvent, readLog } from '../helpers/log.js';
 import { playSound } from '../sounds.js';
 import { animate, pipReacts } from '../motion.js';
-import { getSelectedScenarioId } from '../storage/save.js';
-import { completePhase } from '../phase-progress.js';
+import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
+import { finishPhase } from '../phase-progress.js';
 
 const NEXT_ROOM_LINK =
   '<a class="btn btn-main next-room-btn" id="next-room-btn" href="graph-lab.html" hidden>📊 Let\'s draw a graph! →</a>';
@@ -25,21 +25,37 @@ async function init() {
     contentHTML: partner ? compareLayout(recipe, partner) : singleLayout(recipe),
   });
 
+  const classA = generateClassData(recipe);
+  const classB = partner ? generateClassData(partner) : null;
+
   // Collect is done when every class has been surveyed.
   const showNextRoom = () => {
     document.getElementById('next-room-btn').hidden = false;
-    completePhase('collect');
+    finishPhase('collect', {
+      classSizes: [classA, classB].filter(Boolean).map((c) => c.values.length),
+      // Two classes have two different "most common" answers, so none is named.
+      mostCommon: partner ? null : mode(classA.values).join(' and ') || null,
+      guess: lastPrediction(recipe.id),
+    });
   };
 
   if (partner) {
     // Class B unlocks when Class A is done; the next-room link appears after Class B.
-    wireUpSurvey(recipe, generateClassData(recipe), 'a', () => {
+    wireUpSurvey(recipe, classA, 'a', () => {
       document.getElementById('b-run').disabled = false;
     });
-    wireUpSurvey(partner, generateClassData(partner), 'b', showNextRoom);
+    wireUpSurvey(partner, classB, 'b', showNextRoom);
   } else {
-    wireUpSurvey(recipe, generateClassData(recipe), 'a', showNextRoom);
+    wireUpSurvey(recipe, classA, 'a', showNextRoom);
   }
+}
+
+// This child's Plan guess for this scenario (the newest one), or null.
+// Filtered by code: on a shared device the log also holds other children's work.
+function lastPrediction(scenarioId) {
+  const code = getExplorerCode();
+  const guesses = readLog().filter((e) => e.code === code && e.type === 'prediction' && e.scenarioId === scenarioId);
+  return guesses.length ? guesses[guesses.length - 1].guess : null;
 }
 
 // The run button, answer list and progress bar for one class.

@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-15 built (pop-up, phase intros, progressive step bar), next is Part 16** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-16 built (pop-up, phase intros, progressive step bar, phase feedback), next is Part 17a** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -73,8 +73,17 @@
   - Checked by clicking through in headless Chrome (scratch CDP script, nothing added to the project): locked URL bounces with Pip line, each step slides in, Graph Lab gate, Chance Lab locked → Number Lab, reload keeps progress, preview opens all. No console errors.
   - Known: the active Explore tab shows both the "selected" ✓ and the "done" ✅ (tidy up in Part 21).
 
+- Part 16 (25 Oct 2026, Prof comment 3), 100 tests passing:
+  - js/helpers/feedback.js (pure, tests/feedback.test.js with low/medium/high fixtures for every phase): buildPhaseFeedback(phase, facts) → { stars 1-3, wins (max 3), nextTime, learned }. Stars count reasoning moves only: own clear question (Ask); a guess to compare with (Collect); 2+ graph types and a 5+ word "NOT tell" answer (Graph); a close guess OR a mind changed with a reason (Number); 2+ trial sizes and a 500 run (Chance); 2+ numbers as proof and a 5+ word certainty reason (Conclude). Plan always 3 (guessing first IS the plan). Wrong tries and hints never cost a star. `learned` = the scenario's `teaches` line in Number Lab and Conclude, a short per-phase line elsewhere.
+  - js/feedback-card.js: the card in a pop-up (stars pop in one by one + "2 of 3 stars" in words, ✅ wins with the child's own numbers, 💡 next time, 🧠 learned), done sound + Pip hop, "Unlock next phase →" (Conclude: "🎉 Finish").
+  - phase-progress.js: completePhase → finishPhase(phase, facts): saves straight away, logs phase-complete + phase-feedback { stars }, shows the card, and only after it closes does the next step slide in.
+  - Changed from Part 15 so the card never pops up mid-task: Ask finishes on "Next" after the fix-its (not on the last keystroke); Graph Lab and Chance Lab get an "✅ I'm done" / "✅ I'm done testing" button (Chance: after the first run).
+  - Data Hub's guess lookup filters by the child's code (shared devices).
+  - Checked in headless Chrome: all 7 cards show the child's own numbers, no card while typing, a wrong try in Number Lab still 3 stars, the Plan intro waits behind the Ask card, no console errors.
+  - Not done here (moved to Part 17, the Grade 5 rewrite): tightening the per-question feedback sentences.
+
 ## Next
-- Part 16: phase-end feedback card (stars for reasoning, wins, one nudge, "Unlock next phase" button).
+- Part 17a: content layer (data/content/<scenario>.json) + Grade 5 rewrite of Question Studio.
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.

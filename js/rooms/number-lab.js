@@ -3,15 +3,18 @@ import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
 import { logEvent, trackMeaningTask } from '../helpers/log.js';
 import { cheer, encourage } from '../motion.js';
-import { completePhase } from '../phase-progress.js';
+import { finishPhase } from '../phase-progress.js';
 
 const taskComplete = { 1: false, 2: false, 3: false, 4: false };
 let currentTask = 1;
+// What the child did, for the feedback card at the end (Part 16).
+const numberFacts = { guess: null, mean: null, changedWithReason: false, teaches: '' };
 
 async function init() {
   const response = await fetch('../data/scenarios/sleep-hours.json');
   const recipe = await response.json();
   const { values } = generateClassData(recipe);
+  numberFacts.teaches = recipe.teaches;
 
   mountShell({
     step: 'explore',
@@ -135,7 +138,7 @@ function showTask(n) {
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
   // The room's phase is done when every task is done.
-  if (Object.values(taskComplete).every(Boolean)) completePhase('number');
+  if (Object.values(taskComplete).every(Boolean)) finishPhase('number', numberFacts);
   if (taskNum === 4) document.getElementById('next-room-btn').hidden = false;
   if (currentTask === taskNum) {
     document.getElementById('next-btn').disabled = taskNum === 4;
@@ -183,6 +186,8 @@ function setupPredict(values) {
       : `You said ${guess}. The mean is ${meanVal} — one classmate (3 hours) pulled it down!`;
     feedback.hidden = false;
     revealBtn.disabled = true;
+    numberFacts.guess = guess;
+    numberFacts.mean = meanVal;
     logEvent('number-lab', 'prediction', {
       about: 'typical hours of sleep', guess, mean: meanVal, median: medianVal,
     });
@@ -234,6 +239,7 @@ function setupRevision(getOldGuess) {
       return;
     }
     const newGuess = Number(newGuessInput.value);
+    numberFacts.changedWithReason = true;
     logEvent('number-lab', 'revision', {
       about: 'typical hours of sleep', changed: true, oldGuess: getOldGuess(), newGuess, reason,
     });

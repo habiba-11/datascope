@@ -3,7 +3,7 @@ import { logEvent } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { playSound } from '../sounds.js';
 import { animate } from '../motion.js';
-import { completePhase } from '../phase-progress.js';
+import { finishPhase, isPhaseDone } from '../phase-progress.js';
 
 const DEVICES = {
   coin: { label: 'Fair coin', emoji: '🪙', outcomes: ['Heads', 'Tails'], weights: [1, 1], target: 'Heads' },
@@ -18,6 +18,8 @@ let selectedDevice = null;
 // The last trial run for the selected device, so feedback can honestly say
 // whether a bigger run came out closer to the theory or not.
 let previousRun = null;
+// What the child did, for the feedback card at the end (Part 16).
+const chanceFacts = { rating: '', target: '', runSizes: [], pct500: null, theoryText: '' };
 
 function init() {
   mountShell({
@@ -83,6 +85,7 @@ function init() {
           </div>
         </div>
         <p class="feedback" id="trial-feedback" hidden></p>
+        <button class="btn btn-main" id="chance-done-btn" type="button" hidden>✅ I'm done testing</button>
         <a class="btn btn-main next-room-btn" id="next-room-btn" href="evidence-board.html" hidden>🚩 Next: Evidence Board →</a>
       </section>
 
@@ -98,6 +101,12 @@ function init() {
   addHintButton(document.getElementById('predict-reason'), 'chance-why', 'chance-lab');
   setupTrials();
   setupTaskNav();
+
+  document.getElementById('chance-done-btn').addEventListener('click', (event) => {
+    event.target.hidden = true;
+    document.getElementById('next-room-btn').hidden = false;
+    finishPhase('chance', chanceFacts);
+  });
 }
 
 function showTask(n) {
@@ -120,9 +129,12 @@ function showTask(n) {
 
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
-  // The room's phase is done when every task is done.
-  if (Object.values(taskComplete).every(Boolean)) completePhase('chance');
-  if (taskNum === 3) document.getElementById('next-room-btn').hidden = false;
+  // After the first run: "I'm done testing" (or straight on, if this phase was finished before).
+  if (taskNum === 3) {
+    const finished = isPhaseDone('chance');
+    document.getElementById('chance-done-btn').hidden = finished;
+    document.getElementById('next-room-btn').hidden = !finished;
+  }
   if (currentTask === taskNum) {
     document.getElementById('next-btn').disabled = taskNum === 3;
   }
@@ -149,6 +161,8 @@ function setupDevicePicker() {
       card.classList.add('selected');
       selectedDevice = DEVICES[card.dataset.key];
       previousRun = null;
+      chanceFacts.runSizes = []; // a new device starts a new experiment
+      chanceFacts.pct500 = null;
 
       showOutcomes(selectedDevice, chips);
       document.getElementById('trial-device').textContent = selectedDevice.emoji;
@@ -223,6 +237,7 @@ function setupPredict() {
       buttons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       chosen = btn.textContent;
+      chanceFacts.rating = chosen;
       checkComplete();
       logCertainty();
     });
@@ -323,6 +338,10 @@ function setupTrials() {
         experimentalPct: experimentPct, theory: theoryText(targetIndex),
       });
       previousRun = { count, pct: experimentPct, gap };
+      chanceFacts.target = selectedDevice.target;
+      chanceFacts.theoryText = theoryText(targetIndex);
+      chanceFacts.runSizes.push(count);
+      if (count === 500) chanceFacts.pct500 = experimentPct;
 
       markComplete(3);
     });

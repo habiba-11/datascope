@@ -3,7 +3,7 @@ import { checkQuestion } from '../helpers/checker.js';
 import { logEvent } from '../helpers/log.js';
 import { setSelectedScenarioId } from '../storage/save.js';
 import { cheer } from '../motion.js';
-import { enterPhase, completePhase } from '../phase-progress.js';
+import { enterPhase, finishPhase } from '../phase-progress.js';
 
 const SCENARIO_CARDS = [
   { id: 'sleep-hours', emoji: '😴' },
@@ -127,11 +127,18 @@ function markComplete(taskNum) {
   if (currentTask === taskNum) {
     document.getElementById('next-btn').disabled = taskNum === 3;
   }
-  // Ask is done when a scenario is picked AND both questions are fixed.
-  // Progress is saved per scenario, so picking another scenario later
-  // also counts as finishing Ask for that one.
-  if (taskComplete[1] && taskComplete[2]) completePhase('ask');
-  if (taskNum === 3) completePhase('plan');
+}
+
+// Ask is done when a scenario is picked AND both questions are fixed. It is
+// finished when the child taps Next (not while still typing). Progress is saved
+// per scenario, so picking another scenario later finishes Ask for that one too.
+function finishAsk() {
+  if (!taskComplete[1] || !taskComplete[2]) return;
+  const own = document.getElementById('own-question').value;
+  finishPhase('ask', {
+    scenarioTitle: selectedScenario.recipe.compareTitle || selectedScenario.recipe.title,
+    ownQuestionClear: own.trim() !== '' && checkQuestion(own).length === 0,
+  });
 }
 
 function setupTaskNav() {
@@ -139,6 +146,7 @@ function setupTaskNav() {
     showTask(Math.max(1, currentTask - 1));
   });
   document.getElementById('next-btn').addEventListener('click', () => {
+    if (currentTask === 2) finishAsk();
     if (currentTask < 3) showTask(currentTask + 1);
   });
   showTask(1);
@@ -213,6 +221,7 @@ function savePrediction(guess) {
   feedback.hidden = false;
   document.getElementById('go-collect-btn').hidden = false;
   markComplete(3);
+  finishPhase('plan', { guessText: String(shown) });
 }
 
 // The "Save my prediction" button (number scenarios) is wired up only once,
