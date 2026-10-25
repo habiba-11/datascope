@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { HINTS, getHint } from '../js/helpers/prompts.js';
+import { longestSentence } from '../js/helpers/readability.js';
 
 test('hints come one at a time, then run out', () => {
   assert.equal(getHint('chance-why', 0), HINTS['chance-why'][0]);
@@ -22,5 +23,11 @@ test('hints never use the word "middle" (it shapes how kids picture the median)'
     for (const hint of hints) {
       assert.ok(!/middle/i.test(hint), `"${hint}"`);
     }
+  }
+});
+
+test('every hint follows the Grade 5 rule (12 words or fewer per sentence)', () => {
+  for (const [key, hints] of Object.entries(HINTS)) {
+    for (const hint of hints) assert.ok(longestSentence(hint) <= 12, `${key}: "${hint}"`);
   }
 });

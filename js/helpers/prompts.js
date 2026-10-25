@@ -21,13 +21,14 @@ export const HINTS = {
     'Are all the parts the same size?',
     'Try: "There are ___ outcomes, and..."',
   ],
+  // Evidence Board uses the scenario's own claim hints (data/content); this is the fallback.
   claim: [
     'What did you find out about our pretend class?',
-    'Use a number as your reason, like the median or the mode.',
-    'Try: "I think most classmates ___ because the graph shows ___"',
+    'Use a number as your reason, like the median.',
+    'Try: "I think most kids ___ because ___"',
   ],
   'certainty-why': [
-    'How many classmates did we ask? Is that a lot or a little?',
+    'How many kids did we ask? Is that a lot?',
     'Was anything surprising, like one very different answer?',
     'Try: "I am ___ sure because..."',
   ],

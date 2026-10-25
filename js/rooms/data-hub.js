@@ -1,12 +1,15 @@
 import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { compareValues, mode } from '../helpers/stats.js';
-import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
+import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { playSound } from '../sounds.js';
 import { animate, pipReacts } from '../motion.js';
 import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
 import { finishPhase } from '../phase-progress.js';
+
+// CLAUDE.md: the data is synthetic, and the app must say so where the data appears.
+const PRETEND_NOTE = '<p class="pretend-note">🎭 This is a pretend class. It is made up, just for learning.</p>';
 
 const NEXT_ROOM_LINK =
   '<a class="btn btn-main next-room-btn" id="next-room-btn" href="graph-lab.html" hidden>📊 Let\'s draw a graph! →</a>';
@@ -14,15 +17,16 @@ const NEXT_ROOM_LINK =
 async function init() {
   const recipe = await loadRecipe(getSelectedScenarioId());
   const partner = await loadPartnerRecipe(recipe);
+  const { cardTitle } = await loadContent(recipe.id);
 
   mountShell({
     step: 'collect',
     phase: 'collect',
     accent: 'collect',
     pipMessage: partner
-      ? 'Hoo-hoo! Two pretend classes answered the same question. Survey Class A first, then Class B!'
-      : 'Hoo-hoo! Our pretend class is ready. Press Run survey to see their answers!',
-    contentHTML: partner ? compareLayout(recipe, partner) : singleLayout(recipe),
+      ? 'Hoo-hoo! Two pretend classes answered. Survey Class A, then Class B!'
+      : 'Hoo-hoo! Our pretend class is ready. Tap Run survey!',
+    contentHTML: partner ? compareLayout(recipe, partner, cardTitle) : singleLayout(recipe, cardTitle),
   });
 
   const classA = generateClassData(recipe);
@@ -71,17 +75,18 @@ function surveyHTML(p, recipe, buttonText, disabled = false) {
   `;
 }
 
-function singleLayout(recipe) {
+function singleLayout(recipe, cardTitle) {
   return `
     <div class="two-panel">
       <section class="panel" style="--panel-accent: var(--color-collect)">
-        <h1 class="panel-header">Data Hub · ${recipe.title}</h1>
+        <h1 class="panel-header">📋 Data Hub · ${cardTitle}</h1>
         <p class="room-question">${recipe.question}</p>
+        ${PRETEND_NOTE}
         ${surveyHTML('a', recipe, '▶ Run survey')}
         ${NEXT_ROOM_LINK}
       </section>
       <section class="panel" style="--panel-accent: var(--color-explore)">
-        <header class="panel-header">Our tally</header>
+        <header class="panel-header">📊 Our tally</header>
         <div id="a-tally" class="tally"></div>
       </section>
     </div>
@@ -89,11 +94,12 @@ function singleLayout(recipe) {
 }
 
 // Reading minutes: one panel per class, each with its own survey and tally.
-function compareLayout(recipe, partner) {
+function compareLayout(recipe, partner, cardTitle) {
   return `
     <div class="compare-intro panel" style="--panel-accent: var(--color-collect)">
-      <h1 class="panel-header">Data Hub · ${recipe.compareTitle}</h1>
+      <h1 class="panel-header">📋 Data Hub · ${cardTitle}</h1>
       <p class="room-question">${recipe.question}</p>
+      ${PRETEND_NOTE}
     </div>
     <div class="two-panel">
       <section class="panel" style="--panel-accent: var(--color-collect)">
@@ -146,7 +152,7 @@ function wireUpSurvey(recipe, classData, p, onDone) {
 
   button.addEventListener('click', () => {
     button.disabled = true;
-    button.textContent = 'Running...';
+    button.textContent = '⏳ Asking...';
     let revealed = 0;
 
     function revealNext() {
@@ -169,7 +175,7 @@ function wireUpSurvey(recipe, classData, p, onDone) {
       if (revealed < values.length) {
         setTimeout(revealNext, reduceMotion ? 0 : 400);
       } else {
-        button.textContent = 'Survey complete!';
+        button.textContent = '✅ Survey done!';
         playSound('done');
         animate(button, 'cheer');
         pipReacts('hop');

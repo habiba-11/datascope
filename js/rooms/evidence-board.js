@@ -1,7 +1,8 @@
 import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
-import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
+import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
+import { CERTAINTY, certaintyButtonsHTML } from '../helpers/certainty.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { playSound } from '../sounds.js';
@@ -26,8 +27,8 @@ async function init() {
   scenarioId = recipe.id;
   scenarioTeaches = recipe.teaches;
   const partner = await loadPartnerRecipe(recipe);
+  const { evidenceBoard } = await loadContent(recipe.id); // the claim question and hints
   const { values } = generateClassData(recipe);
-  const title = partner ? recipe.compareTitle : recipe.title;
 
   let evidenceChips;
   if (partner) {
@@ -48,21 +49,21 @@ async function init() {
       { id: 'range', label: `Range: ${range(values)}` },
     ];
   } else {
-    evidenceChips = [{ id: 'mode', label: `Most common: ${mode(values).join(', ')}` }];
+    evidenceChips = [{ id: 'mode', label: `Mode (most common): ${mode(values).join(', ')}` }];
   }
 
   mountShell({
     step: 'conclude',
     phase: 'conclude',
     accent: 'conclude',
-    pipMessage: "Hoo-hoo! Time to share what we found. What do you think, and why?",
+    pipMessage: 'Hoo-hoo! Share what you found. What do you think, and why?',
     contentHTML: `
       <h1 class="room-title">🚩 Evidence Board</h1>
       <p class="task-progress" id="task-progress">Task 1 of 4</p>
 
       <section class="task" data-task="1">
-        <h2 class="task-title">Make your claim</h2>
-        <p>What do you think, based on "${title}"?</p>
+        <h2 class="task-title">💬 Say what you found</h2>
+        <p>${evidenceBoard.claimPrompt}</p>
         <p class="sentence-starter">
           I think <input type="text" id="claim-subject" class="inline-input" placeholder="...">
           because <input type="text" id="claim-reason" class="inline-input" placeholder="...">
@@ -72,8 +73,8 @@ async function init() {
       </section>
 
       <section class="task" data-task="2" hidden>
-        <h2 class="task-title">Pick your evidence</h2>
-        <p>Which numbers back up your claim? Choose at least one.</p>
+        <h2 class="task-title">🔢 Pick your proof</h2>
+        <p>Pick the numbers that prove your idea.</p>
         <div class="evidence-grid" id="evidence-grid">
           ${evidenceChips.map((c) => `<button class="btn choice-btn evidence-chip" data-id="${c.id}" type="button">${c.label}</button>`).join('')}
         </div>
@@ -81,28 +82,24 @@ async function init() {
       </section>
 
       <section class="task" data-task="3" hidden>
-        <h2 class="task-title">How sure are you?</h2>
+        <h2 class="task-title">🤔 How sure are you?</h2>
         <div class="certainty-scale" id="certainty-scale">
-          <button class="btn certainty-btn choice-btn" data-value="impossible" type="button">Impossible</button>
-          <button class="btn certainty-btn choice-btn" data-value="unlikely" type="button">Unlikely</button>
-          <button class="btn certainty-btn choice-btn" data-value="even" type="button">Even chance</button>
-          <button class="btn certainty-btn choice-btn" data-value="likely" type="button">Likely</button>
-          <button class="btn certainty-btn choice-btn" data-value="certain" type="button">Certain</button>
+          ${certaintyButtonsHTML('choice-btn')}
         </div>
-        <label for="certainty-reason">Why?</label>
+        <label for="certainty-reason">✏️ Why are you that sure?</label>
         <textarea id="certainty-reason" rows="2" placeholder="Because..."></textarea>
         <p class="feedback" id="certainty-feedback" hidden></p>
       </section>
 
       <section class="task" data-task="4" hidden>
-        <h2 class="task-title">Who is this for?</h2>
-        <p>Pick an audience:</p>
+        <h2 class="task-title">📣 Who will you tell?</h2>
+        <p>Pick who will hear it:</p>
         <div class="choice-row" id="audience-choices">
           <button class="btn choice-btn" data-value="the principal" type="button">🧑‍💼 The principal</button>
           <button class="btn choice-btn" data-value="the class" type="button">🧑‍🎓 The class</button>
           <button class="btn choice-btn" data-value="a parent evening" type="button">👨‍👩‍👧 Parent evening</button>
         </div>
-        <p>Pick how you'll share it:</p>
+        <p>Pick how you will share it:</p>
         <div class="choice-row" id="form-choices">
           <button class="btn choice-btn" data-value="a prediction" type="button">🔮 A prediction</button>
           <button class="btn choice-btn" data-value="a problem solved" type="button">🧩 A problem solved</button>
@@ -113,7 +110,7 @@ async function init() {
           <button class="btn btn-main" id="save-work-btn" type="button">📤 Save my work for my teacher</button>
           <button class="link-btn" id="save-csv-btn" type="button">or save it as a table (CSV)</button>
           <p class="feedback" id="save-feedback" hidden></p>
-          <a class="btn" href="question-studio.html">Start a new investigation →</a>
+          <a class="btn" href="question-studio.html">🔁 Start a new investigation →</a>
         </div>
       </section>
 
@@ -125,7 +122,7 @@ async function init() {
   });
 
   setupClaim();
-  addHintButton(document.querySelector('.sentence-starter'), 'claim', 'evidence-board');
+  addHintButton(document.querySelector('.sentence-starter'), 'claim', 'evidence-board', evidenceBoard.claimHints);
   addHintButton(document.getElementById('certainty-reason'), 'certainty-why', 'evidence-board');
   setupEvidence();
   setupCertainty();
@@ -184,11 +181,11 @@ function setupClaim() {
 
   btn.addEventListener('click', () => {
     if (!subject.value.trim() || !reason.value.trim()) {
-      feedback.textContent = 'Fill in both blanks first!';
+      feedback.textContent = '✏️ Fill in both gaps first!';
       feedback.hidden = false;
       return;
     }
-    feedback.textContent = `Nice claim! "I think ${subject.value.trim()} because ${reason.value.trim()}."`;
+    feedback.textContent = `👍 Nice! "I think ${subject.value.trim()} because ${reason.value.trim()}."`;
     feedback.hidden = false;
     markComplete(1);
   });
@@ -208,7 +205,7 @@ function setupEvidence() {
       }
 
       if (selectedEvidence.size > 0) {
-        feedback.textContent = `You picked ${selectedEvidence.size} piece${selectedEvidence.size > 1 ? 's' : ''} of evidence.`;
+        feedback.textContent = `✅ You picked ${selectedEvidence.size} number${selectedEvidence.size > 1 ? 's' : ''} as proof.`;
         feedback.hidden = false;
         markComplete(2);
       } else {
@@ -227,7 +224,7 @@ function setupCertainty() {
 
   function checkComplete() {
     if (selectedCertainty && reasonInput.value.trim()) {
-      feedback.textContent = 'Got it — your certainty is saved!';
+      feedback.textContent = '✅ Saved! You said how sure you are.';
       feedback.hidden = false;
       markComplete(3);
     }
@@ -306,13 +303,13 @@ function setupAudienceForm() {
     // Built with textContent, not innerHTML: whatever the child typed is shown
     // as plain text and can never be read by the browser as HTML code.
     const heading = document.createElement('h3');
-    heading.textContent = 'Your Evidence Card';
+    heading.textContent = '🏅 My Evidence Card';
 
     card.replaceChildren(
       heading,
       cardLine('Claim:', `I think ${subject} because ${reason}.`),
       cardLine('Evidence:', evidenceLabels.join(', ')),
-      cardLine('How sure:', `${selectedCertainty} — ${certaintyReason}`),
+      cardLine('How sure:', `${CERTAINTY.find((c) => c.value === selectedCertainty).word} — ${certaintyReason}`),
       cardLine('For:', `${selectedAudience}, as ${selectedForm}`)
     );
     card.hidden = false;

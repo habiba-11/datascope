@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-16 and 17a-c built, next is Part 17d (Data Hub + Evidence Board wording)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-17 built, next is Part 18 (maths recap pop-up)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -111,8 +111,16 @@
   - Hints no longer start with an emoji (the hint box adds 🦉 already); tested.
   - The dice is now labelled "Dice" (was "Six-sided dice"), so new certainty log entries say device "Dice".
 
+- Part 17d (25 Oct 2026, Prof comment 4), 131 tests passing:
+  - Evidence Board: the claim question and its 3 hints follow the scenario (content key evidenceBoard); Grade 5 titles ("💬 Say what you found", "🔢 Pick your proof", "📣 Who will you tell?"); "Pick the numbers that prove your idea."; the card says "🏅 My Evidence Card" and shows the certainty word ("Likely"). Category chip: "Mode (most common): Football".
+  - js/helpers/certainty.js: one shared certainty scale (5 words from Papers 12, 13, 19 + kid gloss) for Chance Lab and Evidence Board; the gloss style moved to tasks.css.
+  - Data Hub: content title in the header, shorter Pip lines, "⏳ Asking..." / "✅ Survey done!", and a visible "🎭 This is a pretend class. It is made up, just for learning." label (CLAUDE.md: label synthetic data in the app).
+  - prompts.js fallback hints rewritten; new test: every hint follows the 12-word rule.
+  - Scanned Pip's other lines (badges, levels, welcome page) with the readability helper: all within 12 words per sentence.
+  - Checked in headless Chrome (sleep, reading): no console errors.
+
 ## Next
-- Part 17d: Data Hub + Evidence Board wording, remaining hints in prompts.js, Pip's speech-bubble lines (Grade 5).
+- Part 18: mean / median / mode recap pop-up (neutral example numbers, never the scenario's real answers).
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.

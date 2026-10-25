@@ -142,3 +142,13 @@
   font-size: 13px;
   font-weight: 700;
 }
+
+/* The "pretend class" label: the data is synthetic (CLAUDE.md integrity rule). */
+.pretend-note {
+  font-size: 16px;
+  font-weight: 700;
+  background: var(--color-bg);
+  border: 2px dashed var(--color-navy);
+  border-radius: var(--radius-button);
+  padding: 6px 12px;
+}

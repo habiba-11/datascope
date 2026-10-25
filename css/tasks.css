@@ -55,3 +55,12 @@
   padding-top: 16px;
   border-top: 2px dashed var(--color-navy);
 }
+
+/* The certainty scale (helpers/certainty.js): a kid gloss under each word ("50-50").
+   Shared by Chance Lab and Evidence Board. */
+.certainty-gloss {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+}

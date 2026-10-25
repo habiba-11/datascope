@@ -7,6 +7,7 @@ import { finishPhase, isPhaseDone } from '../phase-progress.js';
 import { loadContent } from '../helpers/scenarios.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 import { toPct, theoryText, trialMessage } from '../helpers/chance.js';
+import { certaintyButtonsHTML } from '../helpers/certainty.js';
 
 // `verb` is the device's own word for one go, used in the messages.
 const DEVICES = {
@@ -16,14 +17,6 @@ const DEVICES = {
   unfairSpinner: { label: 'Unfair spinner', emoji: '🌀', verb: 'spins', outcomes: ['Red', 'Blue', 'Green', 'Yellow'], weights: [4, 1, 1, 1], target: 'Red' },
 };
 
-// The certainty words come from Papers 12, 13 and 19; the gloss under each is for kids.
-const CERTAINTY = [
-  { value: 'impossible', word: 'Impossible', gloss: "can't happen" },
-  { value: 'unlikely', word: 'Unlikely', gloss: 'probably not' },
-  { value: 'even', word: 'Even chance', gloss: '50-50' },
-  { value: 'likely', word: 'Likely', gloss: 'probably' },
-  { value: 'certain', word: 'Certain', gloss: 'will happen' },
-];
 
 const taskComplete = { 1: false, 2: false, 3: false };
 let currentTask = 1;
@@ -71,10 +64,7 @@ async function init() {
         <h2 class="task-title">🤔 How likely?</h2>
         <p id="predict-question"></p>
         <div class="certainty-scale" id="certainty-scale">
-          ${CERTAINTY.map((c) => `
-            <button class="btn certainty-btn" data-value="${c.value}" data-word="${c.word}" type="button">
-              ${c.word}<span class="certainty-gloss">${c.gloss}</span>
-            </button>`).join('')}
+          ${certaintyButtonsHTML()}
         </div>
         <label for="predict-reason" class="reason-label">✏️ Why do you think so?</label>
         <textarea id="predict-reason" class="reason-input" rows="2" placeholder="Because..."></textarea>

@@ -24,6 +24,14 @@
   "chanceLab": {
     "story": "👟 The shoe shop gives a prize. Chance picks the winner!"
   },
+  "evidenceBoard": {
+    "claimPrompt": "👟 What did you find out about our shoe sizes?",
+    "claimHints": [
+      "Look at your numbers. Which sizes are most common?",
+      "Use a number as your reason, like the mode.",
+      "Try: \"I think most kids wear ___ because ___\""
+    ]
+  },
   "numberLab": {
     "kind": "number",
     "predictPrompt": "🤔 Guess first! What is a typical shoe size?",

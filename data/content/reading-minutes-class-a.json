@@ -24,6 +24,14 @@
   "chanceLab": {
     "story": "📖 Pip uses chance to pick the next class book!"
   },
+  "evidenceBoard": {
+    "claimPrompt": "📖 What did you find out about the two classes?",
+    "claimHints": [
+      "What is the same in both classes? What is different?",
+      "Use a number as your reason, like the range.",
+      "Try: \"I think Class B ___ because ___\""
+    ]
+  },
   "numberLab": {
     "kind": "compare",
     "predictPrompt": "🤔 Guess first! What is a typical number of minutes?",

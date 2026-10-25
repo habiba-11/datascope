@@ -24,6 +24,14 @@
   "chanceLab": {
     "story": "😴 Pip can't pick a bedtime story. Let's use chance to decide!"
   },
+  "evidenceBoard": {
+    "claimPrompt": "😴 What did you find out about our sleep?",
+    "claimHints": [
+      "Look at your numbers. How long do most kids sleep?",
+      "Use a number as your reason, like the median.",
+      "Try: \"I think most kids sleep ___ because ___\""
+    ]
+  },
   "numberLab": {
     "kind": "number",
     "predictPrompt": "🤔 Guess first! What is a typical number of hours?",
