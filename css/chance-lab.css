@@ -194,3 +194,19 @@
   transform: translate(-50%, -100%) rotate(30deg);
   transform-origin: 50% 100%;
 }
+
+/* Part 17c: a kid-friendly gloss under each certainty word ("50-50"). */
+.certainty-gloss {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* The scenario's one-line story above the chance games. */
+.chance-story {
+  font-weight: 700;
+  background: var(--color-bg);
+  border-radius: var(--radius-button);
+  padding: 8px 12px;
+}

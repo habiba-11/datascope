@@ -5,20 +5,21 @@ import { logEvent } from './log.js';
 // Each list goes from a gentle nudge to a sentence starter. A child sees
 // one hint per tap, so they only get as much help as they ask for.
 export const HINTS = {
+  // Graph Lab uses the scenario's own hints (data/content); these are the fallback.
   'graph-tell': [
-    'Look at the tallest bar or the biggest stack. What does it show?',
-    'Try starting with: "Most classmates..."',
-    'Or look at the other end: "Only a few classmates..."',
+    'Find the tallest bar. What does it show?',
+    'Try: "Most kids..."',
+    'Look at the ends: "Only a few kids..."',
   ],
   'graph-not-tell': [
-    'Does the graph tell us WHY classmates answered this way?',
-    'Would a different class give the same answers?',
-    'Try starting with: "This graph does not tell us..."',
+    'Does the graph tell us WHY kids answered this way?',
+    'Would another class give the same answers?',
+    "Try: 'This graph doesn't tell us...'",
   ],
   'chance-why': [
-    'Look at the list of all possible outcomes. How many are there?',
-    'Is every outcome equally likely? Are all the parts the same size?',
-    'Try starting with: "There are ___ outcomes, and..."',
+    'Look at the list. How many things could happen?',
+    'Are all the parts the same size?',
+    'Try: "There are ___ outcomes, and..."',
   ],
   claim: [
     'What did you find out about our pretend class?',

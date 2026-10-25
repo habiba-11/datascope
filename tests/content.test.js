@@ -11,7 +11,7 @@ const read = (path) => JSON.parse(readFileSync(new URL(`../data/${path}`, import
 const contents = PICKABLE_SCENARIOS.map((id) => ({ id, content: read(`content/${id}.json`) }));
 
 // Keys every content file must have. Parts 17b-d add more.
-const REQUIRED_KEYS = ['scenarioId', 'emoji', 'cardTitle', 'fixIts', 'planPrompt', 'numberLab'];
+const REQUIRED_KEYS = ['scenarioId', 'emoji', 'cardTitle', 'fixIts', 'planPrompt', 'numberLab', 'graphLab', 'chanceLab'];
 
 test('readability helper: sentences and words', () => {
   assert.deepEqual(sentences('Make a guess! How many? Go.'), ['Make a guess!', 'How many?', 'Go.']);
@@ -56,6 +56,28 @@ test('no hard-coded answers: content never states a mean, median, mode or range 
   for (const { id, content } of contents) {
     for (const text of allStrings(content)) {
       assert.doesNotMatch(text, /\b(mean|median|mode|range)\b[^.?!]*\d/i, `${id}: "${text}"`);
+    }
+  }
+});
+
+test('content never says "middle" (we say "centre": Part 9.5 decision on how kids picture the median)', () => {
+  for (const { id, content } of contents) {
+    for (const text of allStrings(content)) assert.doesNotMatch(text, /middle/i, `${id}: "${text}"`);
+  }
+});
+
+test('Graph Lab hints: 1 to 3 per question, like the other hints', () => {
+  for (const { id, content } of contents) {
+    for (const list of [content.graphLab.tellHints, content.graphLab.notTellHints]) {
+      assert.ok(list.length >= 1 && list.length <= 3, id);
+    }
+  }
+});
+
+test('hints do not start with an emoji (the hint box already adds 🦉)', () => {
+  for (const { id, content } of contents) {
+    for (const hint of [...content.graphLab.tellHints, ...content.graphLab.notTellHints]) {
+      assert.match(hint, /^[\p{L}"']/u, `${id}: "${hint}"`);
     }
   }
 });

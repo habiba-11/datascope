@@ -7,6 +7,23 @@
     { "flawed": "Do you like games?", "fix": "What is your favourite recess game this week?" }
   ],
   "planPrompt": "🤔 Make a guess! Which game will most kids pick?",
+  "graphLab": {
+    "tell": "📊 What does this graph tell us about recess games?",
+    "notTell": "🤔 What can't this graph tell us?",
+    "tellHints": [
+      "Find the tallest bar. Which game is it?",
+      "Try: \"Most kids picked...\"",
+      "Which game did only a few kids pick?"
+    ],
+    "notTellHints": [
+      "Does it tell us WHY kids like that game?",
+      "Would another school pick the same games?",
+      "Try: \"It doesn't tell us why...\""
+    ]
+  },
+  "chanceLab": {
+    "story": "⚽ Pip uses chance to pick today's recess game!"
+  },
   "numberLab": {
     "kind": "category",
     "predictPrompt": "🤔 Guess first! Which game is the most common?",

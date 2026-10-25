@@ -7,6 +7,23 @@
     { "flawed": "Do you read books?", "fix": "How many books did you read this month?" }
   ],
   "planPrompt": "🤔 Make a guess! How many minutes did most kids read?",
+  "graphLab": {
+    "tell": "📊 What do the two graphs tell us?",
+    "notTell": "🤔 What can't these graphs tell us?",
+    "tellHints": [
+      "Compare the two graphs. Which one is wider?",
+      "Try: \"Class B's answers are more...\"",
+      "Where are most kids in Class A?"
+    ],
+    "notTellHints": [
+      "Do they tell us WHY one class reads more?",
+      "Do they tell us what the kids read?",
+      "Try: \"They don't tell us...\""
+    ]
+  },
+  "chanceLab": {
+    "story": "📖 Pip uses chance to pick the next class book!"
+  },
   "numberLab": {
     "kind": "compare",
     "predictPrompt": "🤔 Guess first! What is a typical number of minutes?",

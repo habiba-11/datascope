@@ -349,7 +349,7 @@ const TASK_SETUP = {
     wireRetryChoices(document.getElementById('mistake-choices'), document.getElementById('mistake-feedback'), {
       task: 'find-mias-mistake',
       isCorrect: (answer) => answer === (miaSays(numbers) === median(numbers) ? 'yes' : 'no'),
-      correctText: `✅ Right! Mia forgot to put them in order. In order: ${inOrder(numbers)}. The middle one is ${median(numbers)}.`,
+      correctText: `✅ Right! Mia forgot to put them in order. In order: ${inOrder(numbers)}. The one in the centre is ${median(numbers)}.`,
       hintText: '🤔 Not quite. What must we do first to find the median?',
       onCorrect: () => markComplete(n),
     });
@@ -377,7 +377,7 @@ const TASK_SETUP = {
     wireRetryChoices(document.getElementById('median-choices'), document.getElementById('median-feedback'), {
       task: 'real-life-median',
       isCorrect: (answer) => Number(answer) === theMedian,
-      correctText: `✅ Yes! In order: ${inOrder(list)}. The middle one is ${theMedian}. It is the median.`,
+      correctText: `✅ Yes! In order: ${inOrder(list)}. The one in the centre is ${theMedian}. It is the median.`,
       hintText: '🤔 Not quite. First put them in order, from smallest to biggest.',
       onCorrect: () => markComplete(n),
     });

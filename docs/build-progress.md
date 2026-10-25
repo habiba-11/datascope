@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-16 and 17a-b built, next is Part 17c (Graph Lab + Chance Lab wording)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-16 and 17a-c built, next is Part 17d (Data Hub + Evidence Board wording)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -102,8 +102,17 @@
   - Found in the browser check and fixed: shoes said "a very big answer pulls it up" (35.3 vs 35, no extreme value) → the "pulls" message now needs a gap of at least 0.5; the reading "teaches" line now describes the comparison.
   - Checked in headless Chrome for all 4 scenarios: every task solvable, wrong tries show kind hints, card appears, no console errors.
 
+- Part 17c (25 Oct 2026, Prof comment 4), 130 tests passing:
+  - Graph Lab: both questions and their 3 hints come from the scenario's content (e.g. "📊 What does this graph tell us about recess games?"; reading: "What do the two graphs tell us?"); chart buttons with icons (📊 📈 🥧 ⚫); shorter Pip lines.
+  - Chance Lab: the 4 approved devices stay; a one-line scenario story on top ("⚽ Pip uses chance to pick today's recess game!"); Grade 5 task titles and texts; the certainty words (Papers 12, 13, 19) keep their names and get a kid gloss underneath (can't happen / probably not / 50-50 / probably / will happen); "Should happen (theory)" vs "Did happen (our test)"; buttons "▶ 10 times".
+  - js/helpers/chance.js (pure, tests/chance.test.js): toPct, theoryText, trialMessage, moved out of chance-lab.js. Messages use the device's own word ("500 rolls: 6 came up 92 times (18.4%). It should be 1 in 6 (about 16.7%).") and are tested against the 12-word rule; "closer" is still only said when true.
+  - Decided with Habiba: no 5th "draw a classmate card" device for now (cut-list item; possible in Part 21).
+  - Fixed on the way: my 17b Number Lab texts said "middle"; the Part 9.5 decision is "centre" (it shapes how kids picture the median). Changed, plus a content test that "middle" never appears.
+  - Hints no longer start with an emoji (the hint box adds 🦉 already); tested.
+  - The dice is now labelled "Dice" (was "Six-sided dice"), so new certainty log entries say device "Dice".
+
 ## Next
-- Part 17c: Graph Lab + Chance Lab wording per scenario (Chance Lab keeps the 4 devices, gets a scenario story). Ask Habiba about the optional "draw a classmate card" device.
+- Part 17d: Data Hub + Evidence Board wording, remaining hints in prompts.js, Pip's speech-bubble lines (Grade 5).
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.
@@ -123,6 +132,7 @@
 
 ## Decisions log
 - 25 Oct 2026 (Round 2 start): Prof's 8 comments planned as Parts 13 to 24 (docs/round-2-plan.md). Backend = optional bonus behind a flag; rewards for reasoning, never speed; DEMO data never exported; deploy locked until "Prof confirmed" (all in CLAUDE.md). Number Lab following the chosen scenario (Part 17b) reverses the earlier "by design" note in Known bugs.
+- 25 Oct 2026 (Part 17c): no extra scenario-linked Chance Lab device for now.
 - 25 Oct 2026 (Part 15): done rules as in the plan, but Conclude = card built (saving moves to My Journey); teacher "open all rooms" preview switch keeps the architecture's "a teacher can open any room"; progress per code + scenario (switching back restores it); Explore rooms open in order Graph → Number → Chance.
 - Still open (decide before the part that needs it): real rubric levels from the Paper 7 and 13 PDFs (Part 20); no "time per phase" on the child's page (Part 19).
 - 22 Oct 2026 (Part 12): more gamification, inserted before deployment (now Part 13). Every sound and motion is tied to a result or reasoning moment; no timers, leaderboards or point loss. No sound on ordinary button taps.

@@ -7,6 +7,23 @@
     { "flawed": "Are your shoes new?", "fix": "How many pairs of shoes did you get this year?" }
   ],
   "planPrompt": "🤔 Make a guess! Which shoe size do most kids wear?",
+  "graphLab": {
+    "tell": "📊 What does this graph tell us about our shoe sizes?",
+    "notTell": "🤔 What can't this graph tell us?",
+    "tellHints": [
+      "Find the tallest bar. Which size is it?",
+      "Try: \"Most kids wear size...\"",
+      "Look again. Is there more than one tallest bar?"
+    ],
+    "notTellHints": [
+      "Does it tell us WHY feet are different sizes?",
+      "Does it tell us next year's sizes?",
+      "Try: \"It doesn't tell us...\""
+    ]
+  },
+  "chanceLab": {
+    "story": "👟 The shoe shop gives a prize. Chance picks the winner!"
+  },
   "numberLab": {
     "kind": "number",
     "predictPrompt": "🤔 Guess first! What is a typical shoe size?",
@@ -16,7 +33,7 @@
       "story": "🏪 A shoe shop sold these sizes this week:",
       "numbers": [36, 34, 35, 34, 37, 36, 34],
       "modeQuestion": "Which size should the shop order the most?",
-      "medianQuestion": "Put the sizes in order. Which one is in the middle?"
+      "medianQuestion": "Put the sizes in order. Which one is in the centre?"
     }
   }
 }

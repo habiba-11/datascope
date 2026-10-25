@@ -2,7 +2,7 @@ import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { compareValues } from '../helpers/stats.js';
 import { buildFrequencyData, makeChartConfig, directLabelsPlugin, describeChart } from '../helpers/charts.js';
-import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
+import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import { logEvent } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { getSelectedScenarioId } from '../storage/save.js';
@@ -17,6 +17,7 @@ Chart.register(directLabelsPlugin);
 async function init() {
   const recipe = await loadRecipe(getSelectedScenarioId());
   const partner = await loadPartnerRecipe(recipe);
+  const { graphLab } = await loadContent(recipe.id); // the questions and hints for this scenario
 
   // One entry per class: usually just one, two for "Class A vs Class B".
   const classes = [recipe, partner].filter(Boolean).map((r, i) => ({
@@ -48,22 +49,22 @@ async function init() {
     explorePage: 'graph',
     phase: 'graph',
     pipMessage: partner
-      ? 'Hoo-hoo! Two classes, same question. Switch the graph type and compare them!'
-      : 'Hoo-hoo! Same data, different graphs. Try each button and see what changes!',
+      ? 'Hoo-hoo! Two classes, same question. Compare the graphs!'
+      : 'Hoo-hoo! Same data, different graphs. Try each one!',
     contentHTML: `
       <h1 class="room-title">📊 Graph Lab</h1>
       <p class="room-question">${recipe.question}</p>
       <div class="chart-type-row">
-        <button class="btn chart-type-btn" data-type="bar" type="button">Bar</button>
-        <button class="btn chart-type-btn" data-type="line" type="button">Line</button>
-        <button class="btn chart-type-btn" data-type="pie" type="button">Pie</button>
-        <button class="btn chart-type-btn" data-type="dot" type="button">Dot plot</button>
+        <button class="btn chart-type-btn" data-type="bar" type="button">📊 Bar</button>
+        <button class="btn chart-type-btn" data-type="line" type="button">📈 Line</button>
+        <button class="btn chart-type-btn" data-type="pie" type="button">🥧 Pie</button>
+        <button class="btn chart-type-btn" data-type="dot" type="button">⚫ Dot plot</button>
       </div>
       <div class="chart-row">${chartBlocks}</div>
       <div class="reflection">
-        <label for="tell">What does ${partner ? 'each' : 'this'} graph tell you?</label>
+        <label for="tell">${graphLab.tell}</label>
         <textarea id="tell" rows="2"></textarea>
-        <label for="not-tell">What does ${partner ? 'each' : 'this'} graph NOT tell you?</label>
+        <label for="not-tell">${graphLab.notTell}</label>
         <textarea id="not-tell" rows="2"></textarea>
       </div>
       <p class="feedback" id="graph-feedback">✏️ Write an answer in both boxes to open Number Lab.</p>
@@ -135,8 +136,8 @@ async function init() {
     nextLink.hidden = false;
   }
 
-  addHintButton(document.getElementById('tell'), 'graph-tell', 'graph-lab');
-  addHintButton(document.getElementById('not-tell'), 'graph-not-tell', 'graph-lab');
+  addHintButton(document.getElementById('tell'), 'graph-tell', 'graph-lab', graphLab.tellHints);
+  addHintButton(document.getElementById('not-tell'), 'graph-not-tell', 'graph-lab', graphLab.notTellHints);
 
   renderCharts('bar');
 }

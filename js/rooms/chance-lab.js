@@ -4,13 +4,26 @@ import { addHintButton } from '../helpers/prompts.js';
 import { playSound } from '../sounds.js';
 import { animate } from '../motion.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
+import { loadContent } from '../helpers/scenarios.js';
+import { getSelectedScenarioId } from '../storage/save.js';
+import { toPct, theoryText, trialMessage } from '../helpers/chance.js';
 
+// `verb` is the device's own word for one go, used in the messages.
 const DEVICES = {
-  coin: { label: 'Fair coin', emoji: '🪙', outcomes: ['Heads', 'Tails'], weights: [1, 1], target: 'Heads' },
-  dice: { label: 'Six-sided dice', emoji: '🎲', outcomes: ['1', '2', '3', '4', '5', '6'], weights: [1, 1, 1, 1, 1, 1], target: '6' },
-  spinner: { label: 'Fair spinner', emoji: '🎡', outcomes: ['Red', 'Blue', 'Green', 'Yellow'], weights: [1, 1, 1, 1], target: 'Blue' },
-  unfairSpinner: { label: 'Unfair spinner', emoji: '🌀', outcomes: ['Red', 'Blue', 'Green', 'Yellow'], weights: [4, 1, 1, 1], target: 'Red' },
+  coin: { label: 'Fair coin', emoji: '🪙', verb: 'flips', outcomes: ['Heads', 'Tails'], weights: [1, 1], target: 'Heads' },
+  dice: { label: 'Dice', emoji: '🎲', verb: 'rolls', outcomes: ['1', '2', '3', '4', '5', '6'], weights: [1, 1, 1, 1, 1, 1], target: '6' },
+  spinner: { label: 'Fair spinner', emoji: '🎡', verb: 'spins', outcomes: ['Red', 'Blue', 'Green', 'Yellow'], weights: [1, 1, 1, 1], target: 'Blue' },
+  unfairSpinner: { label: 'Unfair spinner', emoji: '🌀', verb: 'spins', outcomes: ['Red', 'Blue', 'Green', 'Yellow'], weights: [4, 1, 1, 1], target: 'Red' },
 };
+
+// The certainty words come from Papers 12, 13 and 19; the gloss under each is for kids.
+const CERTAINTY = [
+  { value: 'impossible', word: 'Impossible', gloss: "can't happen" },
+  { value: 'unlikely', word: 'Unlikely', gloss: 'probably not' },
+  { value: 'even', word: 'Even chance', gloss: '50-50' },
+  { value: 'likely', word: 'Likely', gloss: 'probably' },
+  { value: 'certain', word: 'Certain', gloss: 'will happen' },
+];
 
 const taskComplete = { 1: false, 2: false, 3: false };
 let currentTask = 1;
@@ -21,20 +34,24 @@ let previousRun = null;
 // What the child did, for the feedback card at the end (Part 16).
 const chanceFacts = { rating: '', target: '', runSizes: [], pct500: null, theoryText: '' };
 
-function init() {
+async function init() {
+  // Only the story follows the scenario; the 4 devices stay the same for everyone.
+  const { chanceLab } = await loadContent(getSelectedScenarioId());
+
   mountShell({
     step: 'explore',
     accent: 'explore',
     explorePage: 'chance',
     phase: 'chance',
-    pipMessage: "Hoo-hoo! Let's test our predictions with real trials!",
+    pipMessage: "Hoo-hoo! Guess first. Then test it many times!",
     contentHTML: `
       <h1 class="room-title">🎲 Chance Lab</h1>
       <p class="task-progress" id="task-progress">Task 1 of 3</p>
 
       <section class="task" data-task="1">
-        <h2 class="task-title">Pick a device</h2>
-        <p>Choose something to test, then see every possible outcome.</p>
+        <h2 class="task-title">🎲 Pick a chance game</h2>
+        <p class="chance-story">${chanceLab.story}</p>
+        <p>Pick one. Then see everything that could happen.</p>
         <div class="device-grid" id="device-grid">
           ${Object.entries(DEVICES).map(([key, d]) => `
             <button class="device-card" data-key="${key}" type="button">
@@ -44,43 +61,42 @@ function init() {
           `).join('')}
         </div>
         <div class="outcomes-box" id="outcomes-box" hidden>
-          <p><strong>Possible outcomes:</strong></p>
+          <p><strong>Everything that could happen:</strong></p>
           <div class="spinner-picture" id="spinner-picture" role="img" hidden></div>
           <div class="outcome-chips" id="outcome-chips"></div>
         </div>
       </section>
 
       <section class="task" data-task="2" hidden>
-        <h2 class="task-title">Predict</h2>
+        <h2 class="task-title">🤔 How likely?</h2>
         <p id="predict-question"></p>
         <div class="certainty-scale" id="certainty-scale">
-          <button class="btn certainty-btn" data-value="impossible" type="button">Impossible</button>
-          <button class="btn certainty-btn" data-value="unlikely" type="button">Unlikely</button>
-          <button class="btn certainty-btn" data-value="even" type="button">Even chance</button>
-          <button class="btn certainty-btn" data-value="likely" type="button">Likely</button>
-          <button class="btn certainty-btn" data-value="certain" type="button">Certain</button>
+          ${CERTAINTY.map((c) => `
+            <button class="btn certainty-btn" data-value="${c.value}" data-word="${c.word}" type="button">
+              ${c.word}<span class="certainty-gloss">${c.gloss}</span>
+            </button>`).join('')}
         </div>
-        <label for="predict-reason" class="reason-label">Why?</label>
+        <label for="predict-reason" class="reason-label">✏️ Why do you think so?</label>
         <textarea id="predict-reason" class="reason-input" rows="2" placeholder="Because..."></textarea>
         <p class="feedback" id="predict-feedback" hidden></p>
       </section>
 
       <section class="task" data-task="3" hidden>
-        <h2 class="task-title">Run trials</h2>
-        <p>Let's test it! Run some trials and compare what happened to the theory.</p>
+        <h2 class="task-title">🔁 Test it many times</h2>
+        <p>Run a test. Compare what should happen with what did happen.</p>
         <div class="trial-device" id="trial-device" aria-hidden="true"></div>
         <div class="trial-row">
-          <button class="btn btn-run" data-count="10" type="button">Run 10</button>
-          <button class="btn btn-run" data-count="50" type="button">Run 50</button>
-          <button class="btn btn-run" data-count="500" type="button">Run 500</button>
+          <button class="btn btn-run" data-count="10" type="button">▶ 10 times</button>
+          <button class="btn btn-run" data-count="50" type="button">▶ 50 times</button>
+          <button class="btn btn-run" data-count="500" type="button">▶ 500 times</button>
         </div>
         <div class="compare-grid" id="compare-grid" hidden>
           <div class="compare-col">
-            <h3>Theoretical (what should happen)</h3>
+            <h3>🎯 Should happen (theory)</h3>
             <div id="theory-bars" class="bars"></div>
           </div>
           <div class="compare-col">
-            <h3>Experimental (what did happen)</h3>
+            <h3>🧪 Did happen (our test)</h3>
             <div id="experiment-bars" class="bars"></div>
           </div>
         </div>
@@ -123,7 +139,7 @@ function showTask(n) {
 
   if (n === 2 && selectedDevice) {
     document.getElementById('predict-question').textContent =
-      `How likely do you think it is that our ${selectedDevice.label.toLowerCase()} lands on ${selectedDevice.target}?`;
+      `How likely is it that the ${selectedDevice.label.toLowerCase()} lands on ${selectedDevice.target}?`;
   }
 }
 
@@ -214,11 +230,11 @@ function setupPredict() {
   function checkComplete() {
     if (!chosen) return;
     if (!reasonInput.value.trim()) {
-      feedback.textContent = 'Now tell us why you think so!';
+      feedback.textContent = '✏️ Now say why you think so!';
       feedback.hidden = false;
       return;
     }
-    feedback.textContent = `You think it's ${chosen.toLowerCase()} that we'll land on ${selectedDevice.target}. Let's test it!`;
+    feedback.textContent = `👍 You think ${selectedDevice.target} is "${chosen.toLowerCase()}". Let's test it!`;
     feedback.hidden = false;
     markComplete(2);
   }
@@ -236,7 +252,7 @@ function setupPredict() {
     btn.addEventListener('click', () => {
       buttons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
-      chosen = btn.textContent;
+      chosen = btn.dataset.word; // the word only, without the small gloss
       chanceFacts.rating = chosen;
       checkComplete();
       logCertainty();
@@ -257,11 +273,6 @@ function runTrial(device) {
   return device.outcomes[device.outcomes.length - 1];
 }
 
-// Percentages with one decimal place (16.7, 30, 57.1).
-function toPct(part, whole) {
-  return Math.round((part / whole) * 1000) / 10;
-}
-
 function barRow(label, pct, text, fillClass) {
   return `
     <div class="bar-row">
@@ -270,24 +281,6 @@ function barRow(label, pct, text, fillClass) {
       <span class="bar-pct">${text}</span>
     </div>
   `;
-}
-
-// Honest feedback: says what this run really showed. "Closer" is only
-// claimed if this bigger run really is closer to the theory than the last one.
-function trialMessage(count, target, timesHit, experimentPct, theoryText, previous, gap) {
-  const times = timesHit === 1 ? 'time' : 'times';
-  let message = `After ${count} trials, ${target} came up ${timesHit} ${times} (${experimentPct}%). Theory says ${theoryText}.`;
-
-  if (previous && count > previous.count) {
-    message += gap < previous.gap
-      ? ` That's closer to the theory than your ${previous.count}-trial run (${previous.pct}%).`
-      : ` This time it was NOT closer than your ${previous.count}-trial run (${previous.pct}%). Chance can surprise us! Bigger runs are usually closer, but not every time.`;
-  } else if (count < 500) {
-    message += ' Try a bigger run. Do you think it will get closer?';
-  } else {
-    message += ' Run 500 again. Does it stay close?';
-  }
-  return message;
 }
 
 function setupTrials() {
@@ -310,11 +303,10 @@ function setupTrials() {
         results.set(outcome, results.get(outcome) + 1);
       }
 
-      // Theory as "1 in 6 (about 16.7%)", so six rounded numbers never look like 102%.
-      const theoryText = (i) => `${selectedDevice.weights[i]} in ${totalWeight} (about ${toPct(selectedDevice.weights[i], totalWeight)}%)`;
+      const theoryFor = (i) => theoryText(selectedDevice.weights[i], totalWeight);
 
       theoryBars.innerHTML = selectedDevice.outcomes
-        .map((o, i) => barRow(o, toPct(selectedDevice.weights[i], totalWeight), theoryText(i), 'theory'))
+        .map((o, i) => barRow(o, toPct(selectedDevice.weights[i], totalWeight), theoryFor(i), 'theory'))
         .join('');
 
       // For 10, 50 and 500 trials one decimal place is always exact, so these add up to 100%.
@@ -329,17 +321,18 @@ function setupTrials() {
       const experimentPct = toPct(timesHit, count);
       const gap = Math.abs(timesHit / count - selectedDevice.weights[targetIndex] / totalWeight);
 
-      feedback.textContent = trialMessage(
-        count, selectedDevice.target, timesHit, experimentPct, theoryText(targetIndex), previousRun, gap
-      );
+      feedback.textContent = trialMessage({
+        count, verb: selectedDevice.verb, target: selectedDevice.target, timesHit,
+        pct: experimentPct, theory: theoryFor(targetIndex), previous: previousRun, gap,
+      });
       feedback.hidden = false;
       logEvent('chance-lab', 'trials', {
         device: selectedDevice.label, outcome: selectedDevice.target, trials: count, timesHit,
-        experimentalPct: experimentPct, theory: theoryText(targetIndex),
+        experimentalPct: experimentPct, theory: theoryFor(targetIndex),
       });
       previousRun = { count, pct: experimentPct, gap };
       chanceFacts.target = selectedDevice.target;
-      chanceFacts.theoryText = theoryText(targetIndex);
+      chanceFacts.theoryText = theoryFor(targetIndex);
       chanceFacts.runSizes.push(count);
       if (count === 500) chanceFacts.pct500 = experimentPct;
 
