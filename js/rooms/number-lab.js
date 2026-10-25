@@ -60,7 +60,7 @@ async function init() {
 
   // The maths recap (Part 18): a 📘 button, and the first time it opens by
   // itself, right after the Number Lab intro is closed.
-  addRecapButton(document.querySelector('.room-title'), kind, 'number-lab');
+  addRecapButton(kind, 'number-lab');
   whenIntroClosed().then(() => autoOpenRecap(kind));
 }
 

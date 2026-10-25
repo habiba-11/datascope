@@ -75,7 +75,7 @@ function stopLines(phase, p, { cardTitle, kind }) {
         lines.push(`I think ${c.claim} because ${c.because}.`);
         lines.push(`Proof: ${(c.evidence || []).join(', ')}`);
         lines.push(`How sure: ${word}. ${c.certaintyReason}`);
-        lines.push(`For: ${c.audience}`);
+        if (c.audience) lines.push(`For: ${c.audience}`); // cards from before 26 Oct 2026
       }
       break;
     default:

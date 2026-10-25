@@ -25,16 +25,16 @@
     "story": "⚽ Pip uses chance to pick today's recess game!"
   },
   "evidenceBoard": {
-    "claimPrompt": "⚽ What did you find out about recess games?",
+    "claimPrompt": "👀 Look at your findings. Which game do most kids pick?",
     "claimHints": [
-      "Which game did most kids pick?",
+      "Tap 📋 My findings. Which game got the most votes?",
       "Use the mode as your reason.",
       "Try: \"I think most kids pick ___ because ___\""
     ]
   },
   "numberLab": {
     "kind": "category",
-    "predictPrompt": "🤔 Guess first! Which game is the most common?",
+    "predictPrompt": "🤔 Guess first! Which game did the most kids pick?",
     "whyNoMean": {
       "question": "🤔 Why can't we find the mean of favourite games?",
       "options": [

@@ -158,3 +158,17 @@ export function setCurrentStep(stepId) {
     if (isCurrent) link.setAttribute('aria-current', 'step'); else link.removeAttribute('aria-current');
   });
 }
+
+// Puts a button on the same row as the room's title (e.g. "📘 Maths recap"),
+// so it never crowds the task text underneath.
+export function addTitleButton(button) {
+  const title = document.querySelector('.room-title');
+  let row = title.parentElement;
+  if (!row.classList.contains('room-title-row')) {
+    row = document.createElement('div');
+    row.className = 'room-title-row';
+    title.before(row);
+    row.append(title);
+  }
+  row.append(button);
+}

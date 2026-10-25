@@ -19,6 +19,7 @@ export const EVENT_TYPES = [
   'phase-complete', // the child finished a phase (logged once per code + scenario)
   'phase-feedback', // the feedback card shown at the end of a phase, with its stars
   'recap-viewed', // the maths recap pop-up was opened (auto or 📘), and which cards were looked at
+  'findings-viewed', // Evidence Board: the child's "📋 My findings" summary was opened (auto or by tapping)
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];

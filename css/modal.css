@@ -155,8 +155,7 @@
   animation: modal-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.recap-next,
-.recap-btn {
+.recap-next {
   min-height: 48px;
 }
 

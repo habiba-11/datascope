@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-19 built, next is Part 20 (hidden teacher dashboard)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-19 built + fixes from Habiba's test (26 Oct), next is Part 20 (hidden teacher dashboard)** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -135,6 +135,13 @@
   - Decided with Habiba: time per phase is computed (for the teacher) but never shown to the child.
   - Checked in headless Chrome with a full sleep-hours investigation the real way (no preview): fresh child bounced from My journey, every step unlocks, all 7 stops show the right answers, no time shown, save works, no console errors.
 
+- Fixes after Habiba's test (26 Oct 2026), 151 tests passing:
+  - Clearer questions: the Number Lab guess now asks for the mean in kid words ("If every kid slept the same, how many hours would that be?"; games: "Which game did the most kids pick?"); the Evidence Board claim question points to the findings ("👀 Look at your findings. How long do most kids sleep?"), with matching first hints.
+  - Spacing: "📘 Maths recap" sits on the title row (addTitleButton in app.js, .room-title-row in shell.css), no longer crowding "Task 1 of 4".
+  - Evidence Board: the Maths recap button is gone; "📋 My findings" opens by itself after the intro (until Conclude is done) and from a title-row button: the question, the first guess, the class's real numbers (both classes for reading; mode + votes for games), the Number Lab change of mind, and what the child said about the graph. js/helpers/findings.js (pure, tests/findings.test.js). New log event findings-viewed { auto }.
+  - Evidence Board's last task (audience + form) removed (Habiba's decision): 3 tasks now; "🏅 Make my Evidence Card" button on task 3 builds the card (so the feedback card never pops up mid-typing). Claim log entries no longer have audience/form; My journey still shows "For:" for older cards. CLAUDE.md and architecture.md updated with the change (mention to Prof).
+  - Checked in headless Chrome with a full sleep-hours run: no console errors.
+
 ## Next
 - Part 20: hidden teacher dashboard (local-first). Needs from Habiba first: the real rubric levels from Papers 7 and 13 (they are not in docs/literature-key-findings.md).
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
@@ -158,6 +165,7 @@
 - 25 Oct 2026 (Round 2 start): Prof's 8 comments planned as Parts 13 to 24 (docs/round-2-plan.md). Backend = optional bonus behind a flag; rewards for reasoning, never speed; DEMO data never exported; deploy locked until "Prof confirmed" (all in CLAUDE.md). Number Lab following the chosen scenario (Part 17b) reverses the earlier "by design" note in Known bugs.
 - 25 Oct 2026 (Part 17c): no extra scenario-linked Chance Lab device for now.
 - 25 Oct 2026 (Part 15): done rules as in the plan, but Conclude = card built (saving moves to My Journey); teacher "open all rooms" preview switch keeps the architecture's "a teacher can open any room"; progress per code + scenario (switching back restores it); Explore rooms open in order Graph → Number → Chance.
+- 26 Oct 2026: Evidence Board audience/form task removed (Habiba); "My findings" summary replaces the maths recap in Conclude.
 - 25 Oct 2026 (Part 19): time per phase is for the teacher only, never shown to the child.
 - Still open (decide before the part that needs it): real rubric levels from the Paper 7 and 13 PDFs (Part 20).
 - 22 Oct 2026 (Part 12): more gamification, inserted before deployment (now Part 13). Every sound and motion is tied to a result or reasoning moment; no timers, leaderboards or point loss. No sound on ordinary button taps.

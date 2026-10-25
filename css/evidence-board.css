@@ -67,3 +67,21 @@
   margin-top: 20px;
 }
 
+
+#make-card-btn {
+  margin-top: 12px;
+}
+
+/* "📋 My findings" pop-up: one finding per line. */
+.findings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.findings-list li {
+  margin: 8px 0;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--color-bg);
+}

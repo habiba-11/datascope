@@ -25,16 +25,16 @@
     "story": "👟 The shoe shop gives a prize. Chance picks the winner!"
   },
   "evidenceBoard": {
-    "claimPrompt": "👟 What did you find out about our shoe sizes?",
+    "claimPrompt": "👀 Look at your findings. Which shoe sizes are most common?",
     "claimHints": [
-      "Look at your numbers. Which sizes are most common?",
+      "Tap 📋 My findings. How many modes are there?",
       "Use a number as your reason, like the mode.",
       "Try: \"I think most kids wear ___ because ___\""
     ]
   },
   "numberLab": {
     "kind": "number",
-    "predictPrompt": "🤔 Guess first! What is a typical shoe size?",
+    "predictPrompt": "🤔 Guess first! If all feet were one size, what size would it be?",
     "build": "👟 5 friends have a mean shoe size of {target}. Type 5 sizes that fit.",
     "mistake": { "story": "👟 Mia wrote down 5 friends' shoe sizes.", "numbers": [36, 34, 38, 33, 35] },
     "realLife": {

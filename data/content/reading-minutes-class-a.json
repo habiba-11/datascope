@@ -25,16 +25,16 @@
     "story": "📖 Pip uses chance to pick the next class book!"
   },
   "evidenceBoard": {
-    "claimPrompt": "📖 What did you find out about the two classes?",
+    "claimPrompt": "👀 Look at your findings. How are Class A and Class B different?",
     "claimHints": [
-      "What is the same in both classes? What is different?",
+      "Tap 📋 My findings. Compare the two ranges.",
       "Use a number as your reason, like the range.",
       "Try: \"I think Class B ___ because ___\""
     ]
   },
   "numberLab": {
     "kind": "compare",
-    "predictPrompt": "🤔 Guess first! What is a typical number of minutes?",
+    "predictPrompt": "🤔 Guess first! If every kid read the same, how many minutes would that be?",
     "build": "📖 5 kids read some minutes. Their mean is {target}. Type 5 numbers that fit.",
     "mistake": { "story": "📖 Mia asked 5 friends how long they read.", "numbers": [9, 3, 20, 5, 7] },
     "compareRange": {

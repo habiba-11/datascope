@@ -112,11 +112,11 @@ const RULES = {
     };
   },
 
-  // facts: { evidenceCount, certaintyReasonWords, audience, teaches }
+  // facts: { evidenceCount, certaintyReasonWords, teaches }
   conclude: (f) => {
     const twoNumbers = f.evidenceCount >= 2;
     const explained = f.certaintyReasonWords >= EXPLAINED;
-    let nextTime = `Now tell your claim to ${f.audience}!`;
+    let nextTime = 'Now share your claim with your class!';
     if (!twoNumbers) nextTime = 'Use two numbers as proof next time.';
     else if (!explained) nextTime = 'Say more about why you are that sure.';
     return {

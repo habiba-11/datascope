@@ -167,6 +167,8 @@ Think of DataScope as a building with six rooms. A student walks through them in
 
 **Why:** this is the PYP "action" step, and Paper 17's three-part inference rule.
 
+> **Round 2 change (26 Oct 2026, Habiba's decision after testing):** the audience and form choice was removed, because it had no purpose for the child. The Evidence Board is now Claim + Evidence + Certainty (Paper 17's three parts), with a "📋 My findings" summary of the child's own numbers and words before they write the claim. To mention to Prof: the PYP "action / real audience" part is no longer in the app.
+
 ## 6. The architecture in simple terms
 
 **Architecture** means "how the pieces of the app are organised." DataScope is built as four stacked layers, like floors in a building. Each floor only talks to the floor directly below it, which keeps things tidy and makes it easy to fix one part without breaking the rest.

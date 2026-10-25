@@ -63,19 +63,19 @@ test('Chance Lab: more trial sizes and a big run earn stars', () => {
 });
 
 test('Conclude: two numbers as proof and a real reason earn stars', () => {
-  const base = { audience: 'the principal' };
+  const base = {};
   assert.equal(buildPhaseFeedback('conclude', { ...base, evidenceCount: 1, certaintyReasonWords: 2 }).stars, 1);
   assert.equal(buildPhaseFeedback('conclude', { ...base, evidenceCount: 2, certaintyReasonWords: 2 }).stars, 2);
   const high = buildPhaseFeedback('conclude', { ...base, evidenceCount: 3, certaintyReasonWords: 8 });
   assert.equal(high.stars, 3);
-  assert.match(high.nextTime, /the principal/);
+  assert.match(high.nextTime, /share your claim/);
 });
 
 test('a card never has more than 3 wins, and always 1 to 3 stars and a nudge', () => {
   for (const phase of PHASES) {
     const card = buildPhaseFeedback(phase, {
       scenarioTitle: 'x', guessText: '1', classSizes: [5], guess: 1, mean: 1, typesTried: 1, notTellWords: 0,
-      rating: 'Likely', target: 'Red', runSizes: [10], evidenceCount: 1, certaintyReasonWords: 0, audience: 'the class',
+      rating: 'Likely', target: 'Red', runSizes: [10], evidenceCount: 1, certaintyReasonWords: 0,
     });
     assert.ok(card.wins.length >= 1 && card.wins.length <= 3, phase);
     assert.ok(card.stars >= 1 && card.stars <= 3, phase);

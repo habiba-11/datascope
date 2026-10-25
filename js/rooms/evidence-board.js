@@ -1,24 +1,28 @@
-import { mountShell } from '../app.js';
+import { mountShell, addTitleButton } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import { CERTAINTY, certaintyButtonsHTML } from '../helpers/certainty.js';
-import { numberLabKind } from '../helpers/number-tasks.js';
-import { addRecapButton } from '../recap.js';
-import { logEvent } from '../helpers/log.js';
+import { numberLabKind, classStats } from '../helpers/number-tasks.js';
+import { buildJourney } from '../helpers/journey.js';
+import { buildFindings } from '../helpers/findings.js';
+import { logEvent, readLog } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { playSound } from '../sounds.js';
 import { animate, pipReacts, confetti } from '../motion.js';
-import { getSelectedScenarioId } from '../storage/save.js';
-import { finishPhase } from '../phase-progress.js';
+import { openModal } from '../modal.js';
+import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
+import { finishPhase, isPhaseDone } from '../phase-progress.js';
+import { whenIntroClosed } from '../phase-intro.js';
 import { countWords } from '../helpers/feedback.js';
 
-const taskComplete = { 1: false, 2: false, 3: false, 4: false };
+// Claim -> Evidence -> How sure (Paper 17's three parts). The audience/form task
+// was removed on 26 Oct 2026 (Habiba's decision: it had no purpose for the child).
+const TASK_COUNT = 3;
+const taskComplete = { 1: false, 2: false, 3: false };
 let currentTask = 1;
 const selectedEvidence = new Set();
 let selectedCertainty = null;
-let selectedAudience = null;
-let selectedForm = null;
 let scenarioId = null;
 let scenarioTeaches = '';
 let lastLoggedClaim = null; // so the same card is not logged twice
@@ -30,12 +34,12 @@ async function init() {
   const partner = await loadPartnerRecipe(recipe);
   const { evidenceBoard } = await loadContent(recipe.id); // the claim question and hints
   const { values } = generateClassData(recipe);
+  const partnerValues = partner ? generateClassData(partner).values : null;
 
   let evidenceChips;
   if (partner) {
     // Class A vs Class B: the lesson is "same mean, different spread",
     // so the chips show the mean and range of each class.
-    const partnerValues = generateClassData(partner).values;
     evidenceChips = [
       { id: 'mean-a', label: `Class A mean: ${formatMean(mean(values))}` },
       { id: 'mean-b', label: `Class B mean: ${formatMean(mean(partnerValues))}` },
@@ -60,7 +64,7 @@ async function init() {
     pipMessage: 'Hoo-hoo! Share what you found. What do you think, and why?',
     contentHTML: `
       <h1 class="room-title">🚩 Evidence Board</h1>
-      <p class="task-progress" id="task-progress">Task 1 of 4</p>
+      <p class="task-progress" id="task-progress">Task 1 of ${TASK_COUNT}</p>
 
       <section class="task" data-task="1">
         <h2 class="task-title">💬 Say what you found</h2>
@@ -90,22 +94,7 @@ async function init() {
         <label for="certainty-reason">✏️ Why are you that sure?</label>
         <textarea id="certainty-reason" rows="2" placeholder="Because..."></textarea>
         <p class="feedback" id="certainty-feedback" hidden></p>
-      </section>
-
-      <section class="task" data-task="4" hidden>
-        <h2 class="task-title">📣 Who will you tell?</h2>
-        <p>Pick who will hear it:</p>
-        <div class="choice-row" id="audience-choices">
-          <button class="btn choice-btn" data-value="the principal" type="button">🧑‍💼 The principal</button>
-          <button class="btn choice-btn" data-value="the class" type="button">🧑‍🎓 The class</button>
-          <button class="btn choice-btn" data-value="a parent evening" type="button">👨‍👩‍👧 Parent evening</button>
-        </div>
-        <p>Pick how you will share it:</p>
-        <div class="choice-row" id="form-choices">
-          <button class="btn choice-btn" data-value="a prediction" type="button">🔮 A prediction</button>
-          <button class="btn choice-btn" data-value="a problem solved" type="button">🧩 A problem solved</button>
-          <button class="btn choice-btn" data-value="a recommendation" type="button">💡 A recommendation</button>
-        </div>
+        <button class="btn btn-main" id="make-card-btn" type="button" disabled>🏅 Make my Evidence Card</button>
         <div class="evidence-card" id="evidence-card" hidden></div>
         <div class="save-work" id="save-work" hidden>
           <a class="btn btn-main" href="my-journey.html">🗺️ See my journey →</a>
@@ -124,22 +113,58 @@ async function init() {
   addHintButton(document.getElementById('certainty-reason'), 'certainty-why', 'evidence-board');
   setupEvidence();
   setupCertainty();
-  setupAudienceForm();
   setupTaskNav();
-  // 📘 Maths recap, for checking a number before using it as proof (Part 18).
-  addRecapButton(document.querySelector('.room-title'), numberLabKind(recipe), 'evidence-board');
+
+  // "📋 My findings": the child's own numbers and words, so they don't have to
+  // remember them while writing the claim. Opens by itself after the intro
+  // (until Conclude is done), and the button reopens it at any time.
+  const kind = numberLabKind(recipe);
+  const lines = buildFindings({
+    kind,
+    question: recipe.question,
+    values,
+    stats: classStats(kind, values, partnerValues),
+    journey: buildJourney(readLog(), getExplorerCode(), recipe.id, recipe.compareWith || null),
+  });
+  const findingsBtn = document.createElement('button');
+  findingsBtn.type = 'button';
+  findingsBtn.className = 'btn title-btn';
+  findingsBtn.textContent = '📋 My findings';
+  findingsBtn.addEventListener('click', () => showFindings(lines, false));
+  addTitleButton(findingsBtn);
+  if (!isPhaseDone('conclude')) whenIntroClosed().then(() => showFindings(lines, true));
+}
+
+function showFindings(lines, auto) {
+  const list = document.createElement('ul');
+  list.className = 'findings-list';
+  for (const { icon, label, text } of lines) {
+    const item = document.createElement('li');
+    const strong = document.createElement('strong');
+    strong.textContent = `${icon} ${label}: `;
+    item.append(strong, text); // text may be what the child typed: plain text only
+    list.append(item);
+  }
+  logEvent('evidence-board', 'findings-viewed', { auto });
+  return openModal({
+    icon: '📋',
+    title: 'My findings',
+    accent: 'conclude',
+    body: list,
+    buttons: [{ label: "✍️ Let's write my claim", value: 'go', main: true }],
+  });
 }
 
 function showTask(n) {
   document.querySelectorAll('.task').forEach((el) => {
     el.hidden = Number(el.dataset.task) !== n;
   });
-  document.getElementById('task-progress').textContent = `Task ${n} of 4`;
+  document.getElementById('task-progress').textContent = `Task ${n} of ${TASK_COUNT}`;
   document.getElementById('back-btn').disabled = n === 1;
   const nextBtn = document.getElementById('next-btn');
   nextBtn.disabled = !taskComplete[n];
-  // Last task: the room's own big button (next room / save) is the one clear action.
-  nextBtn.hidden = n === 4;
+  // Last task: the room's own big button (make the card) is the one clear action.
+  nextBtn.hidden = n === TASK_COUNT;
   currentTask = n;
 }
 
@@ -148,7 +173,7 @@ function markComplete(taskNum) {
   // The room's phase is done when every task is done.
   if (Object.values(taskComplete).every(Boolean)) finishPhase('conclude', concludeFacts());
   if (currentTask === taskNum) {
-    document.getElementById('next-btn').disabled = taskNum === 4;
+    document.getElementById('next-btn').disabled = taskNum === TASK_COUNT;
   }
 }
 
@@ -157,7 +182,6 @@ function concludeFacts() {
   return {
     evidenceCount: selectedEvidence.size,
     certaintyReasonWords: countWords(document.getElementById('certainty-reason').value),
-    audience: selectedAudience,
     teaches: scenarioTeaches,
   };
 }
@@ -167,7 +191,7 @@ function setupTaskNav() {
     showTask(Math.max(1, currentTask - 1));
   });
   document.getElementById('next-btn').addEventListener('click', () => {
-    if (currentTask < 4) showTask(currentTask + 1);
+    if (currentTask < TASK_COUNT) showTask(currentTask + 1);
   });
   showTask(1);
 }
@@ -216,17 +240,15 @@ function setupEvidence() {
   });
 }
 
+// "How sure" needs a word AND a reason. Then "Make my Evidence Card" builds the
+// card: a button, so the feedback card never pops up while the child is typing.
 function setupCertainty() {
   const buttons = document.querySelectorAll('.certainty-btn');
   const reasonInput = document.getElementById('certainty-reason');
-  const feedback = document.getElementById('certainty-feedback');
+  const makeBtn = document.getElementById('make-card-btn');
 
-  function checkComplete() {
-    if (selectedCertainty && reasonInput.value.trim()) {
-      feedback.textContent = '✅ Saved! You said how sure you are.';
-      feedback.hidden = false;
-      markComplete(3);
-    }
+  function checkReady() {
+    makeBtn.disabled = !(selectedCertainty && reasonInput.value.trim());
   }
 
   buttons.forEach((btn) => {
@@ -234,15 +256,23 @@ function setupCertainty() {
       buttons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       selectedCertainty = btn.dataset.value;
-      checkComplete();
+      checkReady();
     });
   });
+  reasonInput.addEventListener('input', checkReady);
 
-  reasonInput.addEventListener('input', checkComplete);
+  makeBtn.addEventListener('click', () => {
+    renderCard();
+    playSound('done');
+    animate(document.getElementById('evidence-card'), 'cheer');
+    confetti();
+    pipReacts('hop');
+    markComplete(3);
+  });
 }
 
-// Logs the finished card. Picking a different audience or form re-builds
-// the card, so it is logged again only if something actually changed.
+// Logs the finished card. Making the card again (after a change) logs it again
+// only if something actually changed.
 function logClaim(details) {
   const asText = JSON.stringify(details);
   if (asText === lastLoggedClaim) return;
@@ -259,64 +289,28 @@ function cardLine(label, text) {
   return line;
 }
 
-function setupAudienceForm() {
-  const audienceButtons = document.querySelectorAll('#audience-choices .choice-btn');
-  const formButtons = document.querySelectorAll('#form-choices .choice-btn');
+function renderCard() {
   const card = document.getElementById('evidence-card');
+  const subject = document.getElementById('claim-subject').value.trim();
+  const reason = document.getElementById('claim-reason').value.trim();
+  const certaintyReason = document.getElementById('certainty-reason').value.trim();
+  const evidenceLabels = [...document.querySelectorAll('.evidence-chip.active')].map((c) => c.textContent);
 
-  function renderCard() {
-    const subject = document.getElementById('claim-subject').value.trim();
-    const reason = document.getElementById('claim-reason').value.trim();
-    const certaintyReason = document.getElementById('certainty-reason').value.trim();
-    const evidenceLabels = [...document.querySelectorAll('.evidence-chip.active')].map((c) => c.textContent);
+  // Built with textContent, not innerHTML: whatever the child typed is shown
+  // as plain text and can never be read by the browser as HTML code.
+  const heading = document.createElement('h3');
+  heading.textContent = '🏅 My Evidence Card';
 
-    // Built with textContent, not innerHTML: whatever the child typed is shown
-    // as plain text and can never be read by the browser as HTML code.
-    const heading = document.createElement('h3');
-    heading.textContent = '🏅 My Evidence Card';
-
-    card.replaceChildren(
-      heading,
-      cardLine('Claim:', `I think ${subject} because ${reason}.`),
-      cardLine('Evidence:', evidenceLabels.join(', ')),
-      cardLine('How sure:', `${CERTAINTY.find((c) => c.value === selectedCertainty).word} — ${certaintyReason}`),
-      cardLine('For:', `${selectedAudience}, as ${selectedForm}`)
-    );
-    card.hidden = false;
-    document.getElementById('save-work').hidden = false;
-    logClaim({
-      scenarioId, claim: subject, because: reason, evidence: evidenceLabels,
-      certainty: selectedCertainty, certaintyReason, audience: selectedAudience, form: selectedForm,
-    });
-  }
-
-  function checkComplete() {
-    if (selectedAudience && selectedForm) {
-      renderCard();
-      playSound('done');
-      animate(document.getElementById('evidence-card'), 'cheer');
-      confetti();
-      pipReacts('hop');
-      markComplete(4);
-    }
-  }
-
-  audienceButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      audienceButtons.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedAudience = btn.dataset.value;
-      checkComplete();
-    });
-  });
-
-  formButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      formButtons.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedForm = btn.dataset.value;
-      checkComplete();
-    });
+  card.replaceChildren(
+    heading,
+    cardLine('Claim:', `I think ${subject} because ${reason}.`),
+    cardLine('Evidence:', evidenceLabels.join(', ')),
+    cardLine('How sure:', `${CERTAINTY.find((c) => c.value === selectedCertainty).word} — ${certaintyReason}`),
+  );
+  card.hidden = false;
+  document.getElementById('save-work').hidden = false;
+  logClaim({
+    scenarioId, claim: subject, because: reason, evidence: evidenceLabels, certainty: selectedCertainty, certaintyReason,
   });
 }
 

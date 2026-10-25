@@ -55,7 +55,7 @@
   - **Question Studio:** a question checker warns about "not", leading words, a missing timeframe, and yes/no-only questions. Children fix flawed example questions.
   - **Number Lab:** the child predicts first, then the app reveals mean, median, mode and range, followed by meaning tasks (build a dataset with a given mean, find the mistake, real-life median and mode).
   - **Chance Lab:** list all outcomes first, predict, run 10 / 50 / 500 trials, then compare theoretical vs experimental probability. Include unfair spinners and a certainty scale (impossible to certain).
-  - **Evidence Board:** Claim + Evidence + How sure, and why, for a real audience.
+  - **Evidence Board:** Claim + Evidence + How sure, and why. (The audience/form task was removed on 26 Oct 2026, Habiba's decision; a "📋 My findings" summary helps the child before the claim.)
 - **Reasoning log:** records predictions, revisions, certainty ratings and meaning-task results, under anonymous codes only. It is my thesis evidence.
 
 ## UI design: VERY IMPORTANT
