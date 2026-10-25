@@ -4,6 +4,7 @@
 import { earnedBadges, badgeShelf, levelFor } from './helpers/badges.js';
 import { readLog } from './helpers/log.js';
 import { getExplorerCode } from './storage/save.js';
+import { flipIn } from './motion.js';
 
 // Called once by setupCelebrations(), after the sidebar exists.
 export function setupBadgeShelf() {
@@ -18,6 +19,7 @@ export function setupBadgeShelf() {
     dialog.innerHTML = shelfHTML(badgeShelf(earnedBadges(readLog(), getExplorerCode())));
     dialog.querySelector('.shelf-close').addEventListener('click', () => dialog.close());
     dialog.showModal();
+    flipIn(dialog.querySelectorAll('.shelf-card.earned')); // earned badges flip in
   });
 
   // Tapping the dark area around the shelf also closes it.

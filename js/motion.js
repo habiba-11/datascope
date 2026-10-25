@@ -119,6 +119,20 @@ export function unlockStep(element) {
     .fromTo(holder, { scale: 1 }, { scale: 1.25, duration: 0.18, yoyo: true, repeat: 1, clearProps: 'scale' }, '<');
 }
 
+// A progress bar grows from `fromPct` to its own width (e.g. the level bar).
+export function growBar(fill, fromPct) {
+  const gsap = gsapOrNull();
+  if (!gsap || !fill) return;
+  gsap.from(fill, { width: `${fromPct}%`, duration: MOTION.slow, ease: MOTION.out });
+}
+
+// Cards flip in, one after another (e.g. earned badges on the shelf).
+export function flipIn(elements) {
+  const gsap = gsapOrNull();
+  if (!gsap || !elements.length) return;
+  gsap.from(elements, { rotationY: 180, opacity: 0, duration: MOTION.slow, ease: MOTION.spring, stagger: 0.12, clearProps: 'all' });
+}
+
 // ---------- big moments ----------
 
 // Confetti in the five room colours falls over the page (big moments only:

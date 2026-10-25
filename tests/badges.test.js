@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { badgeKey, earnedBadges, badgeMessage, badgeType, badgeShelf, levelFor } from '../js/helpers/badges.js';
+import {
+  badgeKey, earnedBadges, badgeMessage, badgeType, badgeShelf, levelFor, levelProgress,
+} from '../js/helpers/badges.js';
 
 const code = 'OWL-07';
 
@@ -65,4 +67,13 @@ test('levels go up with badges, and the top level has no next level', () => {
   assert.equal(levelFor(5).name, 'Super Detective');
   assert.equal(levelFor(17).name, 'Master Detective');
   assert.equal(levelFor(17).next, null);
+});
+
+test('the level bar fills from one level to the next, and is full at the top', () => {
+  assert.equal(levelProgress(0), 0); // Rookie (0) -> Junior (2)
+  assert.equal(levelProgress(1), 50);
+  assert.equal(levelProgress(2), 0); // just became Junior: a new bar starts
+  assert.equal(levelProgress(4), 67); // Junior (2) -> Super (5): 2 of 3
+  assert.equal(levelProgress(9), 100);
+  assert.equal(levelProgress(15), 100);
 });

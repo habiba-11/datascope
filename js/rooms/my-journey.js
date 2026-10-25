@@ -12,6 +12,7 @@ import { readLog } from '../helpers/log.js';
 import { getSelectedScenarioId, getExplorerCode, getAllProgress } from '../storage/save.js';
 import { buildExport, exportFileName, toCSV, downloadFile } from '../storage/export.js';
 import { guardJourney } from '../phase-progress.js';
+import { pipSVG, pipMoodFor } from '../pip.js';
 
 const STOPS = [
   { phase: 'ask', icon: '❓', name: 'Ask' },
@@ -136,6 +137,31 @@ function save(extension, feedback) {
   feedback.hidden = false;
 }
 
+// A small Pip hops down the trail, stop by stop, to the last finished phase.
+// With reduced motion (or no GSAP) Pip just stands there.
+function walkPip() {
+  const trail = document.querySelector('.trail');
+  const done = [...trail.querySelectorAll('.stop.done')];
+  if (!done.length) return;
+  const pip = el('div', '', 'trail-pip');
+  pip.innerHTML = pipSVG(); // our own drawing, no child text
+  trail.append(pip);
+
+  const y = (stop) => stop.offsetTop + 4;
+  const gsap = window.gsap;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!gsap || reduceMotion) {
+    pip.style.transform = `translateY(${y(done[done.length - 1])}px)`;
+    return;
+  }
+  const walk = gsap.timeline({ delay: 0.6, onComplete: () => pipMoodFor('cheer', 2000) });
+  walk.set(pip, { y: y(done[0]) });
+  done.slice(1).forEach((stop) => {
+    walk.to(pip, { y: y(stop), duration: 0.35, ease: 'power1.inOut' })
+      .to(pip, { scaleY: 0.85, duration: 0.08, yoyo: true, repeat: 1 }); // a little landing squash
+  });
+}
+
 async function init() {
   if (guardJourney()) return; // not finished yet: sent to the furthest open room
 
@@ -167,6 +193,7 @@ async function init() {
   learned.append(el('h2', '🧠 What I learned'), el('p', recipe.teaches));
   document.getElementById('journey-top').append(idCardNode(journey, code), learned);
   document.getElementById('journey-trail').append(trailNode(journey, { cardTitle, kind: numberLabKind(recipe) }));
+  walkPip();
 
   const feedback = document.getElementById('save-feedback');
   document.getElementById('save-work-btn').addEventListener('click', () => save('json', feedback));

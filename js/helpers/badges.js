@@ -95,3 +95,11 @@ export function badgeMessage(entry) {
       return 'Great thinking! ⭐';
   }
 }
+
+// How far the child is from their level to the next one, 0 to 100 (100 at
+// the top level). Drawn as the bar under the badge counter (Part 21b).
+export function levelProgress(count) {
+  const level = levelFor(count);
+  if (!level.next) return 100;
+  return Math.round((100 * (count - level.min)) / (level.next.min - level.min));
+}

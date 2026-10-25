@@ -165,3 +165,23 @@
     break-inside: avoid;
   }
 }
+
+/* Pip hops down the trail to the last finished stop (Part 21b). */
+.trail {
+  position: relative;
+}
+
+/* Centred on the dashed trail line, standing on the stop's dot. */
+.trail-pip {
+  position: absolute;
+  top: 0;
+  left: -20px;
+  width: 36px;
+  pointer-events: none;
+}
+
+@media print {
+  .trail-pip {
+    display: none;
+  }
+}
