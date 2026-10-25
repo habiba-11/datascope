@@ -112,6 +112,30 @@
 
 .bar-fill {
   height: 100%;
+  animation: bar-grow 0.6s ease-out; /* bars grow from the left after each run */
+  transform-origin: left;
+}
+
+@keyframes bar-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* The chosen device tumbles while the trials run. */
+.trial-device {
+  font-size: 56px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.trial-device.roll {
+  animation: roll 0.6s ease-out;
+}
+
+@keyframes roll {
+  0% { transform: translateY(0) rotate(0); }
+  40% { transform: translateY(-24px) rotate(200deg); }
+  100% { transform: translateY(0) rotate(360deg); }
 }
 
 .bar-fill.theory {

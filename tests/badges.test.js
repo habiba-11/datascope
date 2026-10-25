@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { badgeKey, earnedBadges, badgeMessage } from '../js/helpers/badges.js';
+import { badgeKey, earnedBadges, badgeMessage, badgeType, badgeShelf, levelFor } from '../js/helpers/badges.js';
 
 const code = 'OWL-07';
 
@@ -43,4 +43,26 @@ test('each reasoning moment counts once, and only for this child', () => {
 
 test('Pip praises the reasoning, e.g. using a hint', () => {
   assert.match(badgeMessage({ type: 'meaning-task', result: 'after-hint' }), /hint/);
+});
+
+test('every badge key belongs to one named kind of badge', () => {
+  const keys = ['why:Fair coin', 'changed-mind', 'task:build-mean-6', 'not-tell:sleep-hours', 'claim:sleep-hours'];
+  assert.deepEqual(keys.map((key) => badgeType(key).name),
+    ['Why-Wizard', 'Mind-Changer', 'Number Cracker', 'Graph Skeptic', 'Data Detective']);
+});
+
+test('the shelf counts each kind and shows the rest as still to find', () => {
+  const shelf = badgeShelf(new Set(['why:Fair coin', 'why:Six-sided dice', 'task:build-mean-6']));
+  const counts = Object.fromEntries(shelf.map((b) => [b.id, b.count]));
+  assert.deepEqual(counts, { why: 2, 'changed-mind': 0, task: 1, 'not-tell': 0, claim: 0 });
+});
+
+test('levels go up with badges, and the top level has no next level', () => {
+  assert.equal(levelFor(0).name, 'Rookie Explorer');
+  assert.equal(levelFor(0).next.name, 'Junior Detective');
+  assert.equal(levelFor(2).name, 'Junior Detective');
+  assert.equal(levelFor(4).name, 'Junior Detective');
+  assert.equal(levelFor(5).name, 'Super Detective');
+  assert.equal(levelFor(17).name, 'Master Detective');
+  assert.equal(levelFor(17).next, null);
 });

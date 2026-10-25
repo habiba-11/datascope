@@ -162,9 +162,92 @@
   min-height: 320px;
 }
 
-/* The badge counter holds the star burst, so stars fly out from it. */
+/* The badge counter holds the star burst, so stars fly out from it.
+   It is also a button: tapping it opens the badge shelf. */
 .badge-counter {
   position: relative;
+  min-height: 48px; /* tap target */
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column; /* level on top, badge count below */
+  align-items: center;
+}
+
+.level-name {
+  font-weight: 700;
+}
+
+.shelf-level {
+  background: var(--color-bg);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+/* The badge shelf (js/badge-shelf.js), a window over the page. */
+.badge-shelf {
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 20px 24px;
+  max-width: 640px;
+  width: calc(100% - 32px);
+  animation: pop-in 0.3s ease-out;
+}
+
+.badge-shelf::backdrop {
+  background: rgba(20, 30, 60, 0.5);
+}
+
+.shelf-grid {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.shelf-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  border: 2px solid var(--color-navy);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.shelf-card.earned {
+  background: var(--color-plan);
+}
+
+.shelf-card.locked {
+  background: var(--color-bg);
+  border-style: dashed;
+}
+
+.shelf-icon {
+  font-size: 44px;
+  line-height: 1.1;
+}
+
+/* Not found yet: the icon is grey and faded (the words say so too). */
+.shelf-card.locked .shelf-icon {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+.shelf-name {
+  font-family: var(--font-heading);
+  font-size: 19px;
+}
+
+.shelf-status {
+  font-weight: 700;
+}
+
+.shelf-text {
+  font-size: 18px;
 }
 
 .burst-star {
@@ -181,7 +264,7 @@
   to { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.2); opacity: 0; }
 }
 
-/* Pip hops when a badge is earned. */
+/* Pip hops for good reasoning and right answers. */
 .pip-mascot.hop {
   animation: pip-hop 0.6s ease-out;
 }
@@ -190,6 +273,16 @@
   0%, 100% { transform: translateY(0); }
   40% { transform: translateY(-18px) rotate(-6deg); }
   70% { transform: translateY(0) rotate(4deg); }
+}
+
+/* Pip tilts his head, "hmm, let's think", after a wrong answer. */
+.pip-mascot.think {
+  animation: pip-think 0.9s ease-in-out;
+}
+
+@keyframes pip-think {
+  0%, 100% { transform: rotate(0); }
+  30%, 70% { transform: rotate(-14deg); }
 }
 
 .sound-toggle {

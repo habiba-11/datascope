@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Part 11 (11a-c done; 11d = real-device test by Habiba)**
+- Current part: **Part 12 (more gamification): 12a-d built, waiting for Habiba's test; 11d real-device test still open**
 - Last updated: 22 Oct 2026
 
 ## Done
@@ -41,9 +41,18 @@
   - docs/device-test-checklist.md: printable checklist for 11d.
   - 11e: badges for reasoning (js/helpers/badges.js, js/celebrate.js). Badges are counted from the log, once per reasoning moment: a certainty reason (per device), changing your mind with a reason, a meaning task solved (also after a hint), a real answer to "what does this graph NOT tell us?", a full claim card. Never for trials, hints, predictions or speed. A new badge: counter goes up, Pip says what was good, Pip hops, 8 stars burst (none with reduce motion), optional ding. "🔇 Sound: off" toggle in the sidebar, off by default (Web Audio, no sound files). 65 tests passing.
 
+- Part 12 (22 Oct 2026, gamification; Paper 30: badges, levels, instant feedback, but too much game distracts):
+  - 12a: js/sounds.js: every sound in one SOUNDS table (Web Audio, no files), playSound() only plays when sound is on (off by default). correct / tryAgain (soft, not a buzzer) on Number Lab tasks and Question Studio fix-its, tick per classmate + done fanfare in Data Hub (no ticks with reduced motion), spin on Chance Lab trials, done on the Evidence Card, badge ding 0.6 s later so it doesn't clash. A tap "pop" on every button was tried and removed (Habiba didn't like it).
+  - 12b: js/motion.js: animate() restarts a CSS animation; cheer() = chime + feedback bounce + Pip hops; encourage() = soft sound + gentle wobble + Pip tilts his head ("think"). Number Lab stat cards pop in one by one on Reveal; Chance Lab device tumbles on each run and the bars grow; Data Hub button and Evidence Card bounce when done. Keyframes in base.css / shell.css / number-lab.css / chance-lab.css; the global reduced-motion rule switches them all off.
+  - 12c: 5 named kinds of badge in badges.js (BADGE_TYPES, badgeType, badgeShelf): 🧙 Why-Wizard, 🔄 Mind-Changer, 🧮 Number Cracker, 🔍 Graph Skeptic, 🏅 Data Detective. Counting is unchanged (same keys, once each); kinds only group them. The sidebar counter is now a button that opens js/badge-shelf.js (a <dialog>: earned cards "✓ Earned × 2" in yellow, locked cards "🔒 Still to find" + where to find it, dashed + grey icon). Pip names the badge when it's earned. 2 new tests (67 passing). Checked at 1366x768 and 768x1024.
+  - 12d: explorer levels in badges.js (LEVELS, levelFor; tested): 🐣 Rookie Explorer (0) → 🔎 Junior Detective (2) → 🕵️ Super Detective (5) → 🏆 Master Detective (9 of 17 badges). The badge button shows level + count; the shelf says how many badges to the next level. Level-up: Pip announces it, confetti (motion.js confetti(): 40 pieces in room colours, removed by a timer, none with reduced motion), levelUp fanfare. Confetti also when the Evidence Card appears. 68 tests passing.
+
 ## Next
+- Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
+- 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
+- 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.
 - 11d (Habiba): run docs/device-test-checklist.md on a real Chromebook or tablet and report back.
-- Part 12: deploy to GitHub Pages, offline copy (fonts + Chart.js local), demo video, thesis screenshots.
+- Part 13 (was Part 12): deploy to GitHub Pages, offline copy (fonts + Chart.js local), demo video, thesis screenshots.
 
 ## Known bugs/open items
 - Number Lab's predict/reveal task and meaning tasks are still hardcoded to sleep-hours/fixed examples (by design — the "Build it"/"Mia"/shoe-size tasks are scenario-independent skill practice, not meant to follow the Question Studio pick). Only Data Hub, Graph Lab, and Evidence Board follow the selected scenario so far.
@@ -58,6 +67,7 @@
 - none yet
 
 ## Decisions log
+- 22 Oct 2026 (Part 12): more gamification, inserted before deployment (now Part 13). Every sound and motion is tied to a result or reasoning moment; no timers, leaderboards or point loss. No sound on ordinary button taps.
 - 15 Oct 2026: the UI must be colourful, playful, engaging and very simple for kids (see the UI section in CLAUDE.md).
 - 15 Oct 2026: short explanations by default.
 - 15 Oct 2026: deliverables are GitHub source, a live link, a demo video and an offline copy.

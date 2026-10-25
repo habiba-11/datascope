@@ -55,6 +55,52 @@ h1 {
   outline-offset: 3px;
 }
 
+/* Motions (Part 12b), played by js/motion.js. Each one is short and only
+   happens after the child does something, so nothing moves on its own. */
+@keyframes pop-in {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* A right answer: the box bounces once. */
+.cheer {
+  animation: cheer 0.5s ease-out;
+}
+
+@keyframes cheer {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.06); }
+  70% { transform: scale(0.98); }
+}
+
+/* A wrong answer: a small, gentle side-to-side wobble (not an angry shake). */
+.wobble {
+  animation: wobble 0.45s ease-in-out;
+}
+
+@keyframes wobble {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* Confetti pieces (js/motion.js), falling from the top of the screen. */
+.confetti {
+  position: fixed;
+  top: -16px;
+  width: 10px;
+  height: 14px;
+  border: 1px solid var(--color-navy);
+  border-radius: 3px;
+  pointer-events: none; /* never blocks a tap */
+  z-index: 1000;
+  animation: confetti-fall 1.8s ease-in forwards;
+}
+
+@keyframes confetti-fall {
+  to { transform: translateY(105vh) rotate(var(--spin)); }
+}
+
 /* Children (or teachers) who turn on "reduce motion" get no slides or pops. */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -1,6 +1,8 @@
 import { mountShell } from '../app.js';
 import { logEvent } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
+import { playSound } from '../sounds.js';
+import { animate } from '../motion.js';
 
 const DEVICES = {
   coin: { label: 'Fair coin', emoji: '🪙', outcomes: ['Heads', 'Tails'], weights: [1, 1], target: 'Heads' },
@@ -62,6 +64,7 @@ function init() {
       <section class="task" data-task="3" hidden>
         <h2 class="task-title">Run trials</h2>
         <p>Let's test it! Run some trials and compare what happened to the theory.</p>
+        <div class="trial-device" id="trial-device" aria-hidden="true"></div>
         <div class="trial-row">
           <button class="btn btn-run" data-count="10" type="button">Run 10</button>
           <button class="btn btn-run" data-count="50" type="button">Run 50</button>
@@ -144,6 +147,7 @@ function setupDevicePicker() {
       previousRun = null;
 
       showOutcomes(selectedDevice, chips);
+      document.getElementById('trial-device').textContent = selectedDevice.emoji;
       outcomesBox.hidden = false;
 
       markComplete(1);
@@ -277,6 +281,8 @@ function setupTrials() {
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const count = Number(btn.dataset.count);
+      playSound('spin');
+      animate(document.getElementById('trial-device'), 'roll');
       const totalWeight = selectedDevice.weights.reduce((a, b) => a + b, 0);
       const results = new Map(selectedDevice.outcomes.map((o) => [o, 0]));
 

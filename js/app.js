@@ -1,5 +1,5 @@
 import { getExplorerCode } from './storage/save.js';
-import { countBadges, setupCelebrations } from './celebrate.js';
+import { countBadges, counterHTML, setupCelebrations } from './celebrate.js';
 
 const STEPS = [
   { id: 'ask', label: 'Ask', icon: '❓', color: 'ask', href: 'question-studio.html' },
@@ -53,7 +53,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage 
       <aside class="sidebar">
         <div class="speech-bubble">${pipMessage}</div>
         <div class="pip-mascot" aria-hidden="true">🦉</div>
-        <div class="badge-counter" id="badge-counter" aria-live="polite">⭐ Explorer badges: ${countBadges()}</div>
+        <button class="btn badge-counter" id="badge-counter" type="button" aria-live="polite">${counterHTML(countBadges())}</button>
         ${codeBadge()}
         <button class="btn sound-toggle" id="sound-toggle" type="button" aria-pressed="false">🔇 Sound: off</button>
       </aside>

@@ -3,6 +3,8 @@ import { generateClassData } from '../helpers/generator.js';
 import { compareValues } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
 import { logEvent } from '../helpers/log.js';
+import { playSound } from '../sounds.js';
+import { animate, pipReacts } from '../motion.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 
 const NEXT_ROOM_LINK =
@@ -141,11 +143,16 @@ function wireUpSurvey(recipe, classData, p, onDone) {
 
       progressFill.style.width = `${(revealed / values.length) * 100}%`;
       progressText.textContent = `${revealed} of ${values.length} classmates`;
+      // One tick per answer. With reduced motion all answers arrive at once, so no ticks.
+      if (!reduceMotion) playSound('tick');
 
       if (revealed < values.length) {
         setTimeout(revealNext, reduceMotion ? 0 : 400);
       } else {
         button.textContent = 'Survey complete!';
+        playSound('done');
+        animate(button, 'cheer');
+        pipReacts('hop');
         // Scenario + seed recreate exactly the data this child saw (architecture section 5).
         logEvent('data-hub', 'data-seen', {
           scenarioId: classData.scenarioId, seed: classData.seed, classSize: values.length,

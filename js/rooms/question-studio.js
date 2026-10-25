@@ -2,6 +2,7 @@ import { mountShell, setCurrentStep } from '../app.js';
 import { checkQuestion } from '../helpers/checker.js';
 import { logEvent } from '../helpers/log.js';
 import { setSelectedScenarioId } from '../storage/save.js';
+import { cheer } from '../motion.js';
 
 const SCENARIO_CARDS = [
   { id: 'sleep-hours', emoji: '😴' },
@@ -230,6 +231,8 @@ function setupFixIt() {
       : '<li class="ok">✅ Looks good!</li>';
 
     if (trackId) {
+      // Cheer once, at the moment a flawed question becomes clear (not on every key).
+      if (warnings.length === 0 && !clearState[trackId]) cheer(list);
       clearState[trackId] = warnings.length === 0;
       if (Object.values(clearState).every(Boolean)) {
         markComplete(2);

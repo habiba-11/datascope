@@ -4,6 +4,8 @@ import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
+import { playSound } from '../sounds.js';
+import { animate, pipReacts, confetti } from '../motion.js';
 import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
 import { buildExport, exportFileName, toCSV, downloadFile } from '../storage/export.js';
 
@@ -307,6 +309,10 @@ function setupAudienceForm() {
   function checkComplete() {
     if (selectedAudience && selectedForm) {
       renderCard();
+      playSound('done');
+      animate(document.getElementById('evidence-card'), 'cheer');
+      confetti();
+      pipReacts('hop');
       markComplete(4);
     }
   }

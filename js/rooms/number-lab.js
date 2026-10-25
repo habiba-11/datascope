@@ -2,6 +2,7 @@ import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
 import { logEvent, trackMeaningTask } from '../helpers/log.js';
+import { cheer, encourage } from '../motion.js';
 
 const taskComplete = { 1: false, 2: false, 3: false, 4: false };
 let currentTask = 1;
@@ -255,9 +256,11 @@ function setupBuildIt() {
     if (actualMean === 6) {
       feedback.textContent = "Yes! Your numbers' mean is exactly 6. 🎉";
       tracker.solved();
+      cheer(feedback);
       markComplete(2);
     } else {
       tracker.wrong();
+      encourage(feedback);
       feedback.textContent = `Your numbers' mean is ${actualMean.toFixed(2)}. Try adjusting them to reach exactly 6.`;
     }
     feedback.hidden = false;
@@ -282,10 +285,12 @@ function wireRetryChoices(container, feedback, { task, isCorrect, correctText, h
         solved = true;
         feedback.textContent = correctText;
         tracker.solved();
+        cheer(feedback);
         onCorrect();
       } else {
         feedback.textContent = hintText;
         tracker.wrong();
+        encourage(feedback);
       }
       feedback.hidden = false;
     });
