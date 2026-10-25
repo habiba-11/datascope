@@ -3,6 +3,7 @@ import { logEvent } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { playSound } from '../sounds.js';
 import { animate } from '../motion.js';
+import { completePhase } from '../phase-progress.js';
 
 const DEVICES = {
   coin: { label: 'Fair coin', emoji: '🪙', outcomes: ['Heads', 'Tails'], weights: [1, 1], target: 'Heads' },
@@ -23,7 +24,7 @@ function init() {
     step: 'explore',
     accent: 'explore',
     explorePage: 'chance',
-    intro: 'chance',
+    phase: 'chance',
     pipMessage: "Hoo-hoo! Let's test our predictions with real trials!",
     contentHTML: `
       <h1 class="room-title">🎲 Chance Lab</h1>
@@ -119,6 +120,8 @@ function showTask(n) {
 
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
+  // The room's phase is done when every task is done.
+  if (Object.values(taskComplete).every(Boolean)) completePhase('chance');
   if (taskNum === 3) document.getElementById('next-room-btn').hidden = false;
   if (currentTask === taskNum) {
     document.getElementById('next-btn').disabled = taskNum === 3;

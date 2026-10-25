@@ -5,6 +5,7 @@ import { parseExportFile, summarizeChild, MISCONCEPTION_TAGS, tagEntries } from 
 import { toCSV, downloadFile, exportFileName } from './storage/export.js';
 import {
   getTeacherImports, setTeacherImports, getTeacherTags, setTeacherTags, clearChildData,
+  getPreviewAll, setPreviewAll,
 } from './storage/save.js';
 
 let imports = getTeacherImports(); // { "OWL-07": file, ... }
@@ -169,4 +170,20 @@ twoTapButton(document.getElementById('clear-device-btn'), '⚠️ Tap again to c
   say("The child's code and work were cleared from this device. The next child can start fresh.");
 });
 
+// ---------- preview: open every room on this device ----------
+
+const previewBtn = document.getElementById('preview-btn');
+
+function showPreviewState() {
+  const on = getPreviewAll();
+  previewBtn.textContent = on ? '👀 Preview is ON: all rooms open (tap to turn off)' : '🔒 Preview is OFF: tap to open all rooms';
+  previewBtn.setAttribute('aria-pressed', String(on));
+}
+
+previewBtn.addEventListener('click', () => {
+  setPreviewAll(!getPreviewAll());
+  showPreviewState();
+});
+
+showPreviewState();
 render();

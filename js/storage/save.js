@@ -86,11 +86,50 @@ export function markIntroSeen(phase) {
   writeItem(INTROS_KEY, JSON.stringify(all));
 }
 
+// Finished phases (Part 15), per child code AND scenario, so each
+// investigation has its own progress:
+// { "OWL-07": { "sleep-hours": ["ask", "plan"], "shoe-sizes": ["ask"] } }.
+const PROGRESS_KEY = 'datascope:progress';
+
+export function getDonePhases(scenarioId = getSelectedScenarioId()) {
+  const byScenario = readObject(PROGRESS_KEY)[getExplorerCode() || 'NO-CODE'] || {};
+  return byScenario[scenarioId] || [];
+}
+
+// All of this child's progress, for the file they save for the teacher.
+export function getAllProgress() {
+  return readObject(PROGRESS_KEY)[getExplorerCode() || 'NO-CODE'] || {};
+}
+
+// Returns true if the phase is newly done, false if it was done already.
+export function markPhaseDone(phase, scenarioId = getSelectedScenarioId()) {
+  const all = readObject(PROGRESS_KEY);
+  const code = getExplorerCode() || 'NO-CODE';
+  all[code] = all[code] || {};
+  const done = all[code][scenarioId] || [];
+  if (done.includes(phase)) return false;
+  all[code][scenarioId] = [...done, phase];
+  writeItem(PROGRESS_KEY, JSON.stringify(all));
+  return true;
+}
+
+// Teacher's switch: open every room on this device (to preview or test).
+// Kept when a child's work is cleared, because it belongs to the teacher.
+const PREVIEW_KEY = 'datascope:previewAll';
+
+export function getPreviewAll() {
+  return readItem(PREVIEW_KEY) === 'on';
+}
+
+export function setPreviewAll(on) {
+  writeItem(PREVIEW_KEY, on ? 'on' : 'off');
+}
+
 // For shared devices: removes the child's code, chosen scenario, reasoning
-// log and seen pop-ups from THIS device, so the next child starts clean.
-// Teacher data is kept.
+// log, seen pop-ups and progress from THIS device, so the next child starts
+// clean. Teacher data is kept.
 export function clearChildData() {
-  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY, INTROS_KEY]) {
+  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY, INTROS_KEY, PROGRESS_KEY]) {
     memory.delete(key);
     try {
       localStorage.removeItem(key);

@@ -3,6 +3,7 @@ import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
 import { logEvent, trackMeaningTask } from '../helpers/log.js';
 import { cheer, encourage } from '../motion.js';
+import { completePhase } from '../phase-progress.js';
 
 const taskComplete = { 1: false, 2: false, 3: false, 4: false };
 let currentTask = 1;
@@ -16,7 +17,7 @@ async function init() {
     step: 'explore',
     accent: 'explore',
     explorePage: 'number',
-    intro: 'number',
+    phase: 'number',
     pipMessage: "Hoo-hoo! Make a guess first, then let's see what the numbers really say!",
     contentHTML: `
       <h1 class="room-title">🔢 Number Lab</h1>
@@ -133,6 +134,8 @@ function showTask(n) {
 
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
+  // The room's phase is done when every task is done.
+  if (Object.values(taskComplete).every(Boolean)) completePhase('number');
   if (taskNum === 4) document.getElementById('next-room-btn').hidden = false;
   if (currentTask === taskNum) {
     document.getElementById('next-btn').disabled = taskNum === 4;

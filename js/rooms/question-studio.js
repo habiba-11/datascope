@@ -3,7 +3,7 @@ import { checkQuestion } from '../helpers/checker.js';
 import { logEvent } from '../helpers/log.js';
 import { setSelectedScenarioId } from '../storage/save.js';
 import { cheer } from '../motion.js';
-import { setIntroPhase } from '../phase-intro.js';
+import { enterPhase, completePhase } from '../phase-progress.js';
 
 const SCENARIO_CARDS = [
   { id: 'sleep-hours', emoji: '😴' },
@@ -32,6 +32,7 @@ async function init() {
   mountShell({
     step: 'ask',
     accent: 'ask',
+    phase: 'ask',
     pipMessage: "Hoo-hoo! I'm Pip. Let's pick a question to investigate!",
     contentHTML: `
       <h1 class="room-title">❓ Question Studio</h1>
@@ -115,8 +116,8 @@ function showTask(n) {
   badge.textContent = phase === 'plan' ? '🗺️ Plan' : '❓ Ask';
   badge.style.setProperty('--phase-color', `var(--color-${phase})`);
   setCurrentStep(phase);
-  // Ask and Plan share this page, so the Plan intro opens on reaching Task 3.
-  setIntroPhase(phase);
+  // Ask and Plan share this page, so Plan starts (and its intro opens) on reaching Task 3.
+  enterPhase(phase);
 
   if (n === 3) renderPredictTask();
 }
@@ -126,6 +127,11 @@ function markComplete(taskNum) {
   if (currentTask === taskNum) {
     document.getElementById('next-btn').disabled = taskNum === 3;
   }
+  // Ask is done when a scenario is picked AND both questions are fixed.
+  // Progress is saved per scenario, so picking another scenario later
+  // also counts as finishing Ask for that one.
+  if (taskComplete[1] && taskComplete[2]) completePhase('ask');
+  if (taskNum === 3) completePhase('plan');
 }
 
 function setupTaskNav() {

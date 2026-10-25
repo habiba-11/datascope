@@ -6,8 +6,9 @@ import { logEvent, readLog } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { playSound } from '../sounds.js';
 import { animate, pipReacts, confetti } from '../motion.js';
-import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
+import { getSelectedScenarioId, getExplorerCode, getAllProgress } from '../storage/save.js';
 import { buildExport, exportFileName, toCSV, downloadFile } from '../storage/export.js';
+import { completePhase } from '../phase-progress.js';
 
 const taskComplete = { 1: false, 2: false, 3: false, 4: false };
 let currentTask = 1;
@@ -49,7 +50,7 @@ async function init() {
 
   mountShell({
     step: 'conclude',
-    intro: 'conclude',
+    phase: 'conclude',
     accent: 'conclude',
     pipMessage: "Hoo-hoo! Time to share what we found. What do you think, and why?",
     contentHTML: `
@@ -145,6 +146,8 @@ function showTask(n) {
 
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
+  // The room's phase is done when every task is done.
+  if (Object.values(taskComplete).every(Boolean)) completePhase('conclude');
   if (currentTask === taskNum) {
     document.getElementById('next-btn').disabled = taskNum === 4;
   }
@@ -255,7 +258,7 @@ function setupSaveWork() {
     const entries = readLog().filter((entry) => entry.code === code);
     const fileName = exportFileName(code, extension);
     if (extension === 'json') {
-      downloadFile(fileName, JSON.stringify(buildExport(code, entries), null, 2), 'application/json');
+      downloadFile(fileName, JSON.stringify(buildExport(code, entries, new Date(), getAllProgress()), null, 2), 'application/json');
     } else {
       downloadFile(fileName, toCSV(entries), 'text/csv');
     }

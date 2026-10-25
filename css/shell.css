@@ -69,6 +69,53 @@
   background-image: repeating-linear-gradient(to right, var(--color-navy) 0 6px, transparent 6px 12px);
 }
 
+/* Part 15: a newly unlocked step slides in, and its connector draws itself. */
+.step-new {
+  animation: step-slide-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes step-slide-in {
+  from { transform: translateX(-24px) scale(0.6); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.connector-new {
+  transform-origin: left;
+  animation: connector-draw 0.4s ease-out;
+}
+
+@keyframes connector-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* A finished step: a ✅ next to its name (not only a colour change). */
+.step-done {
+  margin-left: 2px;
+  font-size: 12px;
+}
+
+/* Read by screen readers, not shown on screen. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Shown on every room while the teacher's "open all rooms" preview is on. */
+.preview-banner {
+  margin: 0 24px 12px;
+  padding: 8px 16px;
+  background: var(--color-plan);
+  border: 2px dashed var(--color-navy);
+  border-radius: var(--radius-button);
+  font-weight: 700;
+  text-align: center;
+}
+
 .shell-body {
   display: flex;
   gap: 24px;

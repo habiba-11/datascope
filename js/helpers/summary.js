@@ -1,7 +1,8 @@
 // Layer 3: helpers for the teacher view. They read the files children saved
 // (js/storage/export.js) and summarise each child's reasoning log.
 import { isValidCode, makeEntry } from './log.js';
-import { FORMAT_VERSION } from '../storage/export.js';
+// Files from before Part 15 are version 1; newer ones are version 2.
+export const READABLE_VERSIONS = [1, 2];
 
 // Misconceptions a teacher can tag (architecture section 7), each taken from
 // docs/literature-key-findings.md. `papers` are the paper numbers.
@@ -27,7 +28,7 @@ export function parseExportFile(text) {
   if (!file || file.app !== 'DataScope: The Evidence Lab') {
     return { ok: false, reason: 'not a DataScope file' };
   }
-  if (file.formatVersion !== FORMAT_VERSION) {
+  if (!READABLE_VERSIONS.includes(file.formatVersion)) {
     return { ok: false, reason: `unknown file version ${file.formatVersion}` };
   }
   if (!isValidCode(file.code || '') || !Array.isArray(file.entries)) {

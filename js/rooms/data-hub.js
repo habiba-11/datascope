@@ -6,6 +6,7 @@ import { logEvent } from '../helpers/log.js';
 import { playSound } from '../sounds.js';
 import { animate, pipReacts } from '../motion.js';
 import { getSelectedScenarioId } from '../storage/save.js';
+import { completePhase } from '../phase-progress.js';
 
 const NEXT_ROOM_LINK =
   '<a class="btn btn-main next-room-btn" id="next-room-btn" href="graph-lab.html" hidden>📊 Let\'s draw a graph! →</a>';
@@ -16,7 +17,7 @@ async function init() {
 
   mountShell({
     step: 'collect',
-    intro: 'collect',
+    phase: 'collect',
     accent: 'collect',
     pipMessage: partner
       ? 'Hoo-hoo! Two pretend classes answered the same question. Survey Class A first, then Class B!'
@@ -24,8 +25,10 @@ async function init() {
     contentHTML: partner ? compareLayout(recipe, partner) : singleLayout(recipe),
   });
 
+  // Collect is done when every class has been surveyed.
   const showNextRoom = () => {
     document.getElementById('next-room-btn').hidden = false;
+    completePhase('collect');
   };
 
   if (partner) {

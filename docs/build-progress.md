@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-14 built (pop-up, phase intros), next is Part 15** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-15 built (pop-up, phase intros, progressive step bar), next is Part 16** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -62,8 +62,19 @@
   - New log event popup-seen { phase, auto }.
   - Checked in headless Chrome at 1366x768 (Data Hub) and 768x1024 (Question Studio): one pop-up, focus on "Let's go!".
 
+- Part 15 (25 Oct 2026, Prof comment 2), 89 tests passing:
+  - js/helpers/progress.js (pure, tests/progress.test.js): phases ask → plan → collect → graph → number → chance → conclude; unlockedPhases, visibleSteps, isStepDone, guardRedirect.
+  - save.js: finished phases per code AND scenario (getDonePhases / markPhaseDone / getAllProgress), cleared by clearChildData; teacher preview switch (getPreviewAll / setPreviewAll), kept when a child's work is cleared.
+  - js/phase-progress.js: guardPage (locked room → furthest open room with "?locked=1", Pip says it's still locked), enterPhase (logs phase-start while not done, opens the intro), completePhase (saves, logs phase-complete once, tells the shell).
+  - app.js: the step bar shows only open steps, ✅ + "(done)" for screen readers on finished ones; a newly opened step slides in and its connector draws itself; Explore tabs open one by one; Pip says "You unlocked ...". mountShell({ phase }) replaces { intro }.
+  - Done rules (confirmed with Habiba): Ask = scenario + both fix-its; Plan = prediction saved; Collect = survey complete (both classes for reading); Graph Lab = both reflections ≥ 10 characters (new gate: the Next link is hidden until then); Number Lab = all 4 tasks; Chance Lab = all 3 tasks; Conclude = Evidence Card built (saving moves to My Journey in Part 19).
+  - Teacher view: "Preview: open all rooms on this device" switch; a yellow banner shows on every room while it is on; phase events are not logged in preview.
+  - Export FORMAT_VERSION 2 (adds `progress`); the teacher view reads versions 1 and 2.
+  - Checked by clicking through in headless Chrome (scratch CDP script, nothing added to the project): locked URL bounces with Pip line, each step slides in, Graph Lab gate, Chance Lab locked → Number Lab, reload keeps progress, preview opens all. No console errors.
+  - Known: the active Explore tab shows both the "selected" ✓ and the "done" ✅ (tidy up in Part 21).
+
 ## Next
-- Part 15: progress engine + progressive step bar (confirm the completion rules and the open questions first).
+- Part 16: phase-end feedback card (stars for reasoning, wins, one nudge, "Unlock next phase" button).
 - Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
 - 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
 - 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.
@@ -84,7 +95,8 @@
 
 ## Decisions log
 - 25 Oct 2026 (Round 2 start): Prof's 8 comments planned as Parts 13 to 24 (docs/round-2-plan.md). Backend = optional bonus behind a flag; rewards for reasoning, never speed; DEMO data never exported; deploy locked until "Prof confirmed" (all in CLAUDE.md). Number Lab following the chosen scenario (Part 17b) reverses the earlier "by design" note in Known bugs.
-- Still open (decide before the part that needs it): route guard vs "a teacher can open any room" (Part 15); Conclude done = card built, saving moves to My Journey (Parts 15/19); real rubric levels from the Paper 7 and 13 PDFs (Part 20); no "time per phase" on the child's page (Part 19).
+- 25 Oct 2026 (Part 15): done rules as in the plan, but Conclude = card built (saving moves to My Journey); teacher "open all rooms" preview switch keeps the architecture's "a teacher can open any room"; progress per code + scenario (switching back restores it); Explore rooms open in order Graph → Number → Chance.
+- Still open (decide before the part that needs it): real rubric levels from the Paper 7 and 13 PDFs (Part 20); no "time per phase" on the child's page (Part 19).
 - 22 Oct 2026 (Part 12): more gamification, inserted before deployment (now Part 13). Every sound and motion is tied to a result or reasoning moment; no timers, leaderboards or point loss. No sound on ordinary button taps.
 - 15 Oct 2026: the UI must be colourful, playful, engaging and very simple for kids (see the UI section in CLAUDE.md).
 - 15 Oct 2026: short explanations by default.

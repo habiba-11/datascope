@@ -6,6 +6,10 @@ import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
 import { logEvent } from '../helpers/log.js';
 import { addHintButton } from '../helpers/prompts.js';
 import { getSelectedScenarioId } from '../storage/save.js';
+import { completePhase, isPhaseDone } from '../phase-progress.js';
+
+// A real answer, not just "ok": both reflections need at least this many characters.
+const MIN_REFLECTION = 10;
 
 Chart.register(directLabelsPlugin);
 
@@ -41,7 +45,7 @@ async function init() {
     step: 'explore',
     accent: 'explore',
     explorePage: 'graph',
-    intro: 'graph',
+    phase: 'graph',
     pipMessage: partner
       ? 'Hoo-hoo! Two classes, same question. Switch the graph type and compare them!'
       : 'Hoo-hoo! Same data, different graphs. Try each button and see what changes!',
@@ -61,7 +65,8 @@ async function init() {
         <label for="not-tell">What does ${partner ? 'each' : 'this'} graph NOT tell you?</label>
         <textarea id="not-tell" rows="2"></textarea>
       </div>
-      <a class="btn btn-main next-room-btn" href="number-lab.html">🔢 Next: Number Lab →</a>
+      <p class="feedback" id="graph-feedback">✏️ Write an answer in both boxes to open Number Lab.</p>
+      <a class="btn btn-main next-room-btn" id="next-room-btn" href="number-lab.html" hidden>🔢 Next: Number Lab →</a>
     `,
   });
 
@@ -97,6 +102,24 @@ async function init() {
       });
     });
   });
+
+  // Graph Lab is done when both reflections have a real answer.
+  const nextLink = document.getElementById('next-room-btn');
+  const graphFeedback = document.getElementById('graph-feedback');
+  function checkDone() {
+    const answered = ['tell', 'not-tell']
+      .every((id) => document.getElementById(id).value.trim().length >= MIN_REFLECTION);
+    if (!answered) return;
+    nextLink.hidden = false;
+    graphFeedback.textContent = '✅ Great thinking! Number Lab is open.';
+    completePhase('graph');
+  }
+  ['tell', 'not-tell'].forEach((id) => document.getElementById(id).addEventListener('input', checkDone));
+  // Coming back after finishing: the way on is already open.
+  if (isPhaseDone('graph')) {
+    nextLink.hidden = false;
+    graphFeedback.hidden = true;
+  }
 
   addHintButton(document.getElementById('tell'), 'graph-tell', 'graph-lab');
   addHintButton(document.getElementById('not-tell'), 'graph-not-tell', 'graph-lab');

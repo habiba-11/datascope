@@ -1,10 +1,13 @@
 // Layer 4: turns the reasoning log into files the child hands in to the teacher.
 // Nothing is sent anywhere: the browser just saves a file to Downloads.
 
-export const FORMAT_VERSION = 1;
+// Version 2 (Part 15) adds `progress` and the phase-start / phase-complete
+// log events. The teacher view still reads version 1 files.
+export const FORMAT_VERSION = 2;
 
 // The JSON file: everything about one child's work, under the code only.
-export function buildExport(code, entries, now = new Date()) {
+// `progress` is the finished phases per scenario, e.g. { "sleep-hours": ["ask", "plan"] }.
+export function buildExport(code, entries, now = new Date(), progress = {}) {
   return {
     app: 'DataScope: The Evidence Lab',
     formatVersion: FORMAT_VERSION,
@@ -12,6 +15,7 @@ export function buildExport(code, entries, now = new Date()) {
     code,
     note: 'The survey data in DataScope is synthetic (a pretend class), made for teaching. '
       + 'This file holds one child\'s reasoning log under an anonymous code.',
+    progress,
     entries,
   };
 }

@@ -22,6 +22,18 @@ test('a file saved by DataScope is accepted', () => {
   assert.equal(result.file.code, 'OWL-07');
 });
 
+test('both old (version 1) and new (version 2) files are accepted; unknown versions are not', () => {
+  const v2 = buildExport('OWL-07', entries, new Date(), { 'sleep-hours': ['ask', 'plan'] });
+  assert.equal(v2.formatVersion, 2);
+  assert.deepEqual(parseExportFile(JSON.stringify(v2)).file.progress, { 'sleep-hours': ['ask', 'plan'] });
+
+  const v1 = { ...v2, formatVersion: 1 };
+  delete v1.progress; // version 1 files had no progress
+  assert.equal(parseExportFile(JSON.stringify(v1)).ok, true);
+
+  assert.equal(parseExportFile(JSON.stringify({ ...v2, formatVersion: 3 })).reason, 'unknown file version 3');
+});
+
 test('other files are refused with a reason', () => {
   assert.equal(parseExportFile('not json').reason, 'not a JSON file');
   assert.equal(parseExportFile('{"app":"Something else"}').reason, 'not a DataScope file');
