@@ -47,9 +47,21 @@ export function makeEntry(code, room, type, details = {}, now = new Date()) {
   return { code, time: now.toISOString(), room, type, ...details };
 }
 
-// Records one moment for the current child.
+// A random id like "3f2b...-...", so each moment can be sent to the online
+// database once and never twice (Part 22). crypto.randomUUID only works on
+// https or localhost, so there is a fallback that works everywhere.
+export function newId() {
+  if (globalThis.crypto && crypto.randomUUID) return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40; // version 4
+  b[8] = (b[8] & 0x3f) | 0x80; // variant
+  const hex = [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+// Records one moment for the current child (with an id, for the online database).
 export function logEvent(room, type, details) {
-  const entry = makeEntry(getExplorerCode(), room, type, details);
+  const entry = { id: newId(), ...makeEntry(getExplorerCode(), room, type, details) };
   addLogEntry(entry);
   // Tell the page something was logged (the shell uses this for badges).
   // Node tests have no window, so we only do this in the browser.

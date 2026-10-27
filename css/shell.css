@@ -392,3 +392,19 @@
 .shelf-grid {
   perspective: 800px;
 }
+
+/* Part 22: is the work saved online? (words + emoji, never colour only) */
+.sync-status {
+  margin: 0;
+  padding: 6px 10px;
+  border: 2px solid var(--color-navy);
+  border-radius: var(--radius-button);
+  background: white;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.sync-status[data-status="error"] {
+  background: var(--color-plan);
+}

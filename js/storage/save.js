@@ -53,6 +53,11 @@ export function getLogEntries() {
   }
 }
 
+// Replaces the whole log (used once, to give old entries an id: Part 22).
+export function setLogEntries(entries) {
+  writeItem(LOG_KEY, JSON.stringify(entries));
+}
+
 export function addLogEntry(entry) {
   const entries = getLogEntries();
   entries.push(entry);
@@ -68,6 +73,24 @@ export function getSoundOn() {
 
 export function setSoundOn(on) {
   writeItem(SOUND_KEY, on ? 'on' : 'off');
+}
+
+// The ids of log entries already sent to the online database (Part 22),
+// so each entry is sent once. Entries that can never be accepted are added too.
+const SENT_KEY = 'datascope:sentIds';
+
+export function getSentIds() {
+  try {
+    return new Set(JSON.parse(readItem(SENT_KEY)) || []);
+  } catch {
+    return new Set();
+  }
+}
+
+export function addSentIds(ids) {
+  const all = getSentIds();
+  ids.forEach((id) => all.add(id));
+  writeItem(SENT_KEY, JSON.stringify([...all]));
 }
 
 // Phase intro pop-ups each child has already seen (Part 14), kept per code:
@@ -129,7 +152,7 @@ export function setPreviewAll(on) {
 // log, seen pop-ups and progress from THIS device, so the next child starts
 // clean. Teacher data is kept.
 export function clearChildData() {
-  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY, INTROS_KEY, PROGRESS_KEY]) {
+  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY, INTROS_KEY, PROGRESS_KEY, SENT_KEY]) {
     memory.delete(key);
     try {
       localStorage.removeItem(key);

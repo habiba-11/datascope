@@ -186,3 +186,10 @@
     display: none;
   }
 }
+
+/* Part 22: with the online database on, the work is already sent. */
+.online-note {
+  font-weight: 700;
+  font-size: 20px;
+  margin: 0;
+}

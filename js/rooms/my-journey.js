@@ -12,6 +12,7 @@ import { readLog } from '../helpers/log.js';
 import { getSelectedScenarioId, getExplorerCode, getAllProgress, getDonePhases } from '../storage/save.js';
 import { buildExport, exportFileName, toCSV, downloadFile } from '../storage/export.js';
 import { guardJourney } from '../phase-progress.js';
+import { backendReady } from '../config.js';
 import { pipSVG, pipMoodFor } from '../pip.js';
 
 const STOPS = [
@@ -181,8 +182,11 @@ async function init() {
       <div class="journey-top" id="journey-top"></div>
       <div id="journey-trail"></div>
       <div class="journey-actions">
-        <button class="btn btn-main" id="save-work-btn" type="button">📤 Save my work for my teacher</button>
-        <button class="link-btn" id="save-csv-btn" type="button">or save it as a table (CSV)</button>
+        ${backendReady()
+    // With the online database on, nothing to download: the work is already sent.
+    ? '<p class="online-note">☁️ Your work goes to your teacher by itself. Nothing to save!</p>'
+    : `<button class="btn btn-main" id="save-work-btn" type="button">📤 Save my work for my teacher</button>
+        <button class="link-btn" id="save-csv-btn" type="button">or save it as a table (CSV)</button>`}
         <p class="feedback" id="save-feedback" hidden></p>
         <button class="btn" id="print-btn" type="button">🖨️ Print my journey</button>
         <a class="btn" href="question-studio.html">🔁 Start a new investigation →</a>
@@ -196,9 +200,12 @@ async function init() {
   document.getElementById('journey-trail').append(trailNode(journey, { cardTitle, kind: numberLabKind(recipe) }));
   walkPip();
 
-  const feedback = document.getElementById('save-feedback');
-  document.getElementById('save-work-btn').addEventListener('click', () => save('json', feedback));
-  document.getElementById('save-csv-btn').addEventListener('click', () => save('csv', feedback));
+  // Files are only the fallback when the online database is switched off.
+  if (!backendReady()) {
+    const feedback = document.getElementById('save-feedback');
+    document.getElementById('save-work-btn').addEventListener('click', () => save('json', feedback));
+    document.getElementById('save-csv-btn').addEventListener('click', () => save('csv', feedback));
+  }
   document.getElementById('print-btn').addEventListener('click', () => window.print());
 }
 

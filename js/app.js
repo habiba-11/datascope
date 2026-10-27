@@ -6,6 +6,8 @@ import { visibleSteps, isStepDone, isUnlocked } from './helpers/progress.js';
 import { pipReacts, enterRoom, float, unlockStep, confetti } from './motion.js';
 import { pipSVG } from './pip.js';
 import { watchPressedState } from './pressed-state.js';
+import { startSync, STATUS_TEXT } from './storage/sync.js';
+import { backendReady } from './config.js';
 
 const STEPS = [
   { id: 'ask', label: 'Ask', icon: '❓', color: 'ask', href: 'question-studio.html' },
@@ -55,6 +57,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
         <button class="btn badge-counter" id="badge-counter" type="button" aria-live="polite">${counterHTML(countBadges())}</button>
         ${codeBadge()}
         <button class="btn sound-toggle" id="sound-toggle" type="button" aria-pressed="false">🔇 Sound: off</button>
+        ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}
       </aside>
       <main class="room-content" style="--accent: var(--color-${accent})">
         ${step === 'explore' ? `<nav class="explore-subnav" aria-label="Explore rooms">${exploreTabsHTML()}</nav>` : ''}
@@ -76,6 +79,13 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   setupCelebrations();
   setupInfoButton();
   watchPressedState();
+  // Part 22: send the log to the online database (only when it is switched on).
+  startSync((status) => {
+    const label = document.getElementById('sync-status');
+    if (!label) return;
+    label.textContent = STATUS_TEXT[status];
+    label.dataset.status = status;
+  });
   enterRoom(root.querySelector('.room-content'));
   float(root.querySelector('.pip-mascot .pip'));
   window.addEventListener('datascope:phase-done', showUnlocked);

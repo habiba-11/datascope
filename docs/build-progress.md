@@ -203,8 +203,13 @@
 
 - Gap fixes (27 Oct 2026), 174 tests passing: picked answers now tell screen readers (js/pressed-state.js keeps aria-pressed in step with the "active"/"selected" class on every choice, certainty, chart button, scenario and device card, pop-ups included); the current Explore tab shows 📍 instead of ✓; Chance Lab "How likely?" shows the spinner picture again for spinners.
 
+- Part 22a-b (27 Oct 2026), 180 tests passing:
+  - 22a: backend/schema.sql (log_entries, teacher_tags, teachers; row-level security + explicit grants: anon may only INSERT log entries with a valid code; only accounts in teachers (is_teacher()) may read/delete); js/config.js (BACKEND.enabled false until set up); docs/backend-setup-guide.md (beginner, 11 steps + troubleshooting); CLAUDE.md decisions.
+  - 22b: save first, send later. Every log entry gets an id (newId in log.js; old entries get one once). helpers/outbox.js (toRow/fromRow/withIds/pendingEntries/batches, tested). storage/sync.js sends waiting entries with plain fetch to /rest/v1/log_entries in batches of 50; 409 (already there) counts as sent, 400 (can never be accepted) is skipped so it cannot block the rest; retry every 30 s and when the internet comes back. Sidebar status: ☁️ Saved online / ⏳ Sending... / 📴 Offline / ⚠️ Not sent yet. My journey: no file buttons when the database is on.
+  - Tested against a fake Supabase (scratch tool, same rules): online send, Wi-Fi drop (saved in browser, status offline), back online (all sent, 0 duplicates), reload (nothing sent twice), old entries sent, wrong key → ⚠️. No page errors.
+
 ## Next
-- Part 22 (backend + database, Supabase): started 27 Oct 2026 with test codes only (see decisions).
+- Part 22c: teacher dashboard reads the database (email + password login, no file import), tags online, delete a child's data. Then 22d: privacy note.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).
 - Part 23: final QA, docs and thesis material. Part 24 (deploy): locked until "Prof confirmed".
