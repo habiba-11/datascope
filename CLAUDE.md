@@ -24,9 +24,9 @@
 
 ## Decisions already made (do not reopen without asking me)
 - **Tech:**
-  - Plain HTML, CSS and JavaScript (ES modules). No framework, no build tools, no TypeScript, no backend.
+  - Plain HTML, CSS and JavaScript (ES modules). No framework, no build tools, no TypeScript. (Backend: see "Round 2" below, decided 27 Oct 2026.)
   - Chart.js for charts.
-  - Save in the browser (localStorage), and export CSV/JSON.
+  - Save in the browser (localStorage) first, then send to the online database (Supabase) when online. CSV/JSON files are only a fallback when the database is switched off.
   - Host on GitHub Pages.
 - **Running locally:** use the VS Code **Live Server** extension, because ES modules and loading JSON files do not work from `file://`.
 - **Tests:** the stats engine and the data generator are tested with Node's built-in test runner (`node --test`). There is no extra library to install.
@@ -135,7 +135,11 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 
 ## Round 2 (Prof feedback, 25 Oct 2026)
 - The Round 2 plan lives in `docs/round-2-plan.md` (Parts 13 to 24). Read it right after `docs/build-progress.md` at the start of every session. It replaces Parts 11 to 12 of the build plan above (deploy is now Part 24).
-- **Backend is an optional bonus (Part 22), behind a config flag** (`enabled: false` by default). This is an explicit exception to "no backend" above. The app must work fully with the flag off.
+- **Backend (decided 27 Oct 2026, replaces "optional bonus"):** Supabase (PostgreSQL + row-level security + teacher login), called with plain `fetch()` (no Supabase library). Settings in `js/config.js` (`enabled` switch). Offline-first: the log is saved in the browser at once and sent to the database when online (retry, no duplicates).
+  - **No files for children or the teacher:** with the database on, children's work goes online by itself and the teacher sees it on the dashboard after an email + password login (replaces the PIN). File import/export stays only as a fallback when the database is off.
+  - **Security:** children (publishable key) may only ADD log entries; only a logged-in teacher (listed in the `teachers` table) may read or delete. Never put the secret key in the website.
+  - **Ethics:** test with made-up codes (e.g. TEST-01) and DEMO data only until Prof and the GIU ethics check say yes.
+  - Beginner setup guide: `docs/backend-setup-guide.md`. Database script: `backend/schema.sql`.
 - **Rewards stay about good reasoning, never speed.** No timers, no leaderboards, no comparing children.
 - **Demo data is labelled DEMO** everywhere it appears and is **never exported**.
 - **Deploy is locked** until I write "Prof confirmed".
