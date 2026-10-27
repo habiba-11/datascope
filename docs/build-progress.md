@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-20b + 21a built, Part 21 done; waiting for Habiba's tests, rubric levels (20c) and Prof (22); 20c waits for the rubric levels** (Prof's feedback; full plan in docs/round-2-plan.md, Parts 13 to 24)
+- Current part: **Round 2: Parts 13-22 built (22 = Supabase backend, switched off until Habiba sets it up); waiting for Habiba's setup + tests, rubric levels (20c), Prof**
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 25 Oct 2026
@@ -210,8 +210,9 @@
 
 - Part 22c (27 Oct 2026), 182 tests passing: with the database on, the teacher page shows an email + password login (js/teacher/gate.js, renamed from pin-gate.js; the PIN stays for database-off mode). js/teacher/cloud.js (plain fetch): log in / log out, automatic ticket refresh on 401, all entries 1000 per request, tags, delete a child by code. Dashboard: no import button, 🔄 Refresh, 🚪 Log out, tags saved online (undone on failure), "🗑️ Delete all of CODE's data" (two taps) in a child's details. groupByCode/tagsByCode in helpers/outbox.js (tested); twoTapButton moved to js/teacher/two-tap.js. Tested against the fake Supabase: a child without login reads 0 rows; wrong password refused; 2 children loaded; tag saved online; expired ticket refreshed by itself; delete removes the code; reload keeps the login; log out. Database-off mode (PIN, import) still works; axe: no violations on the login page.
 
+- Part 22d (27 Oct 2026): docs/privacy-note.md (what is stored, why, where, who can see it, how to delete, consent): a draft for the thesis and the ethics self-assessment; region, retention and consent wording are marked [TO DECIDE].
+
 ## Next
-- Part 22d: privacy note (docs/privacy-note.md).
 - Habiba: do docs/backend-setup-guide.md (Supabase account, schema, teacher account, js/config.js), then test with TEST codes.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).
@@ -229,6 +230,7 @@
 - 25 Oct 2026 (Round 2 start): Prof's 8 comments planned as Parts 13 to 24 (docs/round-2-plan.md). Backend = optional bonus behind a flag; rewards for reasoning, never speed; DEMO data never exported; deploy locked until "Prof confirmed" (all in CLAUDE.md). Number Lab following the chosen scenario (Part 17b) reverses the earlier "by design" note in Known bugs.
 - 25 Oct 2026 (Part 17c): no extra scenario-linked Chance Lab device for now.
 - 25 Oct 2026 (Part 15): done rules as in the plan, but Conclude = card built (saving moves to My Journey); teacher "open all rooms" preview switch keeps the architecture's "a teacher can open any room"; progress per code + scenario (switching back restores it); Explore rooms open in order Graph → Number → Chance.
+- 27 Oct 2026 (Part 22): Supabase backend via plain fetch (no library); save first, send later; children may only add, teacher reads after email login (PIN only when the database is off); no file import/export for children or teacher when the database is on; test codes only until Prof + ethics say yes.
 - 26 Oct 2026: teacher view NOT hidden: a start-page button + PIN (teacher123, stored as a hash). Part 21: GSAP allowed (local copy), Playwright allowed as a dev tool, Pip becomes an original SVG.
 - 26 Oct 2026: Evidence Board audience/form task removed (Habiba); "My findings" summary replaces the maths recap in Conclude.
 - 25 Oct 2026 (Part 19): time per phase is for the teacher only, never shown to the child.
