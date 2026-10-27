@@ -1,14 +1,15 @@
-// Teacher dashboard: one child's drill-down (Part 20). Their journey in
-// numbers, the exact words they wrote, and a timestamped timeline of every
-// log entry. Shown with textContent only: a file can hold anything a child typed.
+// Teacher dashboard: one child's page (Part 20; layout 27 Oct 2026).
+// Their phases, the exact words they wrote, the teacher's tags, a timestamped
+// timeline of every log moment (folded away), and delete (online only).
+// Shown with textContent only: a log can hold anything a child typed.
 import { PHASES } from '../helpers/progress.js';
 import { twoTapButton } from './two-tap.js';
 
 const PHASE_NAMES = {
-  ask: 'Ask', plan: 'Plan', collect: 'Collect', graph: 'Graph Lab',
-  number: 'Number Lab', chance: 'Chance Lab', conclude: 'Conclude',
+  ask: '❓ Ask', plan: '🗺️ Plan', collect: '📋 Collect', graph: '📊 Graph Lab',
+  number: '🔢 Number Lab', chance: '🎲 Chance Lab', conclude: '🚩 Conclude',
 };
-const BASIC_FIELDS = ['code', 'time', 'room', 'type'];
+const BASIC_FIELDS = ['id', 'code', 'time', 'room', 'type'];
 
 function el(tag, text = '', className = '') {
   const element = document.createElement(tag);
@@ -19,7 +20,7 @@ function el(tag, text = '', className = '') {
 
 const show = (value) => (value === null || value === undefined || value === '' ? '–' : String(value));
 
-// Everything in a log entry except the four fixed fields, as "key: value; ...".
+// Everything in a log entry except the fixed fields, as "key: value; ...".
 function detailsText(entry) {
   return Object.keys(entry)
     .filter((key) => !BASIC_FIELDS.includes(key))
@@ -33,34 +34,60 @@ function definitionList(pairs) {
   return list;
 }
 
-// `row` comes from childRows(); `entries` is the child's whole log.
-// `onDelete` (online database only): deletes everything stored for this code.
-export function renderDetail(container, row, entries, scenarioTitle, onDelete = null) {
-  const close = el('button', '✕ Close', 'btn');
-  close.type = 'button';
-  close.addEventListener('click', () => { container.hidden = true; });
-
-  const phaseTable = el('table', '', 'class-table phase-table');
-  const head = el('tr');
-  ['Phase', 'Done', 'Stars', 'Minutes'].forEach((h) => head.append(el('th', h)));
-  phaseTable.append(el('thead'));
-  phaseTable.tHead.append(head);
+function table(headers, rows, className) {
+  const wrap = el('div', '', 'table-wrap');
+  const t = el('table', '', `class-table ${className}`);
+  const headRow = el('tr');
+  headers.forEach((h) => headRow.append(Object.assign(el('th', h), { scope: 'col' })));
+  t.append(el('thead'));
+  t.tHead.append(headRow);
   const body = el('tbody');
-  for (const phase of PHASES) {
+  rows.forEach((cells) => {
     const tr = el('tr');
-    tr.append(
-      el('td', PHASE_NAMES[phase]),
-      el('td', row[`${phase}Done`] ? '✅ yes' : '– no'),
-      el('td', show(row[`${phase}Stars`])),
-      el('td', show(row[`${phase}Minutes`])),
-    );
+    cells.forEach(([text, cls]) => tr.append(el('td', text, cls || '')));
     body.append(tr);
-  }
-  phaseTable.append(body);
+  });
+  t.append(body);
+  wrap.append(t);
+  return wrap;
+}
+
+// One section: a heading, then its content.
+function section(title, ...content) {
+  const box = el('section', '', 'detail-section');
+  box.append(el('h3', title), ...content);
+  return box;
+}
+
+// `row` comes from childRows(); `entries` is the child's whole log.
+// options: tagsNode (the tag checkboxes), onBack (back to the list),
+//          onDelete (online database only: deletes everything for this code).
+export function renderDetail(container, row, entries, scenarioTitle, { tagsNode = null, onBack, onDelete = null } = {}) {
+  const back = el('button', '← All children', 'btn');
+  back.type = 'button';
+  back.addEventListener('click', onBack);
+
+  const heading = el('h2', `${row.code} · ${scenarioTitle}`);
+  const badges = el('p', '', 'detail-badges');
+  badges.textContent = [
+    row.demo ? '🧪 DEMO' : '',
+    row.preview ? '👀 preview run' : '',
+    `${row.finished ? '✅ finished' : `${row.phasesDone} of 7 phases`}`,
+    `⭐ ${row.totalStars} stars`,
+    `💡 ${row.hintsUsed} hints`,
+  ].filter(Boolean).join(' · ');
+
+  const phases = table(['Phase', 'Done', 'Stars', 'Minutes'], PHASES.map((phase) => [
+    [PHASE_NAMES[phase]],
+    [row[`${phase}Done`] ? '✅ yes' : '– not yet'],
+    [show(row[`${phase}Stars`])],
+    [show(row[`${phase}Minutes`])],
+  ]), 'phase-table');
 
   const words = definitionList([
     ['Plan guess', row.planGuess],
     ['Number Lab guess → mean', row.numberGuess === null ? null : `${row.numberGuess} → ${show(row.mean)} (off by ${show(row.predictionError)})`],
+    ['Number Lab puzzles', `✅ ${row.tasksFirstTry} first try · 💡 ${row.tasksAfterHint} after another try · ❌ ${row.tasksUnsolved} unsolved`],
     ['Changed mind after the data', row.revised === null ? null : `${row.revised ? 'yes' : 'no'}${row.revisionReason ? `, because "${row.revisionReason}"` : ''}`],
     ['Graph: what it shows', row.graphTell],
     ['Graph: what it can NOT show', row.graphNotTell],
@@ -71,46 +98,35 @@ export function renderDetail(container, row, entries, scenarioTitle, onDelete = 
     ['How sure', row.certainty === null ? null : `${row.certainty}: ${row.certaintyReason}`],
   ]);
 
-  const timeline = el('table', '', 'class-table timeline');
-  const tHead = el('tr');
-  ['Time', 'Room', 'Moment', 'Details'].forEach((h) => tHead.append(el('th', h)));
-  timeline.append(el('thead'));
-  timeline.tHead.append(tHead);
-  const tBody = el('tbody');
-  for (const entry of entries) {
-    const tr = el('tr');
-    tr.append(
-      el('td', new Date(entry.time).toLocaleString(), 'no-wrap'),
-      el('td', entry.room),
-      el('td', entry.type),
-      el('td', detailsText(entry)),
-    );
-    tBody.append(tr);
-  }
-  timeline.append(tBody);
+  // The full timeline is long, so it is folded away until the teacher opens it.
+  const timeline = el('details', '', 'more');
+  timeline.append(
+    el('summary', `Show the timeline (${entries.length} moments)`),
+    table(['Time', 'Room', 'Moment', 'Details'], entries.map((entry) => [
+      [new Date(entry.time).toLocaleString(), 'no-wrap'],
+      [entry.room],
+      [entry.type],
+      [detailsText(entry)],
+    ]), 'timeline'),
+  );
 
   container.replaceChildren(
-    el('h2', `🔍 ${row.code} · ${scenarioTitle}${row.demo ? ' · DEMO' : ''}`),
-    close,
-    el('h3', 'Phases'),
-    el('div', '', 'table-wrap'),
-    el('h3', "The child's own words and numbers"),
-    words,
-    el('h3', `Timeline (${entries.length} moments)`),
-    el('div', '', 'table-wrap'),
+    back,
+    heading,
+    badges,
+    section('📈 Phases', phases),
+    section('💬 Their answers and words', words),
   );
-  const wraps = container.querySelectorAll('.table-wrap');
-  wraps[0].append(phaseTable);
-  wraps[1].append(timeline);
+  if (tagsNode) container.append(section('🏷️ Misconception tags', tagsNode));
+  container.append(section('🕒 Timeline', timeline));
 
   // Privacy: the teacher can delete one child's data (two taps, never by accident).
   if (onDelete) {
     const remove = el('button', `🗑️ Delete all of ${row.code}'s data`, 'btn');
     remove.type = 'button';
     twoTapButton(remove, `⚠️ Tap again to delete ${row.code} for good`, () => onDelete(row.code));
-    container.append(el('h3', 'Privacy'), remove);
+    container.append(section('🔒 Privacy', remove));
   }
   container.hidden = false;
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  container.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  back.focus();
 }

@@ -1,11 +1,14 @@
-// Teacher dashboard (Part 20, Prof's comment 6). See the class at a glance
-// (completion funnel, averages), one row per child per scenario, drill into one
-// child, tag misconceptions, download CSVs for the thesis.
+// Teacher dashboard (Part 20, Prof's comment 6; layout 27 Oct 2026).
+// A top bar (who is logged in, Refresh / Import, Log out) and 4 tabs:
+//   📊 Class        the big picture: key numbers and two charts
+//   👧 Children     a short list; "Open" shows one child's page (detail.js)
+//   📥 Thesis data  optional downloads, and the DEMO switch
+//   ⚙️ Settings     this device: clear it, preview the rooms
 // Where the children's work comes from:
 // - online database ON (Part 22): read straight from the database (cloud.js),
 //   nothing to import; loaded by gate.js after the email + password login.
 // - online database OFF: the teacher imports the files children saved.
-// Imported text is shown with textContent only: a file can hold anything a child typed.
+// Text from a log is shown with textContent only: it can hold anything a child typed.
 import { parseExportFile, MISCONCEPTION_TAGS, tagEntries } from '../helpers/summary.js';
 import { childRows, classOverview } from '../helpers/metrics.js';
 import { PHASES } from '../helpers/progress.js';
@@ -20,6 +23,7 @@ import {
 } from '../storage/save.js';
 import { renderDetail } from './detail.js';
 import { twoTapButton } from './two-tap.js';
+import { setupTabs } from './tabs.js';
 import { backendReady } from '../config.js';
 import {
   fetchChildren, fetchTags, addTag, removeTag, deleteChild, logOut, teacherEmail,
@@ -61,33 +65,9 @@ function el(tag, text = '', className = '') {
 
 const show = (value) => (value === null || value === undefined ? '–' : String(value));
 
-// ---------- importing ----------
-
-document.getElementById('file-input').addEventListener('change', async (event) => {
-  let added = 0;
-  const skipped = [];
-
-  for (const upload of event.target.files) {
-    const result = parseExportFile(await upload.text());
-    if (!result.ok) {
-      skipped.push(`${upload.name} (${result.reason})`);
-      continue;
-    }
-    // The same child may hand in twice: keep the newest file.
-    const old = imports[result.file.code];
-    if (!old || old.exportedAt < result.file.exportedAt) imports[result.file.code] = result.file;
-    added += 1;
-  }
-
-  setTeacherImports(imports);
-  event.target.value = ''; // so the same files can be chosen again later
-  say(`Imported ${added} file${added === 1 ? '' : 's'}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`);
-  render();
-});
-
 // ---------- the rows (one per child per scenario) ----------
 
-// The files on show: the real imports, plus the DEMO children when switched on.
+// The files on show: the real ones, plus the DEMO children when switched on.
 function shownFiles() {
   return [...Object.values(imports), ...(showDemo ? demoFiles : [])];
 }
@@ -97,52 +77,15 @@ function currentRows() {
   return filter.value ? rows.filter((r) => r.scenarioId === filter.value) : rows;
 }
 
-function tagCell(code) {
-  const chosen = tags[code] || [];
-  const details = document.createElement('details');
-  details.append(el('summary', `🏷️ Tags (${chosen.length})`));
+// ---------- 📊 Class ----------
 
-  for (const tag of MISCONCEPTION_TAGS) {
-    const label = el('label', '', 'tag-option');
-    const box = document.createElement('input');
-    box.type = 'checkbox';
-    box.checked = chosen.includes(tag.id);
-    box.addEventListener('change', async () => {
-      const now = new Set(tags[code] || []);
-      if (box.checked) now.add(tag.id); else now.delete(tag.id);
-      tags[code] = [...now];
-      details.querySelector('summary').textContent = `🏷️ Tags (${now.size})`;
-      if (!cloud) {
-        setTeacherTags(tags);
-        return;
-      }
-      try {
-        if (box.checked) await addTag(code, tag.id); else await removeTag(code, tag.id);
-      } catch (error) {
-        // Not saved online: undo the tick, so the screen never shows a wrong tag.
-        box.checked = !box.checked;
-        if (box.checked) now.add(tag.id); else now.delete(tag.id);
-        tags[code] = [...now];
-        details.querySelector('summary').textContent = `🏷️ Tags (${now.size})`;
-        say(`⚠️ The tag was not saved: ${error.message}`);
-      }
-    });
-    const papersWord = tag.papers.includes(',') ? 'Papers' : 'Paper';
-    label.append(box, ` ${tag.label} (${papersWord} ${tag.papers})`);
-    details.append(label);
-  }
-  return details;
-}
-
-function renderOverview(rows) {
+function renderClass(rows) {
   const o = classOverview(rows);
+  // The 4 numbers that matter most; the rest in one quiet line underneath.
   const tiles = [
     ['👧 Children', o.children],
-    ['🔎 Investigations', o.investigations],
-    ['🏁 Finished', o.finished],
-    ['💡 Hints used', o.hintsUsed],
+    ['🏁 Finished', `${o.finished} of ${o.investigations}`],
     ['🧩 Puzzles right first time', o.firstTryRate === null ? null : `${o.firstTryRate}%`],
-    ['🎯 Average guess error', o.avgPredictionError],
     ['🔄 Changed mind after data', o.revisedRate === null ? null : `${o.revisedRate}%`],
   ];
   document.getElementById('overview').replaceChildren(...tiles.map(([label, value]) => {
@@ -150,6 +93,8 @@ function renderOverview(rows) {
     tile.append(el('span', show(value), 'tile-value'), el('span', label, 'tile-label'));
     return tile;
   }));
+  document.getElementById('overview-more').textContent =
+    `🎯 Average guess error: ${show(o.avgPredictionError)} · 💡 Hints used: ${o.hintsUsed}`;
 
   document.getElementById('funnel-rows').replaceChildren(...PHASES.map((phase) => {
     const tr = el('tr');
@@ -182,23 +127,22 @@ function renderCharts(o) {
     });
   };
   charts = [
-    bar('funnel-chart', `Investigations that finished each phase (of ${o.investigations})`, PHASES.map((p) => o.funnel[p]), '#38B6FF'),
+    bar('funnel-chart', `Finished each phase (of ${o.investigations})`, PHASES.map((p) => o.funnel[p]), '#38B6FF'),
     bar('minutes-chart', 'Average minutes per phase', PHASES.map((p) => o.avgMinutes[p]), '#4CC26B'),
   ];
 }
 
-function render() {
-  const rows = currentRows();
-  renderOverview(rows);
+// ---------- 👧 Children ----------
 
+function renderChildren(rows) {
   const body = document.getElementById('class-rows');
   body.replaceChildren();
   if (rows.length === 0) {
     const emptyRow = el('tr');
     const emptyCell = el('td', cloud
       ? 'No children yet. Their work appears here by itself when they use DataScope.'
-      : 'No files yet. Import the files your children saved.');
-    emptyCell.colSpan = 11;
+      : 'No files yet. Tap "📂 Import files" at the top.');
+    emptyCell.colSpan = 6;
     emptyRow.append(emptyCell);
     body.append(emptyRow);
   }
@@ -208,44 +152,139 @@ function render() {
     const label = row.demo ? ' 🧪 DEMO' : (row.preview ? ' 👀 preview' : '');
     const codeCell = el('th', `${row.code}${label}`, 'no-wrap');
     codeCell.scope = 'row';
-    const open = el('button', '🔍 Open', 'btn');
+
+    // Progress in words AND a small bar (colour is never the only signal).
+    const progress = el('td', '', 'no-wrap');
+    const bar = el('span', '', 'progress-bar');
+    const fill = el('span', '', 'progress-fill');
+    fill.style.width = `${(row.phasesDone / 7) * 100}%`;
+    bar.append(fill);
+    progress.append(el('span', `${row.finished ? '✅ ' : ''}${row.phasesDone} of 7`), bar);
+
+    const open = el('button', '🔍 Open', 'btn no-wrap');
     open.type = 'button';
-    open.addEventListener('click', () => {
-      const file = row.demo ? demoFiles.find((f) => f.code === row.code) : imports[row.code];
-      const onDelete = cloud && !row.demo ? removeChild : null;
-      renderDetail(document.getElementById('detail'), row, file.entries, titles[row.scenarioId] || row.scenarioId, onDelete);
-    });
-    const tagsTd = el('td');
-    tagsTd.append(tagCell(row.code));
-    const openTd = el('td');
-    openTd.append(open);
+    open.setAttribute('aria-label', `Open ${row.code}`);
+    open.addEventListener('click', () => openChild(row));
+    const openCell = el('td');
+    openCell.append(open);
+
+    const claim = el('td', '', 'col-claim');
+    claim.append(el('span', row.claim === null ? '–' : `I think ${row.claim} because ${row.because}.`, 'claim-cell'));
 
     tr.append(
       codeCell,
       el('td', titles[row.scenarioId] || row.scenarioId),
-      el('td', `${row.finished ? '✅ ' : ''}${row.phasesDone} of 7`, 'no-wrap'),
-      el('td', String(row.totalStars)),
-      el('td', `✅ ${row.tasksFirstTry} · 💡 ${row.tasksAfterHint} · ❌ ${row.tasksUnsolved}`, 'no-wrap'),
-      el('td', String(row.hintsUsed)),
-      el('td', row.numberGuess === null ? '–' : `${row.numberGuess} → ${show(row.mean)}`, 'no-wrap'),
-      el('td', row.revised === null ? '–' : (row.revised ? '🔄 yes' : 'no')),
-      el('td', row.claim === null ? '–' : `I think ${row.claim} because ${row.because}.`, 'claim-cell'),
-      tagsTd,
-      openTd,
+      progress,
+      el('td', `⭐ ${row.totalStars}`, 'no-wrap'),
+      claim,
+      openCell,
     );
     body.append(tr);
   }
 }
 
-filter.addEventListener('change', render);
+// One child's page replaces the list; "← All children" brings the list back.
+function openChild(row) {
+  const file = row.demo ? demoFiles.find((f) => f.code === row.code) : imports[row.code];
+  document.getElementById('children-list').hidden = true;
+  document.getElementById('filter-row').hidden = true; // one child: the filter does nothing here
+  renderDetail(document.getElementById('detail'), row, file.entries, titles[row.scenarioId] || row.scenarioId, {
+    tagsNode: row.demo ? null : tagBoxes(row.code),
+    onBack: closeChild,
+    onDelete: cloud && !row.demo ? removeChild : null,
+  });
+}
 
-// ---------- thesis exports (real children only: DEMO rows are never exported) ----------
+function closeChild() {
+  document.getElementById('detail').hidden = true;
+  document.getElementById('children-list').hidden = false;
+  if (!document.getElementById('panel-children').hidden || !document.getElementById('panel-class').hidden) {
+    document.getElementById('filter-row').hidden = false;
+  }
+}
+
+// The misconception tags for one child, as checkboxes (saved online or on this device).
+function tagBoxes(code) {
+  const box = el('div', '', 'tag-list');
+  for (const tag of MISCONCEPTION_TAGS) {
+    const label = el('label', '', 'tag-option');
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.checked = (tags[code] || []).includes(tag.id);
+    input.addEventListener('change', async () => {
+      const now = new Set(tags[code] || []);
+      if (input.checked) now.add(tag.id); else now.delete(tag.id);
+      tags[code] = [...now];
+      if (!cloud) {
+        setTeacherTags(tags);
+        return;
+      }
+      try {
+        if (input.checked) await addTag(code, tag.id); else await removeTag(code, tag.id);
+      } catch (error) {
+        // Not saved online: undo the tick, so the screen never shows a wrong tag.
+        input.checked = !input.checked;
+        if (input.checked) now.add(tag.id); else now.delete(tag.id);
+        tags[code] = [...now];
+        say(`⚠️ The tag was not saved: ${error.message}`);
+      }
+    });
+    const papersWord = tag.papers.includes(',') ? 'Papers' : 'Paper';
+    label.append(input, ` ${tag.label} (${papersWord} ${tag.papers})`);
+    box.append(label);
+  }
+  return box;
+}
+
+// ---------- drawing everything ----------
+
+function render() {
+  const rows = currentRows();
+  renderClass(rows);
+  renderChildren(rows);
+}
+
+filter.addEventListener('change', () => {
+  closeChild();
+  render();
+});
+
+// The scenario filter only matters for Class and Children. Charts are drawn
+// again when Class opens, because a chart in a hidden tab has no size.
+function onTabChange(tabId) {
+  document.getElementById('filter-row').hidden = !['tab-class', 'tab-children'].includes(tabId);
+  if (tabId === 'tab-class' && Object.keys(titles).length) renderClass(currentRows());
+}
+
+// ---------- importing (online database OFF only) ----------
+
+document.getElementById('file-input').addEventListener('change', async (event) => {
+  let added = 0;
+  const skipped = [];
+  for (const upload of event.target.files) {
+    const result = parseExportFile(await upload.text());
+    if (!result.ok) {
+      skipped.push(`${upload.name} (${result.reason})`);
+      continue;
+    }
+    // The same child may hand in twice: keep the newest file.
+    const old = imports[result.file.code];
+    if (!old || old.exportedAt < result.file.exportedAt) imports[result.file.code] = result.file;
+    added += 1;
+  }
+  setTeacherImports(imports);
+  event.target.value = ''; // so the same files can be chosen again later
+  say(`Imported ${added} file${added === 1 ? '' : 's'}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`);
+  render();
+});
+
+// ---------- 📥 Thesis data (real children only: DEMO rows are never exported) ----------
 
 document.getElementById('export-thesis-btn').addEventListener('click', () => {
   // All scenarios, whatever the filter shows, so the file is always complete.
   const rows = exportableRows(childRows(Object.values(imports), partners));
   if (rows.length === 0) {
-    say(cloud ? "No children's work yet. (DEMO children are never exported.)" : "Import some children's files first. (DEMO children are never exported.)");
+    say("No children's work yet. (DEMO children are never exported.)");
     return;
   }
   downloadFile('thesis-metrics.csv', thesisCSV(rows), 'text/csv');
@@ -257,7 +296,18 @@ document.getElementById('export-dictionary-btn').addEventListener('click', () =>
   say('Saved "thesis-metrics-dictionary.csv" (what every column means) to Downloads.');
 });
 
-// ---------- DEMO data (for showing the dashboard; never saved, never exported) ----------
+document.getElementById('export-class-btn').addEventListener('click', () => {
+  const codes = Object.keys(imports).sort();
+  if (codes.length === 0) {
+    say("No children's work yet.");
+    return;
+  }
+  // Every child's log, plus the teacher's tags as extra rows.
+  const entries = codes.flatMap((code) => [...imports[code].entries, ...tagEntries(code, tags[code] || [])]);
+  const fileName = exportFileName('class', 'csv');
+  downloadFile(fileName, toCSV(entries), 'text/csv');
+  say(`Saved "${fileName}" to Downloads.`);
+});
 
 const demoBtn = document.getElementById('demo-btn');
 demoBtn.addEventListener('click', () => {
@@ -265,48 +315,32 @@ demoBtn.addEventListener('click', () => {
   demoBtn.textContent = showDemo ? '🧪 Hide DEMO data' : '🧪 Show DEMO data';
   demoBtn.setAttribute('aria-pressed', String(showDemo));
   document.getElementById('demo-banner').hidden = !showDemo;
-  document.getElementById('detail').hidden = true;
+  closeChild();
   render();
 });
-
-// ---------- class CSV (every log entry, plus the teacher's tags) ----------
-
-document.getElementById('export-class-btn').addEventListener('click', () => {
-  const codes = Object.keys(imports).sort();
-  if (codes.length === 0) {
-    say(cloud ? "No children's work yet." : 'Import some files first.');
-    return;
-  }
-  const entries = codes.flatMap((code) => [...imports[code].entries, ...tagEntries(code, tags[code] || [])]);
-  const fileName = exportFileName('class', 'csv');
-  downloadFile(fileName, toCSV(entries), 'text/csv');
-  say(`Saved "${fileName}" to Downloads.`);
-});
-
-// ---------- removing things (always two taps, so nothing is lost by accident) ----------
 
 twoTapButton(document.getElementById('clear-btn'), '⚠️ Tap again to remove everything', () => {
   imports = {};
   tags = {};
   setTeacherImports(imports);
   setTeacherTags(tags);
-  document.getElementById('detail').hidden = true;
+  closeChild();
   say('All imported files and tags were removed from this device.');
   render();
 });
 
-twoTapButton(document.getElementById('clear-device-btn'), '⚠️ Tap again to clear the child\'s work', () => {
+// ---------- ⚙️ Settings ----------
+
+twoTapButton(document.getElementById('clear-device-btn'), '⚠️ Tap again to clear this device', () => {
   clearChildData();
   say("The child's code and work were cleared from this device. The next child can start fresh.");
 });
-
-// ---------- preview: open every room on this device ----------
 
 const previewBtn = document.getElementById('preview-btn');
 
 function showPreviewState() {
   const on = getPreviewAll();
-  previewBtn.textContent = on ? '👀 Preview is ON: all rooms open (tap to turn off)' : '🔒 Preview is OFF: tap to open all rooms';
+  previewBtn.textContent = on ? '👀 Preview is ON (tap to turn off)' : '🔒 Preview is OFF (tap to turn on)';
   previewBtn.setAttribute('aria-pressed', String(on));
 }
 
@@ -325,7 +359,7 @@ async function loadFromCloud() {
     imports = Object.fromEntries(files.map((file) => [file.code, file]));
     tags = await fetchTags();
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    say(`☁️ ${files.length} child${files.length === 1 ? '' : 'ren'} loaded from the database at ${time}.`);
+    say(`☁️ ${files.length} child${files.length === 1 ? '' : 'ren'} loaded at ${time}.`);
   } catch (error) {
     if (error.message === 'Please log in again.') {
       location.reload(); // the login ran out: back to the login form
@@ -334,6 +368,7 @@ async function loadFromCloud() {
     const offline = !navigator.onLine || error instanceof TypeError;
     say(offline ? '📴 No internet connection. Connect and tap Refresh.' : `⚠️ Could not load: ${error.message}`);
   }
+  closeChild();
   render();
 }
 
@@ -341,7 +376,6 @@ async function loadFromCloud() {
 async function removeChild(code) {
   try {
     await deleteChild(code);
-    document.getElementById('detail').hidden = true;
     await loadFromCloud();
     say(`🗑️ Everything stored for ${code} was deleted from the database.`);
   } catch (error) {
@@ -349,17 +383,22 @@ async function removeChild(code) {
   }
 }
 
-function setupCloud() {
-  // Nothing to import or remove: the work arrives by itself.
+// The top bar and the texts that depend on where the work comes from.
+function setupSource() {
+  const who = document.getElementById('dash-who');
+  if (!cloud) {
+    who.textContent = '📁 Working from files imported on this device.';
+    document.getElementById('clear-note').textContent = 'After a child has saved their file, removes their code and work from this device, so the next child starts fresh.';
+    return;
+  }
+  who.textContent = `☁️ Logged in as ${teacherEmail()}. Children's work arrives by itself.`;
   document.getElementById('import-label').hidden = true;
-  document.getElementById('clear-btn').hidden = true;
+  document.getElementById('imported-box').hidden = true; // nothing is imported online
   document.getElementById('refresh-btn').hidden = false;
-  const logout = document.getElementById('logout-btn');
-  logout.hidden = false;
-  logout.textContent = `🚪 Log out (${teacherEmail()})`;
-  document.getElementById('source-note').textContent = 'The children\'s work arrives here by itself from the online database. Tap Refresh to see the newest. The survey data children worked with is synthetic (a pretend class).';
+  document.getElementById('logout-btn').hidden = false;
+  document.getElementById('clear-note').textContent = 'When a child\'s work shows ☁️ Saved online, removes their code from this device, so the next child starts fresh. (Their work stays safe in the database.)';
   document.getElementById('refresh-btn').addEventListener('click', loadFromCloud);
-  logout.addEventListener('click', async () => {
+  document.getElementById('logout-btn').addEventListener('click', async () => {
     await logOut();
     location.reload();
   });
@@ -377,12 +416,10 @@ async function init() {
     filter.append(Object.assign(document.createElement('option'), { value: id, textContent: content.cardTitle }));
   }
   showPreviewState();
-  if (cloud) {
-    setupCloud();
-    await loadFromCloud();
-  } else {
-    render();
-  }
+  setupSource();
+  setupTabs(onTabChange);
+  if (cloud) await loadFromCloud();
+  else render();
 }
 
 init();

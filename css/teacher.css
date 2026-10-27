@@ -1,6 +1,7 @@
-/* Teacher view: same look as the app, a bit denser for adults. */
+/* Teacher dashboard: same look as the app, calmer and more structured for
+   adults (layout 27 Oct 2026: a top bar, then 4 tabs, one job each). */
 .teacher {
-  max-width: 1150px;
+  max-width: 1100px;
   margin: 24px auto 120px;
 }
 
@@ -17,14 +18,58 @@ body {
   font-weight: 700;
 }
 
-.teacher-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 16px 0;
+h2 {
+  font-size: 22px;
+  margin-top: 24px;
 }
 
-.teacher-actions .btn:not(.btn-main) {
+/* ---------- getting in ---------- */
+.gate-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  font-weight: 700;
+}
+
+.gate-form input {
+  min-height: 48px;
+  font-size: 18px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 10px;
+  padding: 6px 12px;
+}
+
+/* ---------- top bar ---------- */
+.dash-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-bg);
+}
+
+.dash-top h1 {
+  margin: 0;
+}
+
+.dash-who {
+  margin: 4px 0 0;
+  font-size: 16px;
+}
+
+.dash-top-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dash-top-actions .btn:not(.btn-main),
+.action-list .btn:not(.btn-main),
+.detail > .btn {
   background: white;
   color: var(--color-text);
 }
@@ -48,90 +93,60 @@ body {
   border-radius: 12px;
   padding: 10px 14px;
   font-weight: 700;
+  margin: 12px 0 0;
 }
 
-.class-totals {
+/* DEMO data is labelled in words AND colour (never only colour). */
+.demo-banner {
+  background: var(--color-plan);
+  border: 3px dashed var(--color-navy);
+  border-radius: 12px;
+  padding: 10px 14px;
   font-weight: 700;
+  margin: 12px 0 0;
 }
 
-/* Wide table scrolls sideways on small screens instead of squashing. */
-.table-wrap {
-  overflow-x: auto;
+/* ---------- tabs ---------- */
+.dash-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0 0;
+  border-bottom: var(--border-width) solid var(--color-navy);
 }
 
-.class-table {
-  border-collapse: collapse;
-  width: 100%;
-  min-width: 900px;
-  font-size: 16px;
-}
-
-.class-table th,
-.class-table td {
-  border: 2px solid var(--color-navy);
-  padding: 8px 10px;
-  text-align: left;
-  vertical-align: top;
-}
-
-.class-table thead th {
-  background: var(--color-navy);
-  color: white;
-  font-family: var(--font-heading);
-}
-
-.no-wrap {
-  white-space: nowrap;
-}
-
-.claim-cell {
-  min-width: 220px;
-  max-width: 320px;
-}
-
-.class-table summary {
-  cursor: pointer;
-  font-weight: 700;
+.dash-tab {
   min-height: 48px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  padding: 8px 18px;
+  border: var(--border-width) solid var(--color-navy);
+  border-bottom: none;
+  border-radius: 14px 14px 0 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-/* display: flex hides the ▶ arrow in some browsers, so we draw our own. */
-.class-table summary::before {
-  content: '▶';
-  font-size: 12px;
+/* The open tab: white like its panel, plus a bar on top (not colour only:
+   it is also announced as "selected" to screen readers). */
+.dash-tab[aria-selected="true"] {
+  background: white;
+  box-shadow: inset 0 5px 0 var(--color-collect);
+  margin-bottom: calc(-1 * var(--border-width)); /* joins the panel below */
+  border-bottom: var(--border-width) solid white;
 }
 
-.class-table details[open] summary::before {
-  content: '▼';
+.dash-panel {
+  padding: 16px 0 0;
 }
 
-.tag-option {
-  display: flex;
-  gap: 6px;
-  align-items: flex-start;
-  font-size: 14px;
-  margin: 6px 0;
-}
-
-.tag-option input {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-}
-
-.note {
-  font-size: 14px;
-}
-
-/* Part 20: scenario filter, overview tiles, funnel, drill-down. */
 .filter-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 8px 0 16px;
+  margin: 16px 0 0;
   font-weight: 700;
 }
 
@@ -144,18 +159,17 @@ body {
   padding: 6px 10px;
 }
 
+/* ---------- 📊 Class ---------- */
 .overview {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
-  margin-bottom: 16px;
 }
 
 .tile {
   display: flex;
   flex-direction: column;
-  min-width: 140px;
-  padding: 10px 14px;
+  padding: 14px 16px;
   border: 2px solid var(--color-navy);
   border-radius: 14px;
   background: var(--color-bg);
@@ -163,24 +177,50 @@ body {
 
 .tile-value {
   font-family: var(--font-heading);
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
 }
 
 .tile-label {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
+}
+
+.overview-more {
+  margin: 10px 0 0;
+  font-size: 16px;
+}
+
+.chart-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.chart-box {
+  background: white;
+  border: 2px solid var(--color-navy);
+  border-radius: 14px;
+  padding: 8px;
+}
+
+/* "Show ... " folding sections */
+.more summary {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .funnel-table {
   border-collapse: collapse;
   min-width: 420px;
-  margin-bottom: 12px;
 }
 
 .funnel-table caption {
   text-align: left;
-  font-weight: 700;
   margin-bottom: 6px;
 }
 
@@ -191,16 +231,103 @@ body {
   text-align: left;
 }
 
-.detail {
-  margin-top: 24px;
-  padding: 16px;
-  border: var(--border-width) solid var(--color-navy);
-  border-radius: var(--radius-card);
+/* ---------- 👧 Children ---------- */
+/* Wide tables scroll sideways on small screens instead of squashing. */
+.table-wrap {
+  overflow-x: auto;
+}
+
+.class-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 16px;
+}
+
+.class-table th,
+.class-table td {
+  border-bottom: 2px solid var(--color-bg);
+  padding: 10px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.class-table thead th {
+  background: var(--color-navy);
+  color: white;
+  font-family: var(--font-heading);
+}
+
+/* Read by screen readers, not shown (e.g. the "Open" column heading). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* On a tablet the claim column is left out (it is on the child's page), so
+   the Open button always fits without scrolling sideways. */
+@media (max-width: 900px) {
+  .col-claim {
+    display: none;
+  }
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+/* A long claim shows 2 lines; the full text is on the child's page. */
+.claim-cell {
+  max-width: 320px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.progress-bar {
+  display: block;
+  width: 100px;
+  height: 8px;
+  margin-top: 4px;
+  border: 2px solid var(--color-navy);
+  border-radius: 999px;
+  overflow: hidden;
   background: var(--color-bg);
 }
 
-.detail .class-table {
-  min-width: 0;
+.progress-fill {
+  display: block;
+  height: 100%;
+  background: var(--color-explore);
+}
+
+.note {
+  font-size: 14px;
+}
+
+/* One child's page */
+.detail h2 {
+  margin: 12px 0 4px;
+}
+
+.detail-badges {
+  margin: 0;
+  font-weight: 700;
+}
+
+.detail-section {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 2px solid var(--color-navy);
+  border-radius: 14px;
+}
+
+.detail-section h3 {
+  margin-top: 0;
 }
 
 .detail-list dt {
@@ -212,46 +339,38 @@ body {
   margin: 2px 0 0 16px;
 }
 
-/* DEMO data is labelled in words AND colour (never only colour). */
-.demo-banner {
-  background: var(--color-plan);
-  border: 3px dashed var(--color-navy);
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-weight: 700;
-}
-
-.chart-pair {
+.tag-option {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin: 12px 0 20px;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 15px;
+  margin: 8px 0;
 }
 
-.chart-box {
-  flex: 1;
-  min-width: 300px;
-  max-width: 540px;
-  background: white;
-  border: 2px solid var(--color-navy);
-  border-radius: 14px;
-  padding: 8px;
+.tag-option input {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
 }
 
-/* The PIN form shown before the dashboard. */
-.pin-form {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+/* ---------- 📥 Thesis data and ⚙️ Settings: a button + what it does ---------- */
+.action-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  display: grid;
   gap: 12px;
-  margin: 16px 0;
-  font-weight: 700;
 }
 
-.pin-form input {
-  min-height: 48px;
-  font-size: 18px;
-  border: var(--border-width) solid var(--color-navy);
-  border-radius: 10px;
-  padding: 6px 12px;
+.action-list li {
+  display: grid;
+  grid-template-columns: minmax(220px, auto) 1fr;
+  align-items: center;
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .action-list li {
+    grid-template-columns: 1fr;
+  }
 }

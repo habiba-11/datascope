@@ -212,6 +212,8 @@
 
 - Part 22d (27 Oct 2026): docs/privacy-note.md (what is stored, why, where, who can see it, how to delete, consent): a draft for the thesis and the ethics self-assessment; region, retention and consent wording are marked [TO DECIDE].
 
+- Teacher dashboard redesign (27 Oct 2026, Habiba: too crowded): a top bar (who is logged in + 🔄 Refresh + 🚪 Log out; 📂 Import only when the database is off) and 4 tabs, one job each: 📊 Class (4 key numbers, one quiet line, 2 charts, table folded away), 👧 Children (code, scenario, progress words + bar, stars, claim, Open; the claim column hides on tablets), a child's own page (← All children, phases, their words, tags, timeline folded away, delete), 📥 Thesis data (3 optional downloads with one line each, DEMO switch), ⚙️ Settings (clear this device, preview). js/teacher/tabs.js (keyboard ← → Home End, remembered per browser tab). Same data code as before. Checked with Playwright at 1366 and 768 px: no sideways scroll, Open always visible, axe: 0 violations on all 4 tabs and a child page; database-off mode (PIN + import) still works.
+
 ## Next
 - Habiba: do docs/backend-setup-guide.md (Supabase account, schema, teacher account, js/config.js), then test with TEST codes.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).

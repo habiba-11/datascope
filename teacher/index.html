@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Teacher dashboard (Part 20). With the online database on (Part 22) the
        teacher logs in with email + password (real protection, checked by the
-       database). With it off, a PIN keeps children out: a speed bump only. -->
+       database). With it off, a PIN keeps children out: a speed bump only.
+       Layout (27 Oct 2026): a top bar, then 4 tabs, one job each. -->
   <title>Teacher dashboard · DataScope</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
@@ -18,10 +19,11 @@
 <body>
   <main class="teacher card">
     <a class="back-link" href="../index.html">← Back to DataScope</a>
-    <h1>🧑‍🏫 Teacher dashboard</h1>
 
-    <section class="pin-gate" id="pin-gate">
-      <form id="pin-form" class="pin-form">
+    <!-- ---------- Getting in (one of these two is shown) ---------- -->
+    <section class="gate" id="pin-gate">
+      <h1>🧑‍🏫 Teacher dashboard</h1>
+      <form id="pin-form" class="gate-form">
         <label for="pin-input">🔒 Teacher PIN</label>
         <input type="password" id="pin-input" autocomplete="off">
         <button class="btn btn-main" type="submit">Open the dashboard</button>
@@ -29,8 +31,9 @@
       <p class="feedback" id="pin-message" aria-live="polite" hidden></p>
     </section>
 
-    <section class="pin-gate" id="login-gate" hidden>
-      <form id="login-form" class="pin-form">
+    <section class="gate" id="login-gate" hidden>
+      <h1>🧑‍🏫 Teacher dashboard</h1>
+      <form id="login-form" class="gate-form">
         <label for="login-email">📧 Email</label>
         <input type="email" id="login-email" autocomplete="username" required>
         <label for="login-password">🔒 Password</label>
@@ -40,78 +43,138 @@
       <p class="feedback" id="login-message" aria-live="polite" hidden></p>
     </section>
 
+    <!-- ---------- The dashboard ---------- -->
     <div id="dashboard" hidden>
-    <p id="source-note">Import the files your children saved (<code>datascope-CODE-DATE.json</code>). Everything stays on this device: nothing is uploaded. The survey data children worked with is synthetic (a pretend class).</p>
+      <header class="dash-top">
+        <div>
+          <h1>🧑‍🏫 Teacher dashboard</h1>
+          <p class="dash-who" id="dash-who"></p>
+        </div>
+        <div class="dash-top-actions">
+          <button class="btn btn-main" id="refresh-btn" type="button" hidden>🔄 Refresh</button>
+          <label class="btn btn-main file-btn" id="import-label">
+            📂 Import files
+            <input type="file" id="file-input" accept=".json,application/json" multiple>
+          </label>
+          <button class="btn" id="logout-btn" type="button" hidden>🚪 Log out</button>
+        </div>
+      </header>
 
-    <div class="teacher-actions">
-      <button class="btn btn-main" id="refresh-btn" type="button" hidden>🔄 Refresh</button>
-      <label class="btn btn-main file-btn" id="import-label">
-        📂 Import children's files
-        <input type="file" id="file-input" accept=".json,application/json" multiple>
-      </label>
-      <button class="btn" id="export-thesis-btn" type="button">📑 Download thesis-metrics.csv</button>
-      <button class="btn" id="export-dictionary-btn" type="button">📘 Download data dictionary</button>
-      <button class="btn" id="export-class-btn" type="button">📊 Download class CSV (every log entry)</button>
-      <button class="btn" id="demo-btn" type="button" aria-pressed="false">🧪 Show DEMO data</button>
-      <button class="btn" id="clear-btn" type="button">🗑️ Remove all imported files</button>
-      <button class="btn" id="logout-btn" type="button" hidden>🚪 Log out</button>
-    </div>
-    <p class="feedback" id="teacher-feedback" aria-live="polite" hidden></p>
-    <p class="demo-banner" id="demo-banner" hidden>🧪 DEMO: the DEMO-01 to DEMO-04 children are made up, only to show how the dashboard works. They are never saved with real files and never exported.</p>
+      <p class="feedback" id="teacher-feedback" aria-live="polite" hidden></p>
+      <p class="demo-banner" id="demo-banner" hidden>🧪 DEMO is on: DEMO-01 to DEMO-04 are made-up children, only to try the dashboard. Never saved, never exported.</p>
 
-    <div class="filter-row">
-      <label for="scenario-filter">Scenario:</label>
-      <select id="scenario-filter">
-        <option value="">All scenarios</option>
-      </select>
-    </div>
+      <div class="dash-tabs" role="tablist" aria-label="Dashboard sections">
+        <button class="dash-tab" role="tab" type="button" id="tab-class" aria-controls="panel-class">📊 Class</button>
+        <button class="dash-tab" role="tab" type="button" id="tab-children" aria-controls="panel-children">👧 Children</button>
+        <button class="dash-tab" role="tab" type="button" id="tab-thesis" aria-controls="panel-thesis">📥 Thesis data</button>
+        <button class="dash-tab" role="tab" type="button" id="tab-settings" aria-controls="panel-settings">⚙️ Settings</button>
+      </div>
 
-    <h2>Class overview</h2>
-    <div class="overview" id="overview"></div>
-    <div class="table-wrap">
-      <table class="funnel-table">
-        <caption>Completion funnel: how many investigations finished each phase, and the average minutes it took</caption>
-        <thead><tr><th scope="col">Phase</th><th scope="col">Finished</th><th scope="col">Average minutes</th></tr></thead>
-        <tbody id="funnel-rows"></tbody>
-      </table>
-    </div>
-    <div class="chart-pair">
-      <div class="chart-box"><canvas id="funnel-chart" role="img"></canvas></div>
-      <div class="chart-box"><canvas id="minutes-chart" role="img"></canvas></div>
-    </div>
+      <div class="filter-row" id="filter-row">
+        <label for="scenario-filter">Scenario:</label>
+        <select id="scenario-filter">
+          <option value="">All scenarios</option>
+        </select>
+      </div>
 
-    <h2>Each child</h2>
-    <div class="table-wrap">
-      <table class="class-table">
-        <thead>
-          <tr>
-            <th scope="col">Code</th>
-            <th scope="col">Scenario</th>
-            <th scope="col">Phases</th>
-            <th scope="col">Stars</th>
-            <th scope="col">Number puzzles</th>
-            <th scope="col">Hints</th>
-            <th scope="col">Guess → mean</th>
-            <th scope="col">Changed mind</th>
-            <th scope="col">Final claim</th>
-            <th scope="col">Misconception tags</th>
-            <th scope="col">Details</th>
-          </tr>
-        </thead>
-        <tbody id="class-rows"></tbody>
-      </table>
-    </div>
-    <p class="note">Number puzzles: ✅ right first time · 💡 right after a hint or another try · ❌ left unsolved.</p>
+      <!-- 📊 Class: the big picture -->
+      <section class="dash-panel" role="tabpanel" id="panel-class" aria-labelledby="tab-class" tabindex="0">
+        <div class="overview" id="overview"></div>
+        <p class="overview-more" id="overview-more"></p>
+        <div class="chart-pair">
+          <div class="chart-box"><canvas id="funnel-chart" role="img"></canvas></div>
+          <div class="chart-box"><canvas id="minutes-chart" role="img"></canvas></div>
+        </div>
+        <details class="more">
+          <summary>Show the charts as a table</summary>
+          <div class="table-wrap">
+            <table class="funnel-table">
+              <caption>How many investigations finished each phase, and the average minutes it took</caption>
+              <thead><tr><th scope="col">Phase</th><th scope="col">Finished</th><th scope="col">Average minutes</th></tr></thead>
+              <tbody id="funnel-rows"></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
 
-    <section class="detail" id="detail" hidden aria-live="polite"></section>
+      <!-- 👧 Children: a short list; "Open" shows one child's page -->
+      <section class="dash-panel" role="tabpanel" id="panel-children" aria-labelledby="tab-children" tabindex="0" hidden>
+        <div id="children-list">
+          <div class="table-wrap">
+            <table class="class-table children-table">
+              <thead>
+                <tr>
+                  <th scope="col">Code</th>
+                  <th scope="col">Scenario</th>
+                  <th scope="col">Progress</th>
+                  <th scope="col">Stars</th>
+                  <th scope="col" class="col-claim">Final claim</th>
+                  <th scope="col"><span class="sr-only">Open</span></th>
+                </tr>
+              </thead>
+              <tbody id="class-rows"></tbody>
+            </table>
+          </div>
+          <p class="note">Open a child to see their answers, tags and timeline.</p>
+        </div>
+        <section class="detail" id="detail" hidden></section>
+      </section>
 
-    <h2>Shared device?</h2>
-    <p>After a child has saved their file, you can clear their code and work from <strong>this</strong> device so the next child starts fresh. Make sure the file was saved first!</p>
-    <button class="btn" id="clear-device-btn" type="button">🧹 Clear children's work on THIS device</button>
+      <!-- 📥 Thesis data: downloads (optional) and DEMO -->
+      <section class="dash-panel" role="tabpanel" id="panel-thesis" aria-labelledby="tab-thesis" tabindex="0" hidden>
+        <p>Optional downloads for the Results chapter. Real children only: DEMO children are never exported.</p>
+        <ul class="action-list">
+          <li>
+            <button class="btn btn-main" id="export-thesis-btn" type="button">📑 thesis-metrics.csv</button>
+            <span>One row per child per scenario, ready for Excel or SPSS.</span>
+          </li>
+          <li>
+            <button class="btn" id="export-dictionary-btn" type="button">📘 Data dictionary</button>
+            <span>What every column in thesis-metrics.csv means.</span>
+          </li>
+          <li>
+            <button class="btn" id="export-class-btn" type="button">📊 Every log moment</button>
+            <span>The full reasoning log of every child, plus your tags.</span>
+          </li>
+        </ul>
 
-    <h2>Preview the rooms</h2>
-    <p>Children unlock the steps one at a time. To look at any room yourself, open them all on <strong>this</strong> device. Turn it off before a child uses this device.</p>
-    <button class="btn" id="preview-btn" type="button" aria-pressed="false"></button>
+        <h2>🧪 DEMO data</h2>
+        <ul class="action-list">
+          <li>
+            <button class="btn" id="demo-btn" type="button" aria-pressed="false">🧪 Show DEMO data</button>
+            <span>Adds 4 made-up children, to try the dashboard or show Prof.</span>
+          </li>
+        </ul>
+
+        <div id="imported-box">
+          <h2>📂 Imported files</h2>
+          <ul class="action-list">
+            <li>
+              <button class="btn" id="clear-btn" type="button">🗑️ Remove all imported files</button>
+              <span>Removes the imported files and tags from this device.</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ⚙️ Settings: this device -->
+      <section class="dash-panel" role="tabpanel" id="panel-settings" aria-labelledby="tab-settings" tabindex="0" hidden>
+        <h2>🧹 Shared device</h2>
+        <ul class="action-list">
+          <li>
+            <button class="btn" id="clear-device-btn" type="button">🧹 Clear this device</button>
+            <span id="clear-note">Removes the child's code and work from this device, so the next child starts fresh.</span>
+          </li>
+        </ul>
+
+        <h2>👀 Preview the rooms</h2>
+        <ul class="action-list">
+          <li>
+            <button class="btn" id="preview-btn" type="button" aria-pressed="false"></button>
+            <span>Opens every room on this device, to look around. Turn it off before a child uses it.</span>
+          </li>
+        </ul>
+      </section>
     </div>
   </main>
   <script type="module" src="../js/teacher/gate.js"></script>
