@@ -1,8 +1,10 @@
-// Teacher dashboard (Part 20, Prof's comment 6). Import the children's saved
-// files, see the class at a glance (completion funnel, averages), one row per
-// child per scenario, drill into one child, tag misconceptions, download CSVs.
-// Loaded by pin-gate.js only after the right PIN (a speed bump, not security;
-// real protection needs a login, optional Part 22).
+// Teacher dashboard (Part 20, Prof's comment 6). See the class at a glance
+// (completion funnel, averages), one row per child per scenario, drill into one
+// child, tag misconceptions, download CSVs for the thesis.
+// Where the children's work comes from:
+// - online database ON (Part 22): read straight from the database (cloud.js),
+//   nothing to import; loaded by gate.js after the email + password login.
+// - online database OFF: the teacher imports the files children saved.
 // Imported text is shown with textContent only: a file can hold anything a child typed.
 import { parseExportFile, MISCONCEPTION_TAGS, tagEntries } from '../helpers/summary.js';
 import { childRows, classOverview } from '../helpers/metrics.js';
@@ -17,9 +19,16 @@ import {
   getPreviewAll, setPreviewAll,
 } from '../storage/save.js';
 import { renderDetail } from './detail.js';
+import { twoTapButton } from './two-tap.js';
+import { backendReady } from '../config.js';
+import {
+  fetchChildren, fetchTags, addTag, removeTag, deleteChild, logOut, teacherEmail,
+} from './cloud.js';
 
-let imports = getTeacherImports(); // { "OWL-07": file, ... }
-let tags = getTeacherTags();       // { "OWL-07": ["equally-likely", ...], ... }
+const cloud = backendReady(); // true: the work comes from the online database
+
+let imports = cloud ? {} : getTeacherImports(); // { "OWL-07": file, ... }
+let tags = cloud ? {} : getTeacherTags();       // { "OWL-07": ["equally-likely", ...], ... }
 const titles = {};                 // scenario id -> card title, e.g. "How much do we sleep?"
 const partners = {};               // reading Class A -> Class B (not a scenario of its own)
 // DEMO children: in memory only, never saved with the real imports, never exported.
@@ -98,12 +107,25 @@ function tagCell(code) {
     const box = document.createElement('input');
     box.type = 'checkbox';
     box.checked = chosen.includes(tag.id);
-    box.addEventListener('change', () => {
+    box.addEventListener('change', async () => {
       const now = new Set(tags[code] || []);
       if (box.checked) now.add(tag.id); else now.delete(tag.id);
       tags[code] = [...now];
-      setTeacherTags(tags);
       details.querySelector('summary').textContent = `🏷️ Tags (${now.size})`;
+      if (!cloud) {
+        setTeacherTags(tags);
+        return;
+      }
+      try {
+        if (box.checked) await addTag(code, tag.id); else await removeTag(code, tag.id);
+      } catch (error) {
+        // Not saved online: undo the tick, so the screen never shows a wrong tag.
+        box.checked = !box.checked;
+        if (box.checked) now.add(tag.id); else now.delete(tag.id);
+        tags[code] = [...now];
+        details.querySelector('summary').textContent = `🏷️ Tags (${now.size})`;
+        say(`⚠️ The tag was not saved: ${error.message}`);
+      }
     });
     const papersWord = tag.papers.includes(',') ? 'Papers' : 'Paper';
     label.append(box, ` ${tag.label} (${papersWord} ${tag.papers})`);
@@ -173,7 +195,9 @@ function render() {
   body.replaceChildren();
   if (rows.length === 0) {
     const emptyRow = el('tr');
-    const emptyCell = el('td', 'No files yet. Import the files your children saved.');
+    const emptyCell = el('td', cloud
+      ? 'No children yet. Their work appears here by itself when they use DataScope.'
+      : 'No files yet. Import the files your children saved.');
     emptyCell.colSpan = 11;
     emptyRow.append(emptyCell);
     body.append(emptyRow);
@@ -188,7 +212,8 @@ function render() {
     open.type = 'button';
     open.addEventListener('click', () => {
       const file = row.demo ? demoFiles.find((f) => f.code === row.code) : imports[row.code];
-      renderDetail(document.getElementById('detail'), row, file.entries, titles[row.scenarioId] || row.scenarioId);
+      const onDelete = cloud && !row.demo ? removeChild : null;
+      renderDetail(document.getElementById('detail'), row, file.entries, titles[row.scenarioId] || row.scenarioId, onDelete);
     });
     const tagsTd = el('td');
     tagsTd.append(tagCell(row.code));
@@ -220,7 +245,7 @@ document.getElementById('export-thesis-btn').addEventListener('click', () => {
   // All scenarios, whatever the filter shows, so the file is always complete.
   const rows = exportableRows(childRows(Object.values(imports), partners));
   if (rows.length === 0) {
-    say("Import some children's files first. (DEMO children are never exported.)");
+    say(cloud ? "No children's work yet. (DEMO children are never exported.)" : "Import some children's files first. (DEMO children are never exported.)");
     return;
   }
   downloadFile('thesis-metrics.csv', thesisCSV(rows), 'text/csv');
@@ -249,7 +274,7 @@ demoBtn.addEventListener('click', () => {
 document.getElementById('export-class-btn').addEventListener('click', () => {
   const codes = Object.keys(imports).sort();
   if (codes.length === 0) {
-    say('Import some files first.');
+    say(cloud ? "No children's work yet." : 'Import some files first.');
     return;
   }
   const entries = codes.flatMap((code) => [...imports[code].entries, ...tagEntries(code, tags[code] || [])]);
@@ -259,27 +284,6 @@ document.getElementById('export-class-btn').addEventListener('click', () => {
 });
 
 // ---------- removing things (always two taps, so nothing is lost by accident) ----------
-
-// The first tap changes the button to "Tap again..."; a second tap within
-// 4 seconds runs `action`. (Browser confirm() boxes are avoided on purpose.)
-function twoTapButton(button, warning, action) {
-  const normalText = button.textContent;
-  let armed = false;
-  button.addEventListener('click', () => {
-    if (!armed) {
-      armed = true;
-      button.textContent = warning;
-      setTimeout(() => {
-        armed = false;
-        button.textContent = normalText;
-      }, 4000);
-      return;
-    }
-    armed = false;
-    button.textContent = normalText;
-    action();
-  });
-}
 
 twoTapButton(document.getElementById('clear-btn'), '⚠️ Tap again to remove everything', () => {
   imports = {};
@@ -311,6 +315,56 @@ previewBtn.addEventListener('click', () => {
   showPreviewState();
 });
 
+// ---------- the online database (Part 22) ----------
+
+// Loads every child's work and the tags from the database.
+async function loadFromCloud() {
+  say('⏳ Loading the children\'s work...');
+  try {
+    const files = await fetchChildren();
+    imports = Object.fromEntries(files.map((file) => [file.code, file]));
+    tags = await fetchTags();
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    say(`☁️ ${files.length} child${files.length === 1 ? '' : 'ren'} loaded from the database at ${time}.`);
+  } catch (error) {
+    if (error.message === 'Please log in again.') {
+      location.reload(); // the login ran out: back to the login form
+      return;
+    }
+    const offline = !navigator.onLine || error instanceof TypeError;
+    say(offline ? '📴 No internet connection. Connect and tap Refresh.' : `⚠️ Could not load: ${error.message}`);
+  }
+  render();
+}
+
+// Privacy: deletes one child's data from the database, then reloads.
+async function removeChild(code) {
+  try {
+    await deleteChild(code);
+    document.getElementById('detail').hidden = true;
+    await loadFromCloud();
+    say(`🗑️ Everything stored for ${code} was deleted from the database.`);
+  } catch (error) {
+    say(`⚠️ Could not delete ${code}: ${error.message}`);
+  }
+}
+
+function setupCloud() {
+  // Nothing to import or remove: the work arrives by itself.
+  document.getElementById('import-label').hidden = true;
+  document.getElementById('clear-btn').hidden = true;
+  document.getElementById('refresh-btn').hidden = false;
+  const logout = document.getElementById('logout-btn');
+  logout.hidden = false;
+  logout.textContent = `🚪 Log out (${teacherEmail()})`;
+  document.getElementById('source-note').textContent = 'The children\'s work arrives here by itself from the online database. Tap Refresh to see the newest. The survey data children worked with is synthetic (a pretend class).';
+  document.getElementById('refresh-btn').addEventListener('click', loadFromCloud);
+  logout.addEventListener('click', async () => {
+    await logOut();
+    location.reload();
+  });
+}
+
 // ---------- start ----------
 
 async function init() {
@@ -323,7 +377,12 @@ async function init() {
     filter.append(Object.assign(document.createElement('option'), { value: id, textContent: content.cardTitle }));
   }
   showPreviewState();
-  render();
+  if (cloud) {
+    setupCloud();
+    await loadFromCloud();
+  } else {
+    render();
+  }
 }
 
 init();

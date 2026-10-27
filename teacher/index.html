@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Teacher dashboard (Part 20). A PIN keeps children out; on a static site
-       that is a speed bump, NOT real security (see js/helpers/pin.js). -->
+  <!-- Teacher dashboard (Part 20). With the online database on (Part 22) the
+       teacher logs in with email + password (real protection, checked by the
+       database). With it off, a PIN keeps children out: a speed bump only. -->
   <title>Teacher dashboard · DataScope</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
@@ -28,11 +29,23 @@
       <p class="feedback" id="pin-message" aria-live="polite" hidden></p>
     </section>
 
+    <section class="pin-gate" id="login-gate" hidden>
+      <form id="login-form" class="pin-form">
+        <label for="login-email">📧 Email</label>
+        <input type="email" id="login-email" autocomplete="username" required>
+        <label for="login-password">🔒 Password</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+        <button class="btn btn-main" type="submit">Log in</button>
+      </form>
+      <p class="feedback" id="login-message" aria-live="polite" hidden></p>
+    </section>
+
     <div id="dashboard" hidden>
-    <p>Import the files your children saved (<code>datascope-CODE-DATE.json</code>). Everything stays on this device: nothing is uploaded. The survey data children worked with is synthetic (a pretend class).</p>
+    <p id="source-note">Import the files your children saved (<code>datascope-CODE-DATE.json</code>). Everything stays on this device: nothing is uploaded. The survey data children worked with is synthetic (a pretend class).</p>
 
     <div class="teacher-actions">
-      <label class="btn btn-main file-btn">
+      <button class="btn btn-main" id="refresh-btn" type="button" hidden>🔄 Refresh</button>
+      <label class="btn btn-main file-btn" id="import-label">
         📂 Import children's files
         <input type="file" id="file-input" accept=".json,application/json" multiple>
       </label>
@@ -41,6 +54,7 @@
       <button class="btn" id="export-class-btn" type="button">📊 Download class CSV (every log entry)</button>
       <button class="btn" id="demo-btn" type="button" aria-pressed="false">🧪 Show DEMO data</button>
       <button class="btn" id="clear-btn" type="button">🗑️ Remove all imported files</button>
+      <button class="btn" id="logout-btn" type="button" hidden>🚪 Log out</button>
     </div>
     <p class="feedback" id="teacher-feedback" aria-live="polite" hidden></p>
     <p class="demo-banner" id="demo-banner" hidden>🧪 DEMO: the DEMO-01 to DEMO-04 children are made up, only to show how the dashboard works. They are never saved with real files and never exported.</p>
@@ -100,6 +114,6 @@
     <button class="btn" id="preview-btn" type="button" aria-pressed="false"></button>
     </div>
   </main>
-  <script type="module" src="../js/teacher/pin-gate.js"></script>
+  <script type="module" src="../js/teacher/gate.js"></script>
 </body>
 </html>

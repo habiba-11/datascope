@@ -2,6 +2,7 @@
 // numbers, the exact words they wrote, and a timestamped timeline of every
 // log entry. Shown with textContent only: a file can hold anything a child typed.
 import { PHASES } from '../helpers/progress.js';
+import { twoTapButton } from './two-tap.js';
 
 const PHASE_NAMES = {
   ask: 'Ask', plan: 'Plan', collect: 'Collect', graph: 'Graph Lab',
@@ -33,7 +34,8 @@ function definitionList(pairs) {
 }
 
 // `row` comes from childRows(); `entries` is the child's whole log.
-export function renderDetail(container, row, entries, scenarioTitle) {
+// `onDelete` (online database only): deletes everything stored for this code.
+export function renderDetail(container, row, entries, scenarioTitle, onDelete = null) {
   const close = el('button', '✕ Close', 'btn');
   close.type = 'button';
   close.addEventListener('click', () => { container.hidden = true; });
@@ -100,6 +102,14 @@ export function renderDetail(container, row, entries, scenarioTitle) {
   const wraps = container.querySelectorAll('.table-wrap');
   wraps[0].append(phaseTable);
   wraps[1].append(timeline);
+
+  // Privacy: the teacher can delete one child's data (two taps, never by accident).
+  if (onDelete) {
+    const remove = el('button', `🗑️ Delete all of ${row.code}'s data`, 'btn');
+    remove.type = 'button';
+    twoTapButton(remove, `⚠️ Tap again to delete ${row.code} for good`, () => onDelete(row.code));
+    container.append(el('h3', 'Privacy'), remove);
+  }
   container.hidden = false;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   container.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });

@@ -208,8 +208,11 @@
   - 22b: save first, send later. Every log entry gets an id (newId in log.js; old entries get one once). helpers/outbox.js (toRow/fromRow/withIds/pendingEntries/batches, tested). storage/sync.js sends waiting entries with plain fetch to /rest/v1/log_entries in batches of 50; 409 (already there) counts as sent, 400 (can never be accepted) is skipped so it cannot block the rest; retry every 30 s and when the internet comes back. Sidebar status: ☁️ Saved online / ⏳ Sending... / 📴 Offline / ⚠️ Not sent yet. My journey: no file buttons when the database is on.
   - Tested against a fake Supabase (scratch tool, same rules): online send, Wi-Fi drop (saved in browser, status offline), back online (all sent, 0 duplicates), reload (nothing sent twice), old entries sent, wrong key → ⚠️. No page errors.
 
+- Part 22c (27 Oct 2026), 182 tests passing: with the database on, the teacher page shows an email + password login (js/teacher/gate.js, renamed from pin-gate.js; the PIN stays for database-off mode). js/teacher/cloud.js (plain fetch): log in / log out, automatic ticket refresh on 401, all entries 1000 per request, tags, delete a child by code. Dashboard: no import button, 🔄 Refresh, 🚪 Log out, tags saved online (undone on failure), "🗑️ Delete all of CODE's data" (two taps) in a child's details. groupByCode/tagsByCode in helpers/outbox.js (tested); twoTapButton moved to js/teacher/two-tap.js. Tested against the fake Supabase: a child without login reads 0 rows; wrong password refused; 2 children loaded; tag saved online; expired ticket refreshed by itself; delete removes the code; reload keeps the login; log out. Database-off mode (PIN, import) still works; axe: no violations on the login page.
+
 ## Next
-- Part 22c: teacher dashboard reads the database (email + password login, no file import), tags online, delete a child's data. Then 22d: privacy note.
+- Part 22d: privacy note (docs/privacy-note.md).
+- Habiba: do docs/backend-setup-guide.md (Supabase account, schema, teacher account, js/config.js), then test with TEST codes.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).
 - Part 23: final QA, docs and thesis material. Part 24 (deploy): locked until "Prof confirmed".

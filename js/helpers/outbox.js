@@ -47,3 +47,25 @@ export function batches(list, size = 50) {
   for (let i = 0; i < list.length; i += size) groups.push(list.slice(i, i + size));
   return groups;
 }
+
+// The teacher dashboard reads all entries from the database and groups them
+// into one "file" per child, the same shape as an imported file (Part 20).
+export function groupByCode(entries) {
+  const byCode = new Map();
+  for (const entry of entries) {
+    if (!byCode.has(entry.code)) byCode.set(entry.code, []);
+    byCode.get(entry.code).push(entry);
+  }
+  return [...byCode.entries()].map(([code, list]) => ({
+    code,
+    entries: [...list].sort((a, b) => (a.time < b.time ? -1 : a.time > b.time ? 1 : 0)),
+    progress: {}, // online, "done" comes from the phase-complete entries themselves
+  }));
+}
+
+// teacher_tags rows -> { "OWL-07": ["equally-likely", ...], ... }
+export function tagsByCode(rows) {
+  const tags = {};
+  for (const { code, tag } of rows) (tags[code] = tags[code] || []).push(tag);
+  return tags;
+}

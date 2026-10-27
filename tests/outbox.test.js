@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { toRow, fromRow, withIds, pendingEntries, batches } from '../js/helpers/outbox.js';
+import {
+  toRow, fromRow, withIds, pendingEntries, batches, groupByCode, tagsByCode,
+} from '../js/helpers/outbox.js';
 import { newId } from '../js/helpers/log.js';
 
 const entry = {
@@ -48,4 +50,18 @@ test('batches of at most 50', () => {
   const groups = batches(Array.from({ length: 120 }, (_, i) => i));
   assert.deepEqual(groups.map((g) => g.length), [50, 50, 20]);
   assert.deepEqual(batches([]), []);
+});
+
+test('entries from the database become one file per child, in time order', () => {
+  const files = groupByCode([
+    { code: 'TEST-02', time: '2026-10-27T09:05:00.000Z', type: 'hint' },
+    { code: 'TEST-01', time: '2026-10-27T09:03:00.000Z', type: 'b' },
+    { code: 'TEST-01', time: '2026-10-27T09:01:00.000Z', type: 'a' },
+  ]);
+  assert.deepEqual(files.map((f) => f.code), ['TEST-02', 'TEST-01']);
+  assert.deepEqual(files[1].entries.map((e) => e.type), ['a', 'b']);
+});
+
+test('tag rows become a list of tags per code', () => {
+  assert.deepEqual(tagsByCode([{ code: 'A-1', tag: 'x' }, { code: 'A-1', tag: 'y' }, { code: 'B-2', tag: 'x' }]), { 'A-1': ['x', 'y'], 'B-2': ['x'] });
 });
