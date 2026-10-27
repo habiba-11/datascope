@@ -201,27 +201,21 @@
 
 - Bug fix (26 Oct 2026, found by Habiba), 174 tests passing: My journey said "Not done yet" and 0 stars for every phase when the teacher preview was on, because phase-start/complete/feedback were not logged in preview. Now they are always logged (marked preview: true), and buildJourney also counts a phase as done if the saved progress says so (repairs runs already saved; stars that were never logged stay empty). Teacher dashboard shows "👀 preview" on such runs; thesis-metrics.csv has a new "preview" column (not excluded: Habiba decides).
 
+- Gap fixes (27 Oct 2026), 174 tests passing: picked answers now tell screen readers (js/pressed-state.js keeps aria-pressed in step with the "active"/"selected" class on every choice, certainty, chart button, scenario and device card, pop-ups included); the current Explore tab shows 📍 instead of ✓; Chance Lab "How likely?" shows the spinner picture again for spinners.
+
 ## Next
-- Habiba: test Round 2 in Live Server and on a Chromebook/tablet (open items 11d, 12a-d too).
-- Part 20c: rubric coding of each claim (later: waiting for the real levels from Papers 7 and 13).
-- Part 22 (bonus backend): needs Prof's OK and an ethics check first (D5, D8).
+- Part 22 (backend + database, Supabase): started 27 Oct 2026 with test codes only (see decisions).
+- Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
+- Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).
 - Part 23: final QA, docs and thesis material. Part 24 (deploy): locked until "Prof confirmed".
-- Habiba: test 12a-d (sounds, motions, badge shelf, levels + confetti) in Live Server.
-- 12e (optional): room passport stamps (one stamp per room when its reasoning is done).
-- 12d: explorer levels + room passport stamps + confetti for a finished Evidence Card.
-- 11d (Habiba): run docs/device-test-checklist.md on a real Chromebook or tablet and report back.
-- Round 2 (25 Oct 2026): Part 13 = pop-up component. Deploy moved to **Part 24**, locked until Habiba says "Prof confirmed". See docs/round-2-plan.md.
+- Optional, could be cut: fair-share blocks for the mean, guess slider, tap-a-bar highlight in Graph Lab, drag evidence chips onto the card, scenario-linked Chance Lab device.
 
-## Known bugs/open items
-- Small-group sampling (surveying a few classmates before the whole class) is explicitly out of scope for now — Plan only collects a prediction; decided with Habiba on 18 Oct 2026.
-- Graph Lab: a line chart for categories (playground) joins unrelated games (kept as a "what changes?" talking point); bar/pie colours are by position, so they repeat after 5 values (labels carry the meaning).
-- Not yet tested on a real Chromebook/tablet (11d) or with a real screen reader.
-- Selected answers show a ✓ for sighted users, but buttons don't yet announce "pressed" to screen readers (aria-pressed); feedback text announces the choice in most places.
-- Chance Lab Task 2 asks "how likely?" without repeating the spinner picture from Task 1 (the child just saw it one tap earlier).
-- The app needs the internet for fonts and Chart.js until the offline copy (Part 12).
-
-## Known bugs
-- none yet
+## Known open items
+- Small-group sampling is out of scope (decided 18 Oct 2026); Arabic right-to-left is future work.
+- Graph Lab: a line chart for categories (playground) joins unrelated games (kept as a "what changes?" talking point); bar/pie colours repeat after 5 values (labels carry the meaning).
+- The playground guess shows 5 games (more than 3-4 options), because the choices must match the data.
+- Not yet tested on a real Chromebook/tablet or with a real screen reader.
+- Fonts and Chart.js still load from the internet (local copies come with deploy, Part 24). GSAP is already local.
 
 ## Decisions log
 - 25 Oct 2026 (Round 2 start): Prof's 8 comments planned as Parts 13 to 24 (docs/round-2-plan.md). Backend = optional bonus behind a flag; rewards for reasoning, never speed; DEMO data never exported; deploy locked until "Prof confirmed" (all in CLAUDE.md). Number Lab following the chosen scenario (Part 17b) reverses the earlier "by design" note in Known bugs.

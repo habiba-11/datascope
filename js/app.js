@@ -5,6 +5,7 @@ import { guardPage, enterPhase } from './phase-progress.js';
 import { visibleSteps, isStepDone, isUnlocked } from './helpers/progress.js';
 import { pipReacts, enterRoom, float, unlockStep, confetti } from './motion.js';
 import { pipSVG } from './pip.js';
+import { watchPressedState } from './pressed-state.js';
 
 const STEPS = [
   { id: 'ask', label: 'Ask', icon: '❓', color: 'ask', href: 'question-studio.html' },
@@ -74,6 +75,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
 
   setupCelebrations();
   setupInfoButton();
+  watchPressedState();
   enterRoom(root.querySelector('.room-content'));
   float(root.querySelector('.pip-mascot .pip'));
   window.addEventListener('datascope:phase-done', showUnlocked);

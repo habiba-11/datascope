@@ -145,10 +145,15 @@ h1 {
    .active / .selected are the classes the rooms already add when a child picks something. */
 .choice-btn.active::before,
 .certainty-btn.active::before,
-.chart-type-btn.active::before,
-.explore-tab.active::before {
+.chart-type-btn.active::before {
   content: '✓ ';
   font-weight: 800;
+}
+
+/* The Explore tab you are on gets a pin, not a ✓ (a ✓ means "picked", and a
+   finished room already shows ✅). */
+.explore-tab.active::before {
+  content: '📍 ';
 }
 
 .scenario-card.selected,

@@ -233,3 +233,13 @@
   border-radius: var(--radius-button);
   padding: 8px 12px;
 }
+
+/* The spinner again, smaller, in "How likely?" (Task 2). */
+.spinner-picture.small {
+  width: 100px;
+  height: 100px;
+}
+
+.spinner-picture.small::after {
+  height: 36px;
+}

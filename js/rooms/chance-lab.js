@@ -63,6 +63,7 @@ async function init() {
       <section class="task" data-task="2" hidden>
         <h2 class="task-title">🤔 How likely?</h2>
         <p id="predict-question"></p>
+        <div class="spinner-picture small" id="predict-picture" role="img" hidden></div>
         <div class="certainty-scale" id="certainty-scale">
           ${certaintyButtonsHTML()}
         </div>
@@ -129,6 +130,13 @@ function showTask(n) {
   currentTask = n;
 
   if (n === 2 && selectedDevice) {
+    // Spinners: show the spinner again, so the child can see the slice sizes while deciding.
+    const picture = document.getElementById('predict-picture');
+    picture.hidden = !isSpinner(selectedDevice);
+    if (!picture.hidden) {
+      picture.style.background = spinnerGradient(selectedDevice);
+      picture.setAttribute('aria-label', document.getElementById('spinner-picture').getAttribute('aria-label'));
+    }
     document.getElementById('predict-question').textContent =
       `How likely is it that the ${selectedDevice.label.toLowerCase()} lands on ${selectedDevice.target}?`;
   }
