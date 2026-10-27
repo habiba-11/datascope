@@ -14,6 +14,19 @@
   min-width: 160px;
 }
 
+/* chance-lab.css is not loaded on this page, so the scale gets its own spacing here. */
+#certainty-scale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 24px;
+}
+
+label[for="certainty-reason"] {
+  display: block;
+  font-weight: 700;
+}
+
 #certainty-reason {
   width: 100%;
   max-width: 500px;
