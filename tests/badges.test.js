@@ -148,7 +148,7 @@ test('Chance Tester needs 10 AND 500 tries with the same device', () => {
   ]).includes('chance-tester'));
 });
 
-test('Middle Finder needs Mia\'s mistake solved; an unsolved try does not count', () => {
+test('Centre Finder (middle-finder) needs Mia\'s mistake solved; an unsolved try does not count', () => {
   const ids = (log) => checkBadges(log, code);
   assert.ok(!ids([{ code, type: 'meaning-task', task: 'find-mias-mistake', result: 'incorrect' }]).includes('middle-finder'));
   assert.ok(!ids([{ code, type: 'meaning-task', task: 'build-mean', result: 'correct' }]).includes('middle-finder'));

@@ -186,7 +186,7 @@ export const BADGES = [
     rule: (entries) => hasMoment(entries, 'not-tell:'),
   },
   {
-    id: 'middle-finder', name: 'Middle Finder', phase: 'Explore', color: 'collect', icon: 'median',
+    id: 'middle-finder', name: 'Centre Finder', phase: 'Explore', color: 'collect', icon: 'median',
     why: 'You put the numbers in order to find the centre. That is the median!',
     how: 'Sort the numbers to find the median.',
     // Mia's mistake is only solved after the cards are sorted (Part 21c).
