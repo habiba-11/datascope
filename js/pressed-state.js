@@ -1,7 +1,7 @@
 // Shell layer: screen readers hear which answer is picked. The rooms mark a
 // picked button with the class "active" (or a picked card with "selected");
 // this keeps aria-pressed in step with that class, everywhere, in one place.
-const PICKABLE = '.choice-btn, .certainty-btn, .chart-type-btn, .scenario-card, .device-card';
+const PICKABLE = '.choice-btn, .certainty-btn, .scenario-card, .device-card';
 
 function sync(element) {
   // Choice cards that are radios (js/choices.js) say "checked" themselves.

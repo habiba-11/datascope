@@ -224,8 +224,7 @@ h1 {
 /* Colour is never the only signal (CLAUDE.md): anything chosen also gets a ✓.
    .active / .selected are the classes the rooms already add when a child picks something. */
 .choice-btn.active::before,
-.certainty-btn.active::before,
-.chart-type-btn.active::before {
+.certainty-btn.active::before {
   content: '✓ ';
   font-weight: 800;
 }

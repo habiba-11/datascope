@@ -1,64 +1,60 @@
-.chart-type-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 12px 0 16px;
+/* Graph Lab (3-zone layout). The segmented chart switch is in task-card.css. */
+
+/* Step 1 (Look): the chart(s) fill the card. Steps 2 and 3: the chart and the
+   question sit side by side, so the child can look while writing. With two
+   classes, both charts stay in a row and the question goes underneath. */
+.graph-layout {
+  display: grid;
+  gap: var(--space-3);
 }
 
-.chart-type-btn {
-  background: white;
-  color: var(--color-text);
+.graph-layout--asking:not(.graph-layout--two) {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  align-items: start;
 }
 
-.chart-type-btn.active {
-  background: var(--color-btn-main-bg);
-  color: var(--color-btn-main-text);
-}
-
-/* Holds one chart, or two side by side when comparing classes. */
+/* One chart, or two side by side when comparing classes. */
 .chart-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: var(--space-3);
 }
 
 .chart-block {
   flex: 1;
-  min-width: 280px;
-  max-width: 600px;
+  min-width: 260px;
 }
 
 .chart-wrap {
   position: relative;
-  height: 320px;
+  height: 300px;
   width: 100%;
-  max-width: 600px;
-  margin: 0 0 20px;
+}
+
+/* "📖 Reading minutes: Class A" above each compared chart. */
+.chart-title {
+  font-size: 19px;
+  margin: 0 0 var(--space-1);
 }
 
 .reflection {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  max-width: 500px;
+  gap: var(--space-1);
 }
 
 .reflection label {
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1.2;
 }
 
 .reflection textarea {
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 19px;
   border: var(--border-width) solid var(--color-navy);
   border-radius: 12px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   resize: vertical;
-  margin-bottom: 12px;
-}
-
-/* "📖 Reading minutes: Class A" above each compared chart. */
-.chart-title {
-  font-size: 21px;
 }

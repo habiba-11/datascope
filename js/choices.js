@@ -34,3 +34,12 @@ export function wireChoiceCards(group, cardSelector, onChoose) {
     });
   });
 }
+
+// A row of joined buttons for one small choice (UI guide: segmented), e.g.
+// the chart types or 10 / 50 / 500 tries. Wire it with wireChoiceCards:
+// radio buttons with arrow keys. `options`: [{ value, label }].
+export function segmentedHTML(options, label) {
+  return `<div class="segmented" aria-label="${label}">${options
+    .map((o) => `<button class="segment" data-value="${o.value}" type="button">${o.label}</button>`)
+    .join('')}</div>`;
+}

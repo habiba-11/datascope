@@ -241,3 +241,51 @@
 .room-tool {
   font-size: 17px;
 }
+
+/* segmented (js/choices.js): one small choice as joined buttons, e.g. chart
+   types or 10 / 50 / 500 tries. The chosen one is navy with a ✓. */
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-button);
+}
+
+.segment {
+  min-height: 52px;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-right: var(--border-width) solid var(--color-navy);
+  background: var(--color-card-bg);
+  color: var(--color-navy);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.segment:last-child {
+  border-right: 0;
+}
+
+.segment.selected {
+  background: var(--color-navy);
+  color: #FFFFFF;
+}
+
+.segment.selected::before {
+  content: '✓ ';
+}
+
+.segment:focus-visible {
+  outline-offset: -6px;
+  outline-color: var(--color-plan);
+}
+
+/* The hints of the question on screen (the Hint button is in the action bar). */
+.hint-list-slot .hint-list {
+  margin-top: var(--space-1);
+}
