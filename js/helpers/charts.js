@@ -79,6 +79,21 @@ function toDotPoints(labels, data) {
   return points;
 }
 
+// How big a dot can be: at most 9px, and never wider than the gap between two
+// neighbouring values on the x-axis (or the height of one stack step), so the
+// dots never overlap. Chart.js asks again when the chart is resized.
+export function dotSize(pixelsPerStep) {
+  return Math.max(3, Math.min(9, Math.floor(pixelsPerStep / 2) - 1));
+}
+
+function dotRadius({ chart }) {
+  const { x, y } = chart.scales;
+  if (!x || !y) return 9;
+  const across = Math.abs(x.getPixelForValue(1) - x.getPixelForValue(0));
+  const up = Math.abs(y.getPixelForValue(1) - y.getPixelForValue(0));
+  return dotSize(Math.min(across, up));
+}
+
 // The x-axis of a dot plot. Numbers get a number line from the first to the
 // last label (so two compared classes share the same line). Text answers
 // (e.g. playground games) get one column per category instead.
@@ -111,7 +126,7 @@ export function makeChartConfig(type, labels, data, unitLabel, yMax) {
           backgroundColor: '#38B6FF',
           pointBorderColor: '#17324D',
           pointBorderWidth: 2,
-          pointRadius: 9,
+          pointRadius: dotRadius,
         }],
       },
       options: {

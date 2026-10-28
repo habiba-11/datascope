@@ -162,6 +162,21 @@ export function clearChildData() {
   }
 }
 
+// "Start a new investigation" (My journey): this child's trail starts again
+// at Ask. Only the saved progress and the chosen question are reset; the
+// reasoning log keeps everything (the thesis data and the badges stay).
+export function startNewInvestigation() {
+  const all = readObject(PROGRESS_KEY);
+  delete all[getExplorerCode() || 'NO-CODE'];
+  writeItem(PROGRESS_KEY, JSON.stringify(all));
+  memory.delete(SCENARIO_KEY);
+  try {
+    localStorage.removeItem(SCENARIO_KEY);
+  } catch {
+    // Storage is blocked: nothing was stored there anyway.
+  }
+}
+
 // Teacher view: the children's imported files and the teacher's tags,
 // both stored as { code: ... } objects on the teacher's device.
 const IMPORTS_KEY = 'datascope:teacherImports';

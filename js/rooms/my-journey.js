@@ -10,7 +10,9 @@ import { loadRecipe, loadContent } from '../helpers/scenarios.js';
 import { numberLabKind } from '../helpers/number-tasks.js';
 import { CERTAINTY } from '../helpers/certainty.js';
 import { readLog } from '../helpers/log.js';
-import { getSelectedScenarioId, getExplorerCode, getAllProgress, getDonePhases } from '../storage/save.js';
+import {
+  getSelectedScenarioId, getExplorerCode, getAllProgress, getDonePhases, startNewInvestigation,
+} from '../storage/save.js';
 import { buildExport, exportFileName, toCSV, downloadFile } from '../storage/export.js';
 import { guardJourney } from '../phase-progress.js';
 import { backendReady } from '../config.js';
@@ -175,6 +177,12 @@ function walkPip() {
   });
 }
 
+// A new investigation starts the trail again at Ask (the log keeps the old one).
+function newInvestigation() {
+  startNewInvestigation();
+  location.href = 'question-studio.html';
+}
+
 async function init() {
   if (guardJourney()) return; // not finished yet: sent to the furthest open room
 
@@ -201,7 +209,7 @@ async function init() {
     ? '<p class="online-note">☁️ Your work goes to your teacher by itself. Nothing to save!</p>'
     : '<button class="link-btn" id="save-csv-btn" type="button">or save it as a table (CSV)</button>'}
               <p class="feedback" id="save-feedback" hidden></p>
-              ${backendReady() ? '' : '<a class="btn btn-quiet" href="question-studio.html">🔁 Start a new investigation</a>'}
+              ${backendReady() ? '' : '<button class="btn btn-quiet" id="new-investigation-btn" type="button">🔁 Start a new investigation</button>'}
             </div>
           </div>
         </div>`,
@@ -222,7 +230,7 @@ async function init() {
     back: { label: 'Evidence Board', href: 'evidence-board.html' },
     hint: print,
     primary: backendReady()
-      ? { label: '🔁 Start a new investigation →', onClick: () => { location.href = 'question-studio.html'; } }
+      ? { label: '🔁 Start a new investigation →', onClick: newInvestigation }
       : { label: '📤 Save my work for my teacher', onClick: () => save('json', feedback) },
   });
 
@@ -235,6 +243,7 @@ async function init() {
 
   // Files are only the fallback when the online database is switched off.
   if (!backendReady()) {
+    document.getElementById('new-investigation-btn').addEventListener('click', newInvestigation);
     document.getElementById('save-csv-btn').addEventListener('click', () => save('csv', feedback));
   }
 }

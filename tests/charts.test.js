@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildFrequencyData, makeChartConfig, describeChart } from '../js/helpers/charts.js';
+import { buildFrequencyData, makeChartConfig, describeChart, dotSize } from '../js/helpers/charts.js';
 
 test('dot plot of text answers uses a category x-axis (one column per game)', () => {
   const { labels, data } = buildFrequencyData(['Tag', 'Football', 'Football']);
@@ -34,4 +34,10 @@ test('a chart is also described in words for screen readers', () => {
     'Bar chart. 3 hours: 1 classmate. 9 hours: 6 classmates.'
   );
   assert.equal(describeChart('pie', ['Football', 'Tag'], [6, 3]), 'Pie chart. Football: 6 classmates. Tag: 3 classmates.');
+});
+
+test('dots shrink to fit when answers are close on a long number line, and never vanish', () => {
+  assert.equal(dotSize(60), 9); // lots of room: the normal size
+  assert.equal(dotSize(14), 6); // Class A on the shared 4-36 line: 2 x 6 = 12 px < 14 px, no overlap
+  assert.equal(dotSize(4), 3); // very tight: still a visible dot
 });

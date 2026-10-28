@@ -242,6 +242,9 @@
   - Teacher page: plain buttons now white secondary (were browser grey), Refresh secondary, "← All children" quiet; one green button per form/tab. No Pip, no motion (adult tool).
   - After-audit (same script as before): docs/ui-audit.md, before → after table for every screen. Every child screen now has exactly ONE primary-looking button (7 screens had 2 to 4); Graph Lab 1416 → 1064 px tall, My journey 1566 → 1298 px.
   - Still to do by Habiba: try the new layout in Live Server and on a tablet/Chromebook; keyboard-only run.
+- Fixes after Habiba's check (28 Oct 2026), 210 tests passing:
+  - Graph Lab dot plot, reading minutes: Class A's dots (18 to 22 on the shared 4 to 36 number line) overlapped. The dot size now fits the gap between two values (dotSize in helpers/charts.js, tested; at most 9px, at least 3px; both classes get the same size, so the comparison stays fair).
+  - "🔁 Start a new investigation" (My journey) now starts the trail again at Ask: startNewInvestigation() in save.js clears this child's saved progress and chosen question; the reasoning log is kept (tested). Note for the thesis: if a child repeats the SAME question, buildJourney / thesis-metrics keep the first run's stars and times (first phase-start / phase-complete) and the latest answers.
 
 ## Next
 - Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.

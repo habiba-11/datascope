@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {
   unlockedPhases, isUnlocked, furthestPhase, visibleSteps, isStepDone, guardRedirect,
 } from '../js/helpers/progress.js';
-import { makeEntry } from '../js/helpers/log.js';
+import { makeEntry, logEvent, readLog } from '../js/helpers/log.js';
 import {
   setExplorerCode, setSelectedScenarioId, getDonePhases, markPhaseDone, clearChildData,
-  getPreviewAll, setPreviewAll,
+  getPreviewAll, setPreviewAll, startNewInvestigation, getSelectedScenarioId,
 } from '../js/storage/save.js';
 
 test('a fresh child sees only Ask', () => {
@@ -85,4 +85,18 @@ test('clearing the device removes progress, but keeps the teacher preview switch
 test('phase-start and phase-complete are known log events', () => {
   assert.equal(makeEntry('OWL-07', 'shell', 'phase-start', { phase: 'ask' }).type, 'phase-start');
   assert.equal(makeEntry('OWL-07', 'shell', 'phase-complete', { phase: 'ask' }).type, 'phase-complete');
+});
+
+test('a new investigation starts the trail at Ask again, but keeps the log', () => {
+  clearChildData();
+  setExplorerCode('OWL-07');
+  setSelectedScenarioId('shoe-sizes');
+  markPhaseDone('ask');
+  markPhaseDone('plan');
+  logEvent('question-studio', 'prediction', { guess: 35 });
+  startNewInvestigation();
+  assert.deepEqual(getDonePhases(), []); // the trail shows only Ask
+  assert.deepEqual(getDonePhases('shoe-sizes'), []);
+  assert.equal(getSelectedScenarioId(), 'sleep-hours'); // back to the default: the child picks again
+  assert.equal(readLog().length, 1); // the reasoning log is untouched
 });
