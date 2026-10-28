@@ -22,7 +22,8 @@
 
   --color-line: #9CC6E6;   /* step connectors, dashed list frames */
   --color-soft: #E1EEF8;   /* row lines, empty progress bars */
-  --color-gold: #FFC531;   /* super badge ring, rays */
+  --color-gold: #FFC531;   /* super badge ring */
+  --color-rays: rgba(255, 197, 49, 0.55); /* the gold rays behind a new badge */
   --color-locked: #C9D6E2; /* a badge still to find */
   --color-locked-light: #EEF3F7;
   --color-muted-text: #4A6580; /* small grey text on white (7:1) */

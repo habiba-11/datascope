@@ -1,0 +1,268 @@
+/* Badge patches, the badge pop-up and the backpack (Part 21b).
+   Look and timeline: docs/design/badges-spec.md. Colours come from theme.css.
+   Only transform and opacity are animated. Reduced motion: see the end. */
+
+/* ---------- The patch (js/badge-art.js) ---------- */
+.patch-outer { fill: var(--patch); stroke: var(--color-navy); }
+.patch-gold { fill: var(--color-gold); stroke: var(--color-navy); }
+.patch-stitch { fill: none; stroke: #FFFFFF; }
+.patch-inner { fill: var(--patch-light); stroke: var(--color-navy); }
+.patch-icon { fill: none; stroke: var(--color-navy); color: var(--color-navy); }
+
+.mystery-back { fill: var(--color-navy); }
+.mystery-ring { fill: none; stroke: var(--color-gold); }
+.mystery-mark {
+  fill: var(--color-gold);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 62px;
+}
+
+/* The name under a patch: a white pill with a colour dot (navy text on white
+   is always readable, also for the purple badges). */
+.patch-ribbon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 999px;
+  background: #FFFFFF;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.patch-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--color-navy);
+  background: var(--patch);
+}
+
+/* ---------- The badge pop-up (js/badge-popup.js, built on js/modal.js) ---------- */
+/* openModal() makes header + body + actions. Here the header and body "melt"
+   into the card (display: contents), so their parts can be put in the order
+   of the design: title letters, badge, super tag, name, why, button. */
+.badge-modal[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 440px;
+  padding: 22px 26px 26px;
+  border-radius: 30px;
+  box-shadow: 0 8px 0 var(--color-navy);
+  text-align: center;
+  overflow: hidden;
+  animation: bp-drop 0.55s var(--ease-spring) 0.1s both, bp-shake 0.25s ease-in-out 1.38s both;
+}
+
+.badge-modal.super {
+  background: linear-gradient(var(--color-plan-light), #FFFFFF 45%);
+}
+
+.badge-modal::backdrop {
+  background: rgba(23, 50, 77, 0.55);
+  animation: bp-fade 0.2s ease-out both;
+}
+
+.badge-modal .modal-header,
+.badge-modal .modal-body {
+  display: contents;
+}
+
+/* Esc still closes it (and the badge still goes in the backpack); the one
+   big button is the only thing to tap. */
+.badge-modal .modal-close { display: none; }
+
+.bp-title { order: 1; }
+.bp-stage { order: 2; }
+.bp-super { order: 3; }
+.badge-modal .modal-title { order: 4; }
+.bp-why { order: 5; }
+.badge-modal .modal-actions { order: 6; }
+
+.bp-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 28px;
+  color: var(--color-btn-main-bg);
+  white-space: nowrap;
+}
+
+.bp-title span {
+  display: inline-block;
+  animation: bp-letter 0.5s var(--ease-spring) both;
+}
+
+.bp-stage {
+  position: relative;
+  width: 100%;
+  height: 210px;
+  margin: 6px auto 4px;
+  display: grid;
+  place-items: center;
+}
+
+.bp-stage > * { grid-area: 1 / 1; }
+
+.bp-rays {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(var(--color-rays) 0 9deg, transparent 9deg 22deg);
+  -webkit-mask: radial-gradient(circle, #000 35%, transparent 70%);
+  mask: radial-gradient(circle, #000 35%, transparent 70%);
+  animation: bp-rays-in 0.5s var(--ease-out) 1.35s both, bp-spin 9s linear 1.85s infinite;
+}
+
+.bp-burst {
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+.bp-burst i {
+  position: absolute;
+  left: -7px;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--c);
+  opacity: 0;
+  animation: bp-burst 0.9s var(--ease-out) var(--t, 1.35s) both;
+}
+
+.bp-burst i.star {
+  border-radius: 0;
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.bp-stamp { animation: bp-stamp 0.35s var(--ease-spring) 1.35s both; }
+
+.bp-flip {
+  width: 170px;
+  height: 170px;
+  perspective: 900px;
+}
+
+.bp-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: bp-flip 0.9s cubic-bezier(0.3, 0.1, 0.2, 1) 0.45s both;
+}
+
+.bp-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.bp-face svg { width: 100%; height: 100%; }
+.bp-front { transform: rotateY(180deg); }
+
+.bp-super {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--color-navy);
+  color: var(--color-gold);
+  font-weight: 800;
+  font-size: 16px;
+  animation: bp-rise 0.4s var(--ease-out) 1.55s both;
+}
+
+.badge-modal .modal-title {
+  flex: none;
+  margin: 4px 0 6px;
+  font-size: 30px;
+  line-height: 1.1;
+  animation: bp-rise 0.4s var(--ease-out) 1.5s both;
+}
+
+.bp-why {
+  margin: 0 auto 16px;
+  max-width: 330px;
+  font-weight: 700;
+  font-size: 19px;
+  line-height: 1.35;
+  animation: bp-rise 0.4s var(--ease-out) 1.65s both;
+}
+
+/* Room on the left for Pip, who peeks in from the corner. */
+.badge-modal .modal-actions {
+  justify-content: center;
+  padding: 0 0 0 64px;
+  animation: bp-rise 0.4s var(--ease-out) 1.9s both;
+}
+
+.badge-modal .modal-actions .btn {
+  min-height: 58px;
+  font-size: 22px;
+  animation: bp-pulse 1.6s ease-in-out 2.6s infinite;
+}
+
+.badge-modal .modal-pip {
+  position: absolute;
+  left: 2px;
+  bottom: -6px;
+  width: 80px;
+  animation: bp-peek 0.6s var(--ease-spring) 1.8s both;
+}
+
+.badge-modal .modal-pip .pip-wing-right {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+  animation: bp-wave 0.5s ease-in-out 2.4s 3;
+}
+
+/* The copy of the badge that flies into the backpack (js/badge-popup.js). */
+.bp-ghost {
+  position: fixed;
+  z-index: 1001;
+  pointer-events: none;
+}
+
+/* The backpack bumps and its counter pops when a badge lands. */
+.bp-bump { animation: bp-bump 0.5s var(--ease-spring); }
+.bp-count-pop { animation: bp-count 0.45s var(--ease-spring); }
+.bp-slot-new svg { animation: bp-slot 0.7s var(--ease-spring) both; }
+
+/* ---------- Keyframes ---------- */
+@keyframes bp-fade { from { opacity: 0; } }
+@keyframes bp-drop { 0% { opacity: 0; transform: translateY(-60px) scale(0.6); } 100% { opacity: 1; transform: none; } }
+@keyframes bp-shake { 0%, 100% { rotate: 0deg; } 30% { rotate: -1.6deg; } 70% { rotate: 1.6deg; } }
+@keyframes bp-letter { 0% { opacity: 0; transform: translateY(18px) scale(0.3); } 100% { opacity: 1; transform: none; } }
+@keyframes bp-flip { from { transform: rotateY(0); } to { transform: rotateY(540deg); } }
+@keyframes bp-stamp { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
+@keyframes bp-rays-in { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
+@keyframes bp-spin { to { transform: rotate(360deg); } }
+@keyframes bp-burst {
+  0% { opacity: 1; transform: rotate(var(--a)) translateY(0) scale(0.2); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(var(--d) * -1)) scale(1) rotate(var(--s)); }
+}
+@keyframes bp-rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes bp-peek { from { transform: translateY(110%); } to { transform: none; } }
+@keyframes bp-wave { 50% { transform: rotate(-28deg); } }
+@keyframes bp-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes bp-bump { 0% { transform: scale(1); } 40% { transform: scale(1.18) rotate(-6deg); } 100% { transform: none; } }
+@keyframes bp-count { 0% { transform: scale(1); } 50% { transform: scale(1.6); } 100% { transform: none; } }
+@keyframes bp-slot { 0% { transform: scale(0.2) rotate(-30deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+
+/* ---------- Reduced motion: the same information, no movement ----------
+   base.css already switches every animation off. Here the badge shows its
+   front straight away (no flip), and the rays and confetti are not drawn. */
+@media (prefers-reduced-motion: reduce) {
+  .bp-flip-inner { transform: rotateY(180deg); }
+  .bp-rays,
+  .bp-burst { display: none; }
+}
