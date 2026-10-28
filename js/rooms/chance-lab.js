@@ -1,6 +1,6 @@
-import { mountShell } from '../app.js';
+import { mountShell, exploreCardTabsHTML } from '../app.js';
 import { logEvent } from '../helpers/log.js';
-import { addHintButton } from '../helpers/prompts.js';
+import { createHint } from '../helpers/prompts.js';
 import { playSound } from '../sounds.js';
 import { stagger } from '../motion.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
@@ -8,6 +8,10 @@ import { loadContent } from '../helpers/scenarios.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 import { toPct, theoryText, trialMessage, needleAngle } from '../helpers/chance.js';
 import { certaintyButtonsHTML } from '../helpers/certainty.js';
+import { pipSay } from '../pip.js';
+import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
+import { setupActionBar } from '../action-bar.js';
+import { wireChoiceCards, segmentedHTML } from '../choices.js';
 
 // `verb` is the device's own word for one go, used in the messages.
 const DEVICES = {
@@ -18,8 +22,19 @@ const DEVICES = {
 };
 
 
+// Chance Lab in the 3-zone layout (UI guide): Explore tabs on the card, a
+// mini stepper, and ONE primary button that says what it does ("▶ Spin 500 times").
+const STEP_LABELS = ['Pick a game', 'How likely?', 'Test it'];
+const RUN_SIZES = [10, 50, 500];
+
 const taskComplete = { 1: false, 2: false, 3: false };
 let currentTask = 1;
+let bar = null;
+let hint = null;
+let runSize = 10; // chosen on the 10 / 50 / 500 switch
+let justRan = false; // after a run the primary offers "I'm done testing"
+let rating = null; // the certainty word picked in step 2
+let story = '';
 let selectedDevice = null;
 // The last trial run for the selected device, so feedback can honestly say
 // whether a bigger run came out closer to the theory or not.
@@ -31,103 +46,92 @@ async function init() {
   // Only the story follows the scenario; the 4 devices stay the same for everyone.
   const { chanceLab } = await loadContent(getSelectedScenarioId());
 
+  story = chanceLab.story;
   mountShell({
     step: 'explore',
     accent: 'explore',
     explorePage: 'chance',
     phase: 'chance',
-    pipMessage: "Hoo-hoo! Guess first. Then test it many times!",
-    contentHTML: `
-      <h1 class="room-title">🎲 Chance Lab</h1>
-      <p class="task-progress" id="task-progress">Task 1 of 3</p>
+    layout: 'card',
+    contentHTML: taskCardHTML({
+      tabsHTML: exploreCardTabsHTML(),
+      bodyHTML: `
+        <div id="stepper"></div>
+        ${pipLineHTML(story, '🎲 Pick a chance game')}
 
-      <section class="task" data-task="1">
-        <h2 class="task-title">🎲 Pick a chance game</h2>
-        <p class="chance-story">${chanceLab.story}</p>
-        <p>Pick one. Then see everything that could happen.</p>
-        <div class="device-grid" id="device-grid">
-          ${Object.entries(DEVICES).map(([key, d]) => `
-            <button class="device-card" data-key="${key}" type="button">
-              <span class="device-emoji">${d.emoji}</span>
-              <span class="device-label">${d.label}</span>
-            </button>
-          `).join('')}
-        </div>
-        <div class="outcomes-box" id="outcomes-box" hidden>
-          <p><strong>Everything that could happen:</strong></p>
-          <div class="spinner-picture" id="spinner-picture" role="img" hidden></div>
-          <div class="outcome-chips" id="outcome-chips"></div>
-        </div>
-      </section>
-
-      <section class="task" data-task="2" hidden>
-        <h2 class="task-title">🤔 How likely?</h2>
-        <p id="predict-question"></p>
-        <div class="spinner-picture small" id="predict-picture" role="img" hidden></div>
-        <div class="certainty-scale" id="certainty-scale">
-          ${certaintyButtonsHTML()}
-        </div>
-        <label for="predict-reason" class="reason-label">✏️ Why do you think so?</label>
-        <textarea id="predict-reason" class="reason-input" rows="2" placeholder="Because..."></textarea>
-        <p class="feedback" id="predict-feedback" hidden></p>
-      </section>
-
-      <section class="task" data-task="3" hidden>
-        <h2 class="task-title">🔁 Test it many times</h2>
-        <p>Run a test. Compare what should happen with what did happen.</p>
-        <div class="trial-device" id="trial-device" aria-hidden="true"></div>
-        <p class="trial-result" id="trial-result"></p>
-        <div class="trial-row">
-          <button class="btn btn-run" data-count="10" type="button">▶ 10 times</button>
-          <button class="btn btn-run" data-count="50" type="button">▶ 50 times</button>
-          <button class="btn btn-run" data-count="500" type="button">▶ 500 times</button>
-        </div>
-        <div class="compare-grid" id="compare-grid" hidden>
-          <div class="compare-col">
-            <h3>🎯 Should happen (theory)</h3>
-            <div id="theory-bars" class="bars"></div>
+        <section class="task" data-task="1">
+          <div class="device-grid" id="device-grid">
+            ${Object.entries(DEVICES).map(([key, d], i) => `
+              <button class="device-card m-pop" style="--i: ${i}" data-key="${key}" type="button">
+                <span class="device-emoji" aria-hidden="true">${d.emoji}</span>
+                <span class="device-label">${d.label}</span>
+              </button>
+            `).join('')}
           </div>
-          <div class="compare-col">
-            <h3>🧪 Did happen (our test)</h3>
-            <div id="experiment-bars" class="bars"></div>
+          <div class="outcomes-box" id="outcomes-box" hidden>
+            <p><strong>Everything that could happen:</strong></p>
+            <div class="spinner-picture" id="spinner-picture" role="img" hidden></div>
+            <div class="outcome-chips" id="outcome-chips"></div>
           </div>
-        </div>
-        <p class="feedback" id="trial-feedback" hidden></p>
-        <button class="btn btn-main" id="chance-done-btn" type="button" hidden>✅ I'm done testing</button>
-        <a class="btn btn-main next-room-btn" id="next-room-btn" href="evidence-board.html" hidden>🚩 Next: Evidence Board →</a>
-      </section>
+        </section>
 
-      <div class="task-nav">
-        <button class="btn" id="back-btn" type="button">← Back</button>
-        <button class="btn btn-main" id="next-btn" type="button" disabled>Next →</button>
-      </div>
-    `,
+        <section class="task" data-task="2" hidden>
+          <div class="spinner-picture small" id="predict-picture" role="img" hidden></div>
+          <div class="certainty-scale" id="certainty-scale">
+            ${certaintyButtonsHTML()}
+          </div>
+          <label for="predict-reason" class="reason-label">✏️ Why do you think so?</label>
+          <textarea id="predict-reason" class="reason-input" rows="2" placeholder="Because..."></textarea>
+          <div class="hint-list-slot" id="why-hints"></div>
+          <p class="feedback" id="predict-feedback" hidden></p>
+        </section>
+
+        <section class="task" data-task="3" hidden>
+          <div class="card-panels">
+            <div class="trial-side">
+              <div class="trial-device" id="trial-device" aria-hidden="true"></div>
+              <p class="trial-result" id="trial-result"></p>
+              ${segmentedHTML(RUN_SIZES.map((n) => ({ value: n, label: String(n) })), 'How many times')}
+            </div>
+            <div class="compare-side">
+              <h2 class="panel-title">Should happen vs. did happen</h2>
+              <p class="compare-key"><span class="key-should" aria-hidden="true"></span> 🎯 Should (theory) <span class="key-did" aria-hidden="true"></span> 🧪 Did (our test)</p>
+              <div class="compare-grid" id="compare-grid" hidden>
+                <div class="compare-col">
+                  <h3>🎯 Should happen</h3>
+                  <div id="theory-bars" class="bars"></div>
+                </div>
+                <div class="compare-col">
+                  <h3>🧪 Did happen</h3>
+                  <div id="experiment-bars" class="bars"></div>
+                </div>
+              </div>
+              <p class="compare-empty" id="compare-empty">Run a test to see the bars.</p>
+            </div>
+          </div>
+          <p class="feedback" id="trial-feedback" hidden></p>
+        </section>`,
+    }),
   });
 
+  bar = setupActionBar({ back: null, primary: { label: '' } });
   setupDevicePicker();
   setupPredict();
-  addHintButton(document.getElementById('predict-reason'), 'chance-why', 'chance-lab');
+  hint = createHint('chance-why', 'chance-lab');
+  document.getElementById('why-hints').append(hint.list);
   setupTrials();
-  setupTaskNav();
-
-  document.getElementById('chance-done-btn').addEventListener('click', (event) => {
-    event.target.hidden = true;
-    document.getElementById('next-room-btn').hidden = false;
-    finishPhase('chance', chanceFacts);
-  });
+  showTask(1);
 }
+
+const TASK_QUESTIONS = ['🎲 Pick a chance game', '', '🔁 Test it many times'];
 
 function showTask(n) {
   document.querySelectorAll('.task').forEach((el) => {
     el.hidden = Number(el.dataset.task) !== n;
   });
-  document.getElementById('task-progress').textContent = `Task ${n} of 3`;
-  document.getElementById('back-btn').disabled = n === 1;
-  const nextBtn = document.getElementById('next-btn');
-  nextBtn.disabled = !taskComplete[n];
-  // Last task: the room's own big button (next room / save) is the one clear action.
-  nextBtn.hidden = n === 3;
   currentTask = n;
+  document.getElementById('stepper').innerHTML = miniStepperHTML(STEP_LABELS, n - 1);
+  let question = TASK_QUESTIONS[n - 1];
 
   if (n === 2 && selectedDevice) {
     // Spinners: show the spinner again, so the child can see the slice sizes while deciding.
@@ -137,54 +141,59 @@ function showTask(n) {
       picture.style.background = spinnerGradient(selectedDevice);
       picture.setAttribute('aria-label', document.getElementById('spinner-picture').getAttribute('aria-label'));
     }
-    document.getElementById('predict-question').textContent =
-      `How likely is it that the ${selectedDevice.label.toLowerCase()} lands on ${selectedDevice.target}?`;
+    question = `How likely is it that the ${selectedDevice.label.toLowerCase()} lands on ${selectedDevice.target}?`;
+  }
+  document.querySelector('.task-question').textContent = question;
+  pipSay([story, 'Guess first. Then test it many times!', 'Compare what should happen with what did happen.'][n - 1]);
+  bar.setBack(n === 1 ? { label: 'Number Lab', href: 'number-lab.html' } : { label: 'Back', onClick: () => showTask(n - 1) });
+  bar.setHint(n === 2 ? hint.button : null);
+  refreshPrimary();
+}
+
+// "flips" -> "Flip": the device's own word, for the run button.
+const runWord = (device) => device.verb[0].toUpperCase() + device.verb.slice(1, -1);
+
+// The ONE primary button: what it says depends on the step and what is done.
+function refreshPrimary() {
+  const reasonGiven = document.getElementById('predict-reason').value.trim() !== '';
+  if (currentTask === 1) {
+    bar.setPrimary(selectedDevice
+      ? { label: 'Next: How likely? →', ready: true, onClick: () => showTask(2) }
+      : { label: '', enabled: false, whyDisabled: '👆 Pick a game first' });
+  } else if (currentTask === 2) {
+    if (!rating) bar.setPrimary({ label: '', enabled: false, whyDisabled: '👆 Pick how likely' });
+    else if (!reasonGiven) bar.setPrimary({ label: '', enabled: false, whyDisabled: '✏️ Say why first' });
+    else bar.setPrimary({ label: 'Next: Test it →', ready: true, onClick: () => showTask(3) });
+  } else if (isPhaseDone('chance') && taskComplete[3]) {
+    bar.setPrimary({ label: '🚩 Next: Evidence Board →', ready: true, onClick: () => { location.href = 'evidence-board.html'; } });
+  } else if (justRan) {
+    bar.setPrimary({ label: "✅ I'm done testing", onClick: () => finishPhase('chance', chanceFacts).then(refreshPrimary) });
+  } else {
+    bar.setPrimary({ label: `▶ ${runWord(selectedDevice)} ${runSize} times`, onClick: runTrials });
   }
 }
 
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
-  // After the first run: "I'm done testing" (or straight on, if this phase was finished before).
-  if (taskNum === 3) {
-    const finished = isPhaseDone('chance');
-    document.getElementById('chance-done-btn').hidden = finished;
-    document.getElementById('next-room-btn').hidden = !finished;
-  }
-  if (currentTask === taskNum) {
-    document.getElementById('next-btn').disabled = taskNum === 3;
-  }
-}
-
-function setupTaskNav() {
-  document.getElementById('back-btn').addEventListener('click', () => {
-    showTask(Math.max(1, currentTask - 1));
-  });
-  document.getElementById('next-btn').addEventListener('click', () => {
-    if (currentTask < 3) showTask(currentTask + 1);
-  });
-  showTask(1);
+  if (currentTask === taskNum) refreshPrimary();
 }
 
 function setupDevicePicker() {
-  const cards = document.querySelectorAll('.device-card');
   const outcomesBox = document.getElementById('outcomes-box');
   const chips = document.getElementById('outcome-chips');
 
-  cards.forEach((card) => {
-    card.addEventListener('click', () => {
-      cards.forEach((c) => c.classList.remove('selected'));
-      card.classList.add('selected');
-      selectedDevice = DEVICES[card.dataset.key];
-      previousRun = null;
-      chanceFacts.runSizes = []; // a new device starts a new experiment
-      chanceFacts.pct500 = null;
+  wireChoiceCards(document.getElementById('device-grid'), '.device-card', (card) => {
+    selectedDevice = DEVICES[card.dataset.key];
+    previousRun = null;
+    chanceFacts.runSizes = []; // a new device starts a new experiment
+    chanceFacts.pct500 = null;
 
-      showOutcomes(selectedDevice, chips);
-      drawTrialDevice(selectedDevice);
-      outcomesBox.hidden = false;
+    showOutcomes(selectedDevice, chips);
+    drawTrialDevice(selectedDevice);
+    outcomesBox.hidden = false;
+    justRan = false;
 
-      markComplete(1);
-    });
+    markComplete(1);
   });
 }
 
@@ -312,13 +321,15 @@ function setupPredict() {
       buttons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       chosen = btn.dataset.word; // the word only, without the small gloss
+      rating = chosen;
       chanceFacts.rating = chosen;
+      refreshPrimary();
       checkComplete();
       logCertainty();
     });
   });
 
-  reasonInput.addEventListener('input', checkComplete);
+  reasonInput.addEventListener('input', () => { checkComplete(); refreshPrimary(); });
   reasonInput.addEventListener('change', logCertainty);
 }
 
@@ -342,65 +353,75 @@ function barRow(label, pct, text, fillClass) {
   `;
 }
 
+// What the primary button runs on the test step (set up in setupTrials).
+let runTrials = () => {};
+
 function setupTrials() {
-  const buttons = document.querySelectorAll('.trial-row .btn-run');
+  // Picking a size (again) makes the primary a run button for that size.
+  wireChoiceCards(document.querySelector('.segmented'), '.segment', (btn) => {
+    runSize = Number(btn.dataset.value);
+    justRan = false;
+    if (currentTask === 3) refreshPrimary();
+  });
+  document.querySelector('.segment[data-value="10"]').click();
+
   const compareGrid = document.getElementById('compare-grid');
   const theoryBars = document.getElementById('theory-bars');
   const experimentBars = document.getElementById('experiment-bars');
   const feedback = document.getElementById('trial-feedback');
 
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const count = Number(btn.dataset.count);
-      playSound('spin');
-      const totalWeight = selectedDevice.weights.reduce((a, b) => a + b, 0);
-      const results = new Map(selectedDevice.outcomes.map((o) => [o, 0]));
+  runTrials = () => {
+    const count = runSize;
+    playSound('spin');
+    const totalWeight = selectedDevice.weights.reduce((a, b) => a + b, 0);
+    const results = new Map(selectedDevice.outcomes.map((o) => [o, 0]));
 
-      let lastOutcome = null;
-      for (let i = 0; i < count; i++) {
-        lastOutcome = runTrial(selectedDevice);
-        results.set(lastOutcome, results.get(lastOutcome) + 1);
-      }
-      playTrialDevice(selectedDevice, lastOutcome);
+    let lastOutcome = null;
+    for (let i = 0; i < count; i++) {
+      lastOutcome = runTrial(selectedDevice);
+      results.set(lastOutcome, results.get(lastOutcome) + 1);
+    }
+    playTrialDevice(selectedDevice, lastOutcome);
 
-      const theoryFor = (i) => theoryText(selectedDevice.weights[i], totalWeight);
+    const theoryFor = (i) => theoryText(selectedDevice.weights[i], totalWeight);
 
-      theoryBars.innerHTML = selectedDevice.outcomes
-        .map((o, i) => barRow(o, toPct(selectedDevice.weights[i], totalWeight), theoryFor(i), 'theory'))
-        .join('');
+    theoryBars.innerHTML = selectedDevice.outcomes
+      .map((o, i) => barRow(o, toPct(selectedDevice.weights[i], totalWeight), theoryFor(i), 'theory'))
+      .join('');
 
-      // For 10, 50 and 500 trials one decimal place is always exact, so these add up to 100%.
-      experimentBars.innerHTML = selectedDevice.outcomes
-        .map((o) => barRow(o, toPct(results.get(o), count), `${toPct(results.get(o), count)}% (${results.get(o)})`, 'experiment'))
-        .join('');
+    // For 10, 50 and 500 trials one decimal place is always exact, so these add up to 100%.
+    experimentBars.innerHTML = selectedDevice.outcomes
+      .map((o) => barRow(o, toPct(results.get(o), count), `${toPct(results.get(o), count)}% (${results.get(o)})`, 'experiment'))
+      .join('');
 
-      compareGrid.hidden = false;
-      // The "did happen" bars grow from nothing, one after another.
-      stagger(experimentBars.querySelectorAll('.bar-fill'), { each: 0.1, from: { width: 0 }, keepStyle: true });
+    compareGrid.hidden = false;
+    document.getElementById('compare-empty').hidden = true;
+    // The "did happen" bars grow from nothing, one after another.
+    stagger(experimentBars.querySelectorAll('.bar-fill'), { each: 0.1, from: { width: 0 }, keepStyle: true });
 
-      const targetIndex = selectedDevice.outcomes.indexOf(selectedDevice.target);
-      const timesHit = results.get(selectedDevice.target);
-      const experimentPct = toPct(timesHit, count);
-      const gap = Math.abs(timesHit / count - selectedDevice.weights[targetIndex] / totalWeight);
+    const targetIndex = selectedDevice.outcomes.indexOf(selectedDevice.target);
+    const timesHit = results.get(selectedDevice.target);
+    const experimentPct = toPct(timesHit, count);
+    const gap = Math.abs(timesHit / count - selectedDevice.weights[targetIndex] / totalWeight);
 
-      feedback.textContent = trialMessage({
-        count, verb: selectedDevice.verb, target: selectedDevice.target, timesHit,
-        pct: experimentPct, theory: theoryFor(targetIndex), previous: previousRun, gap,
-      });
-      feedback.hidden = false;
-      logEvent('chance-lab', 'trials', {
-        device: selectedDevice.label, outcome: selectedDevice.target, trials: count, timesHit,
-        experimentalPct: experimentPct, theory: theoryFor(targetIndex),
-      });
-      previousRun = { count, pct: experimentPct, gap };
-      chanceFacts.target = selectedDevice.target;
-      chanceFacts.theoryText = theoryFor(targetIndex);
-      chanceFacts.runSizes.push(count);
-      if (count === 500) chanceFacts.pct500 = experimentPct;
-
-      markComplete(3);
+    feedback.textContent = trialMessage({
+      count, verb: selectedDevice.verb, target: selectedDevice.target, timesHit,
+      pct: experimentPct, theory: theoryFor(targetIndex), previous: previousRun, gap,
     });
-  });
+    feedback.hidden = false;
+    logEvent('chance-lab', 'trials', {
+      device: selectedDevice.label, outcome: selectedDevice.target, trials: count, timesHit,
+      experimentalPct: experimentPct, theory: theoryFor(targetIndex),
+    });
+    previousRun = { count, pct: experimentPct, gap };
+    chanceFacts.target = selectedDevice.target;
+    chanceFacts.theoryText = theoryFor(targetIndex);
+    chanceFacts.runSizes.push(count);
+    if (count === 500) chanceFacts.pct500 = experimentPct;
+
+    justRan = true;
+    markComplete(3);
+  };
 }
 
 init();

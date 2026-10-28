@@ -10,17 +10,30 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  background: var(--color-bg);
+  min-height: 120px;
+  justify-content: center;
+  background: var(--color-card-bg);
+  color: var(--color-text);
   border: var(--border-width) solid var(--color-navy);
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-button);
+  padding: var(--space-2);
   cursor: pointer;
   font-family: var(--font-heading);
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 19px;
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
+/* Chosen (a radio choice card): it lifts and turns soft green; ✓ badge in base.css. */
 .device-card.selected {
-  background: var(--color-explore);
+  background: var(--color-explore-light);
+  transform: translateY(-4px);
+}
+
+.device-card.selected::after {
+  background: var(--color-btn-main-bg);
+  color: #FFFFFF;
 }
 
 .device-emoji {
@@ -46,11 +59,44 @@
   font-weight: 700;
 }
 
-.trial-row {
+.trial-side {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* The key for the two kinds of bar: striped = should, solid = did (and the words). */
+.compare-key {
+  display: flex;
   flex-wrap: wrap;
-  margin: 12px 0 20px;
+  align-items: center;
+  gap: 6px var(--space-1);
+  margin: 0 0 var(--space-2);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.key-should,
+.key-did {
+  display: inline-block;
+  width: 22px;
+  height: 16px;
+  border: 2px solid var(--color-navy);
+  border-radius: 4px;
+}
+
+.key-should,
+.bar-fill.theory {
+  background: repeating-linear-gradient(135deg, var(--color-collect-light) 0 5px, var(--color-card-bg) 5px 10px);
+}
+
+.key-did {
+  background: var(--color-explore);
+}
+
+.compare-empty {
+  color: var(--color-muted-text);
+  font-weight: 700;
 }
 
 .compare-grid {
@@ -79,15 +125,15 @@
 }
 
 .bar-label {
-  width: 56px;
-  font-weight: 700;
-  font-size: 14px;
+  width: 64px;
+  font-weight: 800;
+  font-size: 16px;
   flex-shrink: 0;
 }
 
 .bar-track {
   flex: 1;
-  height: 16px;
+  height: 22px;
   background: var(--color-bg);
   border: 2px solid var(--color-navy);
   border-radius: 999px;
@@ -153,8 +199,9 @@
   margin: 4px 0 8px;
 }
 
+/* "Should" bars are striped (see .key-should above). */
 .bar-fill.theory {
-  background: var(--color-collect);
+  border-right: 2px dashed var(--color-navy);
 }
 
 .bar-fill.experiment {
