@@ -1,9 +1,10 @@
 import { mountShell, setCurrentStep } from '../app.js';
 import { checkQuestion } from '../helpers/checker.js';
-import { logEvent } from '../helpers/log.js';
+import { logEvent, readLog } from '../helpers/log.js';
 import { createHint } from '../helpers/prompts.js';
 import { PICKABLE_SCENARIOS, loadRecipe, loadContent } from '../helpers/scenarios.js';
-import { setSelectedScenarioId } from '../storage/save.js';
+import { setSelectedScenarioId, getExplorerCode } from '../storage/save.js';
+import { finishedScenarios } from '../helpers/progress.js';
 import { cheer } from '../motion.js';
 import { pipSay } from '../pip.js';
 import { enterPhase, finishPhase } from '../phase-progress.js';
@@ -41,6 +42,10 @@ async function init() {
     PICKABLE_SCENARIOS.map(async (id) => ({ id, recipe: await loadRecipe(id), content: await loadContent(id) }))
   );
 
+  // Questions this child already finished get a "✓ Done before" label: a
+  // nudge to try a new one (they can still pick it again).
+  const doneBefore = finishedScenarios(readLog(), getExplorerCode());
+
   mountShell({
     step: 'ask',
     accent: 'ask',
@@ -59,6 +64,7 @@ async function init() {
                 <span class="scenario-emoji" aria-hidden="true">${s.content.emoji}</span>
                 <span class="scenario-title">${s.content.cardTitle}</span>
                 <span class="scenario-question">${s.recipe.question}</span>
+                ${doneBefore.has(s.id) ? '<span class="scenario-done">✓ Done before</span>' : ''}
               </button>
             `).join('')}
           </div>

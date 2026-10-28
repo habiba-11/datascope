@@ -68,3 +68,12 @@ export function journeyRedirect(done, previewAll = false) {
   if (previewAll || done.includes('conclude')) return null;
   return PAGE_OF_PHASE[furthestPhase(done)];
 }
+
+// The questions this child has already finished (Conclude done), from the
+// reasoning log. The log is kept when a new investigation starts, so the
+// Question Studio cards can say "✓ Done before" and nudge towards a new one.
+export function finishedScenarios(entries, code) {
+  return new Set(entries
+    .filter((e) => e.code === code && e.type === 'phase-complete' && e.phase === 'conclude' && e.scenarioId)
+    .map((e) => e.scenarioId));
+}

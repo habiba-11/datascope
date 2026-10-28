@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  unlockedPhases, isUnlocked, furthestPhase, visibleSteps, isStepDone, guardRedirect,
+  unlockedPhases, isUnlocked, furthestPhase, visibleSteps, isStepDone, guardRedirect, finishedScenarios,
 } from '../js/helpers/progress.js';
 import { makeEntry, logEvent, readLog } from '../js/helpers/log.js';
 import {
@@ -99,4 +99,13 @@ test('a new investigation starts the trail at Ask again, but keeps the log', () 
   assert.deepEqual(getDonePhases('shoe-sizes'), []);
   assert.equal(getSelectedScenarioId(), 'sleep-hours'); // back to the default: the child picks again
   assert.equal(readLog().length, 1); // the reasoning log is untouched
+});
+
+test('a question counts as done before only when this child finished Conclude for it', () => {
+  const log = [
+    { code: 'OWL-07', type: 'phase-complete', phase: 'conclude', scenarioId: 'sleep-hours' },
+    { code: 'OWL-07', type: 'phase-complete', phase: 'collect', scenarioId: 'shoe-sizes' }, // not finished
+    { code: 'FOX-12', type: 'phase-complete', phase: 'conclude', scenarioId: 'playground-game' }, // another child
+  ];
+  assert.deepEqual([...finishedScenarios(log, 'OWL-07')], ['sleep-hours']);
 });

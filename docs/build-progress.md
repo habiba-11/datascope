@@ -245,6 +245,7 @@
 - Fixes after Habiba's check (28 Oct 2026), 210 tests passing:
   - Graph Lab dot plot, reading minutes: Class A's dots (18 to 22 on the shared 4 to 36 number line) overlapped. The dot size now fits the gap between two values (dotSize in helpers/charts.js, tested; at most 9px, at least 3px; both classes get the same size, so the comparison stays fair).
   - "🔁 Start a new investigation" (My journey) now starts the trail again at Ask: startNewInvestigation() in save.js clears this child's saved progress and chosen question; the reasoning log is kept (tested). Note for the thesis: if a child repeats the SAME question, buildJourney / thesis-metrics keep the first run's stars and times (first phase-start / phase-complete) and the latest answers.
+  - Decided with Habiba (option b): Question Studio marks questions this child already finished (Conclude done, read from the log by finishedScenarios in progress.js, tested) with "✓ Done before" (word + ✓). They can still pick it; it only nudges towards a new question. 211 tests.
 
 ## Next
 - Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.
