@@ -8,104 +8,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/base.css">
-  <style>
-    .welcome {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .card {
-      text-align: center;
-      max-width: 420px;
-    }
-
-    .mascot {
-      width: 110px;
-      margin: 0 auto;
-    }
-
-    .dots {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 20px 0;
-    }
-
-    .dot {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2px solid var(--color-navy);
-    }
-
-    .dot.ask { background: var(--color-ask); }
-    .dot.plan { background: var(--color-plan); }
-    .dot.collect { background: var(--color-collect); }
-    .dot.explore { background: var(--color-explore); }
-    .dot.conclude { background: var(--color-conclude); }
-
-    .code-form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .code-form label {
-      font-family: var(--font-heading);
-      font-weight: 700;
-    }
-
-    #code-input {
-      width: 200px;
-      min-height: 48px;
-      font-family: var(--font-heading);
-      font-size: 24px;
-      text-align: center;
-      text-transform: uppercase;
-      border: var(--border-width) solid var(--color-navy);
-      border-radius: 12px;
-    }
-
-    .code-help {
-      font-size: 16px;
-      margin: 0;
-    }
-
-    .code-help.warn {
-      font-weight: 700;
-    }
-
-    /* "Teacher's view": a white button under the start form (opens with a PIN). */
-    .teacher-btn {
-      margin-top: 18px;
-      background: white;
-      color: var(--color-text);
-    }
-  </style>
+  <link rel="stylesheet" href="css/motion.css">
+  <link rel="stylesheet" href="css/welcome.css">
 </head>
 <body>
+  <header class="welcome-top">
+    <span class="logo" id="logo"></span>
+  </header>
   <main class="welcome">
-    <div class="card">
-      <div class="mascot" id="mascot"></div>
-      <h1>Hello, DataScope!</h1>
-      <p>I'm Pip, your data-detective guide. Let's go find some evidence!</p>
-      <div class="dots">
-        <span class="dot ask"></span>
-        <span class="dot plan"></span>
-        <span class="dot collect"></span>
-        <span class="dot explore"></span>
-        <span class="dot conclude"></span>
-      </div>
-      <form id="code-form" class="code-form">
+    <div class="mascot m-float" id="mascot"></div>
+    <div>
+      <p class="welcome-pill m-pop">Hoo-hoo! I'm Pip, your guide.</p>
+      <h1 class="welcome-title m-rise" style="--i: 1">Become a Data <span>Detective!</span></h1>
+      <p class="welcome-lead m-rise" style="--i: 2">Ask a question. Collect answers. Find out what the data says.</p>
+      <form id="code-form" class="code-form m-rise" style="--i: 3">
         <label for="code-input">🔑 Type your explorer code</label>
         <input id="code-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. OWL-07">
         <p class="code-help" id="code-help">Your teacher gives you this code. Please don't type your name!</p>
         <button class="btn btn-main" type="submit">Start exploring →</button>
       </form>
-      <a class="btn teacher-btn" href="teacher/index.html">🧑‍🏫 Teacher's view</a>
+      <a class="btn btn-quiet teacher-btn" href="teacher/index.html">🧑‍🏫 Teacher's view</a>
     </div>
   </main>
   <script type="module" src="js/welcome.js"></script>

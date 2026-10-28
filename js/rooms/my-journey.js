@@ -15,6 +15,8 @@ import { buildExport, exportFileName, toCSV, downloadFile } from '../storage/exp
 import { guardJourney } from '../phase-progress.js';
 import { backendReady } from '../config.js';
 import { pipSVG, pipMoodFor } from '../pip.js';
+import { taskCardHTML, pipLineHTML } from '../task-card.js';
+import { setupActionBar } from '../action-bar.js';
 
 const STOPS = [
   { phase: 'ask', icon: '❓', name: 'Ask' },
@@ -98,7 +100,15 @@ function trailNode(journey, info) {
     head.append(el('span', p.done ? '✅ Done' : '🔒 Not done yet', 'stop-status'));
     stop.append(head);
     if (p.stars) stop.append(el('p', starsText(p.stars), 'stop-stars'));
-    stopLines(phase, p, info).forEach((line) => stop.append(el('p', line, 'stop-line')));
+    // One line on the trail; the rest folds away behind "See more" (UI guide).
+    const [first, ...more] = stopLines(phase, p, info);
+    if (first) stop.append(el('p', first, 'stop-line'));
+    if (more.length) {
+      const details = el('details', '', 'stop-more');
+      details.append(el('summary', 'See more'));
+      more.forEach((line) => details.append(el('p', line, 'stop-line')));
+      stop.append(details);
+    }
     trail.append(stop);
   });
   return trail;
@@ -176,38 +186,57 @@ async function init() {
   mountShell({
     step: 'conclude',
     accent: 'conclude',
-    pipMessage: 'Hoo-hoo! Look how far you came! ⭐',
-    contentHTML: `
-      <h1 class="room-title">🗺️ My journey</h1>
-      <p class="journey-scenario">${emoji} ${cardTitle}</p>
-      <div class="journey-top" id="journey-top"></div>
-      <div id="journey-trail"></div>
-      <div class="journey-actions">
-        ${backendReady()
+    layout: 'card',
+    contentHTML: taskCardHTML({
+      title: `🗺️ My journey · ${emoji} ${cardTitle}`,
+      bodyHTML: `
+        ${pipLineHTML('Hoo-hoo! Look how far you came! ⭐', '🗺️ My journey')}
+        <div class="card-panels journey-panels">
+          <div id="journey-trail"></div>
+          <div class="journey-side">
+            <div class="journey-top" id="journey-top"></div>
+            <div class="journey-actions">
+              ${backendReady()
     // With the online database on, nothing to download: the work is already sent.
     ? '<p class="online-note">☁️ Your work goes to your teacher by itself. Nothing to save!</p>'
-    : `<button class="btn btn-main" id="save-work-btn" type="button">📤 Save my work for my teacher</button>
-        <button class="link-btn" id="save-csv-btn" type="button">or save it as a table (CSV)</button>`}
-        <p class="feedback" id="save-feedback" hidden></p>
-        <button class="btn" id="print-btn" type="button">🖨️ Print my journey</button>
-        <a class="btn" href="question-studio.html">🔁 Start a new investigation →</a>
-      </div>
-    `,
+    : '<button class="link-btn" id="save-csv-btn" type="button">or save it as a table (CSV)</button>'}
+              <p class="feedback" id="save-feedback" hidden></p>
+              ${backendReady() ? '' : '<a class="btn btn-quiet" href="question-studio.html">🔁 Start a new investigation</a>'}
+            </div>
+          </div>
+        </div>`,
+    }),
+  });
+
+  // ONE primary: save for the teacher (files only when the database is off),
+  // or start a new investigation. Print is the white button next to it.
+  const print = el('button', '🖨️ Print my journey', 'btn');
+  print.type = 'button';
+  print.addEventListener('click', () => window.print());
+  // On paper every answer shows: "See more" opens by itself before printing.
+  window.addEventListener('beforeprint', () => {
+    document.querySelectorAll('.stop-more').forEach((d) => { d.open = true; });
+  });
+  const feedback = document.getElementById('save-feedback');
+  setupActionBar({
+    back: { label: 'Evidence Board', href: 'evidence-board.html' },
+    hint: print,
+    primary: backendReady()
+      ? { label: '🔁 Start a new investigation →', onClick: () => { location.href = 'question-studio.html'; } }
+      : { label: '📤 Save my work for my teacher', onClick: () => save('json', feedback) },
   });
 
   const learned = el('section', '', 'learned');
   learned.append(el('h2', '🧠 What I learned'), el('p', recipe.teaches));
   document.getElementById('journey-top').append(idCardNode(journey, code), learned);
   document.getElementById('journey-trail').append(trailNode(journey, { cardTitle, kind: numberLabKind(recipe) }));
-  walkPip();
+  // Pip's stops are measured once the fonts have loaded (they change the heights).
+  document.fonts.ready.then(walkPip);
 
   // Files are only the fallback when the online database is switched off.
   if (!backendReady()) {
-    const feedback = document.getElementById('save-feedback');
-    document.getElementById('save-work-btn').addEventListener('click', () => save('json', feedback));
     document.getElementById('save-csv-btn').addEventListener('click', () => save('csv', feedback));
   }
-  document.getElementById('print-btn').addEventListener('click', () => window.print());
 }
 
 init();

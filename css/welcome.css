@@ -1,0 +1,115 @@
+/* The start page (UI guide frame f1): one big action. Pip on the left, the
+   title and the code form on the right; they stack on a narrow screen. */
+.welcome-top {
+  padding: var(--space-3) var(--space-4) 0;
+}
+
+.welcome-top .logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 30px;
+  color: var(--color-navy);
+}
+
+.welcome-top .logo-accent {
+  color: var(--color-btn-main-bg);
+}
+
+.welcome {
+  min-height: calc(100vh - 180px);
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-3) 140px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.mascot {
+  width: min(240px, 60vw);
+  justify-self: center;
+}
+
+.welcome-pill {
+  display: inline-block;
+  margin: 0 0 var(--space-2);
+  padding: 4px 16px;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.welcome-title {
+  margin: 0;
+  font-size: 52px;
+  line-height: 1.05;
+}
+
+.welcome-title span {
+  color: var(--color-btn-main-bg);
+}
+
+.welcome-lead {
+  margin: var(--space-2) 0 var(--space-3);
+  font-size: 20px;
+  font-weight: 700;
+  max-width: 34ch;
+}
+
+.code-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.code-form label {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 19px;
+}
+
+#code-input {
+  min-height: 56px;
+  padding: 0 var(--space-2);
+  font-family: var(--font-heading);
+  font-size: 26px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: #F4FAFF;
+  border: var(--border-width) solid var(--color-line);
+  border-radius: 14px;
+}
+
+/* The example stays as written ("e.g. OWL-07"); only what is typed is in capitals. */
+#code-input::placeholder {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.code-help {
+  margin: 0;
+  font-size: 16px;
+}
+
+.code-help.warn {
+  font-weight: 800;
+}
+
+.code-form .btn-main {
+  margin-top: var(--space-1);
+}
+
+/* "Teacher's view": quiet, under the form (it asks for a password or PIN). */
+.teacher-btn {
+  margin-top: var(--space-2);
+}

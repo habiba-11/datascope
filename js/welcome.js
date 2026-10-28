@@ -2,9 +2,12 @@
 import { normalizeCode, isValidCode } from './helpers/log.js';
 import { getExplorerCode, setExplorerCode } from './storage/save.js';
 import { pipSVG } from './pip.js';
+import { LOGO_SVG } from './icons.js';
 
-// Pip greets the child on the start page.
+// Pip greets the child on the start page (cheering, wings up).
 document.getElementById('mascot').innerHTML = pipSVG('Pip the owl explorer');
+document.querySelector('#mascot .pip').classList.replace('pip--happy', 'pip--cheer');
+document.getElementById('logo').innerHTML = `${LOGO_SVG}<span>Data<span class="logo-accent">Scope</span></span>`;
 
 const form = document.getElementById('code-form');
 const input = document.getElementById('code-input');

@@ -6,11 +6,16 @@
   margin: 0 0 12px;
 }
 
+/* Two panels: the trail on the left; the ID card, what I learned and the
+   quiet extras on the right. */
+.journey-panels {
+  align-items: start;
+}
+
 .journey-top {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 20px;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .id-card,
@@ -122,14 +127,17 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
-  margin-top: 20px;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
 }
 
-.journey-actions a.btn,
-.journey-actions .btn:not(.btn-main) {
-  background: white;
-  color: var(--color-text);
+/* "See more" under a stop: the rest of the child's answers, folded away. */
+.stop-more summary {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 /* A quiet text button for the CSV copy (still 48px tall to tap). */
@@ -151,6 +159,8 @@
   .sidebar,
   .hills,
   .journey-actions,
+  .action-bar,
+  .status-line,
   .preview-banner {
     display: none !important;
   }
