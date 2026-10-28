@@ -51,7 +51,7 @@ const RULES = {
         guessWin,
         'You watched every answer arrive.',
       ],
-      nextTime: hasGuess ? 'In Explore, find out why answers spread out.' : 'Next time, make a guess first.',
+      nextTime: hasGuess ? 'In Explore, find out why answers spread out.' : 'Make a guess first.',
       learned: 'Data is a set of answers, one from each person.',
     };
   },

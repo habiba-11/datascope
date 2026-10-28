@@ -95,3 +95,11 @@ test('Number Lab with words (games): a guess that matches the mode earns the thi
   assert.equal(wrong.stars, 2);
   assert.match(wrong.wins[0], /The mode was Football/);
 });
+
+test('no "next time" line repeats the words the card already shows ("💡 Next time:")', () => {
+  for (const phase of ['ask', 'plan', 'collect', 'graph', 'number', 'chance', 'conclude']) {
+    for (const facts of [{}, { guess: 8, classSizes: [20] }]) {
+      assert.doesNotMatch(buildPhaseFeedback(phase, facts).nextTime, /^next time/i, phase);
+    }
+  }
+});

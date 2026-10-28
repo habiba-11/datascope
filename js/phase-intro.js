@@ -4,6 +4,9 @@
 import { openModal } from './modal.js';
 import { logEvent } from './helpers/log.js';
 import { hasSeenIntro, markIntroSeen } from './storage/save.js';
+import { STEP_OF_PHASE } from './helpers/progress.js';
+
+const STEP_ORDER = ['ask', 'plan', 'collect', 'explore', 'conclude'];
 
 let phasesPromise = null;
 let currentPhase = null;
@@ -21,12 +24,26 @@ async function showPhaseIntro(phase, auto) {
   const intro = (await loadPhases())[phase];
   if (!intro) return;
 
+  // "Step 3 of 5", then the bullets rise in one after another (UI guide f2).
+  const body = document.createElement('div');
+  const where = document.createElement('p');
+  where.className = 'intro-step';
+  where.textContent = `Step ${STEP_ORDER.indexOf(STEP_OF_PHASE[phase]) + 1} of ${STEP_ORDER.length}`;
   const list = document.createElement('ul');
   list.className = 'intro-list';
-  for (const bullet of intro.bullets) {
+  intro.bullets.forEach((bullet, i) => {
     const item = document.createElement('li');
     item.textContent = bullet;
+    item.className = 'm-rise';
+    item.style.setProperty('--i', i + 2);
     list.append(item);
+  });
+  body.append(where, list);
+  if (auto) {
+    const again = document.createElement('p');
+    again.className = 'intro-again';
+    again.textContent = 'Tap the (i) button any time to see this again.';
+    body.append(again);
   }
 
   logEvent('shell', 'popup-seen', { phase, auto });
@@ -34,7 +51,7 @@ async function showPhaseIntro(phase, auto) {
     icon: intro.icon,
     title: intro.title,
     accent: intro.accent,
-    body: list,
+    body,
     buttons: [{ label: "Let's go! →", value: 'go', main: true }],
   });
 }

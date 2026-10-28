@@ -185,3 +185,41 @@ body.modal-open {
   to { transform: scale(1); opacity: 1; }
 }
 /* Reduced motion: the global rule in base.css switches modal-pop off. */
+
+/* The phase intro (UI guide f2): where you are, and how to see it again. */
+.intro-step {
+  display: inline-block;
+  margin: 0 0 var(--space-1);
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--color-soft);
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.intro-again {
+  margin: var(--space-2) 0 0;
+  font-size: 16px;
+  color: var(--color-muted-text);
+  font-weight: 700;
+}
+
+/* The feedback card (UI guide f7). */
+.fb-why-stars {
+  margin: 0 0 var(--space-1);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-muted-text);
+}
+
+.fb-next-stop {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 20px;
+}
+
+/* The lock shakes a little later, once the stars and wins are in. */
+.fb-next-stop.m-shake {
+  animation-delay: 1.4s;
+}
