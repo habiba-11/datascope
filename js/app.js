@@ -49,14 +49,16 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
     <header class="shell-header">
       <a class="logo" href="../index.html">${LOGO_SVG}<span>Data<span class="logo-accent">Scope</span></span></a>
       <nav class="step-bar" aria-label="Investigation steps">${stepBarHTML()}</nav>
-      <button class="btn info-btn" id="info-btn" type="button">ℹ️ What to do</button>
+      <div class="header-actions">
+        <button class="btn info-btn" id="info-btn" type="button">ℹ️ What to do</button>
+        <button class="btn badge-counter" id="badge-counter" type="button" aria-live="polite">${counterHTML(countBadges())}</button>
+      </div>
     </header>
     ${getPreviewAll() ? '<p class="preview-banner">👀 Teacher preview: all rooms are open on this device</p>' : ''}
     <div class="shell-body">
       <aside class="sidebar">
         <div class="speech-bubble">${pipMessage}</div>
         <div class="pip-mascot">${pipSVG()}</div>
-        <button class="btn badge-counter" id="badge-counter" type="button" aria-live="polite">${counterHTML(countBadges())}</button>
         ${codeBadge()}
         <button class="btn sound-toggle" id="sound-toggle" type="button" aria-pressed="false">🔇 Sound: off</button>
         ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}

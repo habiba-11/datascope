@@ -236,6 +236,79 @@
 .bp-count-pop { animation: bp-count 0.45s var(--ease-spring); }
 .bp-slot-new svg { animation: bp-slot 0.7s var(--ease-spring) both; }
 
+/* ---------- My Explorer Backpack (js/badge-shelf.js) ---------- */
+.badge-shelf {
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 0;
+  max-width: 760px;
+  width: calc(100% - 32px);
+  animation: pop-in 0.3s ease-out;
+}
+
+.badge-shelf::backdrop {
+  background: rgba(23, 50, 77, 0.55);
+}
+
+.shelf-title {
+  margin: 0;
+  padding: 10px 22px;
+  background: var(--color-plan);
+  border-bottom: var(--border-width) solid var(--color-navy);
+  font-size: 24px;
+}
+
+.shelf-inside {
+  padding: 12px 24px 24px;
+}
+
+.shelf-level {
+  background: var(--color-bg);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.shelf-grid {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 18px;
+}
+
+.shelf-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.shelf-slot .patch {
+  width: 104px;
+  height: 104px;
+}
+
+/* Locked: dashed ribbon and grey words (and a lock in the picture). */
+.patch-ribbon.locked {
+  border-style: dashed;
+  color: var(--color-muted-text);
+}
+
+.shelf-super {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.shelf-how {
+  max-width: 170px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-muted-text);
+}
+
 /* ---------- Keyframes ---------- */
 @keyframes bp-fade { from { opacity: 0; } }
 @keyframes bp-drop { 0% { opacity: 0; transform: translateY(-60px) scale(0.6); } 100% { opacity: 1; transform: none; } }

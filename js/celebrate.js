@@ -10,6 +10,7 @@ import { playSound } from './sounds.js';
 import { pipReacts, confetti, growBar } from './motion.js';
 import { setupBadgeShelf } from './badge-shelf.js';
 import { showBadgePopup } from './badge-popup.js';
+import { BACKPACK_SVG } from './icons.js';
 import { currentPhase } from './phase-progress.js';
 
 // How many patches the child has (the backpack counter and the level use this).
@@ -17,16 +18,16 @@ export function countBadges() {
   return earnedPatches(readLog(), getExplorerCode()).length;
 }
 
-// What the badge button shows: the level, the badge count, and a bar showing
-// how close the next level is (always words AND a bar).
+// What the backpack button in the header shows: the backpack, the level, the
+// badge count, and a bar showing how close the next level is (words AND a bar).
 export function counterHTML(count) {
   const level = levelFor(count);
   const pct = levelProgress(count);
   const barLabel = level.next ? `Progress to ${level.next.name}: ${pct}%` : 'Top level reached';
-  return `<span class="level-name">${level.icon} ${level.name}</span><span>⭐ Badges: <span class="badge-count">${count}</span></span>
+  return `${BACKPACK_SVG}<span class="backpack-words"><span class="level-name">${level.icon} ${level.name}</span><span>My backpack: <span class="badge-count">${count}</span> badges</span>
     <span class="level-bar" role="progressbar" aria-label="${barLabel}" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100">
       <span class="level-fill" style="width: ${pct}%"></span>
-    </span>`;
+    </span></span>`;
 }
 
 // Called once by mountShell(), after the sidebar exists.

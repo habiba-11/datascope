@@ -3,7 +3,7 @@
 // "My journey" page AND the teacher dashboard (Part 20) both use it, so the two
 // can never disagree. Tested in Node (tests/journey.test.js).
 import { PHASES } from './progress.js';
-import { earnedBadges, levelFor } from './badges.js';
+import { earnedBadges, earnedPatches, levelFor } from './badges.js';
 
 // Which room's log entries belong to each phase.
 export const ROOM_OF_PHASE = {
@@ -113,7 +113,8 @@ export function buildJourney(entries, code, scenarioId, partnerId = null, savedD
     phasesDone: PHASES.filter((p) => phases[p].done).length,
     totalStars: PHASES.reduce((sum, p) => sum + (phases[p].stars || 0), 0),
     hintsUsed: PHASES.reduce((sum, p) => sum + phases[p].hints, 0),
-    badgeCount,
+    badgeCount, // reasoning moments: the thesis columns `badges` and `level`
     level: levelFor(badgeCount),
+    patches: earnedPatches(entries, code).length, // what the child sees in the backpack
   };
 }

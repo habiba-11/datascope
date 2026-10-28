@@ -59,7 +59,9 @@ export function badgeShelf(keys) {
 }
 
 // Explorer levels (Paper 30: levels). They only go up with badges, so a child
-// levels up by reasoning, never by speed. There are 19 badges in all: 4 devices,
+// levels up by reasoning, never by speed. Since Part 21b the child's level
+// counts badge patches (12, see BADGES below); the thesis `level` column still
+// counts reasoning moments. There are 19 moments in all: 4 devices,
 // 1 change of mind, 6 Number Lab puzzles (build-mean, find-mias-mistake,
 // real-life-mode, real-life-median, why-no-mean, compare-range; which ones a
 // child meets depends on the scenario), 4 graphs, 4 claim cards.

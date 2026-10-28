@@ -27,6 +27,14 @@ export function lineIcon(name, size = 24, strokeWidth = 3) {
   return `<svg class="line-icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONS[name]}</svg>`;
 }
 
+// The backpack on the badge button (a new badge flies into it).
+export const BACKPACK_SVG = `<svg class="backpack-mark" width="44" height="44" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+  <path d="M17 12a7 7 0 0 1 14 0" fill="none" style="stroke: var(--color-navy)" stroke-width="4"/>
+  <rect x="8" y="12" width="32" height="32" rx="10" style="fill: var(--color-ask); stroke: var(--color-navy)" stroke-width="3.5"/>
+  <rect x="15" y="27" width="18" height="12" rx="4" style="fill: var(--color-ask-light); stroke: var(--color-navy)" stroke-width="3"/>
+  <path d="M15 31h18" style="stroke: var(--color-navy)" stroke-width="3"/>
+</svg>`;
+
 // The DataScope logo: a green hexagon with a magnifying glass.
 export const LOGO_SVG = `<svg class="logo-mark" width="44" height="44" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
   <path d="M24 4l18 10v20L24 44 6 34V14z" style="fill: var(--color-explore)"/>

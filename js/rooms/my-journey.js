@@ -5,6 +5,7 @@
 // Time per phase is NOT shown here (teacher only, decided 25 Oct 2026).
 import { mountShell } from '../app.js';
 import { buildJourney } from '../helpers/journey.js';
+import { levelFor } from '../helpers/badges.js';
 import { loadRecipe, loadContent } from '../helpers/scenarios.js';
 import { numberLabKind } from '../helpers/number-tasks.js';
 import { CERTAINTY } from '../helpers/certainty.js';
@@ -109,8 +110,8 @@ function idCardNode(journey, code) {
   card.append(
     el('h2', '🪪 Detective ID'),
     el('p', `🔑 ${code || 'No code yet'}`, 'id-code'),
-    el('p', `${journey.level.icon} ${journey.level.name}`),
-    el('p', `🏅 Badges: ${journey.badgeCount}`),
+    el('p', `${levelFor(journey.patches).icon} ${levelFor(journey.patches).name}`),
+    el('p', `🎒 Badges: ${journey.patches}`),
     el('p', `⭐ Stars: ${journey.totalStars} of ${STOPS.length * 3}`),
   );
   return card;

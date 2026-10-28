@@ -104,3 +104,14 @@ test('a phase saved as done counts as done, even with no phase-complete in the l
   assert.equal(j.phases.collect.done, false);
   assert.equal(j.phases.ask.stars, null); // stars that were never logged stay empty
 });
+
+test('the journey counts badge patches (for the child) apart from reasoning moments (for the thesis)', () => {
+  const entries = [
+    e('question-studio', 'prediction', { scenarioId: S, guess: 8 }),
+    e('chance-lab', 'certainty', { device: 'Dice', reason: 'six sides' }),
+    e('chance-lab', 'certainty', { device: 'Fair coin', reason: 'two sides' }),
+  ];
+  const j = buildJourney(entries, 'OWL-07', S);
+  assert.equal(j.badgeCount, 2); // 2 moments: a reason for each device
+  assert.equal(j.patches, 2); // Brave Guesser + Why-Wizard (once)
+});
