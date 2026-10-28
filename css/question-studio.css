@@ -1,15 +1,3 @@
-.phase-badge {
-  display: inline-block;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 14px;
-  background: var(--phase-color, var(--color-ask));
-  border: 2px solid var(--color-navy);
-  border-radius: 999px;
-  padding: 4px 12px;
-  margin-bottom: 8px;
-}
-
 .predict-row {
   display: flex;
   gap: 10px;
@@ -27,47 +15,56 @@
   padding: 8px;
 }
 
-#go-collect-btn {
-  margin-top: 12px;
-}
-
+/* The 4 question cards (choiceCards, js/choices.js): big, tappable, one chosen. */
 .scenario-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 14px;
-  margin: 16px 0;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-2);
 }
 
 .scenario-card {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: var(--space-1);
+  min-height: 150px;
   text-align: left;
-  background: var(--color-bg);
+  background: var(--color-card-bg);
+  color: var(--color-text);
   border: var(--border-width) solid var(--color-navy);
-  border-radius: 16px;
-  padding: 14px 16px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-button);
+  padding: var(--space-2);
   cursor: pointer;
   font-family: var(--font-body);
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
+/* Chosen: it lifts a little and turns a soft yellow; the ✓ badge is in base.css. */
 .scenario-card.selected {
-  background: var(--color-ask);
+  background: var(--color-plan-light);
+  transform: translateY(-4px);
+}
+
+.scenario-card.selected::after {
+  background: var(--color-btn-main-bg);
+  color: #FFFFFF;
 }
 
 .scenario-emoji {
-  font-size: 28px;
+  font-size: 32px;
 }
 
 .scenario-title {
   font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 16px;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.2;
 }
 
 .scenario-question {
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .fixit {
@@ -85,7 +82,7 @@
   width: 100%;
   max-width: 500px;
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 19px;
   border: var(--border-width) solid var(--color-navy);
   border-radius: 12px;
   padding: 8px 12px;
@@ -106,8 +103,8 @@
 .checker-list li {
   border-radius: 10px;
   padding: 6px 10px;
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 700;
+  font-size: 16px;
 }
 
 .checker-list li.warn {
@@ -118,4 +115,25 @@
 .checker-list li.ok {
   background: #E4F7E8;
   border: 2px solid var(--color-btn-main-bg);
+}
+
+/* The bonus question folds away, so the screen shows one task. */
+.bonus {
+  margin-top: var(--space-3);
+}
+
+.bonus summary {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* The Plan question ("How many hours...?") above the guess. */
+.plan-prompt {
+  margin-top: 0;
+  font-weight: 700;
+  font-size: 19px;
 }

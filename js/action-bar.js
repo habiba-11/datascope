@@ -43,8 +43,19 @@ export function setupActionBar({ back = null, hint = null, primary }) {
     onPrimary = onClick;
   }
 
+  // The Hint button of the task on screen (or null for none).
+  let hintBtn = null;
+  function setHint(button) {
+    if (hintBtn) hintBtn.remove();
+    hintBtn = button;
+    if (button) {
+      button.classList.add('btn-secondary');
+      right.prepend(button);
+    }
+  }
+
   setBack(back);
-  if (hint) right.prepend(hint);
+  setHint(hint);
   setPrimary(primary);
-  return { setPrimary, setBack, primaryButton: primaryBtn };
+  return { setPrimary, setBack, setHint, primaryButton: primaryBtn };
 }

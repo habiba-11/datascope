@@ -45,7 +45,14 @@ export function getHint(key, index) {
 export function addHintButton(anchor, key, room, hints = HINTS[key] || []) {
   const box = document.createElement('div');
   box.className = 'hint-box';
+  const { button, list } = createHint(key, room, hints);
+  box.append(button, list);
+  anchor.after(box);
+}
 
+// The same hint button and its list, kept apart: in the card layout the
+// button goes into the action bar and the hints appear in the task card.
+export function createHint(key, room, hints = HINTS[key] || []) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'btn hint-btn';
@@ -71,6 +78,5 @@ export function addHintButton(anchor, key, room, hints = HINTS[key] || []) {
     button.disabled = !more;
   });
 
-  box.append(button, list);
-  anchor.after(box);
+  return { button, list };
 }

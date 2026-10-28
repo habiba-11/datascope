@@ -1,23 +1,39 @@
 import { mountShell, setCurrentStep } from '../app.js';
 import { checkQuestion } from '../helpers/checker.js';
 import { logEvent } from '../helpers/log.js';
-import { addHintButton } from '../helpers/prompts.js';
+import { createHint } from '../helpers/prompts.js';
 import { PICKABLE_SCENARIOS, loadRecipe, loadContent } from '../helpers/scenarios.js';
 import { setSelectedScenarioId } from '../storage/save.js';
 import { cheer } from '../motion.js';
+import { pipSay } from '../pip.js';
 import { enterPhase, finishPhase } from '../phase-progress.js';
+import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
+import { setupActionBar } from '../action-bar.js';
+import { wireChoiceCards } from '../choices.js';
 
-const PHASE_BY_TASK = { 1: 'ask', 2: 'ask', 3: 'plan' };
+// Question Studio in the 3-zone layout (UI guide). One room, two phases:
+// Ask (pick a question, fix two flawed questions) and Plan (guess first).
+// Each screen is one step of the mini stepper, with ONE primary button.
+const STEPS = [
+  { label: 'Pick', phase: 'ask', question: 'What do you want to find out?', pip: 'Pick one. Our pretend class will answer it.' },
+  { label: 'Fix 1', phase: 'ask', question: '🛠️ Fix question 1', pip: 'This question has a problem. Change it until you see ✅.' },
+  { label: 'Fix 2', phase: 'ask', question: '🛠️ Fix question 2', pip: 'One more! Change it until you see ✅.' },
+  { label: 'Guess', phase: 'plan', question: '🤔 Guess first!', pip: 'Scientists guess first, then check.' },
+];
+const STRIP = { ask: '❓ Ask · Question Studio', plan: '🗺️ Plan · Question Studio' };
 const FIXIT_IDS = ['fixit-1', 'fixit-2'];
 
-const taskComplete = { 1: false, 2: false, 3: false };
-let currentTask = 1;
+let step = 0;
+let bar = null;
 let selectedScenario = null; // { id, recipe, content }
-// Which scenario Tasks 2 and 3 were last built for, so they rebuild if the child picks another one.
+// Which scenario the fix-its and the guess were last built for, so they rebuild if the child picks another one.
 let fixitScenarioId = null;
 let predictScenarioId = null;
+let guessSaved = false;
 // Whether each fix-it question is clear right now.
 const clearState = { 'fixit-1': false, 'fixit-2': false };
+// The Hint button of each fix-it (it sits in the action bar while that fix-it is on screen).
+const hintButtons = {};
 
 async function init() {
   // The numbers come from the recipe; the child-facing words from the content file.
@@ -29,100 +45,103 @@ async function init() {
     step: 'ask',
     accent: 'ask',
     phase: 'ask',
-    pipMessage: "Hoo-hoo! I'm Pip. Let's pick a question!",
-    contentHTML: `
-      <h1 class="room-title">❓ Question Studio</h1>
-      <span class="phase-badge" id="phase-badge"></span>
-      <p class="task-progress" id="task-progress">Task 1 of 3</p>
+    layout: 'card',
+    contentHTML: taskCardHTML({
+      title: STRIP.ask,
+      bodyHTML: `
+        <div id="stepper"></div>
+        ${pipLineHTML(STEPS[0].pip, STEPS[0].question)}
 
-      <section class="task" data-task="1">
-        <h2 class="task-title">🔎 Pick a question</h2>
-        <p>Pick one to explore. Our pretend class will answer it.</p>
-        <div class="scenario-grid" id="scenario-grid">
-          ${scenarios.map((s) => `
-            <button class="scenario-card" data-id="${s.id}" type="button">
-              <span class="scenario-emoji">${s.content.emoji}</span>
-              <span class="scenario-title">${s.content.cardTitle}</span>
-              <span class="scenario-question">${s.recipe.question}</span>
-            </button>
-          `).join('')}
-        </div>
-        <p class="feedback" id="scenario-feedback" hidden></p>
-      </section>
+        <section class="task" data-step="0">
+          <div class="scenario-grid" id="scenario-grid">
+            ${scenarios.map((s, i) => `
+              <button class="scenario-card m-pop" style="--i: ${i}" data-id="${s.id}" type="button">
+                <span class="scenario-emoji" aria-hidden="true">${s.content.emoji}</span>
+                <span class="scenario-title">${s.content.cardTitle}</span>
+                <span class="scenario-question">${s.recipe.question}</span>
+              </button>
+            `).join('')}
+          </div>
+        </section>
 
-      <section class="task" data-task="2" hidden>
-        <h2 class="task-title">🛠️ Fix the questions</h2>
-        <p>Each question has a problem. Change it until you see ✅.</p>
+        ${FIXIT_IDS.map((id, i) => `
+          <section class="task fixit" data-step="${i + 1}" hidden>
+            <label for="${id}">Question ${i + 1}</label>
+            <textarea id="${id}" class="fixit-input" rows="2"></textarea>
+            <ul class="checker-list" id="checker-list-${i + 1}"></ul>
+            <div class="hint-list-slot" id="hint-slot-${i + 1}"></div>
+            ${i === 1 ? `
+              <details class="bonus">
+                <summary>⭐ Bonus: write your own question!</summary>
+                <textarea id="own-question" class="fixit-input" rows="2" placeholder="Type a question..." aria-label="My own question"></textarea>
+                <ul class="checker-list" id="checker-list-own"></ul>
+              </details>` : ''}
+          </section>`).join('')}
 
-        <div class="fixit">
-          <label for="fixit-1">Question 1</label>
-          <textarea id="fixit-1" class="fixit-input" rows="2"></textarea>
-          <ul class="checker-list" id="checker-list-1"></ul>
-        </div>
-
-        <div class="fixit">
-          <label for="fixit-2">Question 2</label>
-          <textarea id="fixit-2" class="fixit-input" rows="2"></textarea>
-          <ul class="checker-list" id="checker-list-2"></ul>
-        </div>
-
-        <div class="fixit">
-          <label for="own-question">⭐ Bonus: write your own question!</label>
-          <textarea id="own-question" class="fixit-input" rows="2" placeholder="Type a question..."></textarea>
-          <ul class="checker-list" id="checker-list-own"></ul>
-        </div>
-      </section>
-
-      <section class="task" data-task="3" hidden>
-        <h2 class="task-title">🤔 Guess first!</h2>
-        <p id="predict-question"></p>
-        <div class="predict-row" id="predict-row"></div>
-        <button class="btn btn-main" id="predict-save-btn" type="button">Save my guess</button>
-        <p class="feedback" id="predict-feedback" hidden></p>
-        <a class="btn btn-main" id="go-collect-btn" href="data-hub.html" hidden>📋 Collect the data →</a>
-      </section>
-
-      <div class="task-nav">
-        <button class="btn" id="back-btn" type="button">← Back</button>
-        <button class="btn btn-main" id="next-btn" type="button" disabled>Next →</button>
-      </div>
-    `,
+        <section class="task" data-step="3" hidden>
+          <p class="plan-prompt" id="predict-question"></p>
+          <div class="predict-row" id="predict-row"></div>
+          <p class="feedback" id="predict-feedback" hidden></p>
+        </section>`,
+    }),
   });
 
-  setupScenarioPicker(scenarios);
+  bar = setupActionBar({ back: null, primary: { label: '' } });
+  wireChoiceCards(document.getElementById('scenario-grid'), '.scenario-card', (card) => {
+    setSelectedScenarioId(card.dataset.id);
+    selectedScenario = scenarios.find((s) => s.id === card.dataset.id);
+    refreshPrimary();
+  });
   setupFixIt();
-  setupPredictSave();
-  setupTaskNav();
+  showStep(0);
 }
 
-function showTask(n) {
-  document.querySelectorAll('.task').forEach((el) => {
-    el.hidden = Number(el.dataset.task) !== n;
-  });
-  document.getElementById('task-progress').textContent = `Task ${n} of 3`;
-  document.getElementById('back-btn').disabled = n === 1;
-  currentTask = n;
-  if (n === 2) renderFixIts();
+function showStep(n) {
+  step = n;
+  if (n === 1 || n === 2) renderFixIts();
   if (n === 3) renderPredictTask();
+  document.querySelectorAll('.task').forEach((el) => {
+    el.hidden = Number(el.dataset.step) !== n;
+  });
 
-  const nextBtn = document.getElementById('next-btn');
-  nextBtn.disabled = !taskComplete[n];
-  // Last task: the room's own big button (next room / save) is the one clear action.
-  nextBtn.hidden = n === 3;
-
-  const phase = PHASE_BY_TASK[n];
-  const badge = document.getElementById('phase-badge');
-  badge.textContent = phase === 'plan' ? '🗺️ Plan' : '❓ Ask';
-  badge.style.setProperty('--phase-color', `var(--color-${phase})`);
+  const { phase, question, pip, label } = STEPS[n];
+  document.getElementById('stepper').innerHTML = miniStepperHTML(STEPS.map((s) => s.label), n);
+  document.querySelector('.task-question').textContent = question;
+  pipSay(pip);
+  // The card's colour and name follow the phase (Ask coral, Plan yellow).
+  document.querySelector('.card-layout').style.setProperty('--accent', `var(--color-${phase})`);
+  document.querySelector('.task-card-title').textContent = STRIP[phase];
   setCurrentStep(phase);
-  // Ask and Plan share this page, so Plan starts (and its intro opens) on reaching Task 3.
+  // Ask and Plan share this page, so Plan starts (and its intro opens) on reaching the guess.
   enterPhase(phase);
+
+  bar.setBack(n === 0 ? null : { label: 'Back', onClick: () => showStep(n - 1) });
+  bar.setHint(label.startsWith('Fix') ? hintButtons[FIXIT_IDS[n - 1]] : null);
+  refreshPrimary();
 }
 
-function markComplete(taskNum) {
-  taskComplete[taskNum] = true;
-  if (currentTask === taskNum) {
-    document.getElementById('next-btn').disabled = taskNum === 3;
+// The ONE primary button: what it says depends on the step and what is done.
+function refreshPrimary() {
+  if (step === 0) {
+    bar.setPrimary(selectedScenario
+      ? { label: 'Next: Fix 1 →', ready: true, onClick: () => showStep(1) }
+      : { label: '', enabled: false, whyDisabled: '👆 Pick a question first' });
+  } else if (step === 1) {
+    bar.setPrimary(clearState['fixit-1']
+      ? { label: 'Next: Fix 2 →', ready: true, onClick: () => showStep(2) }
+      : { label: '', enabled: false, whyDisabled: '✏️ Fix the question first' });
+  } else if (step === 2) {
+    const bothClear = Object.values(clearState).every(Boolean);
+    const why = clearState['fixit-2'] ? '✏️ Question 1 needs fixing too' : '✏️ Fix the question first';
+    bar.setPrimary(bothClear
+      ? { label: 'Next: Make a guess →', ready: true, onClick: () => { finishAsk(); showStep(3); } }
+      : { label: '', enabled: false, whyDisabled: why });
+  } else if (guessSaved) {
+    bar.setPrimary({ label: '📋 Collect the data →', ready: true, onClick: () => { location.href = 'data-hub.html'; } });
+  } else if (selectedScenario.recipe.answerType === 'number') {
+    bar.setPrimary({ label: 'Save my guess', onClick: saveTypedGuess });
+  } else {
+    bar.setPrimary({ label: '', enabled: false, whyDisabled: '👆 Pick your guess' });
   }
 }
 
@@ -130,7 +149,6 @@ function markComplete(taskNum) {
 // finished when the child taps Next (not while still typing). Progress is saved
 // per scenario, so picking another scenario later finishes Ask for that one too.
 function finishAsk() {
-  if (!taskComplete[1] || !taskComplete[2]) return;
   const own = document.getElementById('own-question').value;
   finishPhase('ask', {
     scenarioTitle: selectedScenario.content.cardTitle,
@@ -138,94 +156,69 @@ function finishAsk() {
   });
 }
 
-function setupTaskNav() {
-  document.getElementById('back-btn').addEventListener('click', () => {
-    showTask(Math.max(1, currentTask - 1));
-  });
-  document.getElementById('next-btn').addEventListener('click', () => {
-    if (currentTask === 2) finishAsk();
-    if (currentTask < 3) showTask(currentTask + 1);
-  });
-  showTask(1);
-}
-
-function setupScenarioPicker(scenarios) {
-  const cards = document.querySelectorAll('.scenario-card');
-  const feedback = document.getElementById('scenario-feedback');
-
-  cards.forEach((card) => {
-    card.addEventListener('click', () => {
-      cards.forEach((c) => c.classList.remove('selected'));
-      card.classList.add('selected');
-      setSelectedScenarioId(card.dataset.id);
-      selectedScenario = scenarios.find((s) => s.id === card.dataset.id);
-
-      feedback.textContent = '✅ Great pick! Next, fix some questions.';
-      feedback.hidden = false;
-      markComplete(1);
-    });
-  });
-}
-
-// Builds Task 2 for the selected scenario: its two flawed questions, each
+// Builds the fix-its for the selected scenario: its two flawed questions, each
 // with a hint button whose last hint is one possible fix.
 function renderFixIts() {
   if (!selectedScenario || fixitScenarioId === selectedScenario.id) return;
   fixitScenarioId = selectedScenario.id;
-  taskComplete[2] = false;
 
   selectedScenario.content.fixIts.forEach(({ flawed, fix }, i) => {
-    const textarea = document.getElementById(FIXIT_IDS[i]);
+    const id = FIXIT_IDS[i];
+    const textarea = document.getElementById(id);
     textarea.value = flawed;
-    clearState[FIXIT_IDS[i]] = false;
+    clearState[id] = false;
 
-    // A new scenario gets new hints: remove the old hint box first.
-    const box = textarea.closest('.fixit');
-    box.querySelector('.hint-box')?.remove();
-    addHintButton(box.querySelector('.checker-list'), `fixit-${i + 1}`, 'question-studio', [
+    // A new scenario gets new hints: the old hint list goes.
+    const { button, list } = createHint(id, 'question-studio', [
       'Fix one tip at a time, starting at the top.',
       `Here is one idea: "${fix}"`,
     ]);
-    renderChecker(textarea, box.querySelector('.checker-list'), FIXIT_IDS[i]);
+    hintButtons[id] = button;
+    document.getElementById(`hint-slot-${i + 1}`).replaceChildren(list);
+    renderChecker(textarea, document.getElementById(`checker-list-${i + 1}`), id);
   });
 }
 
-// Builds Task 3 for the selected scenario. If the child went back and picked
-// a different scenario, the old guess is cleared and the task is rebuilt.
+// Builds the guess for the selected scenario. If the child went back and
+// picked a different scenario, the old guess is cleared and it is rebuilt.
 function renderPredictTask() {
   if (!selectedScenario || predictScenarioId === selectedScenario.id) return;
   predictScenarioId = selectedScenario.id;
-
-  // Clear any guess made for the previous scenario.
-  taskComplete[3] = false;
+  guessSaved = false;
   document.getElementById('predict-feedback').hidden = true;
-  document.getElementById('go-collect-btn').hidden = true;
 
   const { recipe, content } = selectedScenario;
   document.getElementById('predict-question').textContent = content.planPrompt;
 
   const row = document.getElementById('predict-row');
-  const saveBtn = document.getElementById('predict-save-btn');
   if (recipe.answerType === 'number') {
     row.innerHTML = `<input type="number" id="predict-input" aria-label="My guess">
       <span class="predict-unit">${recipe.unit || ''}</span>`;
-    saveBtn.hidden = false;
-  } else {
-    const uniqueValues = [...new Set(recipe.valuePool)];
-    row.innerHTML = uniqueValues
-      .map((v) => `<button class="btn choice-btn predict-choice" data-value="${v}" type="button">${v}</button>`)
-      .join('');
-    saveBtn.hidden = true;
-
-    // These buttons are new each time, so they get fresh click listeners.
-    document.querySelectorAll('.predict-choice').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.predict-choice').forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-        savePrediction(btn.dataset.value);
-      });
-    });
+    return;
   }
+  const uniqueValues = [...new Set(recipe.valuePool)];
+  row.innerHTML = uniqueValues
+    .map((v) => `<button class="btn choice-btn predict-choice" data-value="${v}" type="button">${v}</button>`)
+    .join('');
+  // These buttons are new each time, so they get fresh click listeners.
+  document.querySelectorAll('.predict-choice').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.predict-choice').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      savePrediction(btn.dataset.value);
+    });
+  });
+}
+
+function saveTypedGuess() {
+  const input = document.getElementById('predict-input');
+  if (input.value === '') {
+    const feedback = document.getElementById('predict-feedback');
+    feedback.textContent = '✏️ Type a number first!';
+    feedback.hidden = false;
+    return;
+  }
+  savePrediction(input.value);
 }
 
 // `guess` is a number (typed) or a category such as "Football" (chosen).
@@ -234,28 +227,13 @@ function savePrediction(guess) {
   const shown = recipe.answerType === 'number' ? guess : `"${guess}"`;
   const feedback = document.getElementById('predict-feedback');
   feedback.textContent = `👍 Your guess: ${shown}. Now let's collect the data!`;
+  feedback.hidden = false;
   logEvent('question-studio', 'prediction', {
     about: recipe.question, scenarioId: recipe.id, guess: recipe.answerType === 'number' ? Number(guess) : guess,
   });
-  feedback.hidden = false;
-  document.getElementById('go-collect-btn').hidden = false;
-  markComplete(3);
+  guessSaved = true;
+  refreshPrimary();
   finishPhase('plan', { guessText: String(shown) });
-}
-
-// The "Save my guess" button (number scenarios) is wired up only once,
-// so going back and forth never adds a second click listener.
-function setupPredictSave() {
-  document.getElementById('predict-save-btn').addEventListener('click', () => {
-    const input = document.getElementById('predict-input');
-    const feedback = document.getElementById('predict-feedback');
-    if (input.value === '') {
-      feedback.textContent = '✏️ Type a number first!';
-      feedback.hidden = false;
-      return;
-    }
-    savePrediction(input.value);
-  });
 }
 
 // Shows the checker's tips under a question (or ✅). Each tip starts with its
@@ -271,7 +249,7 @@ function renderChecker(textarea, list, trackId) {
     // Cheer once, at the moment a flawed question becomes clear (not on every key).
     if (warnings.length === 0 && !clearState[trackId]) cheer(list);
     clearState[trackId] = warnings.length === 0;
-    if (Object.values(clearState).every(Boolean)) markComplete(2);
+    refreshPrimary();
   }
 }
 

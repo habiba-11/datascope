@@ -4,6 +4,8 @@
 const PICKABLE = '.choice-btn, .certainty-btn, .chart-type-btn, .scenario-card, .device-card';
 
 function sync(element) {
+  // Choice cards that are radios (js/choices.js) say "checked" themselves.
+  if (element.getAttribute('role') === 'radio') return;
   const picked = element.classList.contains('active') || element.classList.contains('selected');
   if (element.getAttribute('aria-pressed') !== String(picked)) {
     element.setAttribute('aria-pressed', String(picked));
