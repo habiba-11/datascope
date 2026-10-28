@@ -161,7 +161,7 @@ h1 {
 }
 
 .btn-quiet {
-  background: transparent;
+  background: var(--color-bg); /* not see-through: stays readable over the hills */
   color: var(--color-navy);
   border-color: var(--color-line);
   box-shadow: none;

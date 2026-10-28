@@ -1,149 +1,141 @@
-.room-content:has(.two-panel) {
-  background: none;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-}
+/* Data Hub (3-zone layout, docs/design/ui-ux-guide.md). The card itself is
+   in task-card.css; here: the seats, the tally and the progress bar.
+   Only transform and opacity move. */
 
-.two-panel {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.panel {
-  flex: 1;
-  min-width: 260px;
-  background: white;
-  border: var(--border-width) solid var(--color-navy);
-  border-top: 8px solid var(--panel-accent);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  padding: 20px 24px;
-}
-
-.panel-header {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 18px;
-  margin: 0 0 8px;
-}
-
-.reveal-list {
+/* "Our pretend class": one round seat per classmate, in a dashed frame. */
+.seats {
   list-style: none;
-  margin: 16px 0 0;
-  padding: 0;
-  max-height: 260px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  margin: 0;
+  padding: var(--space-2);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: var(--space-1);
+  border: 3px dashed var(--color-line);
+  border-radius: 18px;
+  background: #F4FAFF;
 }
 
-.reveal-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--color-bg);
-  border: 2px solid var(--color-navy);
-  border-radius: 12px;
-  padding: 8px 12px;
-  font-weight: 700;
-  animation: pop-in 0.25s ease-out;
-}
-
-.reveal-item .badge {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
+.seat {
+  aspect-ratio: 1;
+  max-width: 56px;
+  justify-self: center;
+  width: 100%;
   border-radius: 50%;
-  background: var(--color-collect);
-  border: 2px solid var(--color-navy);
+  border: 3px dashed var(--color-line);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 18px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .reveal-item { animation: none; }
+/* An answer arrived: the seat takes the colour of its tally bar. */
+.seat--filled {
+  background: var(--seat);
+  border: 3px solid var(--color-navy);
+}
+
+.seat-said {
+  margin: var(--space-1) 0 0;
+  font-weight: 800;
 }
 
 .progress-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 16px;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
 }
 
 .progress-track {
   flex: 1;
-  height: 14px;
-  background: var(--color-bg);
+  height: 16px;
+  background: var(--color-soft);
   border: 2px solid var(--color-navy);
   border-radius: 999px;
   overflow: hidden;
 }
 
+/* Grows with scaleX, from the left. */
 .progress-fill {
   height: 100%;
-  width: 0%;
-  background: var(--color-btn-main-bg);
-  transition: width 0.3s ease;
-}
-
-/* Reading minutes: the shared question box above the two class panels. */
-.compare-intro {
-  margin-bottom: 24px;
+  width: 100%;
+  background: var(--color-collect);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
 .progress-text {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   white-space: nowrap;
 }
 
+/* "Our tally so far": one bar per answer, in the same colour as its seats. */
 .tally {
   display: flex;
-  gap: 16px;
+  gap: var(--space-1);
   align-items: flex-end;
-  min-height: 180px;
-  margin-top: 8px;
+  padding-top: 28px; /* room for the count above the tallest bar */
 }
 
 .tally-col {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  justify-content: flex-end;
-  height: 100%;
 }
 
-.tally-count {
-  font-weight: 700;
-  min-height: 1.2em;
+.tally-track {
+  position: relative;
+  width: calc(100% + var(--space-1)); /* the axis line joins up under the gaps */
+  height: 160px; /* = BAR_HEIGHT in js/rooms/data-hub.js */
+  padding: 0 4px;
+  border-bottom: 4px solid var(--color-navy);
 }
 
+/* Full height, scaled down to its share (scaleY): only a transform moves. */
 .tally-bar {
-  width: 36px;
-  background: var(--color-collect);
-  border: 2px solid var(--color-navy);
-  border-radius: 8px 8px 0 0;
-  transition: height 0.25s ease;
+  position: absolute;
+  inset: 0 4px;
+  background: var(--bar);
+  border: 3px solid var(--color-navy);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  transition: transform var(--duration-medium) var(--ease-spring);
+}
+
+/* The count rides on top of its bar (moved with translateY). */
+.tally-count {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 20px;
+  transition: transform var(--duration-medium) var(--ease-spring);
 }
 
 .tally-label {
-  font-size: 13px;
-  font-weight: 700;
+  margin-top: 6px;
+  font-weight: 800;
+  font-size: 16px;
+  text-align: center;
+  hyphens: auto; /* "Basket-ball", not "Basketbal-l" */
+  overflow-wrap: break-word;
 }
 
-/* The "pretend class" label: the data is synthetic (CLAUDE.md integrity rule). */
-.pretend-note {
-  font-size: 16px;
+.tally-unit {
+  margin: var(--space-1) 0 0;
+  font-size: 15px;
   font-weight: 700;
-  background: var(--color-bg);
-  border: 2px dashed var(--color-navy);
-  border-radius: var(--radius-button);
-  padding: 6px 12px;
+  color: var(--color-muted-text);
+  text-align: center;
 }
