@@ -21,6 +21,7 @@ export const EVENT_TYPES = [
   'recap-viewed', // the maths recap pop-up was opened (auto or 📘), and which cards were looked at
   'findings-viewed', // Evidence Board: the child's "📋 My findings" summary was opened (auto or by tapping)
   'chart-switch', // Graph Lab: the child tried another kind of graph (from, chartType)
+  'cards-sorted', // Number Lab: the child put Mia's numbers in order (the card sort); centre = the median
   'badge-earned', // a badge patch was earned and shown (badgeId, phase; backfill: found in an older log)
 ];
 

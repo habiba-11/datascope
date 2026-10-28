@@ -1,4 +1,4 @@
-import { mountShell } from '../app.js';
+import { mountShell, exploreCardTabsHTML } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, formatMean, compareValues } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
@@ -12,6 +12,37 @@ import { finishPhase } from '../phase-progress.js';
 import { whenIntroClosed } from '../phase-intro.js';
 import { addRecapButton, autoOpenRecap } from '../recap.js';
 import { mountCardSort } from '../card-sort.js';
+import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
+import { setupActionBar } from '../action-bar.js';
+import { pipSay } from '../pip.js';
+
+// The 3-zone layout (UI guide): the Explore rooms are tabs on the card, the
+// tasks are a mini stepper, and the ONE primary button in the action bar says
+// what happens next (it replaces each task's own button and "Next").
+const STEP_LABELS = {
+  predict: 'Guess', build: 'Build it', mistake: "Mia's mistake", realLife: 'Real life',
+  whyNoMean: 'Mean of games?', compareRange: 'Spread',
+};
+const TASK_TITLES = {
+  predict: 'Your guess', build: '🧱 Build it!', mistake: '🕵️ Find the mistake', realLife: '🛒 Real life',
+  whyNoMean: '🤔 Mean of games?', compareRange: '📏 Which spreads out more?',
+};
+// Pip's one line for each task.
+const TASK_PIP = {
+  predict: 'Guess first, then check the numbers!',
+  build: 'This time, you choose the numbers!',
+  mistake: 'Mia needs a data detective!',
+  realLife: 'Numbers are everywhere in real life!',
+  whyNoMean: 'Think about words and numbers.',
+  compareRange: 'Two classes, two stories!',
+};
+// Where each task is, for the primary button: e.g. predict 'guess' -> 'revealed' -> 'changing'.
+const stage = { predict: 'guess', mistake: 'answer' };
+let bar = null;
+// What the primary button does in the tasks that have their own action (set up in TASK_SETUP).
+let revealNumbers = () => {};
+let checkBuild = () => {};
+let saveRevision = () => {};
 
 // Number Lab follows the scenario the child picked (Part 17b). The task list
 // depends on the kind of data: see TASKS_BY_KIND in helpers/number-tasks.js.
@@ -43,21 +74,19 @@ async function init() {
     accent: 'explore',
     explorePage: 'number',
     phase: 'number',
-    pipMessage: "Hoo-hoo! Guess first. Then let's see what the numbers say!",
-    contentHTML: `
-      <h1 class="room-title">🔢 Number Lab</h1>
-      <p class="task-progress" id="task-progress"></p>
-      ${tasks.map((task, i) => TASK_HTML[task](i + 1, data)).join('')}
-      <a class="btn btn-main next-room-btn" id="next-room-btn" href="chance-lab.html" hidden>🎲 Next: Chance Lab →</a>
-      <div class="task-nav">
-        <button class="btn" id="back-btn" type="button">← Back</button>
-        <button class="btn btn-main" id="next-btn" type="button" disabled>Next →</button>
-      </div>
-    `,
+    layout: 'card',
+    contentHTML: taskCardHTML({
+      tabsHTML: exploreCardTabsHTML(),
+      bodyHTML: `
+        <div id="stepper"></div>
+        ${pipLineHTML(TASK_PIP[tasks[0]], TASK_TITLES[tasks[0]])}
+        ${tasks.map((task, i) => TASK_HTML[task](i + 1, data)).join('')}`,
+    }),
   });
 
+  bar = setupActionBar({ back: null, primary: { label: '' } });
   tasks.forEach((task, i) => TASK_SETUP[task](i + 1, data));
-  setupTaskNav();
+  showTask(1);
 
   // The maths recap (Part 18): a 📘 button, and the first time it opens by
   // itself, right after the Number Lab intro is closed.
@@ -71,35 +100,45 @@ function showTask(n) {
   document.querySelectorAll('.task').forEach((el) => {
     el.hidden = Number(el.dataset.task) !== n;
   });
-  document.getElementById('task-progress').textContent = `Task ${n} of ${tasks.length}`;
-  document.getElementById('back-btn').disabled = n === 1;
-  const nextBtn = document.getElementById('next-btn');
-  nextBtn.disabled = !taskComplete[n];
-  // Last task: the room's own big button (next room) is the one clear action.
-  nextBtn.hidden = n === tasks.length;
   currentTask = n;
+  const task = tasks[n - 1];
+  document.getElementById('stepper').innerHTML = miniStepperHTML(tasks.map((t) => STEP_LABELS[t]), n - 1);
+  document.querySelector('.task-question').textContent = TASK_TITLES[task];
+  pipSay(TASK_PIP[task]);
+  bar.setBack(n === 1
+    ? { label: 'Graph Lab', href: 'graph-lab.html' }
+    : { label: 'Back', onClick: () => showTask(n - 1) });
+  refreshPrimary();
+}
+
+// The ONE primary button: what it says depends on where the child is in the task.
+function refreshPrimary() {
+  const n = currentTask;
+  const task = tasks[n - 1];
+  if (taskComplete[n]) {
+    bar.setPrimary(n === tasks.length
+      ? { label: '🎲 Next: Chance Lab →', ready: true, onClick: () => { location.href = 'chance-lab.html'; } }
+      : { label: `Next: ${STEP_LABELS[tasks[n]]} →`, ready: true, onClick: () => showTask(n + 1) });
+    return;
+  }
+  if (task === 'predict') {
+    if (stage.predict === 'guess') bar.setPrimary({ label: '🔍 Show the numbers', onClick: revealNumbers });
+    else if (stage.predict === 'changing') bar.setPrimary({ label: 'Save my new guess', onClick: saveRevision });
+    else bar.setPrimary({ label: '', enabled: false, whyDisabled: '🤔 Keep or change your guess?' });
+  } else if (task === 'build') {
+    bar.setPrimary({ label: 'Check my numbers', onClick: checkBuild });
+  } else if (task === 'mistake' && stage.mistake === 'sort') {
+    bar.setPrimary({ label: '', enabled: false, whyDisabled: '🃏 Put the cards in order first' });
+  } else {
+    bar.setPrimary({ label: '', enabled: false, whyDisabled: '👆 Pick an answer first' });
+  }
 }
 
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
-  if (currentTask === taskNum) {
-    document.getElementById('next-btn').disabled = taskNum === tasks.length;
-  }
+  if (currentTask === taskNum) refreshPrimary();
   // The room's phase is done when every task is done.
-  if (Object.values(taskComplete).every(Boolean)) {
-    document.getElementById('next-room-btn').hidden = false;
-    finishPhase('number', numberFacts);
-  }
-}
-
-function setupTaskNav() {
-  document.getElementById('back-btn').addEventListener('click', () => {
-    showTask(Math.max(1, currentTask - 1));
-  });
-  document.getElementById('next-btn').addEventListener('click', () => {
-    if (currentTask < tasks.length) showTask(currentTask + 1);
-  });
-  showTask(1);
+  if (Object.values(taskComplete).every(Boolean)) finishPhase('number', numberFacts);
 }
 
 // ---------- small helpers ----------
@@ -202,10 +241,8 @@ function statsHTML(stats) {
 const TASK_HTML = {
   predict: (n, { values }) => `
     <section class="task" data-task="${n}">
-      <h2 class="task-title">Your guess</h2>
       <p>${content.predictPrompt}</p>
       <div class="predict-row">${guessControl('predict', values)}</div>
-      <button class="btn btn-main" id="reveal-btn" type="button">🔍 Show the numbers</button>
       <div id="stats-box" hidden></div>
       <p class="feedback" id="predict-feedback" hidden></p>
 
@@ -220,7 +257,6 @@ const TASK_HTML = {
           ${guessControl('new-guess', values)}
           <label for="revise-reason">because</label>
           <input type="text" id="revise-reason" class="revise-reason" placeholder="...">
-          <button class="btn btn-main" id="save-revision-btn" type="button">Save my new guess</button>
         </div>
         <p class="feedback" id="revise-feedback" hidden></p>
       </div>
@@ -228,18 +264,15 @@ const TASK_HTML = {
 
   build: (n, { values }) => `
     <section class="task" data-task="${n}" hidden>
-      <h2 class="task-title">🧱 Build it!</h2>
       <p>${fillTemplate(content.build, { target: buildTarget(values) })}</p>
       <div class="build-row">
         ${[1, 2, 3, 4, 5].map((i) => `<input type="number" class="build-input" aria-label="Number ${i}">`).join('')}
       </div>
-      <button class="btn btn-main" id="check-build-btn" type="button">Check my numbers</button>
       <p class="feedback" id="build-feedback" hidden></p>
     </section>`,
 
   mistake: (n) => `
     <section class="task" data-task="${n}" hidden>
-      <h2 class="task-title">🕵️ Find the mistake</h2>
       <p>${content.mistake.story}</p>
       <p class="number-list">${content.mistake.numbers.join(', ')}</p>
       <p>She says: <strong>"The median is ${miaSays(content.mistake.numbers)}."</strong> Is she right?</p>
@@ -258,7 +291,6 @@ const TASK_HTML = {
     const list = content.realLife.numbers || content.realLife.items;
     return `
     <section class="task" data-task="${n}" hidden>
-      <h2 class="task-title">🛒 Real life</h2>
       <p>${content.realLife.story}</p>
       <p class="number-list">${list.join(', ')}</p>
       <p><strong>1.</strong> ${content.realLife.modeQuestion}</p>
@@ -275,7 +307,6 @@ const TASK_HTML = {
 
   whyNoMean: (n) => `
     <section class="task" data-task="${n}" hidden>
-      <h2 class="task-title">🤔 Mean of games?</h2>
       <p>${content.whyNoMean.question}</p>
       <div class="choice-row choice-column" id="why-choices">
         ${content.whyNoMean.options.map((o, i) => `<button class="btn choice-btn" data-answer="${i}" type="button">${o.text}</button>`).join('')}
@@ -285,7 +316,6 @@ const TASK_HTML = {
 
   compareRange: (n) => `
     <section class="task" data-task="${n}" hidden>
-      <h2 class="task-title">📏 Which spreads out more?</h2>
       <p>${content.compareRange.story}</p>
       <p><strong>${content.compareRange.question}</strong></p>
       <div class="choice-row" id="range-choices">${choiceButtons(['Class A', 'Class B'])}</div>
@@ -299,7 +329,7 @@ const TASK_SETUP = {
     wireChoiceGroup('new-guess');
     const feedback = document.getElementById('predict-feedback');
 
-    document.getElementById('reveal-btn').addEventListener('click', (event) => {
+    revealNumbers = () => {
       // Guess first: the numbers stay hidden until the child has made a guess.
       const guess = readGuess('predict');
       if (guess === null) {
@@ -316,7 +346,6 @@ const TASK_SETUP = {
         if (/^\d+(\.\d+)?$/.test(text)) countUp(value, Number(text), text.includes('.') ? 1 : 0);
       });
       show(feedback, revealMessage(kind, guess, stats));
-      event.target.disabled = true;
       document.querySelectorAll('.predict-row input, .predict-row button').forEach((el) => { el.disabled = true; });
 
       numberFacts.guess = guess;
@@ -330,7 +359,9 @@ const TASK_SETUP = {
       }
       logEvent('number-lab', 'prediction', logged);
       document.getElementById('revise-box').hidden = false; // the task completes after the child decides
-    });
+      stage.predict = 'revealed';
+      refreshPrimary();
+    };
 
     setupRevision(n, () => numberFacts.guess);
   },
@@ -341,7 +372,7 @@ const TASK_SETUP = {
     const feedback = document.getElementById('build-feedback');
     const tracker = trackMeaningTask('number-lab', 'build-mean', { scenarioId: recipe.id, target });
 
-    document.getElementById('check-build-btn').addEventListener('click', () => {
+    checkBuild = () => {
       if (inputs.some((input) => input.value === '')) {
         show(feedback, '✏️ Fill in all 5 numbers first!');
         return;
@@ -359,7 +390,7 @@ const TASK_SETUP = {
         tracker.wrong();
         encourage(feedback);
       }
-    });
+    };
   },
 
   mistake: (n) => {
@@ -371,6 +402,8 @@ const TASK_SETUP = {
       hintText: '🤔 Not quite. What must we do first to find the median?',
       // Then the child sorts the cards themselves; the task is done once sorted.
       onCorrect: () => {
+        stage.mistake = 'sort';
+        refreshPrimary();
         const box = document.getElementById('sort-box');
         box.hidden = false;
         mountCardSort(box, numbers, (centre) => {
@@ -378,6 +411,8 @@ const TASK_SETUP = {
           feedback.textContent = `✅ In order! The one in the centre is ${centre.join(' and ')}. That is the median, not ${miaSays(numbers)}.`;
           feedback.hidden = false;
           cheer(feedback);
+          // Logged apart from Mia's yes/no answer (that one is logged when it is right).
+          logEvent('number-lab', 'cards-sorted', { scenarioId: recipe.id, numbers, centre });
           markComplete(n);
         });
       },
@@ -452,8 +487,8 @@ function setupRevision(n, getOldGuess) {
     changeBtn.disabled = true;
     form.hidden = true;
     markComplete(n);
-    // The choice buttons are now locked, so keyboard users jump straight to Next.
-    document.getElementById('next-btn').focus();
+    // The choice buttons are now locked, so keyboard users jump straight to the next step.
+    document.getElementById('action-primary').focus();
   }
 
   keepBtn.addEventListener('click', () => {
@@ -464,11 +499,13 @@ function setupRevision(n, getOldGuess) {
 
   changeBtn.addEventListener('click', () => {
     changeBtn.classList.add('active');
+    stage.predict = 'changing';
+    refreshPrimary();
     form.hidden = false;
     form.querySelector('input, button').focus();
   });
 
-  document.getElementById('save-revision-btn').addEventListener('click', () => {
+  saveRevision = () => {
     const newGuess = readGuess('new-guess');
     const reason = reasonInput.value.trim();
     if (newGuess === null || !reason) {
@@ -480,7 +517,7 @@ function setupRevision(n, getOldGuess) {
       about: recipe.question, scenarioId: recipe.id, changed: true, oldGuess: getOldGuess(), newGuess, reason,
     });
     finish(`✏️ You changed from ${getOldGuess()} to ${newGuess} because ${reason}. Changing your mind with evidence is what data detectives do! 🔎`);
-  });
+  };
 }
 
 init();

@@ -90,6 +90,7 @@ const fullRun = [
   { code, type: 'reflection', prompt: 'not-tell', scenarioId: 'sleep-hours', text: 'why some kids sleep less, because it only counts' },
   { code, type: 'hint', prompt: 'find-mias-mistake', hintNumber: 1 },
   { code, type: 'meaning-task', task: 'find-mias-mistake', result: 'after-hint' },
+  { code, type: 'cards-sorted', scenarioId: 'sleep-hours', numbers: [10, 7, 6, 9, 8], centre: [8] },
   { code, type: 'trials', device: 'Dice', trials: 10 },
   { code, type: 'trials', device: 'Dice', trials: 500 },
   { code, type: 'certainty', device: 'Dice', reason: 'so each side is the same' },
@@ -148,10 +149,10 @@ test('Chance Tester needs 10 AND 500 tries with the same device', () => {
   ]).includes('chance-tester'));
 });
 
-test('Centre Finder (middle-finder) needs Mia\'s mistake solved; an unsolved try does not count', () => {
+test('Centre Finder (middle-finder) needs the cards sorted, not only "Mia is wrong"', () => {
   const ids = (log) => checkBadges(log, code);
-  assert.ok(!ids([{ code, type: 'meaning-task', task: 'find-mias-mistake', result: 'incorrect' }]).includes('middle-finder'));
-  assert.ok(!ids([{ code, type: 'meaning-task', task: 'build-mean', result: 'correct' }]).includes('middle-finder'));
+  assert.ok(!ids([{ code, type: 'meaning-task', task: 'find-mias-mistake', result: 'correct' }]).includes('middle-finder'));
+  assert.ok(ids([{ code, type: 'cards-sorted', numbers: [10, 7, 6, 9, 8], centre: [8] }]).includes('middle-finder'));
 });
 
 test('Because Builder needs 3 different explaining answers', () => {

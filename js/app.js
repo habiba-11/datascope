@@ -74,6 +74,11 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
     </div>`}
   `;
 
+  // Card layout: the Explore tabs were built before this page's room was
+  // known, so they are drawn again now with the right one marked.
+  const cardTabs = root.querySelector('.task-card-tabs');
+  if (cardTabs) cardTabs.innerHTML = exploreCardTabsHTML();
+
   // A locked room: hide it and go to the furthest open room instead.
   if (phase && guardPage(phase)) {
     root.hidden = true;
@@ -168,6 +173,23 @@ function exploreTabsHTML(newTab = null) {
     .join('');
 }
 
+// The Explore rooms as tabs on the task card's header (card layout, UI guide):
+// done rooms get a ✓, the current room is white, then ONE "🔒 More soon" tab
+// while a room is still locked (its name stays hidden, Prof's comment 2).
+export function exploreCardTabsHTML(newTab = null) {
+  const done = getDonePhases();
+  const open = EXPLORE_ROOMS.filter((r) => getPreviewAll() || isUnlocked(r.id, done));
+  const tabs = open.map((r) => {
+    const isActive = r.id === currentExplorePage;
+    const isDone = done.includes(r.id);
+    return `<a class="card-tab${isActive ? ' active' : ''}${isDone ? ' done' : ''}${r.id === newTab ? ' step-new' : ''}"${isActive ? ' aria-current="page"' : ''} href="${r.href}">${isDone ? '<span aria-hidden="true">✓</span> ' : ''}${r.label}${isDone ? '<span class="sr-only"> (done)</span>' : ''}</a>`;
+  });
+  if (open.length < EXPLORE_ROOMS.length) {
+    tabs.push('<span class="card-tab locked">🔒 More soon<span class="sr-only"> (locked)</span></span>');
+  }
+  return `<nav class="card-tab-row" aria-label="Explore rooms">${tabs.join('')}</nav>`;
+}
+
 // A phase was just finished: redraw the bar so the new step (or Explore
 // room) slides in, and Pip announces it.
 function showUnlocked() {
@@ -185,12 +207,21 @@ function showUnlocked() {
     subnav.innerHTML = exploreTabsHTML(newTab && newTab.id);
   }
 
+  // Card layout: the Explore rooms are tabs on the task card.
+  const cardTabs = document.querySelector('.task-card-tabs');
+  if (cardTabs) {
+    const before = cardTabs.querySelectorAll('.card-tab:not(.locked)').length;
+    const open = EXPLORE_ROOMS.filter((r) => isUnlocked(r.id, getDonePhases()));
+    if (open.length > before) newTab = open[open.length - 1];
+    cardTabs.innerHTML = exploreCardTabsHTML(newTab && newTab.id);
+  }
+
   const opened = newStep ? STEPS.find((s) => s.id === newStep) : null;
   const name = opened ? `${opened.emoji} ${opened.label}` : newTab && newTab.label;
   if (name) {
     pipSay(`🔓 Hoo-hoo! You unlocked ${name}!`);
     pipReacts('hop');
-    unlockStep(document.querySelector('.step-bar .step-new, .explore-subnav .step-new'));
+    unlockStep(document.querySelector('.step-bar .step-new, .explore-subnav .step-new, .task-card-tabs .step-new'));
     confetti(); // a phase is finished: a big moment
   }
 }
@@ -217,9 +248,17 @@ export function setCurrentStep(stepId) {
   });
 }
 
-// Puts a button on the same row as the room's title (e.g. "📘 Maths recap"),
-// so it never crowds the task text underneath.
+// Puts a room's own tool (e.g. "📘 Maths recap") next to its title, so it
+// never crowds the task text underneath. In the card layout it goes into the
+// top bar instead, next to (i) (UI guide: at most 3 buttons there).
 export function addTitleButton(button) {
+  const tools = document.getElementById('room-tools');
+  if (document.querySelector('.card-layout') && tools) {
+    button.classList.remove('title-btn');
+    button.classList.add('btn-secondary', 'room-tool');
+    tools.append(button);
+    return;
+  }
   const title = document.querySelector('.room-title');
   let row = title.parentElement;
   if (!row.classList.contains('room-title-row')) {

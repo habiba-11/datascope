@@ -189,8 +189,9 @@ export const BADGES = [
     id: 'middle-finder', name: 'Centre Finder', phase: 'Explore', color: 'collect', icon: 'median',
     why: 'You put the numbers in order to find the centre. That is the median!',
     how: 'Sort the numbers to find the median.',
-    // Mia's mistake is only solved after the cards are sorted (Part 21c).
-    rule: (entries) => entries.some((e) => solved(e) && e.task === 'find-mias-mistake'),
+    // Earned when the cards are really in order (Part 21c card sort), not
+    // already when the child says "Mia is wrong".
+    rule: (entries) => entries.some((e) => e.type === 'cards-sorted'),
   },
   {
     id: 'task', name: 'Number Cracker', phase: 'Explore', color: 'collect', icon: 'calculator',

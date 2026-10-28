@@ -193,3 +193,51 @@
 .status-line .sync-status {
   margin: 0;
 }
+
+/* The Explore rooms as tabs filling the card's header strip (Number Lab,
+   Graph Lab, Chance Lab). Done = ✓, current = white, locked = "🔒 More soon". */
+.task-card-strip:has(.task-card-tabs) {
+  padding: 0;
+}
+
+.task-card-tabs,
+.card-tab-row {
+  display: flex;
+  width: 100%;
+}
+
+.card-tab {
+  flex: 1;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px var(--space-1);
+  border-right: var(--border-width) solid var(--color-navy);
+  background: var(--accent);
+  color: var(--color-navy);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 18px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.card-tab:last-child {
+  border-right: 0;
+}
+
+.card-tab.active {
+  background: var(--color-card-bg);
+}
+
+.card-tab.locked {
+  background: var(--color-explore-light);
+  color: var(--color-muted-text);
+}
+
+/* A room's own tool (📘 Maths recap) in the top bar. */
+.room-tool {
+  font-size: 17px;
+}
