@@ -100,7 +100,14 @@ async function init() {
   }
 
   document.querySelectorAll('.chart-type-btn').forEach((btn) => {
-    btn.addEventListener('click', () => renderCharts(btn.dataset.type));
+    btn.addEventListener('click', () => {
+      const type = btn.dataset.type;
+      // Trying another kind of graph is logged (Graph Explorer badge, thesis).
+      if (type !== currentType) {
+        logEvent('graph-lab', 'chart-switch', { scenarioId: recipe.id, from: currentType, chartType: type });
+      }
+      renderCharts(type);
+    });
   });
 
   // "change" fires when the child leaves the box after editing it,

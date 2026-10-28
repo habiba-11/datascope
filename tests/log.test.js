@@ -75,3 +75,9 @@ test('logEvent adds entries in order, under the current code', () => {
   assert.equal(log.at(-2).type, 'certainty');
   assert.equal(log.at(-1).code, 'FOX-12');
 });
+
+test('Part 21b events: a graph switch and an earned badge patch can be logged', () => {
+  const now = new Date('2026-10-28T10:00:00Z');
+  assert.equal(makeEntry('OWL-07', 'graph-lab', 'chart-switch', { from: 'bar', chartType: 'pie' }, now).chartType, 'pie');
+  assert.equal(makeEntry('OWL-07', 'shell', 'badge-earned', { badgeId: 'brave-guesser', phase: 'plan' }, now).badgeId, 'brave-guesser');
+});
