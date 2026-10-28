@@ -48,6 +48,11 @@ export function enterPhase(phase) {
   setIntroPhase(phase);
 }
 
+// The phase the child is in now (e.g. for the badge-earned log entry).
+export function currentPhase() {
+  return lastPhase;
+}
+
 export function isPhaseDone(phase) {
   return getDonePhases().includes(phase);
 }

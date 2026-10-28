@@ -1,27 +1,29 @@
-// Shell layer: celebrates good reasoning. When a NEW badge is earned, the
-// counter goes up, Pip says what was good, stars burst and (if turned on) a
-// soft "ding" plays (all sounds live in js/sounds.js).
-// Badges come from the log (js/helpers/badges.js).
-import { badgeKey, badgeType, earnedBadges, badgeMessage, levelFor, levelProgress } from './helpers/badges.js';
-import { readLog } from './helpers/log.js';
+// Shell layer: celebrates good reasoning. When the log earns a NEW badge patch
+// (helpers/badges.js checkBadges), it is logged once as "badge-earned", the
+// "You found a badge!" pop-up shows it (js/badge-popup.js), and when it lands
+// in the backpack the counter goes up. A level-up gets Pip's words, confetti
+// and a fanfare. All sounds live in js/sounds.js (off by default).
+import { checkBadges, earnedPatches, findBadge, levelFor, levelProgress } from './helpers/badges.js';
+import { readLog, logEvent } from './helpers/log.js';
 import { getExplorerCode, getSoundOn, setSoundOn } from './storage/save.js';
 import { playSound } from './sounds.js';
 import { pipReacts, confetti, growBar } from './motion.js';
 import { setupBadgeShelf } from './badge-shelf.js';
+import { showBadgePopup } from './badge-popup.js';
+import { currentPhase } from './phase-progress.js';
 
-const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
+// How many patches the child has (the backpack counter and the level use this).
 export function countBadges() {
-  return earnedBadges(readLog(), getExplorerCode()).size;
+  return earnedPatches(readLog(), getExplorerCode()).length;
 }
 
-// What the badge button in the sidebar shows: the level, the badge count, and
-// a bar showing how close the next level is (always words AND a bar).
+// What the badge button shows: the level, the badge count, and a bar showing
+// how close the next level is (always words AND a bar).
 export function counterHTML(count) {
   const level = levelFor(count);
   const pct = levelProgress(count);
   const barLabel = level.next ? `Progress to ${level.next.name}: ${pct}%` : 'Top level reached';
-  return `<span class="level-name">${level.icon} ${level.name}</span><span>⭐ Badges: ${count}</span>
+  return `<span class="level-name">${level.icon} ${level.name}</span><span>⭐ Badges: <span class="badge-count">${count}</span></span>
     <span class="level-bar" role="progressbar" aria-label="${barLabel}" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100">
       <span class="level-fill" style="width: ${pct}%"></span>
     </span>`;
@@ -30,58 +32,70 @@ export function counterHTML(count) {
 // Called once by mountShell(), after the sidebar exists.
 export function setupCelebrations() {
   const code = getExplorerCode();
-  const earned = earnedBadges(readLog(), code);
   setupSoundToggle();
   setupBadgeShelf();
+  if (!code) return;
+
+  // An older log may already have earned patches (from before Part 21b).
+  // They go in the backpack quietly, marked "backfill", with no pop-up.
+  for (const badgeId of checkBadges(readLog(), code)) {
+    logEvent('shell', 'badge-earned', { badgeId, phase: currentPhase(), backfill: true });
+  }
+  let shownCount = countBadges(); // what the counter shows right now
 
   window.addEventListener('datascope:logged', (event) => {
     const entry = event.detail;
-    const key = badgeKey(entry);
-    if (!key || entry.code !== code || earned.has(key)) return;
+    if (entry.code !== code || entry.type === 'badge-earned') return;
+    const newIds = checkBadges(readLog(), code);
+    if (newIds.length === 0) return;
 
-    const levelBefore = levelFor(earned.size).name;
-    const pctBefore = levelProgress(earned.size);
-    earned.add(key);
-    const level = levelFor(earned.size);
-    const counter = document.getElementById('badge-counter');
-    counter.innerHTML = counterHTML(earned.size);
-    // The bar grows from where it was (a new level starts from 0).
-    growBar(counter.querySelector('.level-fill'), level.name !== levelBefore ? 0 : pctBefore);
-    starBurst(counter);
-
-    const type = badgeType(key);
-    // A short wait before each sound, so it doesn't clash with the room's own "correct" chime.
-    if (level.name !== levelBefore) {
-      pipSays(`${type.icon} ${type.name} badge! Level up: you are now a ${level.icon} ${level.name}!`);
-      confetti();
-      setTimeout(() => playSound('levelUp'), 600);
-    } else {
-      pipSays(`${type.icon} ${type.name} badge! ${badgeMessage(entry)}`);
-      setTimeout(() => playSound('badge'), 600);
+    for (const badgeId of newIds) {
+      logEvent('shell', 'badge-earned', { badgeId, phase: currentPhase() });
     }
+    // Wait a moment, so a feedback card opened by the same tap goes first in
+    // the pop-up line (badges-spec.md: badges come after the phase feedback).
+    setTimeout(() => {
+      for (const badgeId of newIds) {
+        showBadgePopup(findBadge(badgeId), () => {
+          shownCount += 1;
+          landInBackpack(shownCount);
+        });
+      }
+    }, 0);
   });
+}
+
+// A badge landed: the counter pops +1, the backpack bumps, the level bar grows.
+function landInBackpack(count) {
+  const counter = document.getElementById('badge-counter');
+  const levelBefore = levelFor(count - 1).name;
+  const pctBefore = levelProgress(count - 1);
+  const level = levelFor(count);
+  counter.innerHTML = counterHTML(count);
+  // The bar grows from where it was (a new level starts from 0).
+  growBar(counter.querySelector('.level-fill'), level.name !== levelBefore ? 0 : pctBefore);
+  restartClass(counter, 'bp-bump');
+  restartClass(counter.querySelector('.badge-count'), 'bp-count-pop');
+
+  if (level.name !== levelBefore) {
+    pipSays(`Level up: you are now a ${level.icon} ${level.name}!`);
+    confetti(); // only now: the badge pop-up (and its own confetti) is closed
+    setTimeout(() => playSound('levelUp'), 300);
+  }
+}
+
+// Plays a CSS animation again, even if it ran before.
+function restartClass(element, name) {
+  if (!element) return;
+  element.classList.remove(name);
+  void element.offsetWidth; // makes the browser notice the class came back
+  element.classList.add(name);
 }
 
 // Pip's speech bubble shows the praise, and Pip does a little hop.
 function pipSays(message) {
   document.querySelector('.speech-bubble').textContent = message;
   pipReacts('hop');
-}
-
-// Eight stars fly out from the badge counter and fade away.
-function starBurst(anchor) {
-  if (reduceMotion()) return;
-  for (let i = 0; i < 8; i++) {
-    const star = document.createElement('span');
-    star.className = 'burst-star';
-    star.textContent = '⭐';
-    star.setAttribute('aria-hidden', 'true');
-    const angle = (i / 8) * 2 * Math.PI;
-    star.style.setProperty('--dx', `${Math.cos(angle) * 70}px`);
-    star.style.setProperty('--dy', `${Math.sin(angle) * 70}px`);
-    anchor.append(star);
-    star.addEventListener('animationend', () => star.remove());
-  }
 }
 
 // The "Sound: off / on" button in the sidebar. Off by default.

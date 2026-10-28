@@ -236,7 +236,7 @@
   min-height: 320px;
 }
 
-/* The badge counter holds the star burst, so stars fly out from it.
+/* The badge counter: a new badge flies into it (js/badge-popup.js).
    It is also a button: tapping it opens the badge shelf. */
 .badge-counter {
   position: relative;
@@ -322,20 +322,6 @@
 
 .shelf-text {
   font-size: 18px;
-}
-
-.burst-star {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  font-size: 20px;
-  pointer-events: none;
-  animation: star-fly 0.9s ease-out forwards;
-}
-
-@keyframes star-fly {
-  from { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
-  to { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.2); opacity: 0; }
 }
 
 /* Pip hops for good reasoning and right answers. */

@@ -22,6 +22,9 @@ export function pauseNextModal(ms) {
 //   buttons:     [{ label, value, main }]; `main` makes it the big green button
 //   accent:      room colour name ('ask', 'plan', 'collect', 'explore', 'conclude')
 //   dismissible: false hides ✕ and ignores Esc, so a button must be pressed
+//   className:   an extra class for a special look (e.g. the badge pop-up)
+//   onOpen:      called with (dialog) when the pop-up really opens (it may wait in line first)
+//   beforeClose: called with (dialog, value) just before the pop-up is removed
 export function openModal(options) {
   return new Promise((resolve) => {
     const item = { options, resolve };
@@ -32,7 +35,7 @@ export function openModal(options) {
 function show({ options, resolve }) {
   const {
     icon = '', title, body, accent = 'collect', dismissible = true,
-    buttons = [{ label: 'OK!', value: 'ok', main: true }],
+    buttons = [{ label: 'OK!', value: 'ok', main: true }], className = '', onOpen, beforeClose,
   } = options;
 
   // Remember where the child was, so focus can go back there on close.
@@ -43,7 +46,7 @@ function show({ options, resolve }) {
   // <dialog> with showModal() makes the page behind it unreachable,
   // so Tab stays inside the pop-up.
   const dialog = document.createElement('dialog');
-  dialog.className = 'modal';
+  dialog.className = className ? `modal ${className}` : 'modal';
   dialog.setAttribute('aria-labelledby', titleId);
   dialog.style.setProperty('--modal-accent', `var(--color-${accent})`);
 
@@ -104,8 +107,10 @@ function show({ options, resolve }) {
   dialog.showModal();
   // Start on the main button (not on ✕), so Enter does the expected thing.
   (mainButton || actions.querySelector('button'))?.focus();
+  if (onOpen) onOpen(dialog);
 
   function close(value) {
+    if (beforeClose) beforeClose(dialog, value);
     dialog.close();
     dialog.remove();
     document.body.classList.remove('modal-open');

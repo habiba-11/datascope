@@ -11,6 +11,7 @@ const SOUNDS = {
   correct: { wave: 'triangle', volume: 0.12, notes: [[523, 0, 0.12], [659, 0.1, 0.12], [784, 0.2, 0.25]] },
   tryAgain: { wave: 'sine', volume: 0.1, notes: [[392, 0, 0.15], [330, 0.15, 0.25]] }, // gentle, not a buzzer
   badge: { wave: 'sine', volume: 0.15, notes: [[660, 0, 0.3], [880, 0.12, 0.3]] },
+  badgeFound: { wave: 'triangle', volume: 0.18, notes: [[523, 0, 0.5], [659, 0.12, 0.5], [784, 0.24, 0.5]] }, // a badge pop-up's stamp
   tick: { wave: 'sine', volume: 0.06, notes: [[880, 0, 0.04]] },
   levelUp: { wave: 'triangle', volume: 0.12, notes: [[392, 0, 0.1], [523, 0.1, 0.1], [659, 0.2, 0.1], [784, 0.3, 0.1], [1047, 0.4, 0.2], [784, 0.6, 0.1], [1047, 0.7, 0.4]] },
   done: { wave: 'triangle', volume: 0.12, notes: [[523, 0, 0.1], [659, 0.1, 0.1], [784, 0.2, 0.1], [1047, 0.3, 0.35]] },
