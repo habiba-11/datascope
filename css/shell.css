@@ -20,11 +20,17 @@
   align-items: center;
   gap: 8px;
   font-family: var(--font-heading);
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-btn-main-bg);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--color-navy);
   text-decoration: none;
   min-height: 48px; /* tap target */
+}
+
+/* "Data" in navy, "Scope" in our main green (passes contrast). */
+.logo-accent {
+  color: var(--color-btn-main-bg);
 }
 
 .step-bar {
@@ -40,33 +46,38 @@
   text-decoration: none;
   color: var(--color-text);
   font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 14px;
-  padding: 0 10px;
+  font-weight: 800;
+  font-size: 16px;
+  padding: 0 8px;
 }
 
+/* A rounded square in the step's colour, with a navy line icon. */
 .step-icon {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
+  border-radius: var(--radius-step);
   background: var(--step-color);
-  border: var(--border-width) solid var(--color-navy);
+  color: var(--color-navy);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
 }
 
+/* Where you are: a bit bigger, a white rim, a navy ring and shadow.
+   (scale, so the bar does not jump; the word "current step" is in aria-current.) */
 .step.current .step-icon {
-  box-shadow: 0 0 0 3px white, 0 0 0 6px var(--step-color);
+  transform: scale(1.12);
+  border: 3px solid white;
+  box-shadow: 0 0 0 3px var(--color-navy), 0 6px 0 3px var(--color-navy);
 }
 
 .connector {
-  width: 28px;
-  height: 3px;
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
   align-self: flex-start;
-  margin-top: 23px;
-  background-image: repeating-linear-gradient(to right, var(--color-navy) 0 6px, transparent 6px 12px);
+  margin-top: 22px;
+  background: var(--color-line);
 }
 
 /* Part 15: a newly unlocked step's connector draws itself. The step itself
@@ -140,11 +151,14 @@
 .speech-bubble {
   background: white;
   border: var(--border-width) solid var(--color-navy);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-button);
+  border-radius: 24px;
+  box-shadow: 0 6px 0 var(--color-navy);
   padding: 16px;
   text-align: left;
   width: 100%;
+  font-weight: 700;
+  font-size: 19px;
+  line-height: 1.35;
 }
 
 /* Pip (SVG, js/pip.js) in the sidebar. */

@@ -38,7 +38,7 @@ h1 {
   display: inline-block;
   font-family: var(--font-heading);
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 800;
   text-decoration: none;
   text-align: center;
   border: var(--border-width) solid var(--color-navy);
@@ -46,6 +46,7 @@ h1 {
   box-shadow: var(--shadow-button);
   padding: 10px 24px;
   cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.08s;
 }
 
 /* A thick, clear outline shows where you are when using the keyboard (Tab).
@@ -121,7 +122,7 @@ h1 {
 
 .btn:active {
   box-shadow: var(--shadow-button-active);
-  transform: translate(3px, 3px);
+  transform: translateY(var(--press-depth));
 }
 
 .btn:disabled {
@@ -131,9 +132,12 @@ h1 {
   transform: none;
 }
 
+/* The one big action on a screen ("Next", "Let's go!"): bigger and chunkier. */
 .btn-main {
   background: var(--color-btn-main-bg);
   color: var(--color-btn-main-text);
+  min-height: 56px;
+  font-size: 21px;
 }
 
 /* Shared by several rooms, so they live here (every page loads base.css). */

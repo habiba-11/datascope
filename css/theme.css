@@ -13,6 +13,20 @@
   --color-explore: #4CC26B;
   --color-conclude: #A596FF; /* lighter purple: navy text on it passes contrast (5.25:1) */
 
+  /* light tints of the room colours (badge centres, soft panels) */
+  --color-ask-light: #FFD9D4;
+  --color-plan-light: #FFF0C2;
+  --color-collect-light: #D3EEFF;
+  --color-explore-light: #D5F2DC;
+  --color-conclude-light: #E3DEFF;
+
+  --color-line: #9CC6E6;   /* step connectors, dashed list frames */
+  --color-soft: #E1EEF8;   /* row lines, empty progress bars */
+  --color-gold: #FFC531;   /* super badge ring, rays */
+  --color-locked: #C9D6E2; /* a badge still to find */
+  --color-locked-light: #EEF3F7;
+  --color-muted-text: #4A6580; /* small grey text on white (7:1) */
+
   --color-hill-back: #BEEAC0;
   --color-hill-front: #8FD79B;
 
@@ -29,13 +43,16 @@
 
   /* shapes */
   --border-width: 3px;
-  --radius-card: 20px;
-  --radius-button: 14px;
+  --radius-card: 26px;
+  --radius-button: 18px;
+  --radius-step: 14px;
 
-  /* bouncy navy shadows */
-  --shadow-card: 8px 8px 0 var(--color-navy);
-  --shadow-button: 4px 4px 0 var(--color-navy);
-  --shadow-button-active: 1px 1px 0 var(--color-navy);
+  /* bouncy navy shadows, straight down (Explorer's Toolkit reference screen).
+     A pressed button moves down by --press-depth, onto its shadow. */
+  --shadow-card: 0 7px 0 var(--color-navy);
+  --shadow-button: 0 5px 0 var(--color-navy);
+  --shadow-button-active: 0 1px 0 var(--color-navy);
+  --press-depth: 4px;
 
   /* motion (Part 21a): CSS animations use these; js/motion.js has the same
      values for GSAP, in its MOTION list. */

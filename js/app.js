@@ -5,16 +5,18 @@ import { guardPage, enterPhase } from './phase-progress.js';
 import { visibleSteps, isStepDone, isUnlocked } from './helpers/progress.js';
 import { pipReacts, enterRoom, float, unlockStep, confetti } from './motion.js';
 import { pipSVG } from './pip.js';
+import { lineIcon, LOGO_SVG } from './icons.js';
 import { watchPressedState } from './pressed-state.js';
 import { startSync, STATUS_TEXT } from './storage/sync.js';
 import { backendReady } from './config.js';
 
+// `icon` is a line icon from icons.js (step bar); `emoji` is used in Pip's words.
 const STEPS = [
-  { id: 'ask', label: 'Ask', icon: '❓', color: 'ask', href: 'question-studio.html' },
-  { id: 'plan', label: 'Plan', icon: '🗺️', color: 'plan', href: 'question-studio.html' },
-  { id: 'collect', label: 'Collect', icon: '📋', color: 'collect', href: 'data-hub.html' },
-  { id: 'explore', label: 'Explore', icon: '📊', color: 'explore', href: 'graph-lab.html' },
-  { id: 'conclude', label: 'Conclude', icon: '🚩', color: 'conclude', href: 'evidence-board.html' },
+  { id: 'ask', label: 'Ask', icon: 'question', emoji: '❓', color: 'ask', href: 'question-studio.html' },
+  { id: 'plan', label: 'Plan', icon: 'map', emoji: '🗺️', color: 'plan', href: 'question-studio.html' },
+  { id: 'collect', label: 'Collect', icon: 'clipboard', emoji: '📋', color: 'collect', href: 'data-hub.html' },
+  { id: 'explore', label: 'Explore', icon: 'bars', emoji: '📊', color: 'explore', href: 'graph-lab.html' },
+  { id: 'conclude', label: 'Conclude', icon: 'flag', emoji: '🚩', color: 'conclude', href: 'evidence-board.html' },
 ];
 
 // The ids are the same as the phase ids in helpers/progress.js.
@@ -45,7 +47,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
 
   root.innerHTML = `
     <header class="shell-header">
-      <a class="logo" href="../index.html">🔎 <span>DataScope</span></a>
+      <a class="logo" href="../index.html">${LOGO_SVG}<span>Data<span class="logo-accent">Scope</span></span></a>
       <nav class="step-bar" aria-label="Investigation steps">${stepBarHTML()}</nav>
       <button class="btn info-btn" id="info-btn" type="button">ℹ️ What to do</button>
     </header>
@@ -108,7 +110,7 @@ function stepBarHTML(newStep = null) {
     return `
       ${connector}
       <a class="step${isCurrent ? ' current' : ''}${isNew ? ' step-new' : ''}"${isCurrent ? ' aria-current="step"' : ''} data-step="${s.id}" href="${s.href}" style="--step-color: var(--color-${s.color})">
-        <span class="step-icon">${s.icon}</span>
+        <span class="step-icon">${lineIcon(s.icon)}</span>
         <span class="step-label">${s.label}${doneMark}</span>
       </a>
     `;
@@ -146,7 +148,7 @@ function showUnlocked() {
   }
 
   const opened = newStep ? STEPS.find((s) => s.id === newStep) : null;
-  const name = opened ? `${opened.icon} ${opened.label}` : newTab && newTab.label;
+  const name = opened ? `${opened.emoji} ${opened.label}` : newTab && newTab.label;
   if (name) {
     document.querySelector('.speech-bubble').textContent = `🔓 Hoo-hoo! You unlocked ${name}!`;
     pipReacts('hop');
