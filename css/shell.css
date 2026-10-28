@@ -7,12 +7,14 @@
   gap: 12px;
 }
 
-/* ℹ️ reopens the phase intro pop-up (js/phase-intro.js). */
+/* ℹ️ reopens the phase intro pop-up (js/phase-intro.js); it is an .icon-btn. */
 .info-btn {
-  min-height: 48px;
-  background: var(--color-card-bg);
   color: var(--color-navy);
-  padding: 8px 16px;
+}
+
+/* A room's own tool (📘 Maths recap, 📋 My findings) sits next to ℹ️. */
+.room-tools {
+  display: contents;
 }
 
 .logo {
@@ -51,11 +53,12 @@
   padding: 0 8px;
 }
 
-/* A rounded square in the step's colour, with a navy line icon. */
+/* A trail stop: a circle in the step's colour with a navy line icon. */
 .step-icon {
   width: 48px;
   height: 48px;
-  border-radius: var(--radius-step);
+  border-radius: 50%;
+  border: var(--border-width) solid var(--color-navy);
   background: var(--step-color);
   color: var(--color-navy);
   display: flex;
@@ -63,12 +66,33 @@
   justify-content: center;
 }
 
-/* Where you are: a bit bigger, a white rim, a navy ring and shadow.
-   (scale, so the bar does not jump; the word "current step" is in aria-current.) */
-.step.current .step-icon {
-  transform: scale(1.12);
-  border: 3px solid white;
-  box-shadow: 0 0 0 3px var(--color-navy), 0 6px 0 3px var(--color-navy);
+/* Done: green with a white ✓ (and "(done)" for screen readers). */
+.step.done .step-icon {
+  background: var(--color-btn-main-bg);
+  color: #FFFFFF;
+}
+
+.step-check {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Where you are: the room colour and a breathing ring (css/motion.css m-ring). */
+.step.current .step-label {
+  text-decoration: underline 3px var(--step-color);
+  text-underline-offset: 4px;
+}
+
+/* "More soon": one locked stop, dashed, so the trail clearly goes on. */
+.step--soon {
+  color: var(--color-muted-text);
+}
+
+.step--soon .step-icon {
+  background: var(--color-card-bg);
+  border: var(--border-width) dashed var(--color-line);
+  color: var(--color-muted-text);
 }
 
 .connector {
@@ -78,6 +102,16 @@
   align-self: flex-start;
   margin-top: 22px;
   background: var(--color-line);
+}
+
+.connector--done {
+  background: var(--color-btn-main-bg);
+}
+
+.connector--soon {
+  background: none;
+  border-top: 4px dotted var(--color-line);
+  height: 0;
 }
 
 /* Part 15: a newly unlocked step's connector draws itself. The step itself
@@ -103,12 +137,6 @@
 @keyframes connector-draw {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
-}
-
-/* A finished step: a ✅ next to its name (not only a colour change). */
-.step-done {
-  margin-left: 2px;
-  font-size: 12px;
 }
 
 /* Read by screen readers, not shown on screen. */
@@ -228,6 +256,7 @@
 
 /* The ℹ️ and backpack buttons sit together on the right of the header. */
 .header-actions {
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -237,38 +266,22 @@
    tapping it opens "My Explorer Backpack" (js/badge-shelf.js). */
 .badge-counter {
   position: relative;
-  min-height: 56px; /* tap target */
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 14px 4px 6px;
-  background: var(--color-card-bg);
-  color: var(--color-text);
-  font-size: 15px;
-  text-align: left;
+  padding: 0 12px 0 6px;
+  gap: 6px;
+  font-size: 18px;
 }
 
 .backpack-mark {
   flex-shrink: 0;
-}
-
-.backpack-words {
-  display: flex;
-  flex-direction: column; /* level on top, badge count below */
-  gap: 2px;
-}
-
-.level-name {
-  font-weight: 800;
+  width: 38px;
+  height: 38px;
 }
 
 .badge-count {
   display: inline-block;
   min-width: 26px;
-  padding: 0 6px;
-  border-radius: 999px;
-  background: var(--color-navy);
-  color: #FFFFFF;
+  font-family: var(--font-heading);
+  font-weight: 800;
   text-align: center;
 }
 
@@ -318,12 +331,12 @@
   color: var(--color-navy);
 }
 
-/* The bar under the badge counter: how close the next level is (Part 21b). */
+/* In the backpack shelf: how close the next level is (Part 21b). */
 .level-bar {
   display: block;
   width: 100%;
-  height: 10px;
-  margin-top: 4px;
+  height: 16px;
+  margin: 4px 0 12px;
   background: var(--color-bg);
   border: 2px solid var(--color-navy);
   border-radius: 999px;

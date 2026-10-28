@@ -64,3 +64,11 @@ export function pipMoodFor(mood, ms = 1400) {
   clearTimeout(moodTimer);
   moodTimer = setTimeout(() => setPipMood('happy'), ms);
 }
+
+// Pip says something: in the sidebar bubble (old layout) or in the Pip line
+// of the task card (new layout). Both are marked with data-pip-text.
+export function pipSay(text) {
+  document.querySelectorAll('[data-pip-text]').forEach((el) => {
+    el.textContent = text;
+  });
+}

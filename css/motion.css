@@ -1,0 +1,68 @@
+/* Motion classes (UI guide section 4). Each motion has a meaning:
+   rise = "this is new, read it", pop = "this just arrived", ring = "you are here",
+   grow = "one more", pulse = "ready, tap me", float = Pip is alive, shake = "locked / try again".
+   Items enter one after another with style="--i: 2" (0, 1, 2...).
+   Only transform and opacity move. Reduced motion: base.css switches every
+   animation off, so each element simply shows in its final state. */
+
+.m-rise {
+  animation: m-rise var(--duration-medium) var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger));
+}
+
+.m-pop {
+  animation: m-pop var(--duration-medium) var(--ease-spring) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger));
+}
+
+/* "You are here": a soft ring breathes around the current trail stop. */
+.m-ring {
+  position: relative;
+}
+
+.m-ring::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: inherit;
+  border: 3px solid var(--ring-colour, var(--color-collect));
+  opacity: 0;
+  animation: m-ring 1.8s var(--ease-out) infinite;
+  pointer-events: none;
+}
+
+/* Bars grow up from the bottom (scaleY), so the layout never jumps. */
+.m-grow {
+  transform-origin: 50% 100%;
+  animation: m-grow var(--duration-slow) var(--ease-spring) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger));
+}
+
+/* Only on a primary button that is ready to be tapped. */
+.m-pulse {
+  animation: m-pulse 1.6s ease-in-out 0.6s infinite;
+}
+
+.m-float {
+  animation: m-float 3s ease-in-out infinite;
+}
+
+/* A small wobble: a lock before it opens, or a gentle "try again". Never a punishment. */
+.m-shake {
+  animation: m-shake 0.45s ease-in-out;
+}
+
+/* Loops rest while the tab is hidden (js/app.js sets the class). */
+.tab-hidden .m-ring::after,
+.tab-hidden .m-pulse,
+.tab-hidden .m-float {
+  animation-play-state: paused;
+}
+
+@keyframes m-rise { from { opacity: 0; transform: translateY(18px); } }
+@keyframes m-pop { from { opacity: 0; transform: scale(0.6); } }
+@keyframes m-ring { 0% { opacity: 0.9; transform: scale(0.9); } 100% { opacity: 0; transform: scale(1.25); } }
+@keyframes m-grow { from { transform: scaleY(0); } }
+@keyframes m-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@keyframes m-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes m-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }

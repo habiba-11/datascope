@@ -1,0 +1,195 @@
+/* The 3-zone room layout (docs/design/ui-ux-guide.md): ONE task card in the
+   middle, the action bar under it, then a quiet status line.
+   Spacing uses only --space-1..4 (8 / 16 / 24 / 32 px). */
+
+/* Zone 2: the card area, centred, never wider than 1000px. */
+.room-content.card-layout {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 var(--space-3);
+  background: none;
+  border: none;
+  box-shadow: none;
+  min-height: 0;
+}
+
+.task-card {
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* The header strip in the room colour: where you are, in words. */
+.task-card-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  padding: 10px var(--space-3);
+  background: var(--accent);
+  border-bottom: var(--border-width) solid var(--color-navy);
+}
+
+.task-card-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 20px;
+}
+
+.task-card-pill {
+  background: var(--color-card-bg);
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.task-card-body {
+  padding: var(--space-3);
+}
+
+/* Pip's one line next to the big question. */
+.pip-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.pip-mascot--line {
+  width: 56px;
+  flex-shrink: 0;
+}
+
+.pip-line-words {
+  min-width: 0;
+}
+
+.task-question {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.15;
+  max-width: 34ch;
+}
+
+.pip-line-text {
+  margin: 4px 0 0;
+  font-weight: 700;
+  font-size: 18px;
+  max-width: 70ch;
+}
+
+/* Up to 2 panels side by side; they stack when the screen is narrow. */
+.card-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-3);
+}
+
+.panel-title {
+  margin: 0 0 var(--space-1);
+  font-size: 19px;
+}
+
+/* The mini stepper: done / now / next, each with a mark AND a word for screen readers. */
+.mini-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  list-style: none;
+  margin: 0 0 var(--space-2);
+  padding: 0;
+}
+
+.stepper-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 999px;
+  background: var(--color-soft);
+  color: var(--color-muted-text);
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.stepper-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-card-bg);
+}
+
+.stepper-chip--done {
+  background: var(--color-explore-light);
+  color: var(--color-navy);
+}
+
+.stepper-chip--done .stepper-mark {
+  background: var(--color-btn-main-bg);
+  color: #FFFFFF;
+}
+
+.stepper-chip--now {
+  background: var(--color-navy);
+  color: #FFFFFF;
+}
+
+.stepper-chip--now .stepper-mark {
+  color: var(--color-navy);
+}
+
+/* Zone 3: always in the same place. Back on the left, Hint + ONE primary on the right. */
+.action-bar {
+  max-width: 1000px;
+  margin: var(--space-3) auto 0;
+  padding: 0 var(--space-3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.action-left,
+.action-right {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.action-right {
+  margin-left: auto;
+}
+
+.action-primary {
+  min-width: 180px;
+}
+
+/* Quiet: the child's code, the sound switch and the online status. */
+.status-line {
+  max-width: 1000px;
+  margin: var(--space-3) auto 120px;
+  padding: 0 var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 15px;
+}
+
+.status-line .sound-toggle {
+  min-height: 48px;
+  font-size: 15px;
+}
+
+.status-line .sync-status {
+  margin: 0;
+}

@@ -1,10 +1,10 @@
 import { getExplorerCode, getDonePhases, getPreviewAll } from './storage/save.js';
-import { countBadges, counterHTML, setupCelebrations } from './celebrate.js';
+import { countBadges, counterHTML, backpackLabel, setupCelebrations } from './celebrate.js';
 import { setupInfoButton } from './phase-intro.js';
 import { guardPage, enterPhase } from './phase-progress.js';
-import { visibleSteps, isStepDone, isUnlocked } from './helpers/progress.js';
+import { visibleSteps, isStepDone, isUnlocked, hasMoreSteps } from './helpers/progress.js';
 import { pipReacts, enterRoom, float, unlockStep, confetti } from './motion.js';
-import { pipSVG } from './pip.js';
+import { pipSVG, pipSay } from './pip.js';
 import { lineIcon, LOGO_SVG } from './icons.js';
 import { watchPressedState } from './pressed-state.js';
 import { startSync, STATUS_TEXT } from './storage/sync.js';
@@ -33,7 +33,10 @@ let currentExplorePage = null;
 
 // `phase` is this page's phase (see helpers/progress.js), e.g. 'collect' or
 // 'graph'. It drives the route guard, the phase-start log and the intro pop-up.
-export function mountShell({ step, accent, pipMessage, contentHTML, explorePage, phase }) {
+// `layout`: 'card' = the 3-zone layout of the UI guide (top bar, ONE task card,
+// action bar; Pip lives in the card). Rooms move to it one at a time; the
+// others keep the 'sidebar' layout until then.
+export function mountShell({ step, accent, pipMessage, contentHTML, explorePage, phase, layout = 'sidebar' }) {
   const root = document.getElementById('shell');
   currentStep = step;
   currentExplorePage = explorePage;
@@ -50,14 +53,15 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
       <a class="logo" href="../index.html">${LOGO_SVG}<span>Data<span class="logo-accent">Scope</span></span></a>
       <nav class="step-bar" aria-label="Investigation steps">${stepBarHTML()}</nav>
       <div class="header-actions">
-        <button class="btn info-btn" id="info-btn" type="button">ℹ️ What to do</button>
-        <button class="btn badge-counter" id="badge-counter" type="button" aria-live="polite">${counterHTML(countBadges())}</button>
+        <span class="room-tools" id="room-tools"></span>
+        <button class="btn icon-btn info-btn" id="info-btn" type="button" aria-label="What to do" title="What to do">${lineIcon('info', 28, 2.6)}</button>
+        <button class="btn icon-btn badge-counter" id="badge-counter" type="button" aria-label="${backpackLabel(countBadges())}">${counterHTML(countBadges())}</button>
       </div>
     </header>
     ${getPreviewAll() ? '<p class="preview-banner">👀 Teacher preview: all rooms are open on this device</p>' : ''}
-    <div class="shell-body">
+    ${layout === 'card' ? cardBodyHTML(accent, contentHTML) : `<div class="shell-body">
       <aside class="sidebar">
-        <div class="speech-bubble">${pipMessage}</div>
+        <div class="speech-bubble" data-pip-text>${pipMessage}</div>
         <div class="pip-mascot">${pipSVG()}</div>
         ${codeBadge()}
         <button class="btn sound-toggle" id="sound-toggle" type="button" aria-pressed="false">🔇 Sound: off</button>
@@ -67,7 +71,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
         ${step === 'explore' ? `<nav class="explore-subnav" aria-label="Explore rooms">${exploreTabsHTML()}</nav>` : ''}
         ${contentHTML}
       </main>
-    </div>
+    </div>`}
   `;
 
   // A locked room: hide it and go to the furthest open room instead.
@@ -90,33 +94,65 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
     label.textContent = STATUS_TEXT[status];
     label.dataset.status = status;
   });
-  enterRoom(root.querySelector('.room-content'));
-  float(root.querySelector('.pip-mascot .pip'));
+  if (layout !== 'card') {
+    enterRoom(root.querySelector('.room-content'));
+    float(root.querySelector('.pip-mascot .pip'));
+  }
+  // Looping motions rest while the tab is hidden (css/motion.css).
+  document.addEventListener('visibilitychange', () => {
+    document.documentElement.classList.toggle('tab-hidden', document.hidden);
+  });
   window.addEventListener('datascope:phase-done', showUnlocked);
   if (phase) enterPhase(phase);
 }
 
-// Only the open steps are shown (Prof's comment 2). Done steps get a ✅ and
-// stay clickable, so a child can go back and look. `newStep` slides in.
+// The trail (Part 15 + UI guide). Only the open steps are shown (Prof's
+// comment 2), then ONE locked "More soon" stop. Done steps are green with a ✓
+// and stay clickable, so a child can go back and look. The current step has a
+// breathing ring. `newStep` springs in (motion.js unlockStep).
 function stepBarHTML(newStep = null) {
   const done = getDonePhases();
   const shown = getPreviewAll() ? STEPS : STEPS.filter((s) => visibleSteps(done).includes(s.id));
 
-  return shown.map((s, i) => {
+  const stops = shown.map((s, i) => {
     const isCurrent = s.id === currentStep;
     const isNew = s.id === newStep;
-    const connector = i > 0 ? `<span class="connector${isNew ? ' connector-new' : ''}"></span>` : '';
-    const doneMark = isStepDone(s.id, done)
-      ? '<span class="step-done" aria-hidden="true">✅</span><span class="sr-only"> (done)</span>'
+    const isDone = isStepDone(s.id, done);
+    const connector = i > 0
+      ? `<span class="connector${isDone || isCurrent ? ' connector--done' : ''}${isNew ? ' connector-new' : ''}"></span>`
       : '';
     return `
       ${connector}
-      <a class="step${isCurrent ? ' current' : ''}${isNew ? ' step-new' : ''}"${isCurrent ? ' aria-current="step"' : ''} data-step="${s.id}" href="${s.href}" style="--step-color: var(--color-${s.color})">
-        <span class="step-icon">${lineIcon(s.icon)}</span>
-        <span class="step-label">${s.label}${doneMark}</span>
+      <a class="step${isCurrent ? ' current' : ''}${isDone ? ' done' : ''}${isNew ? ' step-new' : ''}"${isCurrent ? ' aria-current="step"' : ''} data-step="${s.id}" href="${s.href}" style="--step-color: var(--color-${s.color})">
+        <span class="step-icon${isCurrent ? ' m-ring' : ''}" style="--ring-colour: var(--color-${s.color})">${isDone && !isCurrent ? '<span class="step-check" aria-hidden="true">✓</span>' : lineIcon(s.icon)}</span>
+        <span class="step-label">${s.label}${isDone ? '<span class="sr-only"> (done)</span>' : ''}</span>
       </a>
     `;
-  }).join('');
+  });
+
+  if (hasMoreSteps(done, getPreviewAll())) {
+    stops.push(`
+      <span class="connector connector--soon"></span>
+      <span class="step step--soon">
+        <span class="step-icon">${lineIcon('lock', 20)}</span>
+        <span class="step-label">More soon<span class="sr-only"> (locked)</span></span>
+      </span>`);
+  }
+  return stops.join('');
+}
+
+// Zone 2 and zone 3 of the card layout: the room's task card, the action bar
+// (filled by the room with setupActionBar), and a quiet status line with the
+// child's code, the sound switch and the online status.
+function cardBodyHTML(accent, contentHTML) {
+  return `
+    <main class="room-content card-layout" style="--accent: var(--color-${accent})">${contentHTML}</main>
+    <nav class="action-bar" id="action-bar" aria-label="What to do next"></nav>
+    <footer class="status-line">
+      ${codeBadge()}
+      <button class="btn btn-quiet sound-toggle" id="sound-toggle" type="button" aria-pressed="false">🔇 Sound: off</button>
+      ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}
+    </footer>`;
 }
 
 // The Explore rooms open one after another; only the open ones are shown.
@@ -152,7 +188,7 @@ function showUnlocked() {
   const opened = newStep ? STEPS.find((s) => s.id === newStep) : null;
   const name = opened ? `${opened.emoji} ${opened.label}` : newTab && newTab.label;
   if (name) {
-    document.querySelector('.speech-bubble').textContent = `🔓 Hoo-hoo! You unlocked ${name}!`;
+    pipSay(`🔓 Hoo-hoo! You unlocked ${name}!`);
     pipReacts('hop');
     unlockStep(document.querySelector('.step-bar .step-new, .explore-subnav .step-new'));
     confetti(); // a phase is finished: a big moment
@@ -175,6 +211,7 @@ export function setCurrentStep(stepId) {
   document.querySelectorAll('.step-bar .step').forEach((link) => {
     const isCurrent = link.dataset.step === stepId;
     link.classList.toggle('current', isCurrent);
+    link.querySelector('.step-icon').classList.toggle('m-ring', isCurrent);
     // Screen readers say "current step" for the highlighted one.
     if (isCurrent) link.setAttribute('aria-current', 'step'); else link.removeAttribute('aria-current');
   });

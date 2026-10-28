@@ -3,31 +3,31 @@
 // "You found a badge!" pop-up shows it (js/badge-popup.js), and when it lands
 // in the backpack the counter goes up. A level-up gets Pip's words, confetti
 // and a fanfare. All sounds live in js/sounds.js (off by default).
-import { checkBadges, earnedPatches, findBadge, levelFor, levelProgress } from './helpers/badges.js';
+import { checkBadges, earnedPatches, findBadge, levelFor } from './helpers/badges.js';
 import { readLog, logEvent } from './helpers/log.js';
 import { getExplorerCode, getSoundOn, setSoundOn } from './storage/save.js';
 import { playSound } from './sounds.js';
-import { pipReacts, confetti, growBar } from './motion.js';
+import { pipReacts, confetti } from './motion.js';
 import { setupBadgeShelf } from './badge-shelf.js';
 import { showBadgePopup } from './badge-popup.js';
 import { BACKPACK_SVG } from './icons.js';
 import { currentPhase } from './phase-progress.js';
+import { pipSay } from './pip.js';
 
 // How many patches the child has (the backpack counter and the level use this).
 export function countBadges() {
   return earnedPatches(readLog(), getExplorerCode()).length;
 }
 
-// What the backpack button in the header shows: the backpack, the level, the
-// badge count, and a bar showing how close the next level is (words AND a bar).
+// What the backpack button in the top bar shows: the backpack and the badge
+// count. Its name for screen readers says it in words (backpackLabel).
+// The level and its bar are inside the backpack shelf (js/badge-shelf.js).
 export function counterHTML(count) {
-  const level = levelFor(count);
-  const pct = levelProgress(count);
-  const barLabel = level.next ? `Progress to ${level.next.name}: ${pct}%` : 'Top level reached';
-  return `${BACKPACK_SVG}<span class="backpack-words"><span class="level-name">${level.icon} ${level.name}</span><span>My backpack: <span class="badge-count">${count}</span> badges</span>
-    <span class="level-bar" role="progressbar" aria-label="${barLabel}" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100">
-      <span class="level-fill" style="width: ${pct}%"></span>
-    </span></span>`;
+  return `${BACKPACK_SVG}<span class="badge-count">${count}</span>`;
+}
+
+export function backpackLabel(count) {
+  return `My backpack: ${count} badge${count === 1 ? '' : 's'}. ${levelFor(count).name}.`;
 }
 
 // Called once by mountShell(), after the sidebar exists.
@@ -66,15 +66,13 @@ export function setupCelebrations() {
   });
 }
 
-// A badge landed: the counter pops +1, the backpack bumps, the level bar grows.
+// A badge landed: the counter pops +1 and the backpack bumps.
 function landInBackpack(count) {
   const counter = document.getElementById('badge-counter');
   const levelBefore = levelFor(count - 1).name;
-  const pctBefore = levelProgress(count - 1);
   const level = levelFor(count);
   counter.innerHTML = counterHTML(count);
-  // The bar grows from where it was (a new level starts from 0).
-  growBar(counter.querySelector('.level-fill'), level.name !== levelBefore ? 0 : pctBefore);
+  counter.setAttribute('aria-label', backpackLabel(count));
   restartClass(counter, 'bp-bump');
   restartClass(counter.querySelector('.badge-count'), 'bp-count-pop');
 
@@ -95,7 +93,7 @@ function restartClass(element, name) {
 
 // Pip's speech bubble shows the praise, and Pip does a little hop.
 function pipSays(message) {
-  document.querySelector('.speech-bubble').textContent = message;
+  pipSay(message);
   pipReacts('hop');
 }
 

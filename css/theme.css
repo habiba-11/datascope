@@ -62,4 +62,11 @@
   --duration-slow: 0.8s;
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* overshoots a little: bouncy */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --stagger: 90ms; /* the gap between items that enter one after another */
+
+  /* spacing (UI guide): only these four steps */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
 }

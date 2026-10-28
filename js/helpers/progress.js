@@ -44,6 +44,13 @@ export function visibleSteps(done) {
   return [...new Set(unlockedPhases(done).map((phase) => STEP_OF_PHASE[phase]))];
 }
 
+// The trail ends with ONE locked "More soon" stop while steps are still
+// hidden, so a child knows the journey goes on without seeing it all at once
+// (Prof's comment 2). The teacher preview shows every step, so no stop then.
+export function hasMoreSteps(done, previewAll = false) {
+  return !previewAll && visibleSteps(done).length < new Set(Object.values(STEP_OF_PHASE)).size;
+}
+
 // A step is done when all its phases are done (Explore: all three rooms).
 export function isStepDone(step, done) {
   return PHASES.filter((phase) => STEP_OF_PHASE[phase] === step).every((phase) => done.includes(phase));

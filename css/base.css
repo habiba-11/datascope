@@ -140,6 +140,55 @@ h1 {
   font-size: 21px;
 }
 
+/* The three kinds of button (UI guide): .btn-main is the ONE primary action on
+   a screen; .btn-secondary is white (Hint, tools); .btn-quiet is a light
+   outline with no shadow (Back). .icon-btn is a square button with an icon
+   and an aria-label. All are at least 48px tall. */
+.btn-main,
+.btn-secondary,
+.btn-quiet,
+.icon-btn {
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.btn-secondary {
+  background: var(--color-card-bg);
+  color: var(--color-navy);
+}
+
+.btn-quiet {
+  background: transparent;
+  color: var(--color-navy);
+  border-color: var(--color-line);
+  box-shadow: none;
+}
+
+.btn-quiet:active {
+  box-shadow: none;
+}
+
+.icon-btn {
+  min-width: 52px;
+  padding: 0 var(--space-1);
+  background: var(--color-card-bg);
+  color: var(--color-navy);
+  font-size: 22px;
+}
+
+/* A primary button that is not ready says why in its own words, so it looks
+   clearly "not yet" without fading the text too much to read. */
+.btn-main:disabled {
+  opacity: 1;
+  background: var(--color-soft);
+  color: var(--color-navy);
+  box-shadow: 0 5px 0 var(--color-line);
+  border-color: var(--color-line);
+}
+
 /* Shared by several rooms, so they live here (every page loads base.css). */
 .room-question {
   font-weight: 700;

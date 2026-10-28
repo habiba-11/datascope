@@ -17,6 +17,7 @@ export const ICONS = {
   magnifier: '<circle cx="10" cy="10" r="6"/><path d="M14.5 14.5L20 20"/>',
   calculator: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7.5h8M8.5 12h0M12 12h0M15.5 12h0M8.5 16h0M12 16h0M15.5 16h0"/>',
   wand: '<path d="M4 20L14 10"/><path d="M16 3v4M14 5h4M19.5 9.5v3M18 11h3M9 4v2M8 5h2"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="7.5" r=".8" fill="currentColor"/>',
   lock: '<rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/>',
   backpack: '<path d="M9 6a3 3 0 0 1 6 0"/><rect x="5" y="6" width="14" height="15" rx="4"/><rect x="8.5" y="13" width="7" height="5" rx="1.5"/>',
 };
