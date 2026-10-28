@@ -1,29 +1,41 @@
+/* Evidence Board (3-zone layout): each step on the left, the child's Evidence
+   Card on the right, filling up slot by slot (UI guide frame f8). */
+
+.evidence-panels {
+  align-items: start;
+}
+
 .sentence-starter {
-  font-size: 18px;
+  font-size: 19px;
   line-height: 2.2;
+  font-weight: 700;
 }
 
 .inline-input {
   min-height: 48px;
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 18px;
   border: none;
   border-bottom: 3px solid var(--color-navy);
   background: transparent;
   padding: 4px 6px;
   min-width: 160px;
+  width: 100%;
+  max-width: 320px;
 }
 
-label[for="certainty-reason"] {
+.reason-label {
   display: block;
-  font-weight: 700;
+  margin-top: var(--space-2);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 19px;
 }
 
 #certainty-reason {
   width: 100%;
-  max-width: 500px;
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 18px;
   border: var(--border-width) solid var(--color-navy);
   border-radius: 12px;
   padding: 8px 12px;
@@ -33,48 +45,82 @@ label[for="certainty-reason"] {
   margin-top: 6px;
 }
 
+/* The clue tray: the numbers that can be proof. */
 .evidence-grid {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 12px 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-1);
 }
 
+.evidence-chip {
+  text-align: left;
+  font-size: 18px;
+}
+
+/* The Evidence Card: a header in the Conclude colour and 3 numbered slots. */
 .evidence-card {
-  background: white;
+  position: relative;
+  background: var(--color-card-bg);
   border: var(--border-width) solid var(--color-navy);
-  border-top: 8px solid var(--color-conclude);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
-  padding: 20px 24px;
-  margin-top: 20px;
+  overflow: hidden;
 }
 
-.evidence-card h3 {
-  font-size: 18px;
-  margin-top: 0;
+.evidence-card-title {
+  margin: 0;
+  padding: 10px var(--space-2);
+  background: var(--color-conclude);
+  border-bottom: var(--border-width) solid var(--color-navy);
+  font-size: 20px;
 }
 
-.evidence-card p {
-  margin: 8px 0;
-}
-
-.evidence-card .btn {
-  margin-top: 12px;
-}
-
-/* "See my journey" under the Evidence Card (saving moved to My journey, Part 19). */
-.save-work {
+.card-slot {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 12px;
+  padding: 12px var(--space-2);
+  border-bottom: 2px solid var(--color-soft);
 }
 
+.card-slot:last-child {
+  border-bottom: 0;
+}
 
-#make-card-btn {
-  margin-top: 12px;
+.slot-number {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-navy);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+}
+
+.slot-text {
+  margin: 4px 0 0;
+  padding: 8px 12px;
+  border: 2px dashed var(--color-line);
+  border-radius: 12px;
+  color: var(--color-muted-text);
+  font-weight: 700;
+}
+
+/* Filled: the child's own words, solid instead of dashed. */
+.card-slot.filled .slot-text {
+  border-style: solid;
+  border-color: var(--color-line);
+  background: #F4FAFF;
+  color: var(--color-text);
+}
+
+/* The slot being filled right now. */
+.card-slot.now {
+  background: var(--color-conclude-light);
 }
 
 /* "📋 My findings" pop-up: one finding per line. */
@@ -92,21 +138,17 @@ label[for="certainty-reason"] {
 }
 
 /* The "Checked!" stamp on a finished Evidence Card (Part 21c). */
-.evidence-card {
-  position: relative;
-}
-
 .card-stamp {
   position: absolute;
-  top: 14px;
-  right: 18px;
+  top: 8px;
+  right: 14px;
   padding: 4px 12px;
   border: 3px solid var(--color-btn-main-bg);
   border-radius: 10px;
   color: var(--color-btn-main-bg);
   font-family: var(--font-heading);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 20px;
-  transform: rotate(-12deg);
+  transform: rotate(-8deg);
   background: white;
 }
