@@ -100,13 +100,19 @@ Having an account is not enough: the database only shows children's work to acco
 
 ```sql
 insert into public.teachers (user_id, email)
-select id, email from auth.users where email = 'teacher@example.com';
+select id, email from auth.users where email = 'teacher@example.com'
+on conflict (user_id) do nothing;
 ```
 
-2. Click **Run**.
+2. Click **Run**. Supabase usually just says "Success. No rows returned", even when it worked, so check it:
+3. Click **New query** again, paste this and click **Run**:
 
-✅ **You should see:** "Success. 1 row affected" (or "INSERT 0 1").
-If it says **0 rows**, the email does not match exactly: check spelling and capital letters.
+```sql
+select * from public.teachers;
+```
+
+✅ **You should see:** one row with the teacher's email.
+If the list is **empty**, the email does not match exactly: check spelling and capital letters, then run step 1 again. Running it twice is safe (the `on conflict` line stops a "duplicate key" error).
 
 ## Step 7: Copy the two values the website needs
 
@@ -160,9 +166,11 @@ Free Supabase projects **pause after about 7 days with almost no activity**. Not
 1. Delete the test data. In **SQL Editor** run:
 
 ```sql
-delete from public.log_entries where code like 'TEST-%';
-delete from public.teacher_tags where code like 'TEST-%';
+delete from public.log_entries where code like 'TEST-%' or code like 'OWL-%';
+delete from public.teacher_tags where code like 'TEST-%' or code like 'OWL-%';
 ```
+
+   (`OWL-07` is a made-up code used by the automatic screenshot tool.)
 
 2. Hand out the real anonymous codes (never names).
 3. In the teacher dashboard, make sure **Preview** is switched off on every child device.

@@ -46,22 +46,6 @@
   font-weight: 700;
 }
 
-.certainty-scale {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 12px 0;
-}
-
-.certainty-btn {
-  background: white;
-  color: var(--color-text);
-}
-
-.certainty-btn.active {
-  background: var(--color-explore);
-}
-
 .trial-row {
   display: flex;
   gap: 10px;

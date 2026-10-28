@@ -263,3 +263,59 @@ The stack comes from your project overview. It is deliberately small so a beginn
 | School Chromebooks and tablets | The real devices in class                       | Test on these early                                                    |
 
 **The rule of thumb:** use no framework and no server for the first version. Fewer moving parts means fewer things to break, and the thesis asks for a working prototype, not a giant system.
+---
+
+## 9. Round 2 changes after Prof feedback, Oct 2026
+
+*Added 28 Oct 2026. Sections 1 to 8 above are the design Prof approved; this section records what changed after her 8 comments (25 Oct 2026). The detailed plan is `docs/round-2-plan.md`; the day-by-day record is `docs/build-progress.md`.*
+
+### 9.1 What Prof asked for, and where it is now
+
+| # | Prof's comment | What the app does now | Main files |
+|---|---|---|---|
+| 1 | A pop-up at the start of each phase | A shared pop-up (dialog, focus return, Esc, a queue so two never overlap). Each phase opens with an intro once per child; an ℹ️ button reopens it. | `js/modal.js`, `js/helpers/modal-queue.js`, `js/phase-intro.js`, `data/content/phases.json` |
+| 2 | The step bar unlocks one phase at a time | A progress engine with a "done rule" per phase; locked steps show 🔒 and cannot be opened by typing the address (route guard). Progress is kept per child code and per scenario. Explore rooms open in order: Graph → Number → Chance. | `js/helpers/progress.js`, `js/phase-progress.js`, `js/app.js` |
+| 3 | Instant feedback after each phase | A feedback card: 1 to 3 stars for reasoning moves (never speed, never wrong tries), up to 3 "wins" with the child's own numbers, one "next time" nudge, one "I learned" line. | `js/helpers/feedback.js`, `js/feedback-card.js` |
+| 4 | Simpler questions, tied to the chosen scenario | Every room follows the scenario chosen in Question Studio. All child text is in Grade 5 words, checked by a readability test. | `data/content/*.json`, `js/helpers/readability.js`, `tests/content.test.js` |
+| 5 | A mean / median / mode recap pop-up | A recap with one card per measure (what it tells us + worked steps on a different small example, so answers are never given away). Opens once in Number Lab; a 📘 button reopens it. In Conclude it is replaced by "📋 My findings" (the child's own numbers). | `js/recap.js`, `js/helpers/recap.js`, `js/helpers/findings.js` |
+| 6 | A student journey dashboard and a teacher dashboard | **My journey:** a trail of the 7 phases, stars, the child's own answers, badges and level. **Teacher dashboard:** 4 tabs (Class, Children, Thesis data, Settings), a page per child, misconception tags, `thesis-metrics.csv` + data dictionary, a DEMO class. Both use the same `buildJourney` function, so they can never disagree. | `js/helpers/journey.js`, `js/rooms/my-journey.js`, `js/teacher/*`, `js/helpers/metrics.js`, `js/helpers/thesis.js` |
+| 7 | Backend and database | Supabase (PostgreSQL), called with plain `fetch()`. See 9.3. | `backend/schema.sql`, `js/config.js`, `js/storage/sync.js`, `js/teacher/cloud.js` |
+| 8 | More motion, interaction and gamification | GSAP motion (local copy) that respects reduced motion; an original SVG mascot Pip with moods; unlock animation; card sort for the median (drag or buttons); animated coin, dice and spinner; badges, explorer levels, confetti for reasoning. | `js/motion.js`, `js/pip.js`, `js/card-sort.js`, `js/celebrate.js`, `js/helpers/badges.js` |
+| 9 | Deploy only after Prof confirms | **Not done on purpose:** locked until Habiba writes "Prof confirmed". | – |
+
+### 9.2 Changes to earlier decisions
+
+- **Evidence Board:** the audience and form task was removed (26 Oct 2026, Habiba): it had no purpose for the child. It is now Claim + Evidence + How sure and why (Paper 17's three parts).
+- **Teacher view:** not hidden. A button on the start page; with the database on, an email + password login checked by the database; with it off, a PIN (`teacher123`, stored only as a hash), which is a speed bump, not security.
+- **No files when the database is on:** children's work goes online by itself and the teacher sees it on the dashboard. "Save my work" files and "Import files" only appear when the database is switched off (fallback).
+- **Time per phase** is recorded for the teacher only and never shown to the child.
+- **Libraries added:** GSAP 3.15.0 (local copy in `js/vendor/`) for motion; `playwright-core` as a developer tool only (screenshots and checks, never shipped to children).
+
+### 9.3 Saving and the database (replaces "Firebase, later and optional" in section 8)
+
+```
+Child's browser                                  Supabase (online)
+  every moment → localStorage at once ──(when online, batches of 50, retry)──► log_entries
+  (works offline; each entry has its own id, so a retry never makes a duplicate)
+Teacher's browser ── email + password login ──► reads log_entries, teacher_tags (teachers only)
+```
+
+- **Row-level security:** a child's browser (publishable key) may only **add** log entries with a valid code; it can never read. Only accounts listed in the `teachers` table may read or delete. The secret key is never in the website.
+- **Status in the sidebar:** ☁️ Saved online · ⏳ Sending... · 📴 Offline · ⚠️ Not sent yet.
+- **Switch:** `js/config.js` (`enabled`). With it off, the app works exactly as before, with file export and import.
+- **Privacy:** anonymous codes only; a teacher can delete everything for one code. Draft privacy note: `docs/privacy-note.md`. Only made-up test codes are used until Prof and the GIU ethics check agree.
+- Free Supabase projects pause after about 7 days without use (see `docs/backend-setup-guide.md`, Step 10).
+
+### 9.4 New in the reasoning log
+
+- Every entry now has an `id` (for "no duplicates" when sending).
+- New moment types: `popup-seen`, `phase-start`, `phase-complete`, `phase-feedback` (stars), `recap-viewed`, `findings-viewed`.
+- Entries made while the teacher preview is on are marked `preview: true`, so they can be left out of the thesis data.
+- DEMO children are labelled DEMO everywhere and are never saved or exported.
+
+### 9.5 Still open (decide with Prof)
+
+- Rubric coding of each claim (Part 20c): waits for the real level descriptions from Papers 7 and 13.
+- Data retention and consent wording in `docs/privacy-note.md`.
+- Testing on a real Chromebook or tablet, and with children (after ethics approval).
+- Deployment to GitHub Pages (Part 24, locked).

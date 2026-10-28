@@ -1,10 +1,10 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-22 built (22 = Supabase backend, switched off until Habiba sets it up); waiting for Habiba's setup + tests, rubric levels (20c), Prof**
+- Current part: **Round 2: Parts 13-22 built; Supabase set up by Habiba (js/config.js enabled, not committed yet); Part 23 docs done; waiting for device test, rubric levels (20c), Prof**
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
-- Last updated: 25 Oct 2026
+- Last updated: 28 Oct 2026
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -214,11 +214,13 @@
 
 - Teacher dashboard redesign (27 Oct 2026, Habiba: too crowded): a top bar (who is logged in + 🔄 Refresh + 🚪 Log out; 📂 Import only when the database is off) and 4 tabs, one job each: 📊 Class (4 key numbers, one quiet line, 2 charts, table folded away), 👧 Children (code, scenario, progress words + bar, stars, claim, Open; the claim column hides on tablets), a child's own page (← All children, phases, their words, tags, timeline folded away, delete), 📥 Thesis data (3 optional downloads with one line each, DEMO switch), ⚙️ Settings (clear this device, preview). js/teacher/tabs.js (keyboard ← → Home End, remembered per browser tab). Same data code as before. Checked with Playwright at 1366 and 768 px: no sideways scroll, Open always visible, axe: 0 violations on all 4 tabs and a child page; database-off mode (PIN + import) still works.
 
+- Gap fixes + Part 23 docs (28 Oct 2026), 182 tests passing: Evidence Board "Why are you that sure?" no longer touches the certainty buttons (the scale was styled only in chance-lab.css, which that page does not load). A script found 2 more styles used outside their file: Graph Lab's question line (.room-question, data-hub.css) and Question Studio's guess unit (.predict-unit, number-lab.css). All three moved to base.css. Every page checked at 1366 and 768 px for all 4 scenarios: no console errors, no sideways scroll. Setup guide Step 6 now cannot fail twice (on conflict do nothing) and checks with select; Step 11 also deletes OWL- test codes (used by the screenshot tool). New: architecture.md section 9 (Round 2 changes), docs/change-summary-round-2.md, docs/review-prompt.md (prompt for Claude chat to review the zip).
+
 ## Next
-- Habiba: do docs/backend-setup-guide.md (Supabase account, schema, teacher account, js/config.js), then test with TEST codes.
+- Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).
-- Part 23: final QA, docs and thesis material. Part 24 (deploy): locked until "Prof confirmed".
+- Part 23: docs done (28 Oct); left: keyboard-only run, thesis screenshot list. Part 24 (deploy): locked until "Prof confirmed".
 - Optional, could be cut: fair-share blocks for the mean, guess slider, tap-a-bar highlight in Graph Lab, drag evidence chips onto the card, scenario-linked Chance Lab device.
 
 ## Known open items

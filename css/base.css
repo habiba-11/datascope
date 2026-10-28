@@ -136,6 +136,33 @@ h1 {
   color: var(--color-btn-main-text);
 }
 
+/* Shared by several rooms, so they live here (every page loads base.css). */
+.room-question {
+  font-weight: 700;
+  margin: 4px 0 16px;
+}
+
+.predict-unit {
+  font-weight: 700;
+}
+
+/* The certainty scale (Chance Lab and Evidence Board). */
+.certainty-scale {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 0 24px;
+}
+
+.certainty-btn {
+  background: white;
+  color: var(--color-text);
+}
+
+.certainty-btn.active {
+  background: var(--color-explore);
+}
+
 /* The big "go to the next room" link at the end of a room. */
 .next-room-btn {
   margin-top: 16px;

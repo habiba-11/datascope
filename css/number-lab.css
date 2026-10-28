@@ -120,10 +120,6 @@
   align-items: flex-start;
 }
 
-.predict-unit {
-  font-weight: 700;
-}
-
 /* "Sort the cards" (js/card-sort.js, Part 21c). */
 .sort-row {
   list-style: none;
