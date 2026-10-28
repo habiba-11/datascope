@@ -63,7 +63,7 @@ function section(title, ...content) {
 // options: tagsNode (the tag checkboxes), onBack (back to the list),
 //          onDelete (online database only: deletes everything for this code).
 export function renderDetail(container, row, entries, scenarioTitle, { tagsNode = null, onBack, onDelete = null } = {}) {
-  const back = el('button', '← All children', 'btn');
+  const back = el('button', '← All children', 'btn btn-quiet');
   back.type = 'button';
   back.addEventListener('click', onBack);
 
@@ -122,7 +122,7 @@ export function renderDetail(container, row, entries, scenarioTitle, { tagsNode 
 
   // Privacy: the teacher can delete one child's data (two taps, never by accident).
   if (onDelete) {
-    const remove = el('button', `🗑️ Delete all of ${row.code}'s data`, 'btn');
+    const remove = el('button', `🗑️ Delete all of ${row.code}'s data`, 'btn btn-secondary');
     remove.type = 'button';
     twoTapButton(remove, `⚠️ Tap again to delete ${row.code} for good`, () => onDelete(row.code));
     container.append(section('🔒 Privacy', remove));

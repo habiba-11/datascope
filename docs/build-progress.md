@@ -4,7 +4,7 @@
 - Current part: **Round 2: Parts 13-22 built; Supabase set up by Habiba (js/config.js enabled, not committed yet); Part 23 docs done; waiting for device test, rubric levels (20c), Prof**
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
-- Last updated: 28 Oct 2026 (Part 21b badges)
+- Last updated: 28 Oct 2026 (UI round: 3-zone layout in every room)
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -239,6 +239,9 @@
   - Welcome page (frame f1): logo top left; big cheering Pip (floats); "Hoo-hoo! I'm Pip, your guide." pill; "Become a Data Detective!"; one sentence; the code form in a card with ONE green "Start exploring →"; "🧑‍🏫 Teacher's view" is a quiet button. Styles moved from an inline <style> to css/welcome.css. Same code check (a name is refused) and privacy line.
   - My journey (card layout): the trail on the left (each stop: done, stars, one line; the rest behind "See more", opened by itself before printing), Detective ID + What I learned on the right; ONE primary "📤 Save my work for my teacher" (database off) or "🔁 Start a new investigation →" (database on), "🖨️ Print my journey" as the white button; CSV and "Start a new investigation" quiet. Pip's walk is measured after the fonts load (it stood a little too high). Checked with Playwright at 1366 and 768: no errors, no sideways scroll, all buttons ≥ 48px.
   - Pop-ups (frames f2, f7): the phase intro shows "Step 3 of 5", its bullets rise in one by one, and (when it opens by itself) "Tap the (i) button any time to see this again."; the feedback card's stars pop 300 ms apart, then "Stars are for great thinking, not speed.", the wins rise in, and "🔒 Next stop: Graph Lab" shakes and opens to 🔓 (open straight away with reduced motion; always in words); the button names the next stop ("Unlock Graph Lab →", Conclude: "🎉 Finish"). Found and fixed: "💡 Next time: Next time, make a guess first." (the sentence repeated the card's label); new test that no next-time line starts with "next time". 208 tests.
+  - Teacher page: plain buttons now white secondary (were browser grey), Refresh secondary, "← All children" quiet; one green button per form/tab. No Pip, no motion (adult tool).
+  - After-audit (same script as before): docs/ui-audit.md, before → after table for every screen. Every child screen now has exactly ONE primary-looking button (7 screens had 2 to 4); Graph Lab 1416 → 1064 px tall, My journey 1566 → 1298 px.
+  - Still to do by Habiba: try the new layout in Live Server and on a tablet/Chromebook; keyboard-only run.
 
 ## Next
 - Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.
