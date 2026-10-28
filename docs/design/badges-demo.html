@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataScope – Badge pop-up demo (Explorer's Toolkit)</title>
+<!--
+  REFERENCE DEMO for Claude in VS Code (Part 21b).
+  Plain HTML + CSS + JS, no libraries. Open it with Live Server to see the animation.
+  Port the ideas into the real app (modal.js / motion.js / theme.css); do not copy this file in as-is.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ---------- Design tokens (Explorer's Toolkit) ---------- */
+:root{
+  --bg:#E6F4FF; --ink:#17324D; --card:#FFFFFF; --line:#9CC6E6; --soft:#E1EEF8;
+  --ask:#FF7A6B; --plan:#FFC531; --collect:#38B6FF; --explore:#4CC26B; --conclude:#8E7CFF;
+  --go:#2E9A4F; --gold:#FFC531;
+  --font-head:'Baloo 2', sans-serif; --font-body:'Nunito', sans-serif;
+  --outline:3px solid var(--ink); --shadow:0 6px 0 var(--ink);
+  --spring:cubic-bezier(.34,1.56,.64,1);   /* overshoot = "bouncy" */
+  --ease-out:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:18px}
+button{font:inherit;color:inherit}
+
+/* ---------- Header with backpack ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 28px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--font-head);font-weight:800;font-size:32px}
+.logo b{color:var(--go)}
+.backpack{position:relative;display:flex;align-items:center;gap:10px;min-height:56px;padding:6px 18px 6px 8px;border:var(--outline);border-radius:18px;background:var(--card);box-shadow:0 5px 0 var(--ink);font-weight:800;cursor:pointer}
+.backpack svg{width:44px;height:44px}
+.backpack .count{display:inline-block;min-width:34px;padding:2px 10px;border-radius:999px;background:var(--ink);color:#fff;text-align:center}
+.backpack.bump{animation:bp-bump .5s var(--spring)}
+.backpack .count.pop{animation:bp-count .45s var(--spring)}
+
+/* ---------- Demo controls ---------- */
+.demo{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 28px 18px;padding:14px 16px;border:3px dashed var(--line);border-radius:18px;background:#F4FAFF;font-weight:700}
+.demo .tag{background:var(--ink);color:#fff;border-radius:999px;padding:2px 12px;font-size:14px}
+.btn{min-height:52px;padding:0 22px;border:var(--outline);border-radius:16px;background:var(--card);box-shadow:0 5px 0 var(--ink);font-family:var(--font-head);font-weight:800;font-size:20px;cursor:pointer;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(5px);box-shadow:0 0 0 var(--ink)}
+.btn.go{background:var(--go);color:#fff}
+.btn.gold{background:var(--gold)}
+.demo label{display:flex;align-items:center;gap:8px;min-height:48px;cursor:pointer}
+.demo input{width:24px;height:24px}
+
+/* ---------- Backpack collection grid ---------- */
+.shelf{margin:0 28px 40px;background:var(--card);border:var(--outline);border-radius:26px;box-shadow:var(--shadow);overflow:hidden}
+.shelf h1{margin:0;padding:10px 22px;background:var(--plan);border-bottom:var(--outline);font-family:var(--font-head);font-size:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:22px;padding:24px}
+.slot{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.slot svg{width:120px;height:120px}
+.ribbon{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border:var(--outline);border-radius:999px;background:#fff;font-family:var(--font-head);font-weight:800;font-size:18px;line-height:1.2}
+.ribbon .dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink)}
+.slot .how{font-size:15px;font-weight:700;color:#4A6580;max-width:170px}
+.slot.locked .ribbon{border-style:dashed;color:#4A6580}
+.slot.new svg{animation:bp-slot .7s var(--spring) both}
+
+/* ---------- Badge pop-up (the star of the show) ---------- */
+.bp-backdrop{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(23,50,77,.55);animation:bp-fade .2s ease-out both;z-index:50}
+.bp-backdrop.closing{animation:bp-fade .2s ease-in reverse both}
+.bp-card{position:relative;width:min(440px,100%);padding:22px 26px 26px;border:var(--outline);border-radius:30px;background:var(--card);box-shadow:0 8px 0 var(--ink);text-align:center;overflow:hidden;
+  animation:bp-drop .55s var(--spring) .1s both, bp-shake .25s ease-in-out 1.38s both}
+.bp-card.super{background:linear-gradient(#FFF8DD,#FFFFFF 45%)}
+.bp-title{margin:0;font-family:var(--font-head);font-weight:800;font-size:28px;color:var(--go);white-space:nowrap}
+.bp-title span{display:inline-block;animation:bp-letter .5s var(--spring) both}
+.bp-stage{position:relative;height:210px;margin:6px auto 4px;display:grid;place-items:center}
+.bp-rays{position:absolute;width:250px;height:250px;border-radius:50%;
+  background:repeating-conic-gradient(rgba(255,197,49,.55) 0 9deg, transparent 9deg 22deg);
+  -webkit-mask:radial-gradient(circle, #000 35%, transparent 70%); mask:radial-gradient(circle, #000 35%, transparent 70%);
+  animation:bp-rays-in .5s var(--ease-out) 1.35s both, bp-spin 9s linear 1.85s infinite}
+.bp-burst{position:absolute;left:50%;top:50%;width:0;height:0}
+.bp-burst i{position:absolute;left:-7px;top:-7px;width:14px;height:14px;border-radius:50%;background:var(--c);opacity:0;
+  animation:bp-burst .9s var(--ease-out) var(--t,1.35s) both}
+.bp-burst i.star{border-radius:0;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.bp-stamp{animation:bp-stamp .35s var(--spring) 1.35s both}
+.bp-flip{width:170px;height:170px;perspective:900px}
+.bp-flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:bp-flip .9s cubic-bezier(.3,.1,.2,1) .45s both}
+.bp-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.bp-face svg{width:100%;height:100%}
+.bp-front{transform:rotateY(180deg)}
+.bp-name{margin:4px 0 6px;font-family:var(--font-head);font-weight:800;font-size:30px;line-height:1.1;animation:bp-rise .4s var(--ease-out) 1.5s both}
+.bp-super{display:inline-block;margin-bottom:6px;padding:2px 12px;border-radius:999px;background:var(--ink);color:var(--gold);font-weight:800;font-size:15px;animation:bp-rise .4s var(--ease-out) 1.55s both}
+.bp-why{margin:0 auto 16px;max-width:330px;font-weight:700;font-size:19px;line-height:1.35;animation:bp-rise .4s var(--ease-out) 1.65s both}
+.bp-actions{display:flex;justify-content:center;padding-left:64px;animation:bp-rise .4s var(--ease-out) 1.9s both}
+.bp-actions .btn{display:flex;align-items:center;gap:10px;min-height:58px;font-size:22px;animation:bp-pulse 1.6s ease-in-out 2.6s infinite}
+.bp-pip{position:absolute;left:-4px;bottom:-6px;width:84px;animation:bp-peek .6s var(--spring) 1.8s both}
+.bp-pip .wing{transform-origin:150px 150px;animation:bp-wave .5s ease-in-out 2.4s 3}
+
+/* ---------- Keyframes ---------- */
+@keyframes bp-fade{from{opacity:0}}
+@keyframes bp-drop{0%{opacity:0;transform:translateY(-60px) scale(.6)}100%{opacity:1;transform:none}}
+@keyframes bp-shake{0%,100%{rotate:0deg}30%{rotate:-1.6deg}70%{rotate:1.6deg}}
+@keyframes bp-letter{0%{opacity:0;transform:translateY(18px) scale(.3)}100%{opacity:1;transform:none}}
+@keyframes bp-flip{from{transform:rotateY(0)}to{transform:rotateY(540deg)}}
+@keyframes bp-stamp{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
+@keyframes bp-rays-in{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+@keyframes bp-spin{to{transform:rotate(360deg)}}
+@keyframes bp-burst{0%{opacity:1;transform:rotate(var(--a)) translateY(0) scale(.2)}70%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateY(calc(var(--d) * -1)) scale(1) rotate(var(--s))}}
+@keyframes bp-rise{from{opacity:0;transform:translateY(14px)}}
+@keyframes bp-peek{from{transform:translateY(110%)}to{transform:none}}
+@keyframes bp-wave{50%{transform:rotate(-28deg)}}
+@keyframes bp-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes bp-bump{0%{transform:scale(1)}40%{transform:scale(1.18) rotate(-6deg)}100%{transform:none}}
+@keyframes bp-count{0%{transform:scale(1)}50%{transform:scale(1.6)}100%{transform:none}}
+@keyframes bp-slot{0%{transform:scale(.2) rotate(-30deg);opacity:0}100%{transform:none;opacity:1}}
+
+/* ---------- Reduced motion: same information, no movement ---------- */
+@media (prefers-reduced-motion: reduce){
+  .bp-backdrop *, .bp-backdrop, .backpack, .slot svg{animation:none !important}
+  .bp-flip-inner{transform:rotateY(180deg)}
+  .bp-rays, .bp-burst{display:none}
+}
+html.rm .bp-backdrop *, html.rm .bp-backdrop, html.rm .backpack, html.rm .backpack *, html.rm .slot svg{animation:none !important}
+html.rm .bp-flip-inner{transform:rotateY(180deg)}
+html.rm .bp-rays, html.rm .bp-burst{display:none}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="logo">
+    <svg width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l18 10v20L24 44 6 34V14z" fill="#4CC26B"/><circle cx="22" cy="22" r="9" fill="#fff" stroke="#17324D" stroke-width="4"/><line x1="29" y1="29" x2="36" y2="36" stroke="#17324D" stroke-width="5" stroke-linecap="round"/></svg>
+    <span>Data<b>Scope</b></span>
+  </div>
+  <button class="backpack" id="backpack" type="button" aria-label="My backpack of badges">
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M17 12a7 7 0 0 1 14 0" fill="none" stroke="#17324D" stroke-width="4"/>
+      <rect x="8" y="12" width="32" height="32" rx="10" fill="#FF7A6B" stroke="#17324D" stroke-width="3.5"/>
+      <rect x="15" y="27" width="18" height="12" rx="4" fill="#FFD9D4" stroke="#17324D" stroke-width="3"/>
+      <path d="M15 31h18" stroke="#17324D" stroke-width="3"/>
+    </svg>
+    My backpack <span class="count" id="count">0</span>
+  </button>
+</header>
+
+<section class="demo" aria-label="Demo controls (not part of the real app)">
+  <span class="tag">DEMO ONLY</span>
+  <button class="btn go" type="button" id="earnNormal">Earn a badge</button>
+  <button class="btn gold" type="button" id="earnSuper">Earn a super badge</button>
+  <button class="btn" type="button" id="reset">Reset</button>
+  <label><input type="checkbox" id="rm"> Pretend reduced motion</label>
+  <label><input type="checkbox" id="snd"> Sound</label>
+</section>
+
+<main class="shelf">
+  <h1>My Explorer Backpack</h1>
+  <div class="grid" id="grid"></div>
+</main>
+
+<script>
+/* ===== Badge list: rewards are for REASONING, never speed (round-2 decision D7) ===== */
+const BADGES = [
+  { id:'question-fixer',  name:'Question Fixer',  phase:'Ask',      color:'#FF7A6B', light:'#FFD9D4', icon:'question',
+    why:'You fixed a confusing question. Clear questions get clear answers!', how:'Fix a question that is not clear.' },
+  { id:'brave-guesser',   name:'Brave Guesser',   phase:'Plan',     color:'#FFC531', light:'#FFF0C2', icon:'compass',
+    why:'You made a guess before looking. Scientists guess first, then check!', how:'Make a guess before you see the data.' },
+  { id:'data-collector',  name:'Data Collector',  phase:'Collect',  color:'#38B6FF', light:'#D3EEFF', icon:'clipboard',
+    why:'You asked the whole pretend class. More answers, better evidence!', how:'Ask the whole pretend class.' },
+  { id:'graph-explorer',  name:'Graph Explorer',  phase:'Explore',  color:'#4CC26B', light:'#D5F2DC', icon:'bars',
+    why:'You tried two kinds of graphs. Each one shows something new!', how:'Try 2 different graphs.' },
+  { id:'middle-finder',   name:'Middle Finder',   phase:'Explore',  color:'#38B6FF', light:'#D3EEFF', icon:'median',
+    why:'You put the numbers in order to find the middle. That is the median!', how:'Sort the numbers to find the median.' },
+  { id:'chance-tester',   name:'Chance Tester',   phase:'Explore',  color:'#8E7CFF', light:'#E3DEFF', icon:'dice',
+    why:'You saw that more tries get closer to the real chance!', how:'Run 10 tries, then 500 tries.' },
+  { id:'mind-changer',    name:'Mind Changer',    phase:'Any',      color:'#8E7CFF', light:'#E3DEFF', icon:'refresh', super:true,
+    why:'You changed your mind because of the data. Real scientists do that!', how:'Change your guess after you see the data.' },
+  { id:'because-builder', name:'Because Builder', phase:'Any',      color:'#FFC531', light:'#FFF0C2', icon:'bubble',  super:true,
+    why:'You explained your thinking with "because" three times. Great reasoning!', how:'Explain 3 answers using "because".' },
+  { id:'evidence-expert', name:'Evidence Expert', phase:'Conclude', color:'#FF7A6B', light:'#FFD9D4', icon:'flag',    super:true,
+    why:'You made a claim, showed proof and said how sure you are!', how:'Finish your Evidence Card.' },
+];
+
+/* ===== Icons (24x24, navy stroke) ===== */
+const ICONS = {
+  question:'<path d="M9 9a3 3 0 1 1 4 2.8c-.8.4-1 1-1 2.2"/><circle cx="12" cy="18" r=".8" fill="#17324D"/>',
+  compass:'<circle cx="12" cy="12" r="8"/><path d="M15.5 8.5l-2 5-5 2 2-5z" fill="#17324D"/>',
+  clipboard:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9zM8.5 11h7M8.5 15h4"/>',
+  bars:'<path d="M5 20V12M12 20V5M19 20v-7M3 20h18"/>',
+  median:'<circle cx="3.5" cy="16" r="1.4"/><circle cx="7.8" cy="16" r="1.4"/><circle cx="12" cy="16" r="3" fill="#17324D"/><circle cx="16.2" cy="16" r="1.4"/><circle cx="20.5" cy="16" r="1.4"/><path d="M12 4v6M9.5 7.5L12 10l2.5-2.5"/>',
+  dice:'<rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="#17324D"/><circle cx="12" cy="12" r="1.2" fill="#17324D"/><circle cx="15.5" cy="15.5" r="1.2" fill="#17324D"/>',
+  refresh:'<path d="M5 11a7 7 0 0 1 12-4.5L19 8M19 13a7 7 0 0 1-12 4.5L5 16"/><path d="M19 3.5V8h-4.5M5 20.5V16h4.5"/>',
+  bubble:'<path d="M4 5h16v11H10l-5 4v-4H4z"/><path d="M8 9h8M8 12.5h5"/>',
+  flag:'<path d="M6 21V4M6 4h11l-2.5 4L17 12H6"/>',
+  lock:'<rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/>'
+};
+
+/* Badge = a round explorer patch with stitches. Super badges get a gold ring. */
+function badgeSVG(b, locked){
+  const fill = locked ? '#C9D6E2' : b.color, inner = locked ? '#EEF3F7' : b.light;
+  const ring = (b.super && !locked) ? '<circle cx="60" cy="60" r="57" fill="#FFC531" stroke="#17324D" stroke-width="3"/><circle cx="60" cy="60" r="49" fill="'+fill+'" stroke="#17324D" stroke-width="3"/>'
+                                    : '<circle cx="60" cy="60" r="55" fill="'+fill+'" stroke="#17324D" stroke-width="4"/>';
+  const stitch = (b.super && !locked) ? 41 : 46;
+  return '<svg viewBox="0 0 120 120" role="img" aria-label="'+(locked?'Locked badge':b.name+' badge')+'">'+ring+
+    '<circle cx="60" cy="60" r="'+stitch+'" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 6"/>'+
+    '<circle cx="60" cy="60" r="'+(stitch-8)+'" fill="'+inner+'" stroke="#17324D" stroke-width="3"/>'+
+    '<g transform="translate(36 36) scale(2)" fill="none" stroke="#17324D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'+ICONS[locked?'lock':b.icon]+'</g></svg>';
+}
+/* The back of the badge during the flip: a mystery patch */
+const MYSTERY = '<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="55" fill="#17324D"/><circle cx="60" cy="60" r="46" fill="none" stroke="#FFC531" stroke-width="3" stroke-dasharray="6 6"/><text x="60" y="80" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="62" fill="#FFC531">?</text></svg>';
+
+/* Pip peeking in with a waving wing */
+const PIP = '<svg class="bp-pip" viewBox="0 0 200 190" aria-hidden="true">'+
+  '<path d="M40 150c0-56 26-84 60-84s60 28 60 84c0 30-24 40-60 40s-60-10-60-40z" fill="#C98A4B" stroke="#17324D" stroke-width="5"/>'+
+  '<path d="M62 78l-6-18 18 10M138 78l6-18-18 10" fill="#C98A4B" stroke="#17324D" stroke-width="4" stroke-linejoin="round"/>'+
+  '<circle cx="78" cy="112" r="22" fill="#fff" stroke="#17324D" stroke-width="4"/><circle cx="122" cy="112" r="22" fill="#fff" stroke="#17324D" stroke-width="4"/>'+
+  '<circle cx="82" cy="114" r="9" fill="#17324D"/><circle cx="126" cy="114" r="9" fill="#17324D"/>'+
+  '<path d="M92 134l8 11 8-11z" fill="#FFC531" stroke="#17324D" stroke-width="3" stroke-linejoin="round"/>'+
+  '<path class="wing" d="M150 150c18-10 30-30 28-50-16 6-28 22-34 40z" fill="#B0763C" stroke="#17324D" stroke-width="4" stroke-linejoin="round"/></svg>';
+
+/* ===== State (in the real app this comes from save.js / the reasoning log) ===== */
+const START = ['question-fixer','brave-guesser','data-collector'];
+let earned = new Set(START);
+const $ = s => document.querySelector(s);
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('rm');
+
+function renderGrid(newId){
+  $('#grid').innerHTML = BADGES.map(b => {
+    const got = earned.has(b.id);
+    return '<div class="slot'+(got?'':' locked')+(b.id===newId?' new':'')+'" data-id="'+b.id+'">'+badgeSVG(b,!got)+
+      '<span class="ribbon"><span class="dot" style="background:'+(got?b.color:'#C9D6E2')+'"></span>'+(got?b.name:'Locked')+'</span>'+
+      (got ? '' : '<span class="how">'+b.how+'</span>')+'</div>';
+  }).join('');
+  $('#count').textContent = earned.size;
+}
+
+/* ===== The pop-up ===== */
+function showBadge(b){
+  const back = document.activeElement;
+  const title = 'You found a badge!';
+  const letters = [...title].map((ch,i)=>'<span style="animation-delay:'+(0.3+i*0.035).toFixed(3)+'s">'+(ch===' '?'&nbsp;':ch)+'</span>').join('');
+  const n = b.super ? 28 : 16, colours = ['#FF7A6B','#FFC531','#38B6FF','#4CC26B','#8E7CFF'];
+  let bits = '';
+  for(let i=0;i<n;i++){
+    const a = Math.round(360/n*i + Math.random()*12), d = 95 + Math.round(Math.random()*55), s = Math.round(Math.random()*360);
+    bits += '<i class="'+(i%3===0?'star':'')+'" style="--a:'+a+'deg;--d:'+d+'px;--s:'+s+'deg;--c:'+colours[i%5]+';--t:'+(1.35+Math.random()*0.08).toFixed(2)+'s"></i>';
+  }
+  const wrap = document.createElement('div');
+  wrap.className = 'bp-backdrop';
+  wrap.innerHTML =
+    '<div class="bp-card'+(b.super?' super':'')+'" role="dialog" aria-modal="true" aria-labelledby="bp-name" aria-describedby="bp-why" tabindex="-1">'+
+      '<p class="bp-title" aria-hidden="true">'+letters+'</p>'+
+      '<div class="bp-stage"><div class="bp-rays"></div><div class="bp-burst">'+bits+'</div>'+
+        '<div class="bp-stamp"><div class="bp-flip"><div class="bp-flip-inner">'+
+          '<div class="bp-face bp-back">'+MYSTERY+'</div><div class="bp-face bp-front">'+badgeSVG(b,false)+'</div>'+
+        '</div></div></div></div>'+
+      (b.super ? '<div class="bp-super">★ Super reasoning badge ★</div>' : '')+
+      '<h2 class="bp-name" id="bp-name">'+b.name+'</h2>'+
+      '<p class="bp-why" id="bp-why">'+b.why+'</p>'+
+      '<div class="bp-actions"><button class="btn go" type="button">Put it in my backpack '+
+        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>'+
+      PIP+
+    '</div>';
+  document.body.appendChild(wrap);
+  document.body.style.overflow = 'hidden';
+  const card = wrap.querySelector('.bp-card'), btn = wrap.querySelector('.btn');
+  card.focus();
+  setTimeout(()=>btn.focus({preventScroll:true}), reduceMotion() ? 0 : 1900);
+  if($('#snd').checked) setTimeout(chime, reduceMotion() ? 0 : 1350);
+
+  const close = () => {
+    document.removeEventListener('keydown', onKey);
+    const face = wrap.querySelector('.bp-front svg');
+    earned.add(b.id);
+    if(reduceMotion()){ wrap.remove(); finish(); }
+    else { flyToBackpack(face); wrap.classList.add('closing'); setTimeout(()=>wrap.remove(), 200); }
+    document.body.style.overflow = '';
+    back && back.focus && back.focus({preventScroll:true});
+  };
+  const finish = () => { renderGrid(b.id); bumpBackpack(); };
+  function onKey(e){
+    if(e.key==='Escape'){ e.preventDefault(); close(); }
+    if(e.key==='Tab'){ e.preventDefault(); btn.focus(); }   // only one control, so focus stays on it
+  }
+  document.addEventListener('keydown', onKey);
+  btn.addEventListener('click', close);
+  showBadge.finish = finish;
+}
+
+/* Badge flies along an arc into the backpack (Web Animations API) */
+function flyToBackpack(svg){
+  const from = svg.getBoundingClientRect(), to = $('#backpack svg').getBoundingClientRect();
+  const ghost = svg.cloneNode(true);
+  Object.assign(ghost.style,{position:'fixed',left:from.left+'px',top:from.top+'px',width:from.width+'px',height:from.height+'px',zIndex:60,pointerEvents:'none'});
+  document.body.appendChild(ghost);
+  const dx = (to.left+to.width/2)-(from.left+from.width/2), dy = (to.top+to.height/2)-(from.top+from.height/2);
+  ghost.animate([
+    { transform:'translate(0,0) scale(1) rotate(0)' },
+    { transform:'translate('+dx*0.45+'px,'+(dy*0.45-140)+'px) scale(.75) rotate(-25deg)', offset:.5 },
+    { transform:'translate('+dx+'px,'+dy+'px) scale(.18) rotate(-60deg)', opacity:.8 }
+  ],{ duration:800, easing:'cubic-bezier(.45,0,.35,1)' }).onfinish = () => { ghost.remove(); showBadge.finish(); };
+}
+function bumpBackpack(){
+  const bp = $('#backpack'), c = $('#count');
+  bp.classList.remove('bump'); c.classList.remove('pop'); void bp.offsetWidth;
+  bp.classList.add('bump'); c.classList.add('pop');
+}
+
+/* Soft three-note chime (Web Audio, no sound files). OFF by default. */
+function chime(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [523.25,659.25,783.99].forEach((f,i)=>{
+      const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime + i*0.12;
+      o.type='triangle'; o.frequency.value=f; g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(.18,t+.02); g.gain.exponentialRampToValueAtTime(.001,t+.5);
+      o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+.55);
+    });
+  }catch(e){}
+}
+
+/* ===== Demo wiring ===== */
+const nextLocked = sup => BADGES.find(b => !earned.has(b.id) && !!b.super === sup);
+$('#earnNormal').onclick = () => { const b = nextLocked(false); b ? showBadge(b) : alertNone(); };
+$('#earnSuper').onclick  = () => { const b = nextLocked(true);  b ? showBadge(b) : alertNone(); };
+$('#reset').onclick = () => { earned = new Set(START); renderGrid(); };
+$('#rm').onchange = e => document.documentElement.classList.toggle('rm', e.target.checked);
+function alertNone(){ $('#reset').focus(); $('#reset').animate([{transform:'scale(1)'},{transform:'scale(1.1)'},{transform:'scale(1)'}],{duration:400}); }
+renderGrid();
+</script>
+</body>
+</html>

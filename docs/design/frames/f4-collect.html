@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataScope – Collect: Data Hub</title>
+<!-- VISUAL + MOTION REFERENCE ONLY (DataScope round-2 UI frames, Explorer's Toolkit).
+     Inline styles keep it readable. In the real app: values go to css/theme.css variables,
+     the m-* motion classes go to css/motion.css, and texts come from the content files. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#166FAD}a:hover{color:#0F5383}
+.m-rise{animation:m-rise .5s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0) * 90ms + var(--d,0ms))}
+.m-seat{animation:m-seat .45s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i,0) * 110ms + 400ms)}
+.m-grow{transform-origin:bottom;animation:m-grow .7s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i,0) * 120ms + 900ms)}
+.m-ring{position:relative}
+.m-ring::after{content:'';position:absolute;inset:-7px;border-radius:50%;border:3px solid currentColor;animation:m-ring 1.8s ease-out infinite}
+.m-bubble{animation:m-bubble .5s cubic-bezier(.34,1.56,.64,1) 1.9s both}
+.m-fill{transform-origin:left;animation:m-fill 1.4s cubic-bezier(.22,1,.36,1) .4s both}
+.m-pulse{animation:m-pulse 1.8s ease-in-out 2.2s infinite}
+@keyframes m-rise{from{opacity:0;transform:translateY(18px)}}
+@keyframes m-seat{0%{opacity:0;transform:translateY(-30px) scale(.4)}100%{opacity:1;transform:none}}
+@keyframes m-grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes m-ring{0%{opacity:.9;transform:scale(.85)}100%{opacity:0;transform:scale(1.35)}}
+@keyframes m-bubble{0%{opacity:0;transform:translateY(8px) scale(.6)}100%{opacity:1;transform:none}}
+@keyframes m-fill{from{transform:scaleX(0)}}
+@keyframes m-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}.m-ring::after{display:none}}
+</style>
+</head>
+<body>
+<div style="position: relative; overflow: hidden; width: 100%; min-height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #E6F4FF; font-family: 'Nunito', sans-serif; color: #17324D">
+
+  <!-- ZONE 1: top bar -->
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 16px 28px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l18 10v20L24 44 6 34V14z" fill="#4CC26B"></path><circle cx="22" cy="22" r="9" fill="#FFFFFF" stroke="#17324D" stroke-width="4"></circle><line x1="29" y1="29" x2="36" y2="36" stroke="#17324D" stroke-width="5" stroke-linecap="round"></line></svg>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 28px; line-height: 1">Data<span style="color: #2E9A4F">Scope</span></span>
+    </div>
+    <nav aria-label="Your investigation trail" style="flex: 1 1 300px; display: flex; justify-content: center; align-items: flex-end; gap: 6px">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 15px"><span style="width: 38px; height: 38px; border-radius: 50%; background: #2E9A4F; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"></path></svg></span>Ask</div>
+      <span aria-hidden="true" style="width: 34px; height: 4px; border-radius: 2px; background: #2E9A4F; margin-bottom: 26px"></span>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 15px"><span style="width: 38px; height: 38px; border-radius: 50%; background: #2E9A4F; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"></path></svg></span>Plan</div>
+      <span aria-hidden="true" style="width: 34px; height: 4px; border-radius: 2px; background: #2E9A4F; margin-bottom: 26px"></span>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 15px"><span class="m-ring" style="color: #38B6FF; width: 46px; height: 46px; border-radius: 50%; background: #38B6FF; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg></span>Collect</div>
+      <span aria-hidden="true" style="width: 34px; border-top: 4px dotted #9CC6E6; margin-bottom: 26px"></span>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 15px; color: #4A6580"><span style="width: 38px; height: 38px; border-radius: 50%; background: #FFFFFF; border: 3px dashed #9CC6E6; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A6580" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><rect x="6" y="11" width="12" height="9" rx="2"></rect><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"></path></svg></span>More soon</div>
+    </nav>
+    <div style="display: flex; gap: 10px">
+      <button type="button" aria-label="What is this step?" style="width: 52px; height: 52px; border: 3px solid #17324D; border-radius: 16px; background: #FFFFFF; box-shadow: 0 4px 0 #17324D; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7.5v.5"></path></svg></button>
+      <button type="button" aria-label="My backpack: 2 badges" style="height: 52px; padding: 0 14px 0 8px; border: 3px solid #17324D; border-radius: 16px; background: #FFFFFF; box-shadow: 0 4px 0 #17324D; display: flex; align-items: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 17px; color: #17324D; cursor: pointer"><svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true"><path d="M17 12a7 7 0 0 1 14 0" fill="none" stroke="#17324D" stroke-width="4"></path><rect x="8" y="12" width="32" height="32" rx="10" fill="#FF7A6B" stroke="#17324D" stroke-width="3.5"></rect><rect x="15" y="27" width="18" height="12" rx="4" fill="#FFD9D4" stroke="#17324D" stroke-width="3"></rect></svg>2</button>
+    </div>
+  </header>
+
+  <!-- ZONE 2: one task card -->
+  <main style="flex-grow: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 8px 24px 0; box-sizing: border-box">
+    <section class="m-rise" style="background: #FFFFFF; border: 3px solid #17324D; border-radius: 28px; box-shadow: 0 7px 0 #17324D; overflow: hidden">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 24px; background: #38B6FF; border-bottom: 3px solid #17324D">
+        <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px">Collect · Data Hub</span>
+        <span style="background: #FFFFFF; border-radius: 999px; padding: 3px 12px; font-weight: 800; font-size: 14px">Pretend class · made-up answers</span>
+      </div>
+
+      <div style="padding: 20px 28px 24px; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; align-items: center; gap: 14px">
+          <svg width="52" height="49" viewBox="0 0 200 190" aria-hidden="true" style="flex: 0 0 auto"><path d="M40 150c0-56 26-84 60-84s60 28 60 84c0 30-24 40-60 40s-60-10-60-40z" fill="#C98A4B" stroke="#17324D" stroke-width="6"></path><path d="M62 78l-6-18 18 10M138 78l6-18-18 10" fill="#C98A4B" stroke="#17324D" stroke-width="5" stroke-linejoin="round"></path><circle cx="78" cy="112" r="22" fill="#FFFFFF" stroke="#17324D" stroke-width="5"></circle><circle cx="122" cy="112" r="22" fill="#FFFFFF" stroke="#17324D" stroke-width="5"></circle><circle cx="82" cy="114" r="9" fill="#17324D"></circle><circle cx="126" cy="114" r="9" fill="#17324D"></circle><path d="M92 134l8 11 8-11z" fill="#FFC531" stroke="#17324D" stroke-width="3" stroke-linejoin="round"></path></svg>
+          <h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; line-height: 1.1">How many hours did you sleep last night?</h1>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px">
+          <!-- Seats -->
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <h2 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px">Our pretend class</h2>
+            <div style="position: relative; display: grid; grid-template-columns: repeat(5, 58px); justify-content: center; gap: 10px; padding: 14px; background: #F4FAFF; border: 3px dashed #9CC6E6; border-radius: 20px">
+              <span class="m-seat" style="--i: 0; aspect-ratio: 1; border-radius: 50%; background: #4CC26B; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">9</span>
+              <span class="m-seat" style="--i: 1; aspect-ratio: 1; border-radius: 50%; background: #38B6FF; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">8</span>
+              <span class="m-seat" style="--i: 2; aspect-ratio: 1; border-radius: 50%; background: #8E7CFF; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">10</span>
+              <span class="m-seat" style="--i: 3; aspect-ratio: 1; border-radius: 50%; background: #4CC26B; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">9</span>
+              <span class="m-seat" style="--i: 4; aspect-ratio: 1; border-radius: 50%; background: #FF7A6B; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">3</span>
+              <span class="m-seat" style="--i: 5; aspect-ratio: 1; border-radius: 50%; background: #38B6FF; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">8</span>
+              <span class="m-seat" style="--i: 6; aspect-ratio: 1; border-radius: 50%; background: #4CC26B; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">9</span>
+              <span class="m-seat" style="--i: 7; aspect-ratio: 1; border-radius: 50%; background: #FFC531; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">7</span>
+              <span class="m-seat" style="--i: 8; aspect-ratio: 1; border-radius: 50%; background: #4CC26B; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">9</span>
+              <span class="m-seat" style="--i: 9; aspect-ratio: 1; border-radius: 50%; background: #38B6FF; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">8</span>
+              <span class="m-seat" style="--i: 10; aspect-ratio: 1; border-radius: 50%; background: #8E7CFF; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">10</span>
+              <span class="m-seat m-ring" style="--i: 11; color: #17324D; aspect-ratio: 1; border-radius: 50%; background: #4CC26B; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px">9</span>
+              <span style="aspect-ratio: 1; border-radius: 50%; border: 3px dashed #B8D3E8"></span>
+              <span style="aspect-ratio: 1; border-radius: 50%; border: 3px dashed #B8D3E8"></span>
+              <span style="aspect-ratio: 1; border-radius: 50%; border: 3px dashed #B8D3E8"></span>
+              <span style="aspect-ratio: 1; border-radius: 50%; border: 3px dashed #B8D3E8"></span>
+              <span style="aspect-ratio: 1; border-radius: 50%; border: 3px dashed #B8D3E8"></span>
+              <span style="aspect-ratio: 1; border-radius: 50%; border: 3px dashed #B8D3E8"></span>
+              <span style="aspect-ratio: 1; border-radius: 50%; border: 3px dashed #B8D3E8"></span>
+              <span style="aspect-ratio: 1; border-radius: 50%; border: 3px dashed #B8D3E8"></span>
+              <div class="m-bubble" style="position: absolute; left: 14px; right: 14px; bottom: -22px; margin: 0 auto; width: max-content; padding: 6px 14px; background: #17324D; color: #FFFFFF; border-radius: 14px; font-weight: 800; font-size: 16px">Classmate 12 said: 9 hours</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 18px; font-weight: 800; font-size: 16px">
+              <div style="flex-grow: 1; height: 16px; background: #E1EEF8; border: 2px solid #17324D; border-radius: 999px; overflow: hidden"><div class="m-fill" style="width: 60%; height: 100%; background: #38B6FF"></div></div>
+              12 of 20
+            </div>
+          </div>
+
+          <!-- Tally -->
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <h2 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px">Our tally so far</h2>
+            <div style="flex-grow: 1; min-height: 220px; display: flex; align-items: flex-end; gap: 12px; padding: 0 6px; border-bottom: 4px solid #17324D">
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 18px">1<div class="m-grow" style="--i: 0; width: 100%; height: 36px; background: #FF7A6B; border: 3px solid #17324D; border-bottom: 0; border-radius: 10px 10px 0 0"></div></div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 18px">1<div class="m-grow" style="--i: 1; width: 100%; height: 36px; background: #FFC531; border: 3px solid #17324D; border-bottom: 0; border-radius: 10px 10px 0 0"></div></div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 18px">3<div class="m-grow" style="--i: 2; width: 100%; height: 108px; background: #38B6FF; border: 3px solid #17324D; border-bottom: 0; border-radius: 10px 10px 0 0"></div></div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 18px">5<div class="m-grow" style="--i: 3; width: 100%; height: 180px; background: #4CC26B; border: 3px solid #17324D; border-bottom: 0; border-radius: 10px 10px 0 0"></div></div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 18px">2<div class="m-grow" style="--i: 4; width: 100%; height: 72px; background: #8E7CFF; border: 3px solid #17324D; border-bottom: 0; border-radius: 10px 10px 0 0"></div></div>
+            </div>
+            <div style="display: flex; gap: 12px; padding: 0 6px; font-weight: 800; font-size: 16px; text-align: center"><span style="flex: 1">3 h</span><span style="flex: 1">7 h</span><span style="flex: 1">8 h</span><span style="flex: 1">9 h</span><span style="flex: 1">10 h</span></div>
+            <p style="margin: 0; font-weight: 700; font-size: 15px; color: #4A6580">Seat colours match the bar colours.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ZONE 3: action bar -->
+  <footer style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 22px 24px 26px; box-sizing: border-box; display: flex; align-items: center; gap: 14px">
+    <button type="button" style="min-height: 56px; padding: 0 20px; border: 3px solid #9CC6E6; border-radius: 16px; background: transparent; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; color: #17324D; display: flex; align-items: center; gap: 8px; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Back</button>
+    <span style="flex-grow: 1"></span>
+    <button type="button" style="min-height: 56px; padding: 0 22px; border: 3px solid #17324D; border-radius: 16px; background: #FFFFFF; box-shadow: 0 5px 0 #17324D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; color: #17324D; cursor: pointer">Hint</button>
+    <button type="button" class="m-pulse" style="min-height: 58px; padding: 0 28px; border: 3px solid #17324D; border-radius: 18px; background: #2E9A4F; color: #FFFFFF; box-shadow: 0 5px 0 #17324D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; display: flex; align-items: center; gap: 10px; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true"><path d="M7 4l13 8-13 8z"></path></svg>Ask the other 8</button>
+  </footer>
+</div>
+</body>
+</html>

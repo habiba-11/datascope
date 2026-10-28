@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataScope – Start</title>
+<!-- VISUAL + MOTION REFERENCE ONLY (DataScope round-2 UI frames, Explorer's Toolkit).
+     Inline styles keep it readable. In the real app: values go to css/theme.css variables,
+     the m-* motion classes go to css/motion.css, and texts come from the content files. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#166FAD}a:hover{color:#0F5383}
+.m-rise{animation:m-rise .5s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0) * 90ms + var(--d,0ms))}
+.m-pop{animation:m-pop .55s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i,0) * 90ms + var(--d,0ms))}
+.m-float{animation:m-float 3.2s ease-in-out infinite}
+.m-pulse{animation:m-pulse 1.8s ease-in-out 1.6s infinite}
+.m-letter{display:inline-block;animation:m-letter .55s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i) * 45ms + 200ms)}
+.m-wave{transform-origin:150px 150px;animation:m-wave 2.4s ease-in-out 1s infinite}
+.m-cloud{animation:m-cloud 18s linear infinite}
+@keyframes m-rise{from{opacity:0;transform:translateY(18px)}}
+@keyframes m-pop{0%{opacity:0;transform:scale(.6)}100%{opacity:1;transform:none}}
+@keyframes m-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes m-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes m-letter{0%{opacity:0;transform:translateY(24px) scale(.4)}100%{opacity:1;transform:none}}
+@keyframes m-wave{0%,40%,100%{transform:rotate(0)}10%,30%{transform:rotate(-30deg)}20%{transform:rotate(-8deg)}}
+@keyframes m-cloud{from{transform:translateX(-120px)}to{transform:translateX(1400px)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div style="position: relative; overflow: hidden; width: 100%; min-height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #E6F4FF; font-family: 'Nunito', sans-serif; color: #17324D">
+  <svg viewBox="0 0 1280 220" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; left: 0; bottom: 0; width: 100%; height: 220px"><ellipse cx="200" cy="250" rx="480" ry="150" fill="#BFE8C9"></ellipse><ellipse cx="1040" cy="270" rx="560" ry="170" fill="#A6DDB5"></ellipse></svg>
+  <svg class="m-cloud" width="120" height="50" viewBox="0 0 120 50" aria-hidden="true" style="position: absolute; top: 70px; left: 0"><g fill="#FFFFFF"><circle cx="30" cy="32" r="18"></circle><circle cx="60" cy="22" r="22"></circle><circle cx="90" cy="32" r="16"></circle><rect x="30" y="30" width="60" height="20" rx="10"></rect></g></svg>
+
+  <header style="position: relative; display: flex; align-items: center; padding: 20px 28px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <svg width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l18 10v20L24 44 6 34V14z" fill="#4CC26B"></path><circle cx="22" cy="22" r="9" fill="#FFFFFF" stroke="#17324D" stroke-width="4"></circle><line x1="29" y1="29" x2="36" y2="36" stroke="#17324D" stroke-width="5" stroke-linecap="round"></line></svg>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; line-height: 1">Data<span style="color: #2E9A4F">Scope</span></span>
+    </div>
+  </header>
+
+  <main style="position: relative; flex-grow: 1; width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 24px 60px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 48px">
+    <div class="m-float" style="flex: 0 0 auto">
+      <svg width="300" height="290" viewBox="0 0 200 190" role="img" aria-label="Pip the owl explorer waving hello">
+        <path d="M40 150c0-56 26-84 60-84s60 28 60 84c0 30-24 40-60 40s-60-10-60-40z" fill="#C98A4B" stroke="#17324D" stroke-width="5"></path>
+        <path d="M70 160c0-16 14-24 30-24s30 8 30 24c0 18-14 26-30 26s-30-8-30-26z" fill="#F6E1C3"></path>
+        <path d="M62 78l-6-18 18 10M138 78l6-18-18 10" fill="#C98A4B" stroke="#17324D" stroke-width="4" stroke-linejoin="round"></path>
+        <circle cx="78" cy="112" r="22" fill="#FFFFFF" stroke="#17324D" stroke-width="4"></circle><circle cx="122" cy="112" r="22" fill="#FFFFFF" stroke="#17324D" stroke-width="4"></circle>
+        <circle cx="82" cy="114" r="9" fill="#17324D"></circle><circle cx="126" cy="114" r="9" fill="#17324D"></circle>
+        <circle cx="86" cy="110" r="3" fill="#FFFFFF"></circle><circle cx="130" cy="110" r="3" fill="#FFFFFF"></circle>
+        <path d="M92 134l8 11 8-11z" fill="#FFC531" stroke="#17324D" stroke-width="3" stroke-linejoin="round"></path>
+        <path class="m-wave" d="M150 150c18-10 30-30 28-50-16 6-28 22-34 40z" fill="#B0763C" stroke="#17324D" stroke-width="4" stroke-linejoin="round"></path>
+      </svg>
+    </div>
+
+    <div style="flex: 1 1 420px; max-width: 520px; display: flex; flex-direction: column; gap: 22px">
+      <p class="m-rise" style="--d: 100ms; margin: 0; align-self: flex-start; background: #FFFFFF; border: 3px solid #17324D; border-radius: 999px; padding: 4px 16px; font-weight: 800; font-size: 17px">Hoo-hoo! I'm Pip, your guide.</p>
+      <h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 56px; line-height: 1.02" aria-label="Become a Data Detective!">
+        <span aria-hidden="true"><span class="m-letter" style="--i: 0">Become</span> <span class="m-letter" style="--i: 1">a</span> <span class="m-letter" style="--i: 2">Data</span><br><span class="m-letter" style="--i: 3; color: #2E9A4F">Detective!</span></span>
+      </h1>
+      <p class="m-rise" style="--d: 450ms; margin: 0; font-size: 21px; font-weight: 700; line-height: 1.4">Ask a question. Collect answers. Find out what the data says.</p>
+
+      <div class="m-rise" style="--d: 600ms; background: #FFFFFF; border: 3px solid #17324D; border-radius: 24px; box-shadow: 0 6px 0 #17324D; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+        <label for="code" style="font-weight: 800; font-size: 18px">Type your explorer code</label>
+        <input id="code" value="FOX-27" style="min-height: 56px; padding: 0 18px; border: 3px solid #9CC6E6; border-radius: 16px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: 2px; color: #17324D; background: #F4FAFF">
+        <button type="button" class="m-pulse" style="min-height: 60px; border: 3px solid #17324D; border-radius: 18px; background: #2E9A4F; color: #FFFFFF; box-shadow: 0 5px 0 #17324D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer">Start exploring<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+      </div>
+      <a href="#" class="m-rise" style="--d: 750ms; align-self: flex-start; font-weight: 800; font-size: 17px; min-height: 48px; display: inline-flex; align-items: center">I want to continue my saved investigation</a>
+    </div>
+  </main>
+</div>
+</body>
+</html>

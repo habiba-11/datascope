@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataScope – Conclude: Evidence Board</title>
+<!-- VISUAL + MOTION REFERENCE ONLY (DataScope round-2 UI frames, Explorer's Toolkit).
+     Inline styles keep it readable. In the real app: values go to css/theme.css variables,
+     the m-* motion classes go to css/motion.css, and texts come from the content files. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#166FAD}a:hover{color:#0F5383}
+.m-rise{animation:m-rise .5s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0) * 110ms + var(--d,0ms))}
+.m-ring{position:relative}
+.m-ring::after{content:'';position:absolute;inset:-7px;border-radius:50%;border:3px solid currentColor;animation:m-ring 1.8s ease-out infinite}
+.m-fly{animation:m-fly .9s cubic-bezier(.45,0,.35,1) 1.3s both}
+.m-left{animation:m-left .3s ease-out 1.3s both}
+.m-slot{animation:m-slot .5s cubic-bezier(.34,1.56,.64,1) 2.2s both}
+.m-pick{animation:m-pickpill .5s cubic-bezier(.34,1.56,.64,1) 2.5s both}
+.m-stamp{animation:m-stamp .5s cubic-bezier(.34,1.56,.64,1) 3.1s both}
+.m-pulse{animation:m-pulse 1.8s ease-in-out 3.6s infinite}
+@keyframes m-rise{from{opacity:0;transform:translateY(18px)}}
+@keyframes m-ring{0%{opacity:.9;transform:scale(.85)}100%{opacity:0;transform:scale(1.35)}}
+@keyframes m-fly{0%{opacity:0;transform:translate(-330px, 40px) rotate(-8deg)}15%{opacity:1}55%{transform:translate(-160px, -50px) rotate(-12deg) scale(1.1)}100%{opacity:1;transform:none}}
+@keyframes m-left{to{opacity:.45}}
+@keyframes m-slot{0%{box-shadow:0 0 0 0 rgba(46,154,79,.6)}100%{box-shadow:0 0 0 14px rgba(46,154,79,0)}}
+@keyframes m-pickpill{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes m-stamp{0%{opacity:0;transform:scale(2.4) rotate(-14deg)}100%{opacity:1;transform:scale(1) rotate(-10deg)}}
+@keyframes m-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}.m-ring::after{display:none}.m-stamp{transform:rotate(-10deg)}}
+</style>
+</head>
+<body>
+<div style="position: relative; overflow: hidden; width: 100%; min-height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #E6F4FF; font-family: 'Nunito', sans-serif; color: #17324D">
+
+  <!-- ZONE 1: top bar -->
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 16px 28px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l18 10v20L24 44 6 34V14z" fill="#4CC26B"></path><circle cx="22" cy="22" r="9" fill="#FFFFFF" stroke="#17324D" stroke-width="4"></circle><line x1="29" y1="29" x2="36" y2="36" stroke="#17324D" stroke-width="5" stroke-linecap="round"></line></svg>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 28px; line-height: 1">Data<span style="color: #2E9A4F">Scope</span></span>
+    </div>
+    <nav aria-label="Your investigation trail" style="flex: 1 1 300px; display: flex; justify-content: center; align-items: flex-end; gap: 6px">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 15px"><span style="width: 38px; height: 38px; border-radius: 50%; background: #2E9A4F; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"></path></svg></span>Ask</div>
+      <span aria-hidden="true" style="width: 28px; height: 4px; border-radius: 2px; background: #2E9A4F; margin-bottom: 26px"></span>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 15px"><span style="width: 38px; height: 38px; border-radius: 50%; background: #2E9A4F; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"></path></svg></span>Plan</div>
+      <span aria-hidden="true" style="width: 28px; height: 4px; border-radius: 2px; background: #2E9A4F; margin-bottom: 26px"></span>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 15px"><span style="width: 38px; height: 38px; border-radius: 50%; background: #2E9A4F; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"></path></svg></span>Collect</div>
+      <span aria-hidden="true" style="width: 28px; height: 4px; border-radius: 2px; background: #2E9A4F; margin-bottom: 26px"></span>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 15px"><span style="width: 38px; height: 38px; border-radius: 50%; background: #2E9A4F; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"></path></svg></span>Explore</div>
+      <span aria-hidden="true" style="width: 28px; height: 4px; border-radius: 2px; background: #2E9A4F; margin-bottom: 26px"></span>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 15px"><span class="m-ring" style="color: #8E7CFF; width: 46px; height: 46px; border-radius: 50%; background: #8E7CFF; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 21V4M6 4h11l-2 4 2 4H6"></path></svg></span>Conclude</div>
+    </nav>
+    <div style="display: flex; gap: 10px">
+      <button type="button" aria-label="What is this step?" style="width: 52px; height: 52px; border: 3px solid #17324D; border-radius: 16px; background: #FFFFFF; box-shadow: 0 4px 0 #17324D; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7.5v.5"></path></svg></button>
+      <button type="button" aria-label="My backpack: 6 badges" style="height: 52px; padding: 0 14px 0 8px; border: 3px solid #17324D; border-radius: 16px; background: #FFFFFF; box-shadow: 0 4px 0 #17324D; display: flex; align-items: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 17px; color: #17324D; cursor: pointer"><svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true"><path d="M17 12a7 7 0 0 1 14 0" fill="none" stroke="#17324D" stroke-width="4"></path><rect x="8" y="12" width="32" height="32" rx="10" fill="#FF7A6B" stroke="#17324D" stroke-width="3.5"></rect><rect x="15" y="27" width="18" height="12" rx="4" fill="#FFD9D4" stroke="#17324D" stroke-width="3"></rect></svg>6</button>
+    </div>
+  </header>
+
+  <!-- ZONE 2: one task -->
+  <main style="flex-grow: 1; width: 100%; max-width: 1080px; margin: 0 auto; padding: 8px 24px 0; box-sizing: border-box">
+    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px">
+      <svg width="52" height="49" viewBox="0 0 200 190" aria-hidden="true" style="flex: 0 0 auto"><path d="M40 150c0-56 26-84 60-84s60 28 60 84c0 30-24 40-60 40s-60-10-60-40z" fill="#C98A4B" stroke="#17324D" stroke-width="6"></path><path d="M62 78l-6-18 18 10M138 78l6-18-18 10" fill="#C98A4B" stroke="#17324D" stroke-width="5" stroke-linejoin="round"></path><circle cx="78" cy="112" r="22" fill="#FFFFFF" stroke="#17324D" stroke-width="5"></circle><circle cx="122" cy="112" r="22" fill="#FFFFFF" stroke="#17324D" stroke-width="5"></circle><circle cx="82" cy="114" r="9" fill="#17324D"></circle><circle cx="126" cy="114" r="9" fill="#17324D"></circle><path d="M92 134l8 11 8-11z" fill="#FFC531" stroke="#17324D" stroke-width="3" stroke-linejoin="round"></path></svg>
+      <div>
+        <h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; line-height: 1.1">Build your Evidence Card</h1>
+        <p style="margin: 2px 0 0; font-weight: 700; font-size: 18px">Say what you found. Show your proof. Say how sure you are.</p>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start">
+      <!-- Evidence tray -->
+      <aside class="m-rise" style="flex: 1 1 260px; max-width: 320px; background: #FFFFFF; border: 3px solid #17324D; border-radius: 24px; box-shadow: 0 6px 0 #17324D; overflow: hidden">
+        <h2 style="margin: 0; padding: 10px 18px; background: #FFC531; border-bottom: 3px solid #17324D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px">My clues</h2>
+        <div style="padding: 14px; display: flex; flex-direction: column; gap: 10px">
+          <button type="button" class="m-left" style="min-height: 52px; padding: 0 14px; border: 3px solid #17324D; border-radius: 14px; background: #D3EEFF; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px; color: #17324D; display: flex; align-items: center; gap: 8px; text-align: left; cursor: pointer"><span style="font-family: 'Baloo 2', sans-serif; font-size: 18px">#</span>Median: 9 hours</button>
+          <button type="button" style="min-height: 52px; padding: 0 14px; border: 3px solid #17324D; border-radius: 14px; background: #D5F2DC; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px; color: #17324D; display: flex; align-items: center; gap: 8px; text-align: left; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 19V11M12 19V5M19 19v-6"></path></svg>Bar graph: most slept 9 h</button>
+          <button type="button" style="min-height: 52px; padding: 0 14px; border: 3px solid #17324D; border-radius: 14px; background: #D3EEFF; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px; color: #17324D; display: flex; align-items: center; gap: 8px; text-align: left; cursor: pointer"><span style="font-family: 'Baloo 2', sans-serif; font-size: 18px">#</span>Mean: 8.1 hours</button>
+          <button type="button" style="min-height: 52px; padding: 0 14px; border: 3px solid #17324D; border-radius: 14px; background: #FFD9D4; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px; color: #17324D; display: flex; align-items: center; gap: 8px; text-align: left; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="M16 16l4 4"></path></svg>One kid slept 3 hours</button>
+          <p style="margin: 2px 0 0; font-weight: 700; font-size: 14px; color: #4A6580">Tap a clue to add it to your card.</p>
+        </div>
+      </aside>
+
+      <!-- Evidence card -->
+      <section class="m-rise" style="--d: 150ms; position: relative; flex: 2 1 460px; background: #FFFFFF; border: 3px solid #17324D; border-radius: 28px; box-shadow: 0 7px 0 #17324D; overflow: hidden">
+        <div style="padding: 10px 22px; background: #8E7CFF; border-bottom: 3px solid #17324D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px">My Evidence Card</div>
+        <div style="padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; gap: 12px">
+            <span style="flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: #17324D; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800">1</span>
+            <div style="flex: 1">
+              <h3 style="margin: 0 0 4px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px">I think...</h3>
+              <p style="margin: 0; padding: 10px 14px; background: #F4FAFF; border: 2px solid #9CC6E6; border-radius: 14px; font-weight: 700; font-size: 17px">Most kids in Grade 5 sleep about 9 hours.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px">
+            <span style="flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: #17324D; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800">2</span>
+            <div style="flex: 1">
+              <h3 style="margin: 0 0 4px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px">My proof</h3>
+              <div class="m-slot" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; min-height: 56px; box-sizing: border-box; border: 3px dashed #9CC6E6; border-radius: 14px">
+                <span style="padding: 8px 12px; border: 3px solid #17324D; border-radius: 12px; background: #D5F2DC; font-weight: 800; font-size: 15px">Bar graph: most slept 9 h</span>
+                <span class="m-fly" style="padding: 8px 12px; border: 3px solid #17324D; border-radius: 12px; background: #D3EEFF; font-weight: 800; font-size: 15px"># Median: 9 hours</span>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px">
+            <span style="flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: #17324D; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800">3</span>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px">
+              <h3 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 19px">How sure am I?</h3>
+              <div role="radiogroup" aria-label="How sure are you?" style="display: flex; flex-wrap: wrap; gap: 6px">
+                <button type="button" role="radio" aria-checked="false" style="min-height: 44px; padding: 0 12px; border: 2px solid #17324D; border-radius: 999px; background: #FFFFFF; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: #17324D">Impossible</button>
+                <button type="button" role="radio" aria-checked="false" style="min-height: 44px; padding: 0 12px; border: 2px solid #17324D; border-radius: 999px; background: #FFFFFF; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: #17324D">Unlikely</button>
+                <button type="button" role="radio" aria-checked="false" style="min-height: 44px; padding: 0 12px; border: 2px solid #17324D; border-radius: 999px; background: #FFFFFF; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: #17324D">Even chance</button>
+                <button type="button" role="radio" aria-checked="true" class="m-pick" style="min-height: 44px; padding: 0 14px; border: 3px solid #17324D; border-radius: 999px; background: #8E7CFF; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: #17324D">✓ Likely</button>
+                <button type="button" role="radio" aria-checked="false" style="min-height: 44px; padding: 0 12px; border: 2px solid #17324D; border-radius: 999px; background: #FFFFFF; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: #17324D">Certain</button>
+              </div>
+              <p style="margin: 0; padding: 8px 14px; background: #F4FAFF; border: 2px solid #9CC6E6; border-radius: 14px; font-weight: 700; font-size: 16px">...because only 20 kids answered.</p>
+            </div>
+          </div>
+        </div>
+        <div class="m-stamp" aria-hidden="true" style="position: absolute; right: 22px; top: 16px; padding: 2px 10px; border: 4px solid #2E9A4F; border-radius: 12px; color: #2E9A4F; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 1px; background: rgba(255, 255, 255, 0.85); transform: rotate(-10deg)">READY TO SHARE!</div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ZONE 3: action bar -->
+  <footer style="width: 100%; max-width: 1080px; margin: 0 auto; padding: 22px 24px 26px; box-sizing: border-box; display: flex; align-items: center; gap: 14px">
+    <button type="button" style="min-height: 56px; padding: 0 20px; border: 3px solid #9CC6E6; border-radius: 16px; background: transparent; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; color: #17324D; display: flex; align-items: center; gap: 8px; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Back</button>
+    <span style="flex-grow: 1"></span>
+    <button type="button" style="min-height: 56px; padding: 0 22px; border: 3px solid #17324D; border-radius: 16px; background: #FFFFFF; box-shadow: 0 5px 0 #17324D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; color: #17324D; cursor: pointer">Hint</button>
+    <button type="button" class="m-pulse" style="min-height: 58px; padding: 0 30px; border: 3px solid #17324D; border-radius: 18px; background: #2E9A4F; color: #FFFFFF; box-shadow: 0 5px 0 #17324D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; cursor: pointer">Finish my card</button>
+  </footer>
+</div>
+</body>
+</html>

@@ -8,9 +8,9 @@
 //                 It is meant to be public: the database rules decide what it may do.
 //                 NEVER put the secret key ('sb_secret_...') or the database password here.
 export const BACKEND = {
-  enabled: false,
-  url: '',
-  publishableKey: '',
+  enabled: true,
+  url: 'https://auzqfqphiycppiwjplkl.supabase.co',
+  publishableKey: 'sb_publishable_GM3Wy-nPH7WIeP2aaL16gA_XYK8--vh',
 };
 
 // True when the database is switched on AND filled in.

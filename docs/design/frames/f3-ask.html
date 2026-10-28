@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataScope – Ask: pick a question</title>
+<!-- VISUAL + MOTION REFERENCE ONLY (DataScope round-2 UI frames, Explorer's Toolkit).
+     Inline styles keep it readable. In the real app: values go to css/theme.css variables,
+     the m-* motion classes go to css/motion.css, and texts come from the content files. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#166FAD}a:hover{color:#0F5383}
+.m-rise{animation:m-rise .5s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0) * 90ms + var(--d,0ms))}
+.m-pop{animation:m-pop .55s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i,0) * 90ms + var(--d,0ms))}
+.m-ring{position:relative}
+.m-ring::after{content:'';position:absolute;inset:-7px;border-radius:50%;border:3px solid currentColor;animation:m-ring 1.8s ease-out infinite}
+.m-pick{animation:m-pop .55s cubic-bezier(.34,1.56,.64,1) 350ms both, m-pick .6s cubic-bezier(.34,1.56,.64,1) 1.1s forwards}
+.m-check{animation:m-pop .45s cubic-bezier(.34,1.56,.64,1) 1.3s both}
+.m-pulse{animation:m-pulse 1.8s ease-in-out 1.8s infinite}
+@keyframes m-rise{from{opacity:0;transform:translateY(18px)}}
+@keyframes m-pop{0%{opacity:0;transform:scale(.4)}100%{opacity:1;transform:none}}
+@keyframes m-ring{0%{opacity:.9;transform:scale(.85)}100%{opacity:0;transform:scale(1.35)}}
+@keyframes m-pick{0%{transform:none}40%{transform:translateY(-6px) scale(1.04)}100%{transform:translateY(-4px)}}
+@keyframes m-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}.m-ring::after{display:none}}
+</style>
+</head>
+<body>
+<div style="position: relative; overflow: hidden; width: 100%; min-height: 800px; box-sizing: border-box; display: flex; flex-direction: column; background: #E6F4FF; font-family: 'Nunito', sans-serif; color: #17324D">
+
+  <!-- ZONE 1: top bar -->
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 16px 28px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l18 10v20L24 44 6 34V14z" fill="#4CC26B"></path><circle cx="22" cy="22" r="9" fill="#FFFFFF" stroke="#17324D" stroke-width="4"></circle><line x1="29" y1="29" x2="36" y2="36" stroke="#17324D" stroke-width="5" stroke-linecap="round"></line></svg>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 28px; line-height: 1">Data<span style="color: #2E9A4F">Scope</span></span>
+    </div>
+    <nav aria-label="Your investigation trail" style="flex: 1 1 300px; display: flex; justify-content: center; align-items: flex-end; gap: 6px">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 15px"><span class="m-ring" style="color: #FF7A6B; width: 46px; height: 46px; border-radius: 50%; background: #FF7A6B; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M9 9a3 3 0 1 1 4 2.8c-.8.4-1 1-1 2.2"></path><circle cx="12" cy="18" r=".6"></circle></svg></span>Ask</div>
+      <span aria-hidden="true" style="width: 40px; border-top: 4px dotted #9CC6E6; margin-bottom: 30px"></span>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; font-size: 15px; color: #4A6580"><span style="width: 38px; height: 38px; border-radius: 50%; background: #FFFFFF; border: 3px dashed #9CC6E6; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A6580" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><rect x="6" y="11" width="12" height="9" rx="2"></rect><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"></path></svg></span>More soon</div>
+    </nav>
+    <div style="display: flex; gap: 10px">
+      <button type="button" aria-label="What is this step?" style="width: 52px; height: 52px; border: 3px solid #17324D; border-radius: 16px; background: #FFFFFF; box-shadow: 0 4px 0 #17324D; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7.5v.5"></path></svg></button>
+      <button type="button" aria-label="My backpack: 0 badges" style="height: 52px; padding: 0 14px 0 8px; border: 3px solid #17324D; border-radius: 16px; background: #FFFFFF; box-shadow: 0 4px 0 #17324D; display: flex; align-items: center; gap: 8px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 17px; color: #17324D; cursor: pointer"><svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true"><path d="M17 12a7 7 0 0 1 14 0" fill="none" stroke="#17324D" stroke-width="4"></path><rect x="8" y="12" width="32" height="32" rx="10" fill="#FF7A6B" stroke="#17324D" stroke-width="3.5"></rect><rect x="15" y="27" width="18" height="12" rx="4" fill="#FFD9D4" stroke="#17324D" stroke-width="3"></rect></svg>0</button>
+    </div>
+  </header>
+
+  <!-- ZONE 2: one task card -->
+  <main style="flex-grow: 1; width: 100%; max-width: 1000px; margin: 0 auto; padding: 8px 24px 0; box-sizing: border-box">
+    <section class="m-rise" style="background: #FFFFFF; border: 3px solid #17324D; border-radius: 28px; box-shadow: 0 7px 0 #17324D; overflow: hidden">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 24px; background: #FF7A6B; border-bottom: 3px solid #17324D">
+        <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px">Ask · Question Studio</span>
+        <div aria-label="Task 1 of 3" style="display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px">Task 1 of 3<span style="width: 26px; height: 12px; border-radius: 999px; background: #17324D"></span><span style="width: 12px; height: 12px; border-radius: 50%; background: #FFFFFF; border: 2px solid #17324D"></span><span style="width: 12px; height: 12px; border-radius: 50%; background: #FFFFFF; border: 2px solid #17324D"></span></div>
+      </div>
+
+      <div style="padding: 22px 28px 28px; display: flex; flex-direction: column; gap: 20px">
+        <div class="m-rise" style="--d: 150ms; display: flex; align-items: center; gap: 14px">
+          <svg width="58" height="55" viewBox="0 0 200 190" aria-hidden="true" style="flex: 0 0 auto"><path d="M40 150c0-56 26-84 60-84s60 28 60 84c0 30-24 40-60 40s-60-10-60-40z" fill="#C98A4B" stroke="#17324D" stroke-width="6"></path><path d="M62 78l-6-18 18 10M138 78l6-18-18 10" fill="#C98A4B" stroke="#17324D" stroke-width="5" stroke-linejoin="round"></path><circle cx="78" cy="112" r="22" fill="#FFFFFF" stroke="#17324D" stroke-width="5"></circle><circle cx="122" cy="112" r="22" fill="#FFFFFF" stroke="#17324D" stroke-width="5"></circle><circle cx="82" cy="114" r="9" fill="#17324D"></circle><circle cx="126" cy="114" r="9" fill="#17324D"></circle><path d="M92 134l8 11 8-11z" fill="#FFC531" stroke="#17324D" stroke-width="3" stroke-linejoin="round"></path></svg>
+          <div style="flex: 1; background: #F4FAFF; border: 2px solid #9CC6E6; border-radius: 18px; padding: 10px 16px; font-weight: 700; font-size: 18px">Pick the question you want to explore. You can try the others later!</div>
+        </div>
+
+        <h1 class="m-rise" style="--d: 250ms; margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 34px; line-height: 1.1">What do you want to find out?</h1>
+
+        <div role="radiogroup" aria-label="Choose a question" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px">
+          <button type="button" role="radio" aria-checked="true" class="m-pick" style="position: relative; min-height: 170px; padding: 18px; border: 4px solid #17324D; border-radius: 22px; background: #FFF4CF; box-shadow: 0 7px 0 #17324D; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; text-align: left; font-family: 'Nunito', sans-serif; color: #17324D; cursor: pointer">
+            <span class="m-check" style="position: absolute; top: -14px; right: -12px; width: 40px; height: 40px; border-radius: 50%; background: #2E9A4F; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"></path></svg></span>
+            <span style="width: 52px; height: 52px; border-radius: 16px; background: #8E7CFF; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></span>
+            <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; line-height: 1.1">Sleep</span>
+            <span style="font-weight: 700; font-size: 17px">How long do we sleep?</span>
+          </button>
+          <button type="button" role="radio" aria-checked="false" class="m-pop" style="--i: 1; --d: 350ms; min-height: 170px; padding: 18px; border: 3px solid #17324D; border-radius: 22px; background: #FFFFFF; box-shadow: 0 5px 0 #17324D; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; text-align: left; font-family: 'Nunito', sans-serif; color: #17324D; cursor: pointer">
+            <span style="width: 52px; height: 52px; border-radius: 16px; background: #38B6FF; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16V8h5l2 4h6a3 3 0 0 1 3 3v1z"></path><path d="M4 16h16v3H4z"></path></svg></span>
+            <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; line-height: 1.1">Shoes</span>
+            <span style="font-weight: 700; font-size: 17px">Which shoe size is most common?</span>
+          </button>
+          <button type="button" role="radio" aria-checked="false" class="m-pop" style="--i: 2; --d: 350ms; min-height: 170px; padding: 18px; border: 3px solid #17324D; border-radius: 22px; background: #FFFFFF; box-shadow: 0 5px 0 #17324D; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; text-align: left; font-family: 'Nunito', sans-serif; color: #17324D; cursor: pointer">
+            <span style="width: 52px; height: 52px; border-radius: 16px; background: #4CC26B; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M4.5 9.5c5 1.5 10 1.5 15 0M4.5 14.5c5-1.5 10-1.5 15 0"></path></svg></span>
+            <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; line-height: 1.1">Games</span>
+            <span style="font-weight: 700; font-size: 17px">What is our favourite playground game?</span>
+          </button>
+          <button type="button" role="radio" aria-checked="false" class="m-pop" style="--i: 3; --d: 350ms; min-height: 170px; padding: 18px; border: 3px solid #17324D; border-radius: 22px; background: #FFFFFF; box-shadow: 0 5px 0 #17324D; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; text-align: left; font-family: 'Nunito', sans-serif; color: #17324D; cursor: pointer">
+            <span style="width: 52px; height: 52px; border-radius: 16px; background: #FFC531; border: 3px solid #17324D; display: flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H3zM21 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7z"></path></svg></span>
+            <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; line-height: 1.1">Reading</span>
+            <span style="font-weight: 700; font-size: 17px">Which class reads more?</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ZONE 3: action bar (Back · Hint · ONE primary) -->
+  <footer style="width: 100%; max-width: 1000px; margin: 0 auto; padding: 22px 24px 26px; box-sizing: border-box; display: flex; align-items: center; gap: 14px">
+    <button type="button" style="min-height: 56px; padding: 0 20px; border: 3px solid #9CC6E6; border-radius: 16px; background: transparent; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; color: #17324D; display: flex; align-items: center; gap: 8px; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Back</button>
+    <span style="flex-grow: 1"></span>
+    <button type="button" style="min-height: 56px; padding: 0 22px; border: 3px solid #17324D; border-radius: 16px; background: #FFFFFF; box-shadow: 0 5px 0 #17324D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; color: #17324D; cursor: pointer">Hint</button>
+    <button type="button" class="m-pulse" style="min-height: 58px; padding: 0 30px; border: 3px solid #17324D; border-radius: 18px; background: #2E9A4F; color: #FFFFFF; box-shadow: 0 5px 0 #17324D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; display: flex; align-items: center; gap: 10px; cursor: pointer">Next<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+  </footer>
+</div>
+</body>
+</html>

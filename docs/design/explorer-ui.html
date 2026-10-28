@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DataScope – Explorer's Toolkit reference screen (Data Hub)</title>
+<!-- VISUAL REFERENCE ONLY (chosen design: Direction 3, Explorer's Toolkit).
+     Inline styles are used so the look is easy to read. In the real app, move values into css/theme.css variables. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#166FAD}a:hover{color:#0F5383}
+</style>
+</head>
+<body>
+<div style="position: relative; overflow: hidden; width: 1100px; height: 800px; box-sizing: border-box; padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; background: #E6F4FF; font-family: 'Nunito', sans-serif; color: #17324D">
+
+  <!-- Background hills and clouds -->
+  <svg width="1100" height="800" viewBox="0 0 1100 800" aria-hidden="true" style="position: absolute; left: 0; top: 0">
+    <ellipse cx="180" cy="840" rx="420" ry="150" fill="#BFE8C9"></ellipse>
+    <ellipse cx="880" cy="860" rx="480" ry="170" fill="#A6DDB5"></ellipse>
+    <g fill="#FFFFFF"><circle cx="520" cy="58" r="22"></circle><circle cx="548" cy="48" r="28"></circle><circle cx="580" cy="60" r="20"></circle></g>
+  </svg>
+
+  <!-- Header -->
+  <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l18 10v20L24 44 6 34V14z" fill="#4CC26B"></path><circle cx="22" cy="22" r="9" fill="#FFFFFF" stroke="#17324D" stroke-width="4"></circle><line x1="29" y1="29" x2="36" y2="36" stroke="#17324D" stroke-width="5" stroke-linecap="round"></line></svg>
+      <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 34px; line-height: 1">Data<span style="color: #2E9A4F">Scope</span></span>
+    </div>
+    <nav aria-label="Investigation steps" style="display: flex; align-items: center; gap: 4px">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 92px; font-weight: 800; font-size: 16px"><span style="width: 44px; height: 44px; border-radius: 14px; background: #FF7A6B; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M9 9a3 3 0 1 1 4 2.8c-.8.4-1 1-1 2.2"></path><circle cx="12" cy="18" r="0.6"></circle></svg></span>Ask</div>
+      <div style="width: 22px; height: 4px; border-radius: 2px; background: #9CC6E6; margin-bottom: 22px"></div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 92px; font-weight: 800; font-size: 16px"><span style="width: 44px; height: 44px; border-radius: 14px; background: #FFC531; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M4 6l5-2 6 2 5-2v14l-5 2-6-2-5 2z"></path><path d="M9 4v14M15 6v14"></path></svg></span>Plan</div>
+      <div style="width: 22px; height: 4px; border-radius: 2px; background: #9CC6E6; margin-bottom: 22px"></div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 92px; font-weight: 800; font-size: 16px; color: #0F5383"><span style="width: 52px; height: 52px; border-radius: 16px; background: #38B6FF; border: 4px solid #FFFFFF; box-shadow: 0 0 0 3px #166FAD, 0 6px 0 3px #0F5383; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2"></rect><path d="M9 9h6M9 13h6M9 17h3"></path></svg></span>Collect</div>
+      <div style="width: 22px; height: 4px; border-radius: 2px; background: #9CC6E6; margin-bottom: 22px"></div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 92px; font-weight: 800; font-size: 16px"><span style="width: 44px; height: 44px; border-radius: 14px; background: #4CC26B; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 19V11M12 19V5M19 19v-6"></path></svg></span>Explore</div>
+      <div style="width: 22px; height: 4px; border-radius: 2px; background: #9CC6E6; margin-bottom: 22px"></div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 92px; font-weight: 800; font-size: 16px"><span style="width: 44px; height: 44px; border-radius: 14px; background: #8E7CFF; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 21V4M6 4h11l-2 4 2 4H6"></path></svg></span>Conclude</div>
+    </nav>
+  </div>
+
+  <!-- Main area -->
+  <div style="position: relative; display: grid; grid-template-columns: 250px minmax(0, 1fr) 290px; gap: 22px; flex-grow: 1; min-height: 0">
+
+    <!-- Mascot -->
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 10px">
+      <div style="background: #FFFFFF; border: 3px solid #17324D; border-radius: 24px; padding: 16px 18px; font-size: 19px; font-weight: 700; line-height: 1.35; box-shadow: 0 6px 0 #17324D">Hoo-hoo! I'm <b style="color: #2E9A4F">Pip</b>. Our pretend class is ready. Let's explore their answers!</div>
+      <svg width="210" height="236" viewBox="0 0 210 236" role="img" aria-label="Pip, a round owl explorer with a backpack and a magnifying glass">
+        <ellipse cx="100" cy="226" rx="64" ry="9" fill="#8CCF9E"></ellipse>
+        <rect x="30" y="110" width="30" height="70" rx="12" fill="#FF7A6B" stroke="#17324D" stroke-width="4"></rect>
+        <path d="M54 40l12 26M146 40l-12 26" stroke="#17324D" stroke-width="5" stroke-linecap="round"></path>
+        <path d="M40 140c0-56 26-84 60-84s60 28 60 84c0 44-24 78-60 78s-60-34-60-78z" fill="#C98A4B" stroke="#17324D" stroke-width="5"></path>
+        <path d="M70 160c0-20 14-30 30-30s30 10 30 30c0 24-14 42-30 42s-30-18-30-42z" fill="#F6E1C3"></path>
+        <circle cx="78" cy="104" r="24" fill="#FFFFFF" stroke="#17324D" stroke-width="4"></circle>
+        <circle cx="122" cy="104" r="24" fill="#FFFFFF" stroke="#17324D" stroke-width="4"></circle>
+        <circle cx="82" cy="106" r="10" fill="#17324D"></circle>
+        <circle cx="126" cy="106" r="10" fill="#17324D"></circle>
+        <circle cx="86" cy="102" r="3" fill="#FFFFFF"></circle>
+        <circle cx="130" cy="102" r="3" fill="#FFFFFF"></circle>
+        <path d="M92 126l8 12 8-12z" fill="#FFC531" stroke="#17324D" stroke-width="3" stroke-linejoin="round"></path>
+        <path d="M62 68l-6-18 18 10M138 68l6-18-18 10" fill="#C98A4B" stroke="#17324D" stroke-width="4" stroke-linejoin="round"></path>
+        <path d="M60 150l36 58" stroke="#FF7A6B" stroke-width="7" stroke-linecap="round"></path>
+        <line x1="170" y1="182" x2="196" y2="208" stroke="#17324D" stroke-width="9" stroke-linecap="round"></line>
+        <circle cx="162" cy="172" r="21" fill="#D6F0FF" stroke="#17324D" stroke-width="6"></circle>
+        <path d="M153 165a10 10 0 0 1 9-7" stroke="#FFFFFF" stroke-width="4" fill="none" stroke-linecap="round"></path>
+      </svg>
+    </div>
+
+    <!-- Survey card -->
+    <div style="background: #FFFFFF; border: 3px solid #17324D; border-radius: 26px; box-shadow: 0 7px 0 #17324D; display: flex; flex-direction: column; min-height: 0; overflow: hidden">
+      <div style="background: #38B6FF; border-bottom: 3px solid #17324D; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between">
+        <span style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px">Data Hub · Field notes</span>
+        <span style="background: #FFFFFF; font-size: 14px; font-weight: 800; padding: 3px 12px; border-radius: 999px">Pretend class · made-up answers</span>
+      </div>
+      <div style="padding: 18px 24px 22px; display: flex; flex-direction: column; gap: 14px">
+        <h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 30px; line-height: 1.15">How many hours did you sleep last night?</h1>
+        <button type="button" style="align-self: flex-start; display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 0 30px; border: 3px solid #17324D; border-radius: 18px; background: #FFC531; color: #17324D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px; box-shadow: 0 6px 0 #17324D; cursor: pointer"><svg width="26" height="26" viewBox="0 0 24 24" fill="#17324D" aria-hidden="true"><path d="M7 4l13 8-13 8z"></path></svg>Run survey</button>
+        <div style="display: flex; flex-direction: column; gap: 0; border: 3px dashed #9CC6E6; border-radius: 18px; overflow: hidden">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 7px 14px; font-size: 19px; font-weight: 700; border-bottom: 2px solid #E1EEF8"><span style="width: 32px; height: 32px; border-radius: 10px; background: #FF7A6B; display: flex; align-items: center; justify-content: center; font-weight: 800">1</span><span style="flex-grow: 1">Classmate 1</span><span style="font-weight: 800">9 hours</span></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 7px 14px; font-size: 19px; font-weight: 700; border-bottom: 2px solid #E1EEF8"><span style="width: 32px; height: 32px; border-radius: 10px; background: #FFC531; display: flex; align-items: center; justify-content: center; font-weight: 800">2</span><span style="flex-grow: 1">Classmate 2</span><span style="font-weight: 800">8 hours</span></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 7px 14px; font-size: 19px; font-weight: 700; border-bottom: 2px solid #E1EEF8"><span style="width: 32px; height: 32px; border-radius: 10px; background: #4CC26B; display: flex; align-items: center; justify-content: center; font-weight: 800">3</span><span style="flex-grow: 1">Classmate 3</span><span style="font-weight: 800">10 hours</span></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 7px 14px; font-size: 19px; font-weight: 700; border-bottom: 2px solid #E1EEF8"><span style="width: 32px; height: 32px; border-radius: 10px; background: #8E7CFF; display: flex; align-items: center; justify-content: center; font-weight: 800">4</span><span style="flex-grow: 1">Classmate 4</span><span style="font-weight: 800">9 hours</span></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 7px 14px; font-size: 19px; font-weight: 700; background: #FFF4CF"><span style="width: 32px; height: 32px; border-radius: 10px; background: #38B6FF; display: flex; align-items: center; justify-content: center; font-weight: 800">5</span><span style="flex-grow: 1">Classmate 5 <span style="background: #17324D; color: #FFFFFF; font-size: 14px; padding: 2px 10px; border-radius: 999px; margin-left: 6px">New!</span></span><span style="font-weight: 800">3 hours</span></div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 16px">
+          <div style="flex-grow: 1; height: 16px; background: #E1EEF8; border: 2px solid #17324D; border-radius: 999px; overflow: hidden"><div style="width: 25%; height: 100%; background: #4CC26B"></div></div>
+          <span>5 of 20 classmates</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tally card -->
+    <div style="background: #FFFFFF; border: 3px solid #17324D; border-radius: 26px; box-shadow: 0 7px 0 #17324D; display: flex; flex-direction: column; overflow: hidden">
+      <div style="background: #4CC26B; border-bottom: 3px solid #17324D; padding: 10px 20px">
+        <h2 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px">Our tally</h2>
+      </div>
+      <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding: 16px 20px 20px">
+        <div style="flex-grow: 1; display: flex; align-items: flex-end; gap: 12px; padding-top: 8px; border-bottom: 4px solid #17324D">
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="font-weight: 800; font-size: 20px">1</span><div style="width: 100%; height: 70px; background: #FF7A6B; border: 3px solid #17324D; border-bottom: 0; border-radius: 10px 10px 0 0"></div></div>
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="font-weight: 800; font-size: 20px">1</span><div style="width: 100%; height: 70px; background: #FFC531; border: 3px solid #17324D; border-bottom: 0; border-radius: 10px 10px 0 0"></div></div>
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="font-weight: 800; font-size: 20px">2</span><div style="width: 100%; height: 140px; background: #38B6FF; border: 3px solid #17324D; border-bottom: 0; border-radius: 10px 10px 0 0"></div></div>
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="font-weight: 800; font-size: 20px">1</span><div style="width: 100%; height: 70px; background: #8E7CFF; border: 3px solid #17324D; border-bottom: 0; border-radius: 10px 10px 0 0"></div></div>
+        </div>
+        <div style="display: flex; gap: 12px; font-weight: 800; font-size: 17px; text-align: center">
+          <span style="flex: 1">3 h</span><span style="flex: 1">8 h</span><span style="flex: 1">9 h</span><span style="flex: 1">10 h</span>
+        </div>
+        <div style="background: #E6F4FF; border-radius: 16px; padding: 12px 14px; font-size: 17px; font-weight: 700; line-height: 1.35">Look! Someone slept only 3 hours. What do you notice?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px">
+    <div style="display: flex; align-items: center; gap: 12px; background: #FFFFFF; border: 3px solid #17324D; border-radius: 18px; padding: 6px 18px 6px 8px; font-weight: 800; font-size: 18px">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l14 6v10c0 9-6 15-14 18C12 34 6 28 6 19V9z" fill="#FFC531" stroke="#17324D" stroke-width="2.5"></path><path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#FFFFFF" stroke="#17324D" stroke-width="2" stroke-linejoin="round"></path></svg>
+      Explorer badges: 3
+    </div>
+    <div style="display: flex; gap: 14px">
+      <button type="button" style="min-height: 58px; padding: 0 26px; border: 3px solid #17324D; border-radius: 18px; background: #FFFFFF; color: #17324D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; box-shadow: 0 5px 0 #17324D; cursor: pointer">Hint</button>
+      <button type="button" style="min-height: 58px; padding: 0 34px; border: 3px solid #17324D; border-radius: 18px; background: #2E9A4F; color: #FFFFFF; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 24px; box-shadow: 0 5px 0 #17324D; display: flex; align-items: center; gap: 10px; cursor: pointer">Next<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
