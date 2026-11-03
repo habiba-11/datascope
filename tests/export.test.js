@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildExport, exportFileName, toCSV } from '../js/storage/export.js';
+import { exportFileName, toCSV } from '../js/storage/export.js';
 
 const when = new Date('2026-10-22T09:30:00Z');
 const entries = [
@@ -10,14 +10,6 @@ const entries = [
     claim: 'kids sleep 9 hours, mostly', evidence: ['Median: 9', 'Mode: 9'],
   },
 ];
-
-test('the JSON export holds the code, a synthetic-data note and every entry', () => {
-  const file = buildExport('OWL-07', entries, when);
-  assert.equal(file.code, 'OWL-07');
-  assert.equal(file.exportedAt, '2026-10-22T09:30:00.000Z');
-  assert.match(file.note, /synthetic/);
-  assert.equal(file.entries.length, 2);
-});
 
 test('file names use the code and the date, never a name', () => {
   assert.equal(exportFileName('OWL-07', 'json', when), 'datascope-OWL-07-2026-10-22.json');

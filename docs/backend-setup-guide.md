@@ -2,7 +2,7 @@
 
 This guide sets up everything **outside the code**: a free Supabase account, the database, and the teacher's login. You only do it once. It takes about **30 minutes**. You need a web browser and your GitHub account. No installing.
 
-> **Ethics first.** Until Prof and the GIU ethics check say yes, use **made-up codes only** (TEST-01, TEST-02 ...) and the DEMO data. No real children.
+> **Ethics:** Prof and the GIU ethics check agreed on 4 Nov 2026. For testing, keep using **made-up codes** (TEST-01, TEST-02 ...), and delete them before the pilot (Step 11).
 
 ---
 

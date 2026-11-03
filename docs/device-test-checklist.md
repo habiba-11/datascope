@@ -23,12 +23,12 @@ Open the live site (or Live Server over Wi-Fi: VS Code's Live Server shows a Net
 - [ ] **Graph Lab:** all 4 chart buttons draw a chart. The numbers on the chart are readable at arm's length.
 - [ ] **Number Lab:** Reveal → "Has the data changed your mind?" → Next. Wrong answers in Tasks 3–4 show a hint.
 - [ ] **Chance Lab:** the unfair spinner picture shows a big red part. Run 500 finishes quickly (under 1 second).
-- [ ] **Evidence Board:** finish the card. "📤 Save my work for my teacher" saves a file.
+- [ ] **Evidence Board:** finish the card. My journey says "☁️ Your work goes to your teacher by itself."
 
-## 4. Saving the file (most important for the pilot)
-- [ ] After "Save my work", where did the file go? (Chromebook: Files → Downloads; iPad: Files app or a "Download" prompt.) Write it here: ____________
-- [ ] Can a child find and hand in that file the way your school does it (e.g. Google Classroom upload)? ____________
-- [ ] Teacher view (start page → For teachers): import that file and you see the child's row.
+## 4. Work goes online (most important for the pilot)
+- [ ] The status line at the bottom of a room says "☁️ Saved online" a few seconds after an answer.
+- [ ] Turn Wi-Fi off, answer something, turn it on again: it changes from "📴 Offline" to "☁️ Saved online" by itself.
+- [ ] Teacher's view → log in with the teacher email and password → 🔄 Refresh: the child's code is in 👧 Children.
 
 ## 5. Coming back and sharing
 - [ ] Close the browser and open the site again: the code is still filled in on the start page.

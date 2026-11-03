@@ -1,9 +1,6 @@
-// Layer 3: helpers for the teacher dashboard. They check the files children saved
-// (js/storage/export.js) and hold the misconception tags. The per-child numbers
-// come from helpers/metrics.js (Part 20).
-import { isValidCode, makeEntry } from './log.js';
-// Files from before Part 15 are version 1; newer ones are version 2.
-export const READABLE_VERSIONS = [1, 2];
+// Layer 3: helpers for the teacher dashboard: the misconception tags. The
+// per-child numbers come from helpers/metrics.js (Part 20).
+import { makeEntry } from './log.js';
 
 // Misconceptions a teacher can tag (architecture section 7), each taken from
 // docs/literature-key-findings.md. `papers` are the paper numbers.
@@ -17,29 +14,6 @@ export const MISCONCEPTION_TAGS = [
   { id: 'graph-as-picture', label: 'Reads the graph as a picture', papers: '20' },
   { id: 'sees-expected', label: 'Sees what they expected, not what the data shows', papers: '20' },
 ];
-
-// Checks a file a child saved. Returns { ok: true, file } or { ok: false, reason }.
-export function parseExportFile(text) {
-  let file;
-  try {
-    file = JSON.parse(text);
-  } catch {
-    return { ok: false, reason: 'not a JSON file' };
-  }
-  if (!file || file.app !== 'DataScope: The Evidence Lab') {
-    return { ok: false, reason: 'not a DataScope file' };
-  }
-  if (!READABLE_VERSIONS.includes(file.formatVersion)) {
-    return { ok: false, reason: `unknown file version ${file.formatVersion}` };
-  }
-  if (!isValidCode(file.code || '') || !Array.isArray(file.entries)) {
-    return { ok: false, reason: 'missing code or entries' };
-  }
-  if (file.entries.some((entry) => entry.code !== file.code)) {
-    return { ok: false, reason: 'entries from a different code' };
-  }
-  return { ok: true, file };
-}
 
 // The teacher's tags become log entries too, so they appear in the class CSV.
 export function tagEntries(code, tagIds, now = new Date()) {

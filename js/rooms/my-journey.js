@@ -12,11 +12,9 @@ import { CERTAINTY } from '../helpers/certainty.js';
 import { readLog } from '../helpers/log.js';
 import { shownTheory } from '../helpers/chance.js';
 import {
-  getSelectedScenarioId, getExplorerCode, getAllProgress, getDonePhases, startNewInvestigation,
+  getSelectedScenarioId, getExplorerCode, getDonePhases, startNewInvestigation,
 } from '../storage/save.js';
-import { buildExport, exportFileName, toCSV, downloadFile } from '../storage/export.js';
 import { guardJourney } from '../phase-progress.js';
-import { backendReady } from '../config.js';
 import { pipSVG, pipMoodFor } from '../pip.js';
 import { taskCardHTML, pipLineHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
@@ -130,28 +128,6 @@ function idCardNode(journey, code) {
   return card;
 }
 
-// "Save my work for my teacher" (moved here from Evidence Board in Part 19).
-// JSON is the main file (the teacher dashboard imports it); CSV opens in a spreadsheet.
-function save(extension, feedback) {
-  const code = getExplorerCode();
-  if (!code) {
-    // Without a code the teacher can't tell whose file it is. The log stays saved.
-    feedback.textContent = '🔑 You need your explorer code first! Go to the start page, type it, then come back.';
-    feedback.hidden = false;
-    return;
-  }
-  // Only this child's entries: on a shared device, another child's work stays out of the file.
-  const entries = readLog().filter((entry) => entry.code === code);
-  const fileName = exportFileName(code, extension);
-  if (extension === 'json') {
-    downloadFile(fileName, JSON.stringify(buildExport(code, entries, new Date(), getAllProgress()), null, 2), 'application/json');
-  } else {
-    downloadFile(fileName, toCSV(entries), 'text/csv');
-  }
-  feedback.textContent = `🎉 Saved! Look in Downloads for "${fileName}". Hand it in to your teacher.`;
-  feedback.hidden = false;
-}
-
 // A small Pip hops down the trail, stop by stop, to the last finished phase.
 // With reduced motion (or no GSAP) Pip just stands there.
 function walkPip() {
@@ -205,20 +181,15 @@ async function init() {
           <div class="journey-side">
             <div class="journey-top" id="journey-top"></div>
             <div class="journey-actions">
-              ${backendReady()
-    // With the online database on, nothing to download: the work is already sent.
-    ? '<p class="online-note">☁️ Your work goes to your teacher by itself. Nothing to save!</p>'
-    : '<button class="link-btn" id="save-csv-btn" type="button">or save it as a table (CSV)</button>'}
-              <p class="feedback" id="save-feedback" hidden></p>
-              ${backendReady() ? '' : '<button class="btn btn-quiet" id="new-investigation-btn" type="button">🔁 Start a new investigation</button>'}
+              <p class="online-note">☁️ Your work goes to your teacher by itself. Nothing to save!</p>
             </div>
           </div>
         </div>`,
     }),
   });
 
-  // ONE primary: save for the teacher (files only when the database is off),
-  // or start a new investigation. Print is the white button next to it.
+  // ONE primary: start a new investigation (the work is already online, decided
+  // 4 Nov 2026: no files). Print is the white button next to it.
   const print = el('button', '🖨️ Print my journey', 'btn');
   print.type = 'button';
   print.addEventListener('click', () => window.print());
@@ -226,13 +197,10 @@ async function init() {
   window.addEventListener('beforeprint', () => {
     document.querySelectorAll('.stop-more').forEach((d) => { d.open = true; });
   });
-  const feedback = document.getElementById('save-feedback');
   setupActionBar({
     back: { label: 'Evidence Board', href: 'evidence-board.html' },
     hint: print,
-    primary: backendReady()
-      ? { label: '🔁 Start a new investigation →', onClick: newInvestigation }
-      : { label: '📤 Save my work for my teacher', onClick: () => save('json', feedback) },
+    primary: { label: '🔁 Start a new investigation →', onClick: newInvestigation },
   });
 
   const learned = el('section', '', 'learned');
@@ -241,12 +209,6 @@ async function init() {
   document.getElementById('journey-trail').append(trailNode(journey, { cardTitle, kind: numberLabKind(recipe) }));
   // Pip's stops are measured once the fonts have loaded (they change the heights).
   document.fonts.ready.then(walkPip);
-
-  // Files are only the fallback when the online database is switched off.
-  if (!backendReady()) {
-    document.getElementById('new-investigation-btn').addEventListener('click', newInvestigation);
-    document.getElementById('save-csv-btn').addEventListener('click', () => save('csv', feedback));
-  }
 }
 
 init();

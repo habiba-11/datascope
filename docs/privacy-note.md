@@ -1,8 +1,8 @@
 # DataScope privacy note (online database, Part 22)
 
-*Draft for Habiba's thesis and for Prof / the GIU ethics self-assessment. Parts marked **[TO DECIDE]** are not decided yet: fill them in with Prof and the school. Nothing in this note means approval has been given.*
+*Draft for Habiba's thesis and for Prof / the GIU ethics self-assessment. Parts marked **[TO DECIDE]** (retention, consent wording) are not decided yet: fill them in with Prof and the school.*
 
-Status: **testing only.** Until Prof and the ethics check agree, only made-up codes (TEST-01 ...) and DEMO data are used.
+Status: **approved for the pilot** (Habiba, 4 Nov 2026: Prof and the GIU ethics check agreed). Children's work goes online under anonymous codes only. Before the pilot, delete the TEST- codes (setup guide, Step 11).
 
 ## 1. What is stored
 
@@ -54,4 +54,4 @@ The survey data children work with is **synthetic** (a made-up class). No real c
 
 ## 7. If the internet or the database is down
 
-The work is saved in the browser first and sent later (with retry and no duplicates), so a dropped connection loses nothing. With the database switched off (`js/config.js`), DataScope works fully on the device, and files are the fallback.
+The work is saved in the browser first and sent later (with retry and no duplicates), so a dropped connection loses nothing. There are no files: children do not save or hand in files, and the teacher does not import any (removed 4 Nov 2026).

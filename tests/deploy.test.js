@@ -43,8 +43,16 @@ test('the secret key and the database password are never in the website', () => 
   }
 });
 
-test('the live site starts with the database switched off (until the ethics check)', () => {
-  assert.equal(BACKEND.enabled, false);
+test('the live site sends work to the online database, with the publishable key only', () => {
+  // ON since 4 Nov 2026 (Prof and the GIU ethics check agreed).
+  assert.equal(BACKEND.enabled, true);
+  assert.match(BACKEND.url, /^https:\/\/[a-z0-9]+\.supabase\.co$/);
+  assert.match(BACKEND.publishableKey, /^sb_publishable_/);
+});
+
+test('children never save or import files any more: everything goes online (4 Nov 2026)', () => {
+  assert.doesNotMatch(read('js/rooms/my-journey.js'), /downloadFile|Save my work/);
+  assert.doesNotMatch(read('teacher/index.html'), /type="file"|Import files/);
 });
 
 test('GitHub Pages serves every file as it is (no Jekyll)', () => {

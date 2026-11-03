@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 3: Parts 25-35, Part 36a (deploy prep) and the f7b summary card committed (3 Nov 2026, after "Prof confirmed"). NEXT (Habiba, 4 Nov): follow docs/deploy-guide.md: `npm run pin` (new PIN) → commit → `npm run deploy-check` → `git push` → switch on GitHub Pages → tell Claude what the live link shows; then 36c (live test together, offline copy, demo-video script). Nothing is pushed yet.** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
+- Current part: **Round 3 done and PUSHED to GitHub (4 Nov 2026). Prof confirmed + the ethics check agreed: the database is ON, no files at all. NEXT (Habiba): switch on GitHub Pages (docs/deploy-guide.md, Step 1), test the live link with a TEST- code, then tell Claude; then 36c (offline copy, demo-video script). Before the pilot: delete the TEST- codes (backend-setup-guide, Step 11).**
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 3 Nov 2026 (Round 3, Part 34); `node --test` = 280 passing, 0 failing
@@ -361,6 +361,16 @@
   - Decided while building: "Your work" per phase: Ask = their own clear bonus question, or the question they picked ("your own choice"); Plan and Collect = their guess ("your own choice", Collect has no written answer); Graph Lab = what the graph can NOT tell; Number Lab = why they changed their guess, or their guess; Chance Lab = "Likely: <reason>"; Conclude = the claim card's sentence. A fourth chip "🧑💡 your words and a hint" for a claim that mixes both (f7b had 3 chips). Answers logged before Round 3 show no chip.
   - The rooms pass the extra facts to finishPhase (question-studio, graph-lab, number-lab, chance-lab, evidence-board).
   - Checked in Chrome through all 7 phases the real way: 1366 with reduced motion (all 7 cards: the right colour, step, words, answer, chip, trail, next stop, button in view and focused, no text under 18px, no page errors) and 768 with motion (the lock opens; the only page errors are the known Part 21a page-fade one).
+- Part 36b (4 Nov 2026, Habiba: "my prof and ethics confirmed ... everything needs to be online ... commit and push"), 295 tests passing:
+  - js/config.js: the database is ON. The teacher logs in with the email + password in the database (no change needed: gate.js already does this when it is on).
+  - No files any more: removed the child's "📤 Save my work" (JSON) and "save it as a table (CSV)" from My journey, and the teacher's "📂 Import files" button, its handler, "Remove all imported files", the imports storage (save.js), and the file format that only those used (buildExport / FORMAT_VERSION in export.js, parseExportFile in summary.js) with their 4 tests. Kept: the teacher's downloads made from the online data (thesis-metrics.csv, the data dictionary, the full class log). With the database switched off, the dashboard can now only show DEMO.
+  - Kept on purpose: the browser stores each moment until it is sent (offline-first, Round 2), so a dropped Wi-Fi loses nothing. Children never see or handle it.
+  - The PIN stays as it is, stored only as a hash (Habiba's decision): online it is never asked. deploy-check no longer blocks on it.
+  - tests/deploy.test.js: the database is on with a Supabase URL and a publishable key; no file saving or import is left.
+  - Checked the real database read-only (4 Nov 2026): without a login, asking for children's work returns nothing ([]), the login service answers, and public sign-up is off. Nothing was written to it.
+  - Checked in Chrome: My journey has no file buttons and says the work goes to the teacher by itself; the teacher page asks for email + password, with no file picker; no page errors.
+  - Docs updated: CLAUDE.md (Round 2 files line, ethics line, Round 3 live-site line), architecture.md 10.4-10.5, privacy-note.md (approved), device-test-checklist.md (section 4: online), backend-setup-guide.md (ethics), deploy-guide.md (rewritten: only switching on Pages is left), round-3-plan.md (Part 36).
+  - Not tested by Claude: the teacher's real login (needs Habiba's password) and a child's answer arriving in the real database (that writes to it). Both are in the deploy guide's Step 2, with a TEST- code.
 - Habiba: try Round 3 on a real tablet or Chromebook (touch drag of hint answers, the tutorial's timing for a slow reader) and keyboard-only.
 - Decided 3 Nov 2026 (Habiba, option a): the small navigation labels (step names, mini stepper chips, code / sound / online line) stay at 14 to 16px; they are short labels, not reading text, and 18px would make the step chips wrap on a tablet.
 - Part 36 (deploy) stays locked until Habiba writes "Prof confirmed".

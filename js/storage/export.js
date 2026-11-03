@@ -1,26 +1,8 @@
-// Layer 4: turns the reasoning log into files the child hands in to the teacher.
-// Nothing is sent anywhere: the browser just saves a file to Downloads.
+// Layer 4: the teacher's downloads (the class log and the thesis tables), made
+// from the work in the online database. Nothing is sent anywhere: the browser
+// just saves a file to Downloads. (Children no longer save files: 4 Nov 2026.)
 
-// Version 2 (Part 15) adds `progress` and the phase-start / phase-complete
-// log events. The teacher view still reads version 1 files.
-export const FORMAT_VERSION = 2;
-
-// The JSON file: everything about one child's work, under the code only.
-// `progress` is the finished phases per scenario, e.g. { "sleep-hours": ["ask", "plan"] }.
-export function buildExport(code, entries, now = new Date(), progress = {}) {
-  return {
-    app: 'DataScope: The Evidence Lab',
-    formatVersion: FORMAT_VERSION,
-    exportedAt: now.toISOString(),
-    code,
-    note: 'The survey data in DataScope is synthetic (a pretend class), made for teaching. '
-      + 'This file holds one child\'s reasoning log under an anonymous code.',
-    progress,
-    entries,
-  };
-}
-
-// e.g. "datascope-OWL-07-2026-10-22.json". Uses the device's own (local) date:
+// e.g. "datascope-class-2026-10-22.csv". Uses the device's own (local) date:
 // toISOString() is UTC, which in Egypt would say "yesterday" just after midnight.
 export function exportFileName(code, extension, now = new Date()) {
   const two = (n) => String(n).padStart(2, '0');

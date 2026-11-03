@@ -355,8 +355,15 @@ Teacher's browser ── email + password login ──► reads log_entries, tea
 - `thesis-metrics.csv`: 8 new columns at the end (the sources and `suggestionsUsed`); the data dictionary explains them. Older logs leave them empty, never guessed.
 - **Honest limit for the Results chapter:** a tapped answer is not evidence of the child's reasoning. Only own and hint-edited answers are, and even a one-letter edit counts as hint-edited (the original suggestion is saved next to it).
 
-### 10.4 Still open
+### 10.4 Changed on 4 Nov 2026 (after "Prof confirmed" and the ethics check)
 
-- Deployment (Part 36): locked until "Prof confirmed". The live site will run with the database off until the GIU ethics check is cleared.
+- **The database is on** for the live site: children's work goes online by itself, and the teacher logs in with the email and password in the database.
+- **No files:** the child's "Save my work" files and the teacher's file import are removed. The browser keeps each moment only until it is sent (offline-first, so a dropped connection loses nothing).
+- **The teacher PIN stays** as it is, stored only as a hash; it is only asked when the database is switched off.
+- Fonts and Chart.js are stored with the app; a deploy check and a path test guard every push (`docs/deploy-guide.md`).
+
+### 10.5 Still open
+
+- Switching on GitHub Pages: Habiba, from github.com (`docs/deploy-guide.md`).
 - Testing on a real tablet or Chromebook, and keyboard-only: Habiba.
 - Rubric coding of claims (Papers 7 and 13), data retention and consent wording: as in 9.5.

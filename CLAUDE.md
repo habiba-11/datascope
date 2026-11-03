@@ -136,9 +136,9 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 ## Round 2 (Prof feedback, 25 Oct 2026)
 - The Round 2 plan lives in `docs/round-2-plan.md` (Parts 13 to 24). Read it right after `docs/build-progress.md` at the start of every session. It replaces Parts 11 to 12 of the build plan above (deploy is now Part 24).
 - **Backend (decided 27 Oct 2026, replaces "optional bonus"):** Supabase (PostgreSQL + row-level security + teacher login), called with plain `fetch()` (no Supabase library). Settings in `js/config.js` (`enabled` switch). Offline-first: the log is saved in the browser at once and sent to the database when online (retry, no duplicates).
-  - **No files for children or the teacher:** with the database on, children's work goes online by itself and the teacher sees it on the dashboard after an email + password login (replaces the PIN). File import/export stays only as a fallback when the database is off.
+  - **No files for children or the teacher:** with the database on, children's work goes online by itself and the teacher sees it on the dashboard after an email + password login (replaces the PIN). **Changed 4 Nov 2026 (Habiba): no files at all.** The child's "Save my work" files and the teacher's file import were removed; everything goes online. The browser keeps each moment only until it is sent (offline-first).
   - **Security:** children (publishable key) may only ADD log entries; only a logged-in teacher (listed in the `teachers` table) may read or delete. Never put the secret key in the website.
-  - **Ethics:** test with made-up codes (e.g. TEST-01) and DEMO data only until Prof and the GIU ethics check say yes.
+  - **Ethics:** Prof and the GIU ethics check agreed (Habiba, 4 Nov 2026), so real children's work may go online, under anonymous codes only. Delete the TEST- codes from the database before the pilot (`docs/backend-setup-guide.md`, Step 11).
   - Beginner setup guide: `docs/backend-setup-guide.md`. Database script: `backend/schema.sql`.
 - **Rewards stay about good reasoning, never speed.** No timers, no leaderboards, no comparing children.
 - **Demo data is labelled DEMO** everywhere it appears and is **never exported**.
@@ -156,4 +156,4 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 - **Mean task:** keep 5 numbers, with a worked example beside the question. All-same answers are correct and logged as `allSame`.
 - **Room summary:** a "📖 About this room" tab on the task card. The pop-up still opens once, and the (i) button is removed.
 - **Checker:** accepts specific and regular time phrases, and vague words still ask "When?" (Paper 28).
-- **Live site:** database off until the GIU ethics check is cleared. The repo stays public.
+- **Live site (changed 4 Nov 2026):** the database is ON (Prof and the ethics check agreed). The teacher logs in with the email + password in the database. The PIN stays as it is, stored only as a hash; it is only asked when the database is off. Claude commits and pushes; Habiba switches on GitHub Pages herself. The repo stays public.

@@ -110,8 +110,8 @@ Not part of this plan: the literature review, which comes after everything is co
 **Tests:** all green, no console errors, accessibility audit.
 **You should see:** every Prof comment ticked off in the change summary.
 
-### Part 36: Deployment (comment 9) (LOCKED)
-**Do not start until Habiba writes "Prof confirmed".**
+### Part 36: Deployment (comment 9)
+**Unlocked: Habiba wrote "Prof confirmed" (3 Nov 2026). Changed 4 Nov 2026: the database is ON (ethics agreed), no files at all, the PIN stays as it is (hashed); Claude pushes, Habiba switches on GitHub Pages herself.**
 **Files:** `js/config.js`, the HTML pages, `docs/`, `js/helpers/pin.js`, a new beginner deploy guide.
 **Build:** a step-by-step guide. Database off until the GIU ethics check is cleared. Local copies of fonts and Chart.js. Change the PIN and remove it from the docs. Turn on GitHub Pages from `main`. Smoke-test the link. Build the offline copy and demo-video script.
 **Risks:** everything in the public repo is also served on the site. Linux hosting is case-sensitive, unlike Windows.

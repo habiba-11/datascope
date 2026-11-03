@@ -74,19 +74,6 @@ h2 {
   color: var(--color-text);
 }
 
-/* The real file picker is hidden; the big label button opens it. */
-.file-btn input[type="file"] {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-}
-
-.file-btn:focus-within {
-  outline: 3px solid var(--color-collect);
-  outline-offset: 3px;
-}
-
 .feedback {
   background: white;
   border: 2px dashed var(--color-navy);

@@ -1,15 +1,15 @@
 // Teacher dashboard (Part 20, Prof's comment 6; layout 27 Oct 2026).
-// A top bar (who is logged in, Refresh / Import, Log out) and 4 tabs:
+// A top bar (who is logged in, Refresh, Log out) and 4 tabs:
 //   📊 Class        the big picture: key numbers and two charts
 //   👧 Children     a short list; "Open" shows one child's page (detail.js)
 //   📥 Thesis data  optional downloads, and the DEMO switch
 //   ⚙️ Settings     this device: clear it, preview the rooms
-// Where the children's work comes from:
-// - online database ON (Part 22): read straight from the database (cloud.js),
-//   nothing to import; loaded by gate.js after the email + password login.
-// - online database OFF: the teacher imports the files children saved.
+// Where the children's work comes from: the online database (Part 22), read
+// straight from it (cloud.js) after the email + password login (gate.js).
+// No files (decided 4 Nov 2026, after Prof and the ethics check agreed): with
+// the database switched off, the dashboard can only show the DEMO children.
 // Text from a log is shown with textContent only: it can hold anything a child typed.
-import { parseExportFile, MISCONCEPTION_TAGS, tagEntries } from '../helpers/summary.js';
+import { MISCONCEPTION_TAGS, tagEntries } from '../helpers/summary.js';
 import { childRows, classOverview } from '../helpers/metrics.js';
 import { PHASES } from '../helpers/progress.js';
 import { PICKABLE_SCENARIOS, loadRecipe, loadContent } from '../helpers/scenarios.js';
@@ -18,7 +18,7 @@ import { thesisCSV, dictionaryCSV, exportableRows } from '../helpers/thesis.js';
 import { makeDemoFiles } from '../helpers/demo.js';
 import { directLabelsPlugin } from '../helpers/charts.js';
 import {
-  getTeacherImports, setTeacherImports, getTeacherTags, setTeacherTags, clearChildData,
+  getTeacherTags, setTeacherTags, clearChildData,
   getPreviewAll, setPreviewAll,
 } from '../storage/save.js';
 import { renderDetail } from './detail.js';
@@ -31,7 +31,7 @@ import {
 
 const cloud = backendReady(); // true: the work comes from the online database
 
-let imports = cloud ? {} : getTeacherImports(); // { "OWL-07": file, ... }
+let imports = {}; // every child's work from the database: { "OWL-07": { code, entries }, ... }
 let tags = cloud ? {} : getTeacherTags();       // { "OWL-07": ["equally-likely", ...], ... }
 const titles = {};                 // scenario id -> card title, e.g. "How much do we sleep?"
 const partners = {};               // reading Class A -> Class B (not a scenario of its own)
@@ -141,7 +141,7 @@ function renderChildren(rows) {
     const emptyRow = el('tr');
     const emptyCell = el('td', cloud
       ? 'No children yet. Their work appears here by itself when they use DataScope.'
-      : 'No files yet. Tap "📂 Import files" at the top.');
+      : 'The online database is switched off. Tap "🧪 Show DEMO data" in Thesis data to try the dashboard.');
     emptyCell.colSpan = 6;
     emptyRow.append(emptyCell);
     body.append(emptyRow);
@@ -256,28 +256,6 @@ function onTabChange(tabId) {
   if (tabId === 'tab-class' && Object.keys(titles).length) renderClass(currentRows());
 }
 
-// ---------- importing (online database OFF only) ----------
-
-document.getElementById('file-input').addEventListener('change', async (event) => {
-  let added = 0;
-  const skipped = [];
-  for (const upload of event.target.files) {
-    const result = parseExportFile(await upload.text());
-    if (!result.ok) {
-      skipped.push(`${upload.name} (${result.reason})`);
-      continue;
-    }
-    // The same child may hand in twice: keep the newest file.
-    const old = imports[result.file.code];
-    if (!old || old.exportedAt < result.file.exportedAt) imports[result.file.code] = result.file;
-    added += 1;
-  }
-  setTeacherImports(imports);
-  event.target.value = ''; // so the same files can be chosen again later
-  say(`Imported ${added} file${added === 1 ? '' : 's'}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`);
-  render();
-});
-
 // ---------- 📥 Thesis data (real children only: DEMO rows are never exported) ----------
 
 document.getElementById('export-thesis-btn').addEventListener('click', () => {
@@ -316,16 +294,6 @@ demoBtn.addEventListener('click', () => {
   demoBtn.setAttribute('aria-pressed', String(showDemo));
   document.getElementById('demo-banner').hidden = !showDemo;
   closeChild();
-  render();
-});
-
-twoTapButton(document.getElementById('clear-btn'), '⚠️ Tap again to remove everything', () => {
-  imports = {};
-  tags = {};
-  setTeacherImports(imports);
-  setTeacherTags(tags);
-  closeChild();
-  say('All imported files and tags were removed from this device.');
   render();
 });
 
@@ -387,13 +355,10 @@ async function removeChild(code) {
 function setupSource() {
   const who = document.getElementById('dash-who');
   if (!cloud) {
-    who.textContent = '📁 Working from files imported on this device.';
-    document.getElementById('clear-note').textContent = 'After a child has saved their file, removes their code and work from this device, so the next child starts fresh.';
+    who.textContent = '📴 The online database is switched off (js/config.js), so only the DEMO children can be shown.';
     return;
   }
   who.textContent = `☁️ Logged in as ${teacherEmail()}. Children's work arrives by itself.`;
-  document.getElementById('import-label').hidden = true;
-  document.getElementById('imported-box').hidden = true; // nothing is imported online
   document.getElementById('refresh-btn').hidden = false;
   document.getElementById('logout-btn').hidden = false;
   document.getElementById('clear-note').textContent = 'When a child\'s work shows ☁️ Saved online, removes their code from this device, so the next child starts fresh. (Their work stays safe in the database.)';

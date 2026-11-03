@@ -189,9 +189,8 @@ export function startNewInvestigation() {
   }
 }
 
-// Teacher view: the children's imported files and the teacher's tags,
-// both stored as { code: ... } objects on the teacher's device.
-const IMPORTS_KEY = 'datascope:teacherImports';
+// Teacher view with the database switched off: the teacher's tags, stored as
+// { code: [...] } on the teacher's device. (Online, the tags are in the database.)
 const TAGS_KEY = 'datascope:teacherTags';
 
 function readObject(key) {
@@ -200,14 +199,6 @@ function readObject(key) {
   } catch {
     return {};
   }
-}
-
-export function getTeacherImports() {
-  return readObject(IMPORTS_KEY);
-}
-
-export function setTeacherImports(imports) {
-  writeItem(IMPORTS_KEY, JSON.stringify(imports));
 }
 
 export function getTeacherTags() {
