@@ -6,7 +6,7 @@ import { stagger } from '../motion.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
 import { loadContent } from '../helpers/scenarios.js';
 import { getSelectedScenarioId } from '../storage/save.js';
-import { toPct, theoryText, trialMessage, needleAngle } from '../helpers/chance.js';
+import { toPct, theoryText, theoryWords, outcomeRows, trialMessage, needleAngle } from '../helpers/chance.js';
 import { certaintyButtonsHTML } from '../helpers/certainty.js';
 import { pipSay } from '../pip.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
@@ -87,28 +87,14 @@ async function init() {
         </section>
 
         <section class="task" data-task="3" hidden>
-          <div class="card-panels">
-            <div class="trial-side">
-              <div class="trial-device" id="trial-device" aria-hidden="true"></div>
-              <p class="trial-result" id="trial-result"></p>
-              ${segmentedHTML(RUN_SIZES.map((n) => ({ value: n, label: String(n) })), 'How many times')}
-            </div>
-            <div class="compare-side">
-              <h2 class="panel-title">Should happen vs. did happen</h2>
-              <p class="compare-key"><span class="key-should" aria-hidden="true"></span> 🎯 Should (theory) <span class="key-did" aria-hidden="true"></span> 🧪 Did (our test)</p>
-              <div class="compare-grid" id="compare-grid" hidden>
-                <div class="compare-col">
-                  <h3>🎯 Should happen</h3>
-                  <div id="theory-bars" class="bars"></div>
-                </div>
-                <div class="compare-col">
-                  <h3>🧪 Did happen</h3>
-                  <div id="experiment-bars" class="bars"></div>
-                </div>
-              </div>
-              <p class="compare-empty" id="compare-empty">Run a test to see the bars.</p>
-            </div>
+          <div class="trial-side">
+            <div class="trial-device" id="trial-device" aria-hidden="true"></div>
+            <p class="trial-result" id="trial-result"></p>
+            ${segmentedHTML(RUN_SIZES.map((n) => ({ value: n, label: String(n) })), 'How many times')}
           </div>
+          <h2 class="panel-title">Should happen vs. did happen</h2>
+          <div class="outcome-rows" id="outcome-rows" hidden></div>
+          <p class="compare-empty" id="compare-empty">Run a test to see the bars.</p>
           <p class="feedback" id="trial-feedback" hidden></p>
         </section>`,
     }),
@@ -343,14 +329,23 @@ function runTrial(device) {
   return device.outcomes[device.outcomes.length - 1];
 }
 
-function barRow(label, pct, text, fillClass) {
-  return `
-    <div class="bar-row">
-      <span class="bar-label">${label}</span>
+// One outcome: its "should" bar (striped) right above its "did" bar (solid), each
+// with its word, so the two can be compared without looking somewhere else.
+function outcomeRowHTML({ name, shouldPct, shouldText, didPct, didText }) {
+  const line = (word, pct, text, fillClass) => `
+    <div class="bar-line">
+      <span class="bar-word">${word}</span>
       <div class="bar-track"><div class="bar-fill ${fillClass}" style="width:${pct}%"></div></div>
-      <span class="bar-pct">${text}</span>
-    </div>
-  `;
+      <span class="bar-value">${text}</span>
+    </div>`;
+  return `
+    <div class="outcome-row">
+      <span class="outcome-name">${name}</span>
+      <div class="outcome-bars">
+        ${line('🎯 Should', shouldPct, shouldText, 'theory')}
+        ${line('🧪 Did', didPct, didText, 'experiment')}
+      </div>
+    </div>`;
 }
 
 // What the primary button runs on the test step (set up in setupTrials).
@@ -365,9 +360,7 @@ function setupTrials() {
   });
   document.querySelector('.segment[data-value="10"]').click();
 
-  const compareGrid = document.getElementById('compare-grid');
-  const theoryBars = document.getElementById('theory-bars');
-  const experimentBars = document.getElementById('experiment-bars');
+  const rows = document.getElementById('outcome-rows');
   const feedback = document.getElementById('trial-feedback');
 
   runTrials = () => {
@@ -383,21 +376,15 @@ function setupTrials() {
     }
     playTrialDevice(selectedDevice, lastOutcome);
 
-    const theoryFor = (i) => theoryText(selectedDevice.weights[i], totalWeight);
-
-    theoryBars.innerHTML = selectedDevice.outcomes
-      .map((o, i) => barRow(o, toPct(selectedDevice.weights[i], totalWeight), theoryFor(i), 'theory'))
-      .join('');
-
     // For 10, 50 and 500 trials one decimal place is always exact, so these add up to 100%.
-    experimentBars.innerHTML = selectedDevice.outcomes
-      .map((o) => barRow(o, toPct(results.get(o), count), `${toPct(results.get(o), count)}% (${results.get(o)})`, 'experiment'))
+    rows.innerHTML = outcomeRows(selectedDevice.outcomes, selectedDevice.weights, results, count)
+      .map(outcomeRowHTML)
       .join('');
 
-    compareGrid.hidden = false;
+    rows.hidden = false;
     document.getElementById('compare-empty').hidden = true;
     // The "did happen" bars grow from nothing, one after another.
-    stagger(experimentBars.querySelectorAll('.bar-fill'), { each: 0.1, from: { width: 0 }, keepStyle: true });
+    stagger(rows.querySelectorAll('.bar-fill.experiment'), { each: 0.1, from: { width: 0 }, keepStyle: true });
 
     const targetIndex = selectedDevice.outcomes.indexOf(selectedDevice.target);
     const timesHit = results.get(selectedDevice.target);
@@ -406,16 +393,16 @@ function setupTrials() {
 
     feedback.textContent = trialMessage({
       count, verb: selectedDevice.verb, target: selectedDevice.target, timesHit,
-      pct: experimentPct, theory: theoryFor(targetIndex), previous: previousRun, gap,
+      pct: experimentPct, theory: theoryWords(selectedDevice.weights[targetIndex], totalWeight), previous: previousRun, gap,
     });
     feedback.hidden = false;
     logEvent('chance-lab', 'trials', {
       device: selectedDevice.label, outcome: selectedDevice.target, trials: count, timesHit,
-      experimentalPct: experimentPct, theory: theoryFor(targetIndex),
+      experimentalPct: experimentPct, theory: theoryText(selectedDevice.weights[targetIndex], totalWeight),
     });
     previousRun = { count, pct: experimentPct, gap };
     chanceFacts.target = selectedDevice.target;
-    chanceFacts.theoryText = theoryFor(targetIndex);
+    chanceFacts.theoryText = theoryWords(selectedDevice.weights[targetIndex], totalWeight);
     chanceFacts.runSizes.push(count);
     if (count === 500) chanceFacts.pct500 = experimentPct;
 

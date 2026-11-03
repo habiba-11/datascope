@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { tallyKeys, colourFor, seatLabels, countAnswers } from '../js/helpers/tally.js';
+import { tallyKeys, colourFor, seatLabels, countAnswers, tallyWords } from '../js/helpers/tally.js';
 import sleep from '../data/scenarios/sleep-hours.json' with { type: 'json' };
 import games from '../data/scenarios/playground-game.json' with { type: 'json' };
 
@@ -27,4 +27,12 @@ test('seat labels: numbers as they are, words by their first letter unless two w
 test('the tally counts each answer, and answers nobody gave stay at 0', () => {
   const counts = countAnswers([3, 7, 8], [7, 7, 3]);
   assert.deepEqual([...counts.entries()], [[3, 1], [7, 2], [8, 0]]);
+});
+
+test('the tally uses the same words as the charts, or plain numbers for two classes', () => {
+  const shoes = { valueLabel: 'Size {value}' };
+  assert.deepEqual(tallyWords(34, 5, shoes), { value: 'Size 34', count: '5 kids' });
+  assert.deepEqual(tallyWords(34, 1, shoes), { value: 'Size 34', count: '1 kid' });
+  assert.deepEqual(tallyWords(34, 0, shoes), { value: 'Size 34', count: '' });
+  assert.deepEqual(tallyWords(20, 4, { valueLabel: '{value} min' }, true), { value: '20', count: '4' });
 });

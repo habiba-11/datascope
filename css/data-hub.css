@@ -2,6 +2,18 @@
    in task-card.css; here: the seats, the tally and the progress bar.
    Only transform and opacity move. */
 
+/* Seats and tally side by side; on a tablet the tally goes underneath, with
+   the full width, so long words like "Basketball" fit whole at 18px. */
+.hub-panels {
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+}
+
+@media (min-width: 1000px) {
+  .hub-panels {
+    grid-template-columns: 2fr 3fr; /* the tally's words need more room than the seats */
+  }
+}
+
 /* "Our pretend class": one round seat per classmate, in a dashed frame. */
 .seats {
   list-style: none;
@@ -68,7 +80,7 @@
 }
 
 .progress-text {
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -77,7 +89,7 @@
 .tally {
   display: flex;
   gap: var(--space-1);
-  align-items: flex-end;
+  align-items: flex-start; /* the bars line up, even if one label takes two lines */
   padding-top: 28px; /* room for the count above the tallest bar */
 }
 
@@ -119,14 +131,17 @@
   text-align: center;
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: 20px;
+  font-size: 18px;
+  white-space: nowrap;
   transition: transform var(--duration-medium) var(--ease-spring);
 }
 
 .tally-label {
+  width: 100%; /* stays in its column, so a long word wraps instead of overlapping */
   margin-top: 6px;
   font-weight: 800;
-  font-size: 16px;
+  font-size: 18px;
+  line-height: 1.15;
   text-align: center;
   hyphens: auto; /* "Basket-ball", not "Basketbal-l" */
   overflow-wrap: break-word;
@@ -134,8 +149,7 @@
 
 .tally-unit {
   margin: var(--space-1) 0 0;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--color-muted-text);
+  font-size: 18px;
+  font-weight: 800;
   text-align: center;
 }

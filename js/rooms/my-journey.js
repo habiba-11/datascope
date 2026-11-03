@@ -10,6 +10,7 @@ import { loadRecipe, loadContent } from '../helpers/scenarios.js';
 import { numberLabKind } from '../helpers/number-tasks.js';
 import { CERTAINTY } from '../helpers/certainty.js';
 import { readLog } from '../helpers/log.js';
+import { shownTheory } from '../helpers/chance.js';
 import {
   getSelectedScenarioId, getExplorerCode, getAllProgress, getDonePhases, startNewInvestigation,
 } from '../storage/save.js';
@@ -72,7 +73,7 @@ function stopLines(phase, p, { cardTitle, kind }) {
       if (p.rating) lines.push(`${p.device}: you said "${p.rating}" because "${p.reason}".`);
       if (p.biggestRun) {
         const r = p.biggestRun;
-        lines.push(`${r.trials} tries: ${r.outcome} came up ${r.pct}%. It should be ${r.theory}.`);
+        lines.push(`${r.trials} tries: ${r.outcome} came up ${r.pct}%. It should be ${shownTheory(r.theory)}.`);
       }
       break;
     case 'conclude':

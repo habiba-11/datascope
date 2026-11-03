@@ -2,6 +2,7 @@
 // Each answer gets one colour, the same on its seat and on its tally bar, so
 // a child sees "one answer -> one bar step" (UI guide, Collect motion).
 import { compareValues } from './stats.js';
+import { valueText, countText } from './charts.js';
 
 export const TALLY_COLOURS = ['ask', 'plan', 'collect', 'explore', 'conclude'];
 
@@ -32,6 +33,18 @@ export function seatLabels(keys) {
     labels.set(key, key.slice(0, size));
   }
   return labels;
+}
+
+// The words on a tally bar, the same as on the charts: "Size 34" under it, "5
+// kids" on it. `plain`: two tallies side by side have little room, so they use
+// plain numbers (the title under the tally says what they are). No count until
+// someone has given that answer.
+export function tallyWords(key, count, recipe, plain = false) {
+  const shownCount = plain ? String(count) : countText(count);
+  return {
+    value: plain ? String(key) : valueText(key, recipe),
+    count: count ? shownCount : '',
+  };
 }
 
 // How many classmates gave each answer so far (every answer starts at 0).

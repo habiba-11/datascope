@@ -6,9 +6,36 @@ export function toPct(part, whole) {
   return Math.round((part / whole) * 1000) / 10;
 }
 
-// Theory as "1 in 6 (about 16.7%)", so six rounded numbers never look like 102%.
+// Theory as saved in the reasoning log: "1 in 6 (about 16.7%)". One decimal, so
+// six rounded numbers never look like 102%. Kept as it is for the thesis data.
 export function theoryText(weight, totalWeight) {
   return `${weight} in ${totalWeight} (about ${toPct(weight, totalWeight)}%)`;
+}
+
+// Theory as a child sees it, with no brackets (Prof's comment 7): "1 in 6, about 16.7%".
+export function theoryWords(weight, totalWeight) {
+  return `${weight} in ${totalWeight}, about ${toPct(weight, totalWeight)}%`;
+}
+
+// The same words from a theory saved in the log (My journey, older entries too).
+export function shownTheory(logged) {
+  return logged.replace(' (about ', ', about ').replace(')', '');
+}
+
+// One row per outcome: what should happen and what did happen, side by side.
+// Each number says what it is ("6 of 50", never a bare number in brackets).
+export function outcomeRows(outcomes, weights, results, count) {
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  return outcomes.map((name, i) => {
+    const times = results.get(name);
+    return {
+      name,
+      shouldPct: toPct(weights[i], totalWeight),
+      shouldText: theoryWords(weights[i], totalWeight),
+      didPct: toPct(times, count),
+      didText: `${times} of ${count}, ${toPct(times, count)}%`,
+    };
+  });
 }
 
 // Honest feedback in Grade 5 words: it says what this test really showed.
@@ -16,11 +43,11 @@ export function theoryText(weight, totalWeight) {
 // than the last one. `verb` is the device's own word: flips, rolls, spins.
 export function trialMessage({ count, verb, target, timesHit, pct, theory, previous, gap }) {
   const times = timesHit === 1 ? 'time' : 'times';
-  let message = `${count} ${verb}: ${target} came up ${timesHit} ${times} (${pct}%). It should be ${theory}.`;
+  let message = `${count} ${verb}: ${target} came up ${timesHit} ${times}. That is ${pct}%. It should be ${theory}.`;
 
   if (previous && count > previous.count) {
     message += gap < previous.gap
-      ? ` 🎯 That's closer than your ${previous.count} ${verb} (${previous.pct}%).`
+      ? ` 🎯 That's closer than your ${previous.count} ${verb}, which gave ${previous.pct}%.`
       : ` 😮 This time it was NOT closer than ${previous.count} ${verb}. Chance can surprise us! Big tests are usually closer.`;
   } else if (count < 500) {
     message += ' Try a bigger test. Will it get closer?';

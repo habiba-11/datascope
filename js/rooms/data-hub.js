@@ -2,7 +2,8 @@ import { mountShell } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { mode } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
-import { tallyKeys, colourFor, seatLabels, countAnswers } from '../helpers/tally.js';
+import { tallyKeys, colourFor, seatLabels, countAnswers, tallyWords } from '../helpers/tally.js';
+import { valueText } from '../helpers/charts.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { playSound } from '../sounds.js';
 import { pipReacts } from '../motion.js';
@@ -33,6 +34,7 @@ async function init() {
     p: i === 0 ? 'a' : 'b',
     data: generateClassData(r),
     keys: tallyKeys(r),
+    plain: Boolean(partner), // two classes side by side: plain numbers, like the charts
     answers: [],
     done: false,
   }));
@@ -133,7 +135,7 @@ function classPanelsHTML(c, twoClasses) {
   const size = c.data.values.length;
   const seats = Array.from({ length: size }, (_, i) => `<li class="seat" id="${c.p}-seat-${i}"><span class="sr-only">Classmate ${i + 1}: not asked yet</span></li>`).join('');
   return `
-    <div class="card-panels" id="${c.p}-panels">
+    <div class="card-panels hub-panels" id="${c.p}-panels">
       <section>
         <h2 class="panel-title">${twoClasses ? shortName(c.recipe) : 'Our pretend class'}</h2>
         <ol class="seats" aria-label="Answers so far">${seats}</ol>
@@ -146,7 +148,7 @@ function classPanelsHTML(c, twoClasses) {
       <section>
         <h2 class="panel-title">Our tally so far</h2>
         <div class="tally" id="${c.p}-tally"></div>
-        <p class="tally-unit">${c.recipe.unit || ''}</p>
+        <p class="tally-unit">${c.recipe.chartAxis}</p>
       </section>
     </div>`;
 }
@@ -159,7 +161,7 @@ function comparePanelsHTML(classes) {
         <section>
           <h2 class="panel-title">${shortName(c.recipe)}</h2>
           <div class="tally" id="${c.p}-tally-compare"></div>
-          <p class="tally-unit">${c.recipe.unit || ''}</p>
+          <p class="tally-unit">${c.recipe.chartAxis}</p>
         </section>`).join('')}
     </div>`;
 }
@@ -173,7 +175,7 @@ function renderTally(c, allKeys, scaleMax, where = '') {
     tally.innerHTML = c.keys.map((key) => `
       <div class="tally-col" data-key="${key}" style="--bar: var(--color-${colourFor(allKeys, key)})">
         <div class="tally-track"><span class="tally-count"></span><div class="tally-bar"></div></div>
-        <span class="tally-label">${key}</span>
+        <span class="tally-label">${tallyWords(key, 0, c.recipe, c.plain).value}</span>
       </div>`).join('');
   }
   tally.querySelectorAll('.tally-col').forEach((col) => {
@@ -182,7 +184,7 @@ function renderTally(c, allKeys, scaleMax, where = '') {
     const share = count / scaleMax;
     col.querySelector('.tally-bar').style.transform = `scaleY(${share})`;
     const label = col.querySelector('.tally-count');
-    label.textContent = count || '';
+    label.textContent = tallyWords(key, count, c.recipe, c.plain).count;
     label.style.transform = `translateY(${-share * BAR_HEIGHT}px)`;
   });
 }
@@ -193,7 +195,6 @@ function renderTally(c, allKeys, scaleMax, where = '') {
 function runSurvey(c, allKeys, { onProgress, onDone }) {
   const { values } = c.data;
   const labels = seatLabels(c.keys);
-  const unit = c.recipe.unit || '';
   const said = document.getElementById(`${c.p}-said`);
 
   function revealNext() {
@@ -202,10 +203,10 @@ function runSurvey(c, allKeys, { onProgress, onDone }) {
     c.answers.push(value);
 
     const seat = document.getElementById(`${c.p}-seat-${i}`);
-    seat.innerHTML = `<span aria-hidden="true">${labels.get(value)}</span><span class="sr-only">Classmate ${i + 1}: ${value} ${unit}</span>`;
+    seat.innerHTML = `<span aria-hidden="true">${labels.get(value)}</span><span class="sr-only">Classmate ${i + 1}: ${valueText(value, c.recipe)}</span>`;
     seat.style.setProperty('--seat', `var(--color-${colourFor(allKeys, value)})`);
     seat.classList.add('seat--filled', 'm-pop');
-    said.textContent = `Classmate ${i + 1} said: ${value} ${unit}`;
+    said.textContent = `Classmate ${i + 1} said: ${valueText(value, c.recipe)}`;
 
     const scale = Math.max(1, ...countAnswers(c.keys, c.answers).values());
     renderTally(c, allKeys, scale);

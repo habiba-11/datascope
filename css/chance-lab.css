@@ -59,39 +59,19 @@
   font-weight: 700;
 }
 
+/* The device, its last result and the 10 / 50 / 500 switch, in one row. */
 .trial-side {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* The key for the two kinds of bar: striped = should, solid = did (and the words). */
-.compare-key {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px var(--space-1);
-  margin: 0 0 var(--space-2);
-  font-weight: 700;
-  font-size: 15px;
+  justify-content: center;
+  gap: var(--space-1) var(--space-3);
+  margin-bottom: var(--space-2);
 }
 
-.key-should,
-.key-did {
-  display: inline-block;
-  width: 22px;
-  height: 16px;
-  border: 2px solid var(--color-navy);
-  border-radius: 4px;
-}
-
-.key-should,
+/* "Should" bars are striped, "did" bars solid (and each line has its word). */
 .bar-fill.theory {
   background: repeating-linear-gradient(135deg, var(--color-collect-light) 0 5px, var(--color-card-bg) 5px 10px);
-}
-
-.key-did {
-  background: var(--color-explore);
 }
 
 .compare-empty {
@@ -99,36 +79,46 @@
   font-weight: 700;
 }
 
-.compare-grid {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-
-.compare-col {
-  flex: 1;
-  min-width: 220px;
-}
-
-.compare-col h3 {
-  font-size: 18px;
-  font-family: var(--font-heading);
-  margin: 0 0 8px;
-}
-
-.bar-row {
-  display: flex;
+/* One row per outcome (Prof's comment 7): big, bold, every number says what it is. */
+.outcome-row {
+  display: grid;
+  grid-template-columns: 84px 1fr;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  border-bottom: 2px solid var(--color-soft);
 }
 
-.bar-label {
-  width: 64px;
+.outcome-name {
+  font-family: var(--font-heading);
   font-weight: 800;
-  font-size: 16px;
-  flex-shrink: 0;
+  font-size: 24px;
+}
+
+.outcome-bars {
+  display: grid;
+  gap: 6px;
+}
+
+.bar-line {
+  display: grid;
+  grid-template-columns: 110px 1fr 220px;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* Narrow screens: the bar gets its own line. */
+@media (max-width: 720px) {
+  .bar-line {
+    grid-template-columns: 110px 1fr;
+  }
+
+  .bar-track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
 }
 
 .bar-track {
@@ -199,7 +189,7 @@
   margin: 4px 0 8px;
 }
 
-/* "Should" bars are striped (see .key-should above). */
+/* The end of a "should" bar is dashed. */
 .bar-fill.theory {
   border-right: 2px dashed var(--color-navy);
 }
@@ -224,13 +214,6 @@
   padding: 8px 12px;
   resize: vertical;
   margin-top: 6px;
-}
-
-.bar-pct {
-  width: 150px;
-  font-size: 13px;
-  font-weight: 700;
-  flex-shrink: 0;
 }
 
 /* The spinner drawing: slice sizes come from the device's weights (chance-lab.js). */
