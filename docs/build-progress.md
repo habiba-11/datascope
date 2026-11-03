@@ -1,10 +1,10 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 3: Parts 25-27 built (not committed yet), waiting for Habiba's check. Next: Part 28 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
+- Current part: **Round 3: Parts 25-27 committed; Parts 28-29 built (not committed yet), waiting for Habiba's check. Next: Part 30 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
-- Last updated: 3 Nov 2026 (Round 3, Part 27); `node --test` = 241 passing, 0 failing
+- Last updated: 3 Nov 2026 (Round 3, Part 29); `node --test` = 250 passing, 0 failing
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -269,8 +269,23 @@
   - Known: bar charts still space values evenly (3 to 7 hours looks like 7 to 8). The plan only asked to fix the line chart.
   - Checked in Chrome, 4 scenarios at 1366 and 768, plus the chart beside the question: no sideways scroll, no page errors.
 
+- Part 28 (3 Nov 2026, Round 3, Prof comments 7 and 2), 245 tests passing:
+  - What the brackets were: in the "did" bars, how many times an outcome came up; in the "should" bars and the message, a percent. They meant different things in different places.
+  - Chance Lab test step: one row per outcome with "🎯 Should" and "🧪 Did" bars together (outcomeRows, tested), no brackets, all text at least 18px and bold: "1 in 6, about 16.7%" and "81 of 500, 16.2%". The chart now has the full width, under the device and the 10 / 50 / 500 switch. Kept one decimal (not the plan's "about 17%"): six rounded numbers must not look like 102%, and 16.7 compares easily with 18.4.
+  - The message and the feedback card drop their brackets too; My journey shows older log entries the same way (shownTheory). The reasoning log's `theory` field keeps its format ("1 in 6 (about 16.7%)"), so thesis data stays comparable.
+  - Data Hub tally: "Size 34" and "5 kids", all text 18px, title under it from the recipe ("Shoe size"). Two classes use plain numbers, like the charts (tallyWords, tested). "Classmate 7 said: Size 34" (was "34 EU size"). Long game names did not fit on a tablet, so there the tally now sits under the seats, with the full width.
+  - Checked in Chrome, coin, dice and unfair spinner plus all 4 Data Hub scenarios at 1366 and 768: no brackets on screen, nothing under 18px, no sideways scroll, no page errors. Google Fonts was timing out at the time, so these were checked with a wider fallback font; the game names were measured again with real Nunito once it came back (one line each at both sizes). With the fallback font alone, "Basketball" and "Hopscotch" wrap by one letter on a laptop (local fonts in Part 36 remove this).
+
+- Part 29 (3 Nov 2026, Round 3, Prof comment 5), 250 tests passing:
+  - "Build it" keeps 5 numbers (reverse calculation, Paper 9), with a worked example beside the boxes (under them on a tablet): 4, 4, 4, 4, 4 with its total, then 3 ⬇, 5 ⬆, 4, 4, 4 with the same total, "The total stays the same, so the mean stays 4!". buildExample in number-tasks.js computes it (tested with stats.js); its mean is never the child's target (a task with mean 4 would get 5).
+  - All-the-same answers are correct and never block: the build-mean log entry now has allSame (true or false), and Pip asks "Can you make them different? Try one down, one up." If the child then changes them, Pip notices with no button, and a new event build-varied is logged (once). The wrong-try tip is unchanged. Rewards unchanged: the Number Cracker badge counts the task as before.
+  - trackMeaningTask's solved() can now add details known only at the end.
+  - Checked in Chrome for sleep, shoes and reading at 1366 and 768: a wrong try, all the same, the challenge, different numbers first time; no sideways scroll, no page errors.
+  - Not checked with real children: whether this is really faster. That is what the pilot can show.
+  - Found while here, for Part 35's audit: the stat card labels (13px) and the sort card's "centre" (14px) are under the 18px rule.
+
 ## Next
-- Round 3 next: Habiba checks Parts 25-27; then Part 28.
+- Round 3 next: Habiba checks Parts 28-29; then Part 30.
 - Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).
@@ -282,7 +297,7 @@
 - Graph Lab: bar colours repeat after 5 values (labels carry the meaning).
 - The playground guess shows 5 games (more than 3-4 options), because the choices must match the data.
 - Not yet tested on a real Chromebook/tablet or with a real screen reader.
-- Fonts and Chart.js still load from the internet (local copies come with deploy, Part 24). GSAP is already local.
+- Fonts and Chart.js still load from the internet (local copies come with deploy, now Part 36). GSAP is already local. Seen on 3 Nov 2026: when Google Fonts timed out, pages did not finish loading for many seconds, so on weak school Wi-Fi this matters.
 - Checker: "Do you know what game you like today?" still passes: any open word (what, how...) anywhere in a question cancels the yes/no warning. Not in the agreed bug list, so left as it is.
 
 ## Decisions log

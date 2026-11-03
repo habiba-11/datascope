@@ -56,6 +56,17 @@ test('a tracked task logs one result, even if solved() is called twice', () => {
   assert.equal(added[0].wrongTries, 1);
 });
 
+test('solved() can add what is only known at the end, and the build-varied event is known', () => {
+  setExplorerCode('OWL-07');
+  const before = readLog().length;
+  trackMeaningTask('number-lab', 'build-mean', { target: 8 }).solved({ allSame: true });
+  const [entry] = readLog().slice(before);
+  assert.equal(entry.allSame, true);
+  assert.equal(entry.target, 8);
+  assert.equal(entry.result, 'correct');
+  assert.equal(makeEntry('OWL-07', 'number-lab', 'build-varied', { target: 8 }).type, 'build-varied');
+});
+
 test('clearing a shared device removes the code and the log', () => {
   setExplorerCode('OWL-07');
   logEvent('number-lab', 'revision', { changed: true, oldGuess: 7, newGuess: 9, reason: 'most kids said 9' });

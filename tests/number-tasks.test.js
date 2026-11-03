@@ -2,13 +2,43 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  numberLabKind, TASKS_BY_KIND, fillTemplate, buildTarget, miaSays, choicesFor, revealMessage, classStats,
+  numberLabKind, TASKS_BY_KIND, fillTemplate, buildTarget, buildExample, isAllSame, miaSays, choicesFor, revealMessage, classStats,
 } from '../js/helpers/number-tasks.js';
-import { median, mode } from '../js/helpers/stats.js';
+import { mean, median, mode } from '../js/helpers/stats.js';
+import { longestSentence } from '../js/helpers/readability.js';
 import { generateClassData } from '../js/helpers/generator.js';
 import { PICKABLE_SCENARIOS } from '../js/helpers/scenarios.js';
 
 const read = (path) => JSON.parse(readFileSync(new URL(`../data/${path}`, import.meta.url), 'utf8'));
+
+test('the worked example is right: the same total and the same mean, before and after', () => {
+  const example = buildExample(8);
+  assert.equal(example.mean, 4);
+  assert.deepEqual(example.start, [4, 4, 4, 4, 4]);
+  assert.deepEqual(example.moved, [3, 5, 4, 4, 4]);
+  assert.equal(mean(example.start), mean(example.moved));
+  assert.equal(example.total, 20);
+});
+
+test('the worked example never gives away the answer', () => {
+  assert.equal(buildExample(4).mean, 5); // a task with mean 4 gets another example
+  for (const id of PICKABLE_SCENARIOS) {
+    const recipe = read(`scenarios/${id}.json`);
+    if (recipe.answerType !== 'number') continue;
+    const target = buildTarget(generateClassData(recipe).values);
+    assert.notEqual(buildExample(target).mean, target, id);
+  }
+});
+
+test('the worked example follows the Grade 5 rule (12 words or fewer per sentence)', () => {
+  const { title, startText, movedText, endText } = buildExample(8);
+  for (const text of [title, startText, movedText, endText]) assert.ok(longestSentence(text) <= 12, text);
+});
+
+test('all the same is noticed; different numbers are not', () => {
+  assert.equal(isAllSame([8, 8, 8, 8, 8]), true);
+  assert.equal(isAllSame([7, 9, 8, 8, 8]), false);
+});
 
 test('each scenario gets the right kind of Number Lab', () => {
   assert.equal(numberLabKind(read('scenarios/sleep-hours.json')), 'number');

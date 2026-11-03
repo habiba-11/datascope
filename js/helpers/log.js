@@ -23,6 +23,7 @@ export const EVENT_TYPES = [
   'chart-switch', // Graph Lab: the child tried another kind of graph (from, chartType)
   'cards-sorted', // Number Lab: the child put Mia's numbers in order (the card sort); centre = the median
   'badge-earned', // a badge patch was earned and shown (badgeId, phase; backfill: found in an older log)
+  'build-varied', // Number Lab: after 8, 8, 8, 8, 8 the child also made different numbers with the same mean
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];
@@ -90,7 +91,8 @@ const unsolvedTasks = new Set();
 
 // Follows one meaning task. Call wrong() after each wrong answer and
 // solved() when it is right. The result is logged only once.
-// `extra` is logged with it too (e.g. { scenarioId }).
+// `extra` is logged with it too (e.g. { scenarioId }); solved() can add more
+// that is only known at the end (e.g. { allSame }).
 export function trackMeaningTask(room, task, extra = {}) {
   let wrongTries = 0;
   let done = false;
@@ -100,19 +102,19 @@ export function trackMeaningTask(room, task, extra = {}) {
       wrongTries += 1;
       unsolvedTasks.add(tracker);
     },
-    solved() {
-      finish(true);
+    solved(details = {}) {
+      finish(true, details);
     },
     leftUnsolved() {
       finish(false);
     },
   };
 
-  function finish(solved) {
+  function finish(solved, details = {}) {
     if (done) return;
     done = true;
     unsolvedTasks.delete(tracker);
-    logEvent(room, 'meaning-task', { task, ...extra, result: meaningTaskResult(wrongTries, solved), wrongTries });
+    logEvent(room, 'meaning-task', { task, ...extra, ...details, result: meaningTaskResult(wrongTries, solved), wrongTries });
   }
 
   watchForLeaving();

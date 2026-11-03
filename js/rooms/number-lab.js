@@ -3,7 +3,7 @@ import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, formatMean, compareValues } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import {
-  numberLabKind, TASKS_BY_KIND, fillTemplate, buildTarget, miaSays, choicesFor, revealMessage, classStats,
+  numberLabKind, TASKS_BY_KIND, fillTemplate, buildTarget, buildExample, isAllSame, miaSays, choicesFor, revealMessage, classStats,
 } from '../helpers/number-tasks.js';
 import { logEvent, trackMeaningTask } from '../helpers/log.js';
 import { getSelectedScenarioId } from '../storage/save.js';
@@ -238,6 +238,26 @@ function statsHTML(stats) {
   return grid(stats.mean, stats.median, stats.mode, stats.range);
 }
 
+// The worked example beside "Build it". The ⬇ and ⬆ mark the two numbers that
+// changed (an icon as well as a colour), and the total shows nothing was lost.
+function buildExampleHTML(example) {
+  const chips = (numbers, start) => numbers.map((number, i) => {
+    let mark = '';
+    if (number < start[i]) mark = ' ⬇';
+    if (number > start[i]) mark = ' ⬆';
+    return `<span class="example-chip${mark ? ' example-chip--moved' : ''}">${number}${mark}</span>`;
+  }).join('');
+  return `
+    <aside class="build-example" aria-label="A worked example">
+      <p class="build-example-title">${example.title}</p>
+      <p>${example.startText}</p>
+      <div class="example-row">${chips(example.start, example.start)}<span class="example-total">Total: ${example.total}</span></div>
+      <p>${example.movedText}</p>
+      <div class="example-row">${chips(example.moved, example.start)}<span class="example-total">Total: ${example.total}</span></div>
+      <p class="build-example-end">${example.endText}</p>
+    </aside>`;
+}
+
 const TASK_HTML = {
   predict: (n, { values }) => `
     <section class="task" data-task="${n}">
@@ -264,9 +284,14 @@ const TASK_HTML = {
 
   build: (n, { values }) => `
     <section class="task" data-task="${n}" hidden>
-      <p>${fillTemplate(content.build, { target: buildTarget(values) })}</p>
-      <div class="build-row">
-        ${[1, 2, 3, 4, 5].map((i) => `<input type="number" class="build-input" aria-label="Number ${i}">`).join('')}
+      <div class="build-layout">
+        <div>
+          <p>${fillTemplate(content.build, { target: buildTarget(values) })}</p>
+          <div class="build-row">
+            ${[1, 2, 3, 4, 5].map((i) => `<input type="number" class="build-input" aria-label="Number ${i}">`).join('')}
+          </div>
+        </div>
+        ${buildExampleHTML(buildExample(buildTarget(values)))}
       </div>
       <p class="feedback" id="build-feedback" hidden></p>
     </section>`,
@@ -371,6 +396,19 @@ const TASK_SETUP = {
     const inputs = [...document.querySelectorAll('.build-input')];
     const feedback = document.getElementById('build-feedback');
     const tracker = trackMeaningTask('number-lab', 'build-mean', { scenarioId: recipe.id, target });
+    let allSameSolved = false;
+
+    // After all-the-same numbers, the child may take up Pip's challenge. No
+    // button needed: Pip notices as soon as the numbers differ and still fit.
+    inputs.forEach((input) => input.addEventListener('input', () => {
+      if (!allSameSolved || inputs.some((box) => box.value === '')) return;
+      const numbers = inputs.map((box) => Number(box.value));
+      if (isAllSame(numbers) || mean(numbers) !== target) return;
+      allSameSolved = false;
+      show(feedback, `✅ Well done! They are different now, and the mean is still ${target}. 🎉`);
+      logEvent('number-lab', 'build-varied', { scenarioId: recipe.id, target });
+      cheer(feedback);
+    }));
 
     checkBuild = () => {
       if (inputs.some((input) => input.value === '')) {
@@ -380,8 +418,12 @@ const TASK_SETUP = {
       const numbers = inputs.map((input) => Number(input.value));
       const theirMean = mean(numbers);
       if (theirMean === target) {
-        show(feedback, `✅ Yes! The mean of your numbers is exactly ${target}. 🎉`);
-        tracker.solved();
+        // All the same is correct, so it never blocks; Pip just asks for more.
+        allSameSolved = isAllSame(numbers);
+        show(feedback, allSameSolved
+          ? `✅ Yes! The mean is exactly ${target}. 🤔 Can you make them different? Try one down, one up.`
+          : `✅ Yes! The mean of your numbers is exactly ${target}. 🎉`);
+        tracker.solved({ allSame: allSameSolved });
         cheer(feedback);
         markComplete(n);
       } else {

@@ -29,6 +29,30 @@ export function buildTarget(values) {
   return Math.round(mean(values));
 }
 
+// "Build it": a small worked example beside the question (Prof's comment 5). It
+// shows the fair-share idea: 5 of the same number, then one down and one up, so
+// the total and the mean stay the same. Its mean is never the child's target.
+export function buildExample(target) {
+  const exampleMean = target === 4 ? 5 : 4;
+  const start = [1, 2, 3, 4, 5].map(() => exampleMean);
+  const moved = [exampleMean - 1, exampleMean + 1, exampleMean, exampleMean, exampleMean];
+  return {
+    mean: mean(moved),
+    start,
+    moved,
+    total: moved.reduce((sum, n) => sum + n, 0),
+    title: `👀 See how! Make a mean of ${exampleMean}.`,
+    startText: '1. Start with 5 of the same.',
+    movedText: '2. One goes down, one goes up.',
+    endText: `The total stays the same, so the mean stays ${exampleMean}!`,
+  };
+}
+
+// True if every number is the same: correct, but it doesn't show much thinking.
+export function isAllSame(numbers) {
+  return new Set(numbers).size === 1;
+}
+
 // "Find the mistake": Mia picks the middle number WITHOUT putting them in order.
 export function miaSays(numbers) {
   return numbers[Math.floor(numbers.length / 2)];

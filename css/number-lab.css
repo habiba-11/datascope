@@ -47,6 +47,67 @@
   color: var(--color-text); /* green text on light blue was too faint (2:1) */
 }
 
+/* "Build it": the question and boxes, with the worked example beside them. */
+.build-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.build-example {
+  padding: var(--space-2);
+  background: var(--color-plan-light);
+  border: var(--border-width) dashed var(--color-navy);
+  border-radius: var(--radius-button);
+}
+
+.build-example p {
+  margin: 0 0 var(--space-1);
+  font-weight: 700;
+}
+
+.build-example .build-example-title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.build-example .build-example-end {
+  margin: var(--space-1) 0 0;
+  font-weight: 800;
+}
+
+.example-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--space-2);
+}
+
+.example-chip {
+  min-width: 40px;
+  padding: 4px 8px;
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-navy);
+  border-radius: 10px;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.example-chip--moved {
+  background: var(--color-plan);
+}
+
+.example-total {
+  margin-left: var(--space-1);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .build-row {
   display: flex;
   gap: 8px;
