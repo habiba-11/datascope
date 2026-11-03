@@ -10,7 +10,10 @@ const PHASE_NAMES = {
   number: 'Number Lab', chance: 'Chance Lab', conclude: 'Conclude',
 };
 
+const SOURCE_MEANING = 'own = the child\'s own words; hint = a suggested answer kept word for word; hint-edited = a suggested answer the child changed or added to (even one letter counts); empty = no answer, or logged before Round 3. Only own and hint-edited answers are evidence of the child\'s reasoning.';
+
 // The columns, in order, each with its meaning (this list IS the data dictionary).
+// New columns go at the end, so older spreadsheets keep their column order.
 export const THESIS_COLUMNS = [
   { key: 'code', meaning: 'Anonymous explorer code (no names).' },
   { key: 'scenarioId', meaning: 'Which synthetic scenario the child investigated.' },
@@ -23,7 +26,7 @@ export const THESIS_COLUMNS = [
     { key: `${p}Minutes`, meaning: `${PHASE_NAMES[p]}: minutes from first entering the phase to finishing it (empty if unknown).` },
   ]),
   { key: 'totalStars', meaning: 'Sum of stars over all phases (0-21).' },
-  { key: 'hintsUsed', meaning: 'Hints the child asked for in this investigation (never penalised).' },
+  { key: 'hintsUsed', meaning: 'Times the child tapped the hint button in this investigation (never penalised). Since Round 3 one tap shows all the suggested answers for a box, so older runs with several tips per question are not directly comparable.' },
   { key: 'badges', meaning: 'Reasoning badges earned (whole log, all scenarios).' },
   { key: 'level', meaning: 'Explorer level reached (from badges).' },
   { key: 'planGuess', meaning: 'The guess made in Plan, before seeing any data.' },
@@ -48,9 +51,23 @@ export const THESIS_COLUMNS = [
   { key: 'evidenceCount', meaning: 'Evidence Board: how many numbers the child picked as proof.' },
   { key: 'certainty', meaning: 'Evidence Board: how sure (impossible / unlikely / even / likely / certain).' },
   { key: 'certaintyReason', meaning: 'Evidence Board: why the child is that sure.' },
+  { key: 'graphTellSource', meaning: `Graph Lab, what the graph tells: ${SOURCE_MEANING}` },
+  { key: 'graphNotTellSource', meaning: `Graph Lab, what the graph can NOT tell: ${SOURCE_MEANING}` },
+  { key: 'chanceReasonSource', meaning: `Chance Lab, the reason: ${SOURCE_MEANING}` },
+  { key: 'revisionReasonSource', meaning: `Number Lab, the reason for changing a guess: ${SOURCE_MEANING}` },
+  { key: 'claimSource', meaning: `Evidence Board, the claim: ${SOURCE_MEANING}` },
+  { key: 'becauseSource', meaning: `Evidence Board, the "because": ${SOURCE_MEANING}` },
+  { key: 'certaintyReasonSource', meaning: `Evidence Board, why that sure: ${SOURCE_MEANING}` },
+  { key: 'suggestionsUsed', meaning: 'How many suggested answers the child tapped or dragged into a box in this investigation.' },
 ];
 
 const KEYS = THESIS_COLUMNS.map((c) => c.key);
+
+// Where an answer came from, in words for the teacher's page ('' = not recorded).
+export function sourceLabel(source) {
+  const labels = { own: '✍️ own words', hint: '💡 from a hint, unchanged', 'hint-edited': '✏️ from a hint, changed' };
+  return labels[source] || '';
+}
 
 // The rows that may be exported: real children only, never DEMO.
 export function exportableRows(rows) {

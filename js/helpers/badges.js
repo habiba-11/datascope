@@ -5,17 +5,26 @@
 // Which reasoning moment (if any) a log entry shows. Returns a key, or null.
 // The key makes each moment count once: rating the same spinner twice, or
 // solving the same task again, does not earn a second badge.
+//
+// A suggested answer kept word for word (answerSource 'hint') is not the child
+// explaining, so it earns no "you explained" badge; own words and an edited hint
+// do. Older entries have no source: nothing could be tapped then, so they count.
+// Stars are different: a hint never costs a star (helpers/feedback.js).
+const ownWords = (source) => source !== 'hint';
+
 export function badgeKey(entry) {
   switch (entry.type) {
     case 'certainty':
-      return entry.reason ? `why:${entry.device}` : null;
+      return entry.reason && ownWords(entry.answerSource) ? `why:${entry.device}` : null;
     case 'revision':
       return entry.changed && entry.reason ? 'changed-mind' : null;
     case 'meaning-task':
       return entry.result === 'correct' || entry.result === 'after-hint' ? `task:${entry.task}` : null;
     case 'reflection':
       // "What does this graph NOT tell you?" with a real answer (not one or two letters).
-      return entry.prompt === 'not-tell' && entry.text && entry.text.length >= 10 ? `not-tell:${entry.scenarioId}` : null;
+      return entry.prompt === 'not-tell' && entry.text && entry.text.length >= 10 && ownWords(entry.answerSource)
+        ? `not-tell:${entry.scenarioId}`
+        : null;
     case 'claim':
       return entry.because && entry.certaintyReason ? `claim:${entry.scenarioId}` : null;
     default:
@@ -124,15 +133,15 @@ export function explains(text) {
 
 // How many of the child's answers explain, one per question (typing the same
 // answer again does not count twice). The claim card's "because" box counts:
-// the card reads "I think ... because ...".
+// the card reads "I think ... because ...". Only the child's own or edited words.
 function becauseAnswers(entries) {
   const keys = new Set();
   for (const e of entries) {
-    if (e.type === 'reflection' && explains(e.text)) keys.add(`reflection:${e.scenarioId}:${e.prompt}`);
-    if (e.type === 'certainty' && explains(e.reason)) keys.add(`certainty:${e.device}`);
-    if (e.type === 'revision' && e.changed && explains(e.reason)) keys.add(`revision:${e.scenarioId}`);
-    if (e.type === 'claim' && e.because && e.because.trim().length >= 10) keys.add(`claim-because:${e.scenarioId}`);
-    if (e.type === 'claim' && explains(e.certaintyReason)) keys.add(`claim-sure:${e.scenarioId}`);
+    if (e.type === 'reflection' && explains(e.text) && ownWords(e.answerSource)) keys.add(`reflection:${e.scenarioId}:${e.prompt}`);
+    if (e.type === 'certainty' && explains(e.reason) && ownWords(e.answerSource)) keys.add(`certainty:${e.device}`);
+    if (e.type === 'revision' && e.changed && explains(e.reason) && ownWords(e.answerSource)) keys.add(`revision:${e.scenarioId}`);
+    if (e.type === 'claim' && e.because && e.because.trim().length >= 10 && ownWords(e.becauseSource)) keys.add(`claim-because:${e.scenarioId}`);
+    if (e.type === 'claim' && explains(e.certaintyReason) && ownWords(e.certaintyReasonSource)) keys.add(`claim-sure:${e.scenarioId}`);
   }
   return keys.size;
 }

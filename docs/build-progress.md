@@ -1,10 +1,10 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 3: Parts 25-30 committed; Part 31 built (not committed yet), waiting for Habiba's check. Next: Part 32 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
+- Current part: **Round 3: Parts 25-31 committed; Part 32 built (not committed yet), waiting for Habiba's check. Next: Part 33 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
-- Last updated: 3 Nov 2026 (Round 3, Part 31); `node --test` = 260 passing, 0 failing
+- Last updated: 3 Nov 2026 (Round 3, Part 32); `node --test` = 270 passing, 0 failing
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -303,8 +303,19 @@
   - Known: a suggested reason is true, but it may not fit the child's choice ("You changed from Basketball to Tag because Football got the most votes."). The same can happen with a rating. Left as it is: it is the child's choice to make, and the log keeps it. Worth mentioning to Prof.
   - Known, for Part 35: on a narrow Evidence Card the "Checked!" stamp covers part of the card's title (from before this round).
 
+- Part 32 (3 Nov 2026, Round 3, Prof comment 3), 270 tests passing:
+  - Stars ignore where an answer came from, so a hint never costs a star (tested with every suggested answer for all 4 scenarios). feedback.js itself did not change.
+  - Graph Skeptic, Why-Wizard and Because Builder need own or edited words: badgeKey and becauseAnswers skip answers with source 'hint'. Older entries with no source still count (nothing could be tapped then). All other badges are unchanged, including Mind Changer and Evidence Expert. Changing a tapped answer later earns the badge then.
+  - Decided while building: the thesis `badges` and `level` columns follow the same rule, because they count the same reasoning moments.
+  - thesis-metrics.csv: 8 new columns at the end (older spreadsheets keep their order): graphTellSource, graphNotTellSource, chanceReasonSource, revisionReasonSource, claimSource, becauseSource, certaintyReasonSource, suggestionsUsed. The data dictionary explains them, says only own and hint-edited answers are evidence of reasoning and that even a one-letter edit counts as hint-edited; hintsUsed now says one tap shows all the answers for a box, so older runs are not directly comparable.
+  - Decided while building: older logs leave the source columns empty, never guessed as own.
+  - Teacher's child page: each answer shows where it came from ("✍️ own words", "💡 from a hint, unchanged", "✏️ from a hint, changed"), outside the child's quote marks, plus how many answers were tapped in. DEMO-01 has sources, so Prof can see this; DEMO is still never exported (tested).
+  - docs/privacy-note.md: the answer's source added to what is stored.
+  - Checked in Chrome: two real Graph Lab runs (tapped: same stars, no Graph Skeptic; edited: same stars, Graph Skeptic earned). Teacher page checked with the database switched off in a test copy (PIN + DEMO); no page errors. The online teacher login was not opened: please check it with your account.
+  - Round 3 hints are now complete (Parts 30-32), so badge counts are reliable from here on. Children's data still waits for Prof and the ethics check.
+
 ## Next
-- Round 3 next: Habiba checks Part 31; then Part 32.
+- Round 3 next: Habiba checks Part 32; then Part 33.
 - Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).

@@ -6,7 +6,7 @@ import {
 } from '../js/helpers/suggestions.js';
 import { generateClassData } from '../js/helpers/generator.js';
 import { PICKABLE_SCENARIOS } from '../js/helpers/scenarios.js';
-import { countWords } from '../js/helpers/feedback.js';
+import { countWords, buildPhaseFeedback } from '../js/helpers/feedback.js';
 import { longestSentence } from '../js/helpers/readability.js';
 
 const read = (path) => JSON.parse(readFileSync(new URL(`../data/${path}`, import.meta.url), 'utf8'));
@@ -167,6 +167,19 @@ test('Evidence Board and Number Lab answers say the real numbers of each scenari
 test('an "I think" answer fits its one-line box', () => {
   for (const id of PICKABLE_SCENARIOS) {
     for (const { text } of roomAnswers(id).claim) assert.ok(text.length <= 45, `${id}: "${text}"`);
+  }
+});
+
+test('a hint never costs a star: a tapped answer earns the same stars as typed words', () => {
+  for (const id of PICKABLE_SCENARIOS) {
+    for (const { text } of graphAnswers(id).notTell) {
+      const card = buildPhaseFeedback('graph', { typesTried: 2, notTellWords: countWords(text) });
+      assert.equal(card.stars, 3, `${id}: "${text}"`);
+    }
+    for (const { text } of roomAnswers(id).sure) {
+      const card = buildPhaseFeedback('conclude', { evidenceCount: 2, certaintyReasonWords: countWords(text) });
+      assert.equal(card.stars, 3, `${id}: "${text}"`);
+    }
   }
 });
 

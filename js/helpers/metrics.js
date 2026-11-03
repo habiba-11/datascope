@@ -63,6 +63,16 @@ export function childRows(files, partners = {}) {
         evidenceCount: claim ? (claim.evidence || []).length : null,
         certainty: claim ? claim.certainty : null,
         certaintyReason: claim ? claim.certaintyReason : null,
+        // Where each answer came from (own / hint / hint-edited; null = no answer,
+        // or logged before Round 3). Only own and edited answers are the child's reasoning.
+        graphTellSource: graph.tellSource,
+        graphNotTellSource: graph.notTellSource,
+        chanceReasonSource: chance.reasonSource,
+        revisionReasonSource: number.revision && number.revision.changed ? number.revision.reasonSource : null,
+        claimSource: claim?.claimSource ?? null,
+        becauseSource: claim?.becauseSource ?? null,
+        certaintyReasonSource: claim?.certaintyReasonSource ?? null,
+        suggestionsUsed: j.suggestionsUsed,
       };
       for (const phase of PHASES) {
         row[`${phase}Done`] = j.phases[phase].done;

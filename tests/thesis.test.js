@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { THESIS_COLUMNS, thesisCSV, dictionaryCSV, exportableRows } from '../js/helpers/thesis.js';
+import { THESIS_COLUMNS, thesisCSV, dictionaryCSV, exportableRows, sourceLabel } from '../js/helpers/thesis.js';
 import { makeDemoFiles } from '../js/helpers/demo.js';
 import { childRows, classOverview } from '../js/helpers/metrics.js';
 import { parseExportFile } from '../js/helpers/summary.js';
@@ -55,6 +55,58 @@ test('the dictionary file lists every column', () => {
   const lines = dictionaryCSV().split('\r\n');
   assert.equal(lines[0], 'column,meaning');
   assert.equal(lines.length, THESIS_COLUMNS.length + 1);
+});
+
+const SOURCE_COLUMNS = [
+  'graphTellSource', 'graphNotTellSource', 'chanceReasonSource', 'revisionReasonSource',
+  'claimSource', 'becauseSource', 'certaintyReasonSource', 'suggestionsUsed',
+];
+
+test('the new columns come last, so older spreadsheets keep their column order', () => {
+  const keys = THESIS_COLUMNS.map((c) => c.key);
+  assert.deepEqual(keys.slice(-SOURCE_COLUMNS.length), SOURCE_COLUMNS);
+  assert.equal(keys[keys.length - SOURCE_COLUMNS.length - 1], 'certaintyReason');
+});
+
+test('the dictionary explains the sources, and says what counts as reasoning', () => {
+  const meaning = THESIS_COLUMNS.find((c) => c.key === 'claimSource').meaning;
+  assert.match(meaning, /own = /);
+  assert.match(meaning, /hint-edited = /);
+  assert.match(meaning, /Only own and hint-edited answers are evidence/);
+  assert.match(THESIS_COLUMNS.find((c) => c.key === 'hintsUsed').meaning, /not directly comparable/);
+});
+
+test('each answer\'s source reaches the row', () => {
+  const [row] = realRows;
+  assert.equal(row.graphTellSource, 'own');
+  assert.equal(row.graphNotTellSource, 'hint');
+  assert.equal(row.chanceReasonSource, 'hint-edited');
+  assert.equal(row.revisionReasonSource, 'own');
+  assert.equal(row.claimSource, 'own');
+  assert.equal(row.becauseSource, 'hint');
+  assert.equal(row.certaintyReasonSource, 'own');
+  assert.equal(row.suggestionsUsed, 1);
+  assert.equal(row.hintsUsed, 1);
+});
+
+test('an older log, with no source fields, leaves the columns empty (never guessed)', () => {
+  const stripped = {
+    ...real,
+    entries: real.entries
+      .filter((e) => e.type !== 'hint-picked')
+      .map(({ answerSource, claimSource, becauseSource, certaintyReasonSource, suggestions, ...rest }) => rest),
+  };
+  const [row] = childRows([stripped], PARTNERS);
+  for (const key of SOURCE_COLUMNS.slice(0, -1)) assert.equal(row[key], null, key);
+  assert.equal(row.suggestionsUsed, 0);
+  assert.match(thesisCSV([row]).split('\r\n')[1], /,0$/); // empty cells, then the count
+});
+
+test('the teacher sees each source in words', () => {
+  assert.match(sourceLabel('own'), /own words/);
+  assert.match(sourceLabel('hint'), /unchanged/);
+  assert.match(sourceLabel('hint-edited'), /changed/);
+  assert.equal(sourceLabel(null), '');
 });
 
 test('fixed-column CSV: missing values are empty, and typed formulas are made safe', () => {

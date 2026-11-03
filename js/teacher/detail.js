@@ -3,6 +3,7 @@
 // timeline of every log moment (folded away), and delete (online only).
 // Shown with textContent only: a log can hold anything a child typed.
 import { PHASES } from '../helpers/progress.js';
+import { sourceLabel } from '../helpers/thesis.js';
 import { twoTapButton } from './two-tap.js';
 
 const PHASE_NAMES = {
@@ -75,6 +76,7 @@ export function renderDetail(container, row, entries, scenarioTitle, { tagsNode 
     `${row.finished ? '✅ finished' : `${row.phasesDone} of 7 phases`}`,
     `⭐ ${row.totalStars} stars`,
     `💡 ${row.hintsUsed} hints`,
+    `👆 answers tapped in: ${row.suggestionsUsed}`,
   ].filter(Boolean).join(' · ');
 
   const phases = table(['Phase', 'Done', 'Stars', 'Minutes'], PHASES.map((phase) => [
@@ -84,18 +86,27 @@ export function renderDetail(container, row, entries, scenarioTitle, { tagsNode 
     [show(row[`${phase}Minutes`])],
   ]), 'phase-table');
 
+  // The child's words, then where they came from (own words, or from a hint).
+  const withSource = (text, source) => {
+    const label = sourceLabel(source);
+    return label && text !== null ? `${text} (${label})` : text;
+  };
+  const claimSources = [
+    sourceLabel(row.claimSource) && `I think: ${sourceLabel(row.claimSource)}`,
+    sourceLabel(row.becauseSource) && `because: ${sourceLabel(row.becauseSource)}`,
+  ].filter(Boolean).join('; ');
   const words = definitionList([
     ['Plan guess', row.planGuess],
     ['Number Lab guess → mean', row.numberGuess === null ? null : `${row.numberGuess} → ${show(row.mean)} (off by ${show(row.predictionError)})`],
     ['Number Lab puzzles', `✅ ${row.tasksFirstTry} first try · 💡 ${row.tasksAfterHint} after another try · ❌ ${row.tasksUnsolved} unsolved`],
-    ['Changed mind after the data', row.revised === null ? null : `${row.revised ? 'yes' : 'no'}${row.revisionReason ? `, because "${row.revisionReason}"` : ''}`],
-    ['Graph: what it shows', row.graphTell],
-    ['Graph: what it can NOT show', row.graphNotTell],
-    ['Chance Lab', row.chanceRating ? `${row.chanceDevice}: "${row.chanceRating}" because "${row.chanceReason}"` : null],
+    ['Changed mind after the data', row.revised === null ? null : `${row.revised ? 'yes' : 'no'}${row.revisionReason ? `, because ${withSource(`"${row.revisionReason}"`, row.revisionReasonSource)}` : ''}`],
+    ['Graph: what it shows', withSource(row.graphTell, row.graphTellSource)],
+    ['Graph: what it can NOT show', withSource(row.graphNotTell, row.graphNotTellSource)],
+    ['Chance Lab', row.chanceRating ? `${row.chanceDevice}: "${row.chanceRating}" because ${withSource(`"${row.chanceReason}"`, row.chanceReasonSource)}` : null],
     ['Biggest test', row.biggestRun === null ? null : `${row.biggestRun} tries, ${row.biggestRunPct}%`],
-    ['Claim', row.claim === null ? null : `I think ${row.claim} because ${row.because}.`],
+    ['Claim', row.claim === null ? null : `I think ${row.claim} because ${row.because}.${claimSources ? ` (${claimSources})` : ''}`],
     ['Evidence used', row.evidenceCount],
-    ['How sure', row.certainty === null ? null : `${row.certainty}: ${row.certaintyReason}`],
+    ['How sure', row.certainty === null ? null : `${row.certainty}: ${withSource(row.certaintyReason, row.certaintyReasonSource)}`],
   ]);
 
   // The full timeline is long, so it is folded away until the teacher opens it.

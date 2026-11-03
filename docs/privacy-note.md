@@ -11,6 +11,7 @@ Status: **testing only.** Until Prof and the ethics check agree, only made-up co
 | Anonymous explorer code | `OWL-07` | every log entry |
 | Reasoning-log moments: type, room, time | "prediction in Number Lab at 09:14" | `log_entries` |
 | What the child chose or typed in the tasks | a guess (8), a reason ("the 3 pulls it down"), a claim | `log_entries.details` |
+| Whether an answer was the child's own words or a suggested answer (kept or changed) | `hint-edited` | `log_entries.details` |
 | Which synthetic scenario and seed the child saw | `sleep-hours`, seed 5 | `log_entries` |
 | The teacher's misconception tags on a code | `median-no-order` | `teacher_tags` |
 | The teacher's login (email + password hash) | managed by Supabase Auth | Supabase |

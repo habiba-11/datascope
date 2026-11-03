@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   badgeKey, earnedBadges, badgeMessage, badgeType, badgeShelf, levelFor, levelProgress,
-  BADGES, findBadge, checkBadges, backpack, explains,
+  BADGES, findBadge, checkBadges, backpack, explains, earnedPatches,
 } from '../js/helpers/badges.js';
 
 const code = 'OWL-07';
@@ -26,6 +26,57 @@ test('"What does this graph NOT tell you?" needs a real answer', () => {
   assert.ok(badgeKey({ type: 'reflection', prompt: 'not-tell', scenarioId: 's', text: 'why people sleep less' }));
   assert.equal(badgeKey({ type: 'reflection', prompt: 'not-tell', scenarioId: 's', text: 'idk' }), null);
   assert.equal(badgeKey({ type: 'reflection', prompt: 'tell', scenarioId: 's', text: 'most sleep 9 hours' }), null);
+});
+
+test('a suggested answer kept word for word earns no "you explained" moment', () => {
+  const notTell = { type: 'reflection', prompt: 'not-tell', scenarioId: 's', text: 'It does not tell us why' };
+  assert.equal(badgeKey({ ...notTell, answerSource: 'hint' }), null);
+  assert.ok(badgeKey({ ...notTell, answerSource: 'hint-edited' }));
+  assert.ok(badgeKey({ ...notTell, answerSource: 'own' }));
+  assert.ok(badgeKey(notTell), 'older entries, with no source, still count');
+
+  const why = { type: 'certainty', device: 'Dice', reason: 'Because the chance is 1 in 6.' };
+  assert.equal(badgeKey({ ...why, answerSource: 'hint' }), null);
+  assert.ok(badgeKey({ ...why, answerSource: 'hint-edited' }));
+});
+
+test('Graph Skeptic and Why-Wizard need own or edited words', () => {
+  const earned = (entries) => earnedPatches(entries, code);
+  const notTell = { code, type: 'reflection', prompt: 'not-tell', scenarioId: 's', text: 'It does not tell us why' };
+  const why = { code, type: 'certainty', device: 'Dice', reason: 'Because the chance is 1 in 6.' };
+  assert.ok(!earned([{ ...notTell, answerSource: 'hint' }]).includes('not-tell'));
+  assert.ok(earned([{ ...notTell, answerSource: 'hint-edited' }]).includes('not-tell'));
+  assert.ok(!earned([{ ...why, answerSource: 'hint' }]).includes('why'));
+  assert.ok(earned([{ ...why, answerSource: 'own' }]).includes('why'));
+  // Changed the tapped answer afterwards: earned then.
+  assert.ok(earned([{ ...notTell, answerSource: 'hint' }, { ...notTell, answerSource: 'hint-edited' }]).includes('not-tell'));
+});
+
+test('Because Builder counts only own or edited words', () => {
+  const answers = (source) => [
+    { code, type: 'reflection', scenarioId: 's', prompt: 'tell', text: 'Most kids slept 9 because of school', answerSource: source },
+    { code, type: 'certainty', device: 'Dice', reason: 'Because the chance is 1 in 6', answerSource: source },
+    { code, type: 'revision', scenarioId: 's', changed: true, reason: 'because the mean is 8', answerSource: source },
+  ];
+  assert.ok(!earnedPatches(answers('hint'), code).includes('because-builder'));
+  assert.ok(earnedPatches(answers('hint-edited'), code).includes('because-builder'));
+  assert.ok(earnedPatches(answers('own'), code).includes('because-builder'));
+
+  const claim = (becauseSource, certaintyReasonSource) => [{
+    code, type: 'claim', scenarioId: 's', because: 'the median is 9 hours', certaintyReason: 'Because we asked 20 kids', becauseSource, certaintyReasonSource,
+  }, ...answers('own').slice(0, 1)];
+  assert.ok(!earnedPatches(claim('hint', 'hint'), code).includes('because-builder'));
+  assert.ok(earnedPatches(claim('own', 'hint-edited'), code).includes('because-builder'));
+});
+
+test('the other badges do not depend on where the words came from', () => {
+  const changed = { code, type: 'revision', changed: true, reason: 'the mean is 8.4 hours', answerSource: 'hint' };
+  assert.ok(earnedPatches([changed], code).includes('changed-mind'));
+  const card = {
+    code, type: 'claim', scenarioId: 's', because: 'the median is 9', certaintyReason: 'we asked 20 kids', evidence: ['Median: 9'],
+    claimSource: 'hint', becauseSource: 'hint', certaintyReasonSource: 'hint',
+  };
+  assert.ok(earnedPatches([card], code).includes('claim'));
 });
 
 test('speed or clicking never earns badges (trials, hints, predictions)', () => {

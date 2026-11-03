@@ -55,7 +55,7 @@ test("each phase holds the child's own answers", () => {
   assert.equal(journey.phases.graph.notTell, 'It does not tell us why one kid slept 3.'); // the newest answer
   assert.equal(journey.phases.number.guess, 9);
   assert.equal(journey.phases.number.mean, 8.4);
-  assert.deepEqual(journey.phases.number.revision, { changed: true, newGuess: 8, reason: 'the 3 pulls it down' });
+  assert.deepEqual(journey.phases.number.revision, { changed: true, newGuess: 8, reason: 'the 3 pulls it down', reasonSource: null });
   assert.equal(journey.phases.number.firstTry, 1);
   assert.equal(journey.phases.number.afterHint, 1);
 });

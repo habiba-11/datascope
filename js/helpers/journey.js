@@ -25,9 +25,13 @@ const DETAILS = {
   },
   graph: (es) => {
     const reflections = ofType(es, 'reflection');
+    const tell = last(reflections.filter((e) => e.prompt === 'tell'));
+    const notTell = last(reflections.filter((e) => e.prompt === 'not-tell'));
     return {
-      tell: last(reflections.filter((e) => e.prompt === 'tell'))?.text ?? null,
-      notTell: last(reflections.filter((e) => e.prompt === 'not-tell'))?.text ?? null,
+      tell: tell?.text ?? null,
+      tellSource: tell?.answerSource ?? null,
+      notTell: notTell?.text ?? null,
+      notTellSource: notTell?.answerSource ?? null,
     };
   },
   number: (es) => {
@@ -39,7 +43,9 @@ const DETAILS = {
       mean: prediction?.mean ?? null,
       median: prediction?.median ?? null,
       mode: prediction?.mode ?? null,
-      revision: revision ? { changed: revision.changed, newGuess: revision.newGuess ?? null, reason: revision.reason ?? null } : null,
+      revision: revision
+        ? { changed: revision.changed, newGuess: revision.newGuess ?? null, reason: revision.reason ?? null, reasonSource: revision.answerSource ?? null }
+        : null,
       tasks,
       firstTry: tasks.filter((t) => t.result === 'correct').length,
       afterHint: tasks.filter((t) => t.result === 'after-hint').length,
@@ -54,6 +60,7 @@ const DETAILS = {
       device: certainty?.device ?? null,
       rating: certainty?.rating ?? null,
       reason: certainty?.reason ?? null,
+      reasonSource: certainty?.answerSource ?? null,
       runs: trials.map((e) => e.trials),
       biggestRun: biggest
         ? { trials: biggest.trials, outcome: biggest.outcome, pct: biggest.experimentalPct, theory: biggest.theory }
@@ -101,6 +108,7 @@ export function buildJourney(entries, code, scenarioId, partnerId = null, savedD
       // For the teacher only (decided 25 Oct 2026): the child's page never shows time.
       durationMs: start && end ? Date.parse(end) - Date.parse(start) : null,
       hints: ofType(inPhase, 'hint').length,
+      suggestionsUsed: ofType(inPhase, 'hint-picked').length,
       ...DETAILS[phase](inPhase),
     };
   }
@@ -113,6 +121,7 @@ export function buildJourney(entries, code, scenarioId, partnerId = null, savedD
     phasesDone: PHASES.filter((p) => phases[p].done).length,
     totalStars: PHASES.reduce((sum, p) => sum + (phases[p].stars || 0), 0),
     hintsUsed: PHASES.reduce((sum, p) => sum + phases[p].hints, 0),
+    suggestionsUsed: PHASES.reduce((sum, p) => sum + phases[p].suggestionsUsed, 0),
     badgeCount, // reasoning moments: the thesis columns `badges` and `level`
     level: levelFor(badgeCount),
     patches: earnedPatches(entries, code).length, // what the child sees in the backpack
