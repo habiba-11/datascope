@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 3: Parts 25-33 committed; Part 34 built (not committed yet), waiting for Habiba's check. Next: Part 35 (docs/round-3-plan.md); Part 36 (deploy) locked until "Prof confirmed".** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
+- Current part: **Round 3: Parts 25-34 committed; Part 35 done by Claude (not committed yet); waiting for Habiba's device / keyboard test and her choice on the small navigation labels. Part 36 (deploy) locked until "Prof confirmed".** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 3 Nov 2026 (Round 3, Part 34); `node --test` = 280 passing, 0 failing
@@ -337,8 +337,18 @@
   - Found by looking at the screens and fixed: my cleanup of the first version left its styles in welcome.css, which squeezed the film to 720px and made the code box huge; welcome.css is back to its committed version.
   - For Part 35: the start page's help line under the code box is 16px (from before this round). A page error "Transition was aborted because of invalid state" appears when going from the start page to Question Studio with motion on; it comes from the page fade of Part 21a (it happens with no tutorial, and on the commit before Part 34), and children do not see it.
 
+- Part 35 (3 Nov 2026, Round 3, all comments), 286 tests passing:
+  - Full runs the real way (no preview), start page to My journey: 4 questions at 1366, sleep and games at 768; every run 7 phases "✅ Done"; no page errors, no sideways scroll, no buttons under 44px. Results and method: docs/change-summary-round-3.md ("Part 35 check").
+  - Fixed: scenario and device cards said both "checked" and "pressed" to screen readers (choices.js removes aria-pressed when a card becomes a radio); Number Lab's Class A / Class B headings are h2 (were h3 under the h1). axe: 0 problems in the reading-minutes rerun.
+  - 13 kinds of text children read raised to 18px (stat labels, certainty words, code help, scenario question, checker tips, badge line, hint button, pretend-class pill, room tools, intro step and again lines, "Stars are for great thinking").
+  - Docs: docs/architecture.md section 10 (Round 3), docs/change-summary-round-3.md.
+  - Left for Habiba: the step names (16px), mini stepper chips (15px), the code / sound / online line (14 to 15px) are still under 18px (the UI guide allows 15px labels; CLAUDE.md says 18px). On the tutorial's last scene, "Watch again" and "Start exploring" are both green.
+
 ## Next
-- Round 3 next: Habiba checks Part 34; then Part 35 (full check and docs). Part 36 (deploy) stays locked until "Prof confirmed".
+- Habiba: commit Part 35; try Round 3 on a real tablet or Chromebook (touch drag of hint answers, the tutorial's timing for a slow reader) and keyboard-only.
+- Decided 3 Nov 2026 (Habiba, option a): the small navigation labels (step names, mini stepper chips, code / sound / online line) stay at 14 to 16px; they are short labels, not reading text, and 18px would make the step chips wrap on a tablet.
+- Part 36 (deploy) stays locked until Habiba writes "Prof confirmed".
+- Thesis: declare the AI assistance used (GIU regulations).
 - Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).

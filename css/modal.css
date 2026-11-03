@@ -194,12 +194,12 @@ body.modal-open {
   border-radius: 999px;
   background: var(--color-soft);
   font-weight: 800;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .intro-again {
   margin: var(--space-2) 0 0;
-  font-size: 16px;
+  font-size: 18px;
   color: var(--color-muted-text);
   font-weight: 700;
 }
@@ -207,7 +207,7 @@ body.modal-open {
 /* The feedback card (UI guide f7). */
 .fb-why-stars {
   margin: 0 0 var(--space-1);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--color-muted-text);
 }

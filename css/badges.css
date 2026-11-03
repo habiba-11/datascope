@@ -176,7 +176,7 @@
   background: var(--color-navy);
   color: var(--color-gold);
   font-weight: 800;
-  font-size: 16px;
+  font-size: 18px;
   animation: bp-rise 0.4s var(--ease-out) 1.55s both;
 }
 

@@ -63,7 +63,7 @@
 }
 
 .scenario-question {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
 }
 
@@ -115,7 +115,7 @@
   border-radius: 10px;
   padding: 6px 10px;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .checker-list li.warn {

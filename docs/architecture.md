@@ -319,3 +319,44 @@ Teacher's browser ── email + password login ──► reads log_entries, tea
 - Data retention and consent wording in `docs/privacy-note.md`.
 - Testing on a real Chromebook or tablet, and with children (after ethics approval).
 - Deployment to GitHub Pages (Part 24, locked).
+
+---
+
+## 10. Round 3 changes after Prof feedback, Nov 2026
+
+*Added 3 Nov 2026. Prof's 9 comments from the meeting on 2 Nov 2026. The plan is `docs/round-3-plan.md`; the part-by-part record is `docs/change-summary-round-3.md` and `docs/build-progress.md`.*
+
+### 10.1 What Prof asked for, and where it is now
+
+| # | Prof's comment | What the app does now | Main files |
+|---|---|---|---|
+| 1 | A mini tutorial on the start page: the purpose, how to use it, all rooms | A 6-scene animated film with Pip (about 50 s): hello, the mission, the 5-step journey, the 6 rooms, how to use hints and the About tab, ready. It plays by itself with Pause, Back, Next, dots and Skip; the words are always in a caption; no sound. Opens by itself once per browser; "See how it works" replays it. Reduced motion: no autoplay. | `js/tutorial.js`, `css/tutorial.css`, `data/content/tutorial.json`, `js/helpers/tutorial-steps.js` |
+| 2 | Charts: larger bold dark text, word labels, a better line chart, size vs count | 18px bold navy chart text; "Size 34" under a bar and "5 kids" on it, "Number of kids" on the axis. The line chart uses a true number line (gaps show) with a thick line and big dots; games get no line and an explanation. The pie has its counts outside and a colour key (Habiba's choice). The Data Hub tally uses the same words. | `js/helpers/charts.js`, `js/rooms/graph-lab.js`, `js/helpers/tally.js` |
+| 3 | Hints should give answers to tap, drag or edit | The first 💡 tap shows 3 true answers built from the real data (words in content, numbers from `stats.js`). Tap or drag puts one in the box; the child can change it or write their own. Every answer is logged as own, hint or hint-edited. | `js/helpers/suggestions.js`, `js/helpers/prompts.js`, the rooms |
+| 4 | "Show the numbers" becomes "Show statistics" | The button, Pip's line and the intro say "statistics", with a one-line meaning. | `js/rooms/number-lab.js`, `data/content/phases.json` |
+| 5 | The mean task takes too long | Still 5 numbers (reverse calculation, Paper 9), now with a worked example beside it: 4, 4, 4, 4, 4 becomes 3, 5, 4, 4, 4, the same total. | `js/helpers/number-tasks.js` |
+| 6 | Room summaries as a tab | A yellow "📖 About this room" tab on every task card, with "You are done when...". The first-time pop-up stays; the (i) button is gone. | `js/task-card.js`, `js/phase-intro.js` |
+| 7 | Chance Lab: small numbers, unclear brackets | One row per outcome, should and did side by side, no brackets ("1 in 6, about 16.7%" · "81 of 500, 16.2%"), 18px bold. The log keeps its old format. | `js/helpers/chance.js`, `js/rooms/chance-lab.js` |
+| 8 | The question checker should know many time words | It recognises specific and regular times (this term, every day, on Monday, after school, two days ago...) and still asks "When?" for vague words (Paper 28). Five checker bugs fixed. | `js/helpers/checker.js` |
+| 9 | Deployment, explained for a beginner | Part 36: **locked** until Habiba writes "Prof confirmed". | – |
+
+### 10.2 Changes to earlier decisions
+
+- **Hints:** the escalating tips (Part 10) are gone where a hint can give an answer. Question Studio's fix-its keep their tips, because fixing the question is the skill itself.
+- **Rewards:** stars ignore where an answer came from (a hint never costs a star). Graph Skeptic, Why-Wizard and Because Builder need the child's own or edited words. The thesis `badges` and `level` columns follow the same rule.
+- **Pie chart:** a colour key (Habiba's decision), against "colour is never the only signal" and Paper 20's "label directly". The screen-reader description still names every slice; the bar, line and dot charts keep direct labels.
+- **Tutorial autoplay:** the one exception to "no timers". It never rewards or rushes the child; Pause holds any scene.
+- **Text size:** text children read is now at least 18px everywhere it was smaller (stat labels, certainty words, help lines, hint button, badge line, pop-up lines). Small navigation labels (the step names, the mini stepper, the code and sound line) stay at 14 to 16px, as the UI guide allows; to decide with Habiba.
+
+### 10.3 New in the reasoning log and the thesis data
+
+- New events: `hint-picked` (a suggested answer tapped or dragged in) and `build-varied` (different numbers after an all-the-same answer). `popup-seen` may have `via: 'tab'`.
+- Answers carry `answerSource` (own / hint / hint-edited) and the original `suggestions`; the claim has `claimSource`, `becauseSource`, `certaintyReasonSource`. `build-mean` has `allSame`.
+- `thesis-metrics.csv`: 8 new columns at the end (the sources and `suggestionsUsed`); the data dictionary explains them. Older logs leave them empty, never guessed.
+- **Honest limit for the Results chapter:** a tapped answer is not evidence of the child's reasoning. Only own and hint-edited answers are, and even a one-letter edit counts as hint-edited (the original suggestion is saved next to it).
+
+### 10.4 Still open
+
+- Deployment (Part 36): locked until "Prof confirmed". The live site will run with the database off until the GIU ethics check is cleared.
+- Testing on a real tablet or Chromebook, and keyboard-only: Habiba.
+- Rubric coding of claims (Papers 7 and 13), data retention and consent wording: as in 9.5.

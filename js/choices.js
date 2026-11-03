@@ -24,6 +24,9 @@ export function wireChoiceCards(group, cardSelector, onChoose) {
   cards.forEach((card, i) => {
     card.setAttribute('role', 'radio');
     card.setAttribute('aria-checked', 'false');
+    // pressed-state.js may have given it aria-pressed before it became a radio:
+    // a radio says "checked", never "pressed" (axe: aria-allowed-attr).
+    card.removeAttribute('aria-pressed');
     card.tabIndex = i === 0 ? 0 : -1; // Tab reaches the group once
     card.addEventListener('click', () => choose(card));
     card.addEventListener('keydown', (event) => {

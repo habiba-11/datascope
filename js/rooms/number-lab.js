@@ -237,8 +237,9 @@ function statsHTML(stats) {
     ${statCard('Mean', formatMean(m))}${statCard('Median', md)}${statCard('Mode', modeText(mo))}${statCard('Range', r)}
   </div>`;
   if (kind === 'compare') {
-    return `<h3 class="stats-class-title">Class A</h3>${grid(stats.mean, stats.median, stats.mode, stats.range)}
-      <h3 class="stats-class-title">Class B</h3>${grid(stats.meanB, stats.medianB, stats.modeB, stats.rangeB)}`;
+    // h2: the task's question is the page's h1 (axe: heading-order).
+    return `<h2 class="stats-class-title">Class A</h2>${grid(stats.mean, stats.median, stats.mode, stats.range)}
+      <h2 class="stats-class-title">Class B</h2>${grid(stats.meanB, stats.medianB, stats.modeB, stats.rangeB)}`;
   }
   return grid(stats.mean, stats.median, stats.mode, stats.range);
 }

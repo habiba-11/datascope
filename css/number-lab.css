@@ -35,7 +35,7 @@
 
 .stat-label {
   display: block;
-  font-size: 13px;
+  font-size: 18px;
   font-weight: 700;
 }
 
@@ -248,5 +248,5 @@
 .sort-card.centre::after {
   content: 'centre';
   font-weight: 700;
-  font-size: 14px;
+  font-size: 18px;
 }
