@@ -1,2 +1,5 @@
 # Third-party files are kept byte-for-byte (no line-ending changes).
 js/vendor/** -text
+
+# Fonts are binary files.
+assets/fonts/** -text

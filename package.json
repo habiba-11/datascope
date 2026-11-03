@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "shots": "node dev/shots.mjs"
+    "shots": "node dev/shots.mjs",
+    "pin": "node dev/pin-hash.mjs",
+    "deploy-check": "node dev/deploy-check.mjs"
   },
   "devDependencies": {
     "gsap": "^3.15.0",

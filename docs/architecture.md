@@ -286,7 +286,7 @@ The stack comes from your project overview. It is deliberately small so a beginn
 ### 9.2 Changes to earlier decisions
 
 - **Evidence Board:** the audience and form task was removed (26 Oct 2026, Habiba): it had no purpose for the child. It is now Claim + Evidence + How sure and why (Paper 17's three parts).
-- **Teacher view:** not hidden. A button on the start page; with the database on, an email + password login checked by the database; with it off, a PIN (`teacher123`, stored only as a hash), which is a speed bump, not security.
+- **Teacher view:** not hidden. A button on the start page; with the database on, an email + password login checked by the database; with it off, a PIN (stored only as a hash; the PIN itself is not written in the docs), which is a speed bump, not security.
 - **No files when the database is on:** children's work goes online by itself and the teacher sees it on the dashboard. "Save my work" files and "Import files" only appear when the database is switched off (fallback).
 - **Time per phase** is recorded for the teacher only and never shown to the child.
 - **Libraries added:** GSAP 3.15.0 (local copy in `js/vendor/`) for motion; `playwright-core` as a developer tool only (screenshots and checks, never shipped to children).
