@@ -67,6 +67,12 @@ test('solved() can add what is only known at the end, and the build-varied event
   assert.equal(makeEntry('OWL-07', 'number-lab', 'build-varied', { target: 8 }).type, 'build-varied');
 });
 
+test('a tapped or dragged answer can be logged (hint-picked)', () => {
+  const entry = makeEntry('OWL-07', 'graph-lab', 'hint-picked', { prompt: 'graph-tell', suggestionId: 's1', how: 'tap' });
+  assert.equal(entry.suggestionId, 's1');
+  assert.equal(entry.how, 'tap');
+});
+
 test('clearing a shared device removes the code and the log', () => {
   setExplorerCode('OWL-07');
   logEvent('number-lab', 'revision', { changed: true, oldGuess: 7, newGuess: 9, reason: 'most kids said 9' });

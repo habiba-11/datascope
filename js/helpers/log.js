@@ -11,6 +11,7 @@ export const EVENT_TYPES = [
   'meaning-task', // a Number Lab meaning task: correct, after a hint, or incorrect
   'trials',       // a Chance Lab run: device, number of trials, what happened
   'hint',         // the child asked for a hint on an open question
+  'hint-picked',  // the child tapped or dragged a suggested answer into a box (prompt, suggestionId, how)
   'reflection',   // what a graph tells / does NOT tell
   'claim',        // the final Evidence Board claim
   'teacher-tag',  // a misconception the teacher tagged (teacher view)

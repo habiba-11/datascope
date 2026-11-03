@@ -1,10 +1,10 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 3: Parts 25-27 committed; Parts 28-29 built (not committed yet), waiting for Habiba's check. Next: Part 30 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
+- Current part: **Round 3: Parts 25-29 committed; Part 30 built (not committed yet), waiting for Habiba's check. Next: Part 31 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
-- Last updated: 3 Nov 2026 (Round 3, Part 29); `node --test` = 250 passing, 0 failing
+- Last updated: 3 Nov 2026 (Round 3, Part 30); `node --test` = 259 passing, 0 failing
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -284,8 +284,16 @@
   - Not checked with real children: whether this is really faster. That is what the pilot can show.
   - Found while here, for Part 35's audit: the stat card labels (13px) and the sort card's "centre" (14px) are under the 18px rule.
 
+- Part 30 (3 Nov 2026, Round 3, Prof comment 3), 259 tests passing:
+  - js/helpers/suggestions.js (pure, tests/suggestions.test.js): graphFacts (the real numbers, from the class's answers), fillSuggestions (fills the {gaps} of the words in data/content), appendAnswer, answerSource (own / hint / hint-edited).
+  - createAnswerHint in prompts.js. In Graph Lab, the first 💡 tap shows 3 true answers (the old tips are gone from content: graphLab.tellAnswers, notTellAnswers). Tap adds an answer to the box; drag is a bonus (pointer events, a copy follows the finger, the box shows a thick dashed edge); a used answer gets a ✓. Enter works too. Emptying the box frees the answers and resets the source to own.
+  - Log: every reflection now has answerSource, plus suggestions (the original text) if any were used; a new event hint-picked { prompt, suggestionId, how: tap / drag }. The hint event is logged once per question (hintNumber 1).
+  - Tests check for all 4 scenarios: 3 answers per question, every gap filled, at least 5 words and 10 characters (so a tapped answer passes the same rules as a typed one), the Grade 5 rule, the real numbers.
+  - Checked in Chrome, 4 scenarios at 1366 and 768, plus tap, edit, clear, own words, tap after own words, a real mouse drag, a drag that misses the box, keyboard, and a touch tap: all logged correctly; no sideways scroll, no page errors. A touch DRAG has not been tried on a real tablet.
+  - Until Part 32: a tapped answer still earns Graph Skeptic and counts towards Because Builder. Part 32 changes those rules and adds the thesis columns.
+
 ## Next
-- Round 3 next: Habiba checks Parts 28-29; then Part 30.
+- Round 3 next: Habiba checks Part 30; then Part 31.
 - Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).

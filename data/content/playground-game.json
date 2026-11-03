@@ -11,15 +11,15 @@
     "tell": "📊 What does this graph tell us about recess games?",
     "notTell": "🤔 What can't this graph tell us?",
     "noLine": "🤔 Games have no order. A line between them means nothing. Try a bar!",
-    "tellHints": [
-      "Find the tallest bar. Which game is it?",
-      "Try: \"Most kids picked...\"",
-      "Which game did only a few kids pick?"
+    "tellAnswers": [
+      "{top} is the most common answer, with {topCount}.",
+      "Only {lowCount} picked {low}.",
+      "Kids picked {kinds} different games."
     ],
-    "notTellHints": [
-      "Does it tell us WHY kids like that game?",
-      "Would another school pick the same games?",
-      "Try: \"It doesn't tell us why...\""
+    "notTellAnswers": [
+      "It doesn't tell us why kids like that game.",
+      "It doesn't tell us what other schools play.",
+      "It doesn't tell us who picked which game."
     ]
   },
   "chanceLab": {

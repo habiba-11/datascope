@@ -10,15 +10,15 @@
   "graphLab": {
     "tell": "📊 What does this graph tell us about our shoe sizes?",
     "notTell": "🤔 What can't this graph tell us?",
-    "tellHints": [
-      "Find the tallest bar. Which size is it?",
-      "Try: \"Most kids wear size...\"",
-      "Look again. Is there more than one tallest bar?"
+    "tellAnswers": [
+      "{top} are most common, with {topCount} each.",
+      "Fewer kids wear {low}, only {lowCount} each.",
+      "The sizes go from {min} to {max}."
     ],
-    "notTellHints": [
-      "Does it tell us WHY feet are different sizes?",
-      "Does it tell us next year's sizes?",
-      "Try: \"It doesn't tell us...\""
+    "notTellAnswers": [
+      "It doesn't tell us why feet are different sizes.",
+      "It doesn't tell us what sizes kids will wear next year.",
+      "It doesn't tell us which shoes kids like to wear."
     ]
   },
   "chanceLab": {

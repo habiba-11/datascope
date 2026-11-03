@@ -66,10 +66,10 @@ test('content never says "middle" (we say "centre": Part 9.5 decision on how kid
   }
 });
 
-test('Graph Lab hints: 1 to 3 per question, like the other hints', () => {
+test('Graph Lab: 3 suggested answers per question (at most 3 choices at once)', () => {
   for (const { id, content } of contents) {
-    for (const list of [content.graphLab.tellHints, content.graphLab.notTellHints]) {
-      assert.ok(list.length >= 1 && list.length <= 3, id);
+    for (const list of [content.graphLab.tellAnswers, content.graphLab.notTellAnswers]) {
+      assert.equal(list.length, 3, id);
     }
   }
 });
@@ -83,10 +83,10 @@ test('a scenario with word answers explains why it has no line chart', () => {
   }
 });
 
-test('hints do not start with an emoji (the hint box already adds 🦉)', () => {
+test('a suggested answer has no emoji at its start (a child may keep it as their own words)', () => {
   for (const { id, content } of contents) {
-    for (const hint of [...content.graphLab.tellHints, ...content.graphLab.notTellHints]) {
-      assert.match(hint, /^[\p{L}"']/u, `${id}: "${hint}"`);
+    for (const answer of [...content.graphLab.tellAnswers, ...content.graphLab.notTellAnswers]) {
+      assert.match(answer, /^[\p{L}{]/u, `${id}: "${answer}"`);
     }
   }
 });

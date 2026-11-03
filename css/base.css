@@ -289,6 +289,66 @@ h1 {
   font-weight: 600;
 }
 
+/* Hints that give answers (createAnswerHint in js/helpers/prompts.js). */
+.hint-list.suggestion-list {
+  max-width: none;
+}
+
+.suggestion-list li {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 18px;
+}
+
+.suggestion-list .suggestion-help {
+  font-weight: 800;
+}
+
+.suggestion-chip {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  background: var(--color-plan-light);
+  color: var(--color-text);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-button);
+  box-shadow: var(--shadow-button-active);
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 800;
+  text-align: left;
+  cursor: grab;
+  touch-action: none; /* a finger drags the answer instead of scrolling the page */
+  user-select: none;
+}
+
+/* Already in the box: a tick as well as the paler look. */
+.suggestion-chip:disabled {
+  background: var(--color-soft);
+  box-shadow: none;
+  cursor: default;
+}
+
+.suggestion-chip:disabled::before {
+  content: '✓ ';
+}
+
+/* The copy that follows the finger while dragging. */
+.suggestion-copy {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  box-shadow: var(--shadow-card);
+}
+
+/* The box says "drop it here" with a thicker edge, as well as its colour. */
+.drop-ready {
+  outline: 5px dashed var(--color-btn-main-bg);
+  outline-offset: 2px;
+}
+
 .btn-run {
   background: var(--color-btn-run-bg);
   color: var(--color-btn-run-text);

@@ -10,15 +10,15 @@
   "graphLab": {
     "tell": "📊 What do the two graphs tell us?",
     "notTell": "🤔 What can't these graphs tell us?",
-    "tellHints": [
-      "Compare the two graphs. Which one is wider?",
-      "Try: \"Class B's answers are more...\"",
-      "Where are most kids in Class A?"
+    "tellAnswers": [
+      "Class A's answers are close together, from {min} to {max}.",
+      "Class B's answers are spread out, from {minB} to {maxB}.",
+      "Both classes have a mean of {meanA} minutes."
     ],
-    "notTellHints": [
-      "Do they tell us WHY one class reads more?",
-      "Do they tell us what the kids read?",
-      "Try: \"They don't tell us...\""
+    "notTellAnswers": [
+      "They don't tell us why one class reads differently.",
+      "They don't tell us what the kids read.",
+      "They don't tell us how fast the kids read."
     ]
   },
   "chanceLab": {

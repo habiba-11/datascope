@@ -4,7 +4,8 @@ import { compareValues } from '../helpers/stats.js';
 import { buildFrequencyData, makeChartConfig, directLabelsPlugin, describeChart, pieKeyPosition, lineFits } from '../helpers/charts.js';
 import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import { logEvent } from '../helpers/log.js';
-import { createHint } from '../helpers/prompts.js';
+import { createAnswerHint } from '../helpers/prompts.js';
+import { graphFacts, fillSuggestions } from '../helpers/suggestions.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
 import { countWords } from '../helpers/feedback.js';
@@ -131,22 +132,27 @@ async function init() {
     renderCharts(type);
   });
 
-  // "change" fires when the child leaves the box after editing it,
-  // so we log the finished answer, not every key press.
+  // The hints give answers built from the class's real numbers. Their button
+  // sits in the action bar while their question is on screen.
+  const facts = graphFacts(recipe, classes[0].values, partner, partner ? classes[1].values : null);
+  const answerHint = (id, key, templates) => createAnswerHint(
+    key, 'graph-lab', fillSuggestions(templates, facts), document.getElementById(id),
+  );
+  const hints = {
+    tell: answerHint('tell', 'graph-tell', graphLab.tellAnswers),
+    'not-tell': answerHint('not-tell', 'graph-not-tell', graphLab.notTellAnswers),
+  };
+  Object.entries(hints).forEach(([id, { list }]) => document.getElementById(`${id}-hints`).append(list));
+
+  // "change" fires when the child leaves the box after editing it (or a hint
+  // fills it), so we log the finished answer, not every key press.
   ['tell', 'not-tell'].forEach((id) => {
     document.getElementById(id).addEventListener('change', (event) => {
       logEvent('graph-lab', 'reflection', {
-        scenarioId: recipe.id, chartType: currentType, prompt: id, text: event.target.value.trim(),
+        scenarioId: recipe.id, chartType: currentType, prompt: id, text: event.target.value.trim(), ...hints[id].answerFields(),
       });
     });
   });
-
-  // The hints sit in the action bar while their question is on screen.
-  const hints = {
-    tell: createHint('graph-tell', 'graph-lab', graphLab.tellHints),
-    'not-tell': createHint('graph-not-tell', 'graph-lab', graphLab.notTellHints),
-  };
-  Object.entries(hints).forEach(([id, { list }]) => document.getElementById(`${id}-hints`).append(list));
 
   const bar = setupActionBar({ back: null, primary: { label: '' } });
   const pipLines = [

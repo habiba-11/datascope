@@ -10,15 +10,15 @@
   "graphLab": {
     "tell": "📊 What does this graph tell us about our sleep?",
     "notTell": "🤔 What can't this graph tell us?",
-    "tellHints": [
-      "Find the tallest bar. How many hours is it?",
-      "Try: \"Most kids slept...\"",
-      "Look at the ends: \"Only a few kids...\""
+    "tellAnswers": [
+      "{top} is the most common answer, with {topCount}.",
+      "Only {lowCount} slept {low}.",
+      "The answers go from {min} to {max}."
     ],
-    "notTellHints": [
-      "Does it tell us WHY kids slept that long?",
-      "Does it tell us about other classes?",
-      "Try: \"It doesn't tell us why...\""
+    "notTellAnswers": [
+      "It doesn't tell us why kids slept that long.",
+      "It doesn't tell us what time kids went to bed.",
+      "It doesn't tell us how other classes sleep."
     ]
   },
   "chanceLab": {
