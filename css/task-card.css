@@ -48,6 +48,55 @@
   font-weight: 800;
 }
 
+/* "📖 About this room" (Prof's comment 6): it hangs from the strip, on the right,
+   and is yellow in every room, so it can't be mistaken for an Explore room's tab. */
+.about-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 var(--space-3);
+}
+
+.about-tab {
+  min-height: 48px;
+  padding: 6px var(--space-2);
+  background: var(--color-plan-light);
+  color: var(--color-text);
+  border: var(--border-width) solid var(--color-navy);
+  border-top: 0;
+  border-radius: 0 0 14px 14px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.about-arrow {
+  font-size: 14px;
+}
+
+.about-panel {
+  margin: var(--space-2) var(--space-3) 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-plan-light);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-button);
+}
+
+.about-panel p {
+  margin: 0;
+}
+
+.about-panel .about-title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 22px;
+}
+
+.about-panel .about-done {
+  margin-top: var(--space-1);
+  font-weight: 800;
+}
+
 .task-card-body {
   padding: var(--space-3);
 }

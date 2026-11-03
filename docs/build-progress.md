@@ -1,10 +1,10 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 3: Parts 25-31 committed; Part 32 built (not committed yet), waiting for Habiba's check. Next: Part 33 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
+- Current part: **Round 3: Parts 25-32 committed; Part 33 built (not committed yet), waiting for Habiba's check. Next: Part 34 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
-- Last updated: 3 Nov 2026 (Round 3, Part 32); `node --test` = 270 passing, 0 failing
+- Last updated: 3 Nov 2026 (Round 3, Part 33); `node --test` = 273 passing, 0 failing
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -314,8 +314,17 @@
   - Checked in Chrome: two real Graph Lab runs (tapped: same stars, no Graph Skeptic; edited: same stars, Graph Skeptic earned). Teacher page checked with the database switched off in a test copy (PIN + DEMO); no page errors. The online teacher login was not opened: please check it with your account.
   - Round 3 hints are now complete (Parts 30-32), so badge counts are reliable from here on. Children's data still waits for Prof and the ethics check.
 
+- Part 33 (3 Nov 2026, Round 3, Prof comment 6), 273 tests passing:
+  - "📖 About this room": a yellow tab hanging under the strip of every task card, on the right, in the same spot in all 6 rooms. It opens inside the card (no pop-up) and closes with the same tap; aria-expanded + ▼ ▲; Enter and Space work; 48px.
+  - The panel: the phase's name, "Step 3 of 5", the same bullets as the pop-up, and "✅ You are done when: ..." (new phases.json doneWhen, following the done rules, tested against the 12-word rule).
+  - The pop-up still opens once per child per phase (Prof's Round 2 comment 1), now saying "Tap 📖 About this room any time to see this again." The (i) button is gone.
+  - Question Studio covers two phases: an open panel follows Ask to Plan. My journey has no phase, so no tab.
+  - Log: popup-seen { phase, auto: false, via: 'tab' } when the tab is opened.
+  - Checked in Chrome: all 6 rooms at 1366 and 768, Ask to Plan the real way, keyboard, reload (no pop-up, tab still there), My journey: no sideways scroll, no page errors.
+  - Mention to Prof: it is yellow in every room and sits outside the strip, so it does not look like the Explore room tabs. On a phone-width screen it was not tried.
+
 ## Next
-- Round 3 next: Habiba checks Part 32; then Part 33.
+- Round 3 next: Habiba checks Part 33; then Part 34.
 - Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).

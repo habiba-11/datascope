@@ -6,6 +6,18 @@
 import { pipSVG } from './pip.js';
 import { stepStates } from './helpers/stepper.js';
 
+// Prof's comment 6: the room's summary is a tab a child can reopen at any time,
+// in the same spot on every card (js/phase-intro.js fills it). It hangs under the
+// strip and is yellow, so it can't be mistaken for an Explore room's tab. It stays
+// hidden on a page with no phase (My journey).
+const ABOUT_TAB_HTML = `
+  <div class="about-row">
+    <button class="about-tab" id="about-tab" type="button" aria-expanded="false" aria-controls="about-panel" hidden>
+      📖 About this room <span class="about-arrow" aria-hidden="true">▼</span>
+    </button>
+  </div>
+  <div class="about-panel" id="about-panel" hidden></div>`;
+
 // title:     the strip's words, e.g. "Collect · Data Hub"
 // pill:      optional small label on the right of the strip (e.g. the pretend-class label)
 // tabsHTML:  optional tabs in the strip instead of the title (the Explore rooms)
@@ -17,6 +29,7 @@ export function taskCardHTML({ title, pill = '', tabsHTML = '', bodyHTML }) {
   return `
     <section class="task-card m-rise">
       <header class="task-card-strip">${strip}</header>
+      ${ABOUT_TAB_HTML}
       <div class="task-card-body">${bodyHTML}</div>
     </section>`;
 }

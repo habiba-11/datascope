@@ -1,6 +1,7 @@
-// Shell layer: the "what happens here" pop-up at the start of each phase (Part 14).
-// It opens by itself the first time a child reaches a phase; the ℹ️ button
-// in the header opens it again at any time. Texts: data/content/phases.json.
+// Shell layer: what each phase is about (Part 14, Part 33). A pop-up opens by
+// itself the first time a child reaches a phase; the "📖 About this room" tab on
+// the task card shows the same words, and more, at any time (Prof's comment 6).
+// Texts: data/content/phases.json.
 import { openModal } from './modal.js';
 import { logEvent } from './helpers/log.js';
 import { hasSeenIntro, markIntroSeen } from './storage/save.js';
@@ -20,33 +21,33 @@ function loadPhases() {
   return phasesPromise;
 }
 
-async function showPhaseIntro(phase, auto) {
-  const intro = (await loadPhases())[phase];
-  if (!intro) return;
+function el(tag, text, className) {
+  const element = document.createElement(tag);
+  element.textContent = text;
+  element.className = className;
+  return element;
+}
 
-  // "Step 3 of 5", then the bullets rise in one after another (UI guide f2).
-  const body = document.createElement('div');
-  const where = document.createElement('p');
-  where.className = 'intro-step';
-  where.textContent = `Step ${STEP_ORDER.indexOf(STEP_OF_PHASE[phase]) + 1} of ${STEP_ORDER.length}`;
-  const list = document.createElement('ul');
-  list.className = 'intro-list';
+// "Step 3 of 5", then the bullets rise in one after another (UI guide f2).
+function introNodes(phase, intro) {
+  const where = el('p', `Step ${STEP_ORDER.indexOf(STEP_OF_PHASE[phase]) + 1} of ${STEP_ORDER.length}`, 'intro-step');
+  const list = el('ul', '', 'intro-list');
   intro.bullets.forEach((bullet, i) => {
-    const item = document.createElement('li');
-    item.textContent = bullet;
-    item.className = 'm-rise';
+    const item = el('li', bullet, 'm-rise');
     item.style.setProperty('--i', i + 2);
     list.append(item);
   });
-  body.append(where, list);
-  if (auto) {
-    const again = document.createElement('p');
-    again.className = 'intro-again';
-    again.textContent = 'Tap the (i) button any time to see this again.';
-    body.append(again);
-  }
+  return [where, list];
+}
 
-  logEvent('shell', 'popup-seen', { phase, auto });
+async function showPhaseIntro(phase) {
+  const intro = (await loadPhases())[phase];
+  if (!intro) return;
+
+  const body = document.createElement('div');
+  body.append(...introNodes(phase, intro), el('p', 'Tap 📖 About this room any time to see this again.', 'intro-again'));
+
+  logEvent('shell', 'popup-seen', { phase, auto: true });
   await openModal({
     icon: intro.icon,
     title: intro.title,
@@ -56,22 +57,51 @@ async function showPhaseIntro(phase, auto) {
   });
 }
 
+// Fills the tab's panel with the phase the child is in now.
+async function fillAboutPanel(panel, phase) {
+  const intro = (await loadPhases())[phase];
+  if (!intro) return;
+  panel.replaceChildren(
+    el('p', `${intro.icon} ${intro.title}`, 'about-title'),
+    ...introNodes(phase, intro),
+    el('p', `✅ You are done when: ${intro.doneWhen}`, 'about-done'),
+  );
+}
+
 // Tells the shell which phase the child is in now. Shows its intro if this
 // child has never seen it. "Seen" is saved straight away (before the texts
 // load), so two quick calls can never open the same intro twice.
 export function setIntroPhase(phase) {
   currentPhase = phase;
+  // A room with a phase has the tab. One room covers two phases (Ask, then
+  // Plan), so an open panel follows along.
+  const tab = document.getElementById('about-tab');
+  const panel = document.getElementById('about-panel');
+  if (tab) tab.hidden = false;
+  if (panel && !panel.hidden) fillAboutPanel(panel, phase);
+
   if (hasSeenIntro(phase)) return;
   markIntroSeen(phase);
-  autoIntroClosed = showPhaseIntro(phase, true);
+  autoIntroClosed = showPhaseIntro(phase);
 }
 
 export function whenIntroClosed() {
   return autoIntroClosed;
 }
 
-// The ℹ️ button always shows the intro of the phase the child is in now.
-export function setupInfoButton() {
-  const button = document.getElementById('info-btn');
-  if (button) button.addEventListener('click', () => showPhaseIntro(currentPhase, false));
+// The "📖 About this room" tab opens and closes its panel inside the card.
+export function setupAboutTab() {
+  const tab = document.getElementById('about-tab');
+  const panel = document.getElementById('about-panel');
+  if (!tab) return;
+  tab.addEventListener('click', async () => {
+    const opening = panel.hidden;
+    if (opening) {
+      await fillAboutPanel(panel, currentPhase);
+      logEvent('shell', 'popup-seen', { phase: currentPhase, auto: false, via: 'tab' });
+    }
+    panel.hidden = !opening;
+    tab.setAttribute('aria-expanded', String(opening));
+    tab.querySelector('.about-arrow').textContent = opening ? '▲' : '▼';
+  });
 }

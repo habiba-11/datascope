@@ -15,7 +15,7 @@ export const EVENT_TYPES = [
   'reflection',   // what a graph tells / does NOT tell
   'claim',        // the final Evidence Board claim
   'teacher-tag',  // a misconception the teacher tagged (teacher view)
-  'popup-seen',   // a phase intro pop-up was shown (auto: by itself, or via ℹ️)
+  'popup-seen',   // a phase's summary was shown (auto: the pop-up by itself; via: 'tab' from 📖 About this room)
   'phase-start',  // the child entered a phase not yet done (time per phase = first start to complete)
   'phase-complete', // the child finished a phase (logged once per code + scenario)
   'phase-feedback', // the feedback card shown at the end of a phase, with its stars

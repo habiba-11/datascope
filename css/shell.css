@@ -7,12 +7,7 @@
   gap: 12px;
 }
 
-/* ℹ️ reopens the phase intro pop-up (js/phase-intro.js); it is an .icon-btn. */
-.info-btn {
-  color: var(--color-navy);
-}
-
-/* A room's own tool (📘 Maths recap, 📋 My findings) sits next to ℹ️. */
+/* A room's own tool (📘 Maths recap, 📋 My findings) sits in the top bar. */
 .room-tools {
   display: contents;
 }

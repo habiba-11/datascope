@@ -12,12 +12,13 @@ READ FIRST (in this order):
 2. docs/build-progress.md
 3. docs/architecture.md
 4. docs/round-2-plan.md
-5. docs/design/ui-ux-guide.md and docs/privacy-note.md
+5. docs/design/ui-ux-guide.md, docs/design/frames/f0-tutorial.html and docs/privacy-note.md
 6. The code you need to understand each comment: js/app.js, js/welcome.js, js/phase-intro.js, js/recap.js, js/helpers/charts.js, js/rooms/graph-lab.js, js/rooms/number-lab.js, js/rooms/chance-lab.js, js/rooms/question-studio.js, js/rooms/evidence-board.js, js/helpers/prompts.js, js/helpers/checker.js, js/helpers/number-tasks.js, js/helpers/badges.js, js/helpers/feedback.js, js/helpers/thesis.js, data/content/*.json, index.html, css/*.css
 
 PROF'S COMMENTS (my words, in order of the meeting):
 
 1. START-PAGE TUTORIAL. A student who opens the site will be confused: he does not know what he will learn, what the website is for, or how to use it. Prof suggested a mini tutorial video or animation on the start page, at the very beginning, showing (a) the purpose of the website, (b) how to use it, and (c) a brief summary of all the rooms.
+   UI REFERENCE: I will put docs/design/frames/f0-tutorial.html in the repo. It is an animated reference (same style as the other frames) with 6 screens: Hello, Your mission, The journey (5 steps), The 6 rooms, How to use it (hints + room tab), Ready. Open it in a browser, match its look and motion, and take the "Notes for building it" at the bottom of that page as the starting spec. Tell me what you would change.
 
 2. GRAPHS AND CHARTS (Graph Lab, and any chart a child sees). The UI is not suitable:
    - a little larger font, and BOLD, dark text (not light grey)

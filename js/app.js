@@ -1,6 +1,6 @@
 import { getExplorerCode, getDonePhases, getPreviewAll } from './storage/save.js';
 import { countBadges, counterHTML, backpackLabel, setupCelebrations } from './celebrate.js';
-import { setupInfoButton } from './phase-intro.js';
+import { setupAboutTab } from './phase-intro.js';
 import { guardPage, enterPhase } from './phase-progress.js';
 import { visibleSteps, isStepDone, isUnlocked, hasMoreSteps } from './helpers/progress.js';
 import { pipReacts, enterRoom, float, unlockStep, confetti } from './motion.js';
@@ -54,7 +54,6 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
       <nav class="step-bar" aria-label="Investigation steps">${stepBarHTML()}</nav>
       <div class="header-actions">
         <span class="room-tools" id="room-tools"></span>
-        <button class="btn icon-btn info-btn" id="info-btn" type="button" aria-label="What to do" title="What to do">${lineIcon('info', 28, 2.6)}</button>
         <button class="btn icon-btn badge-counter" id="badge-counter" type="button" aria-label="${backpackLabel(countBadges())}">${counterHTML(countBadges())}</button>
       </div>
     </header>
@@ -90,7 +89,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   root.querySelectorAll('.feedback').forEach((el) => el.setAttribute('aria-live', 'polite'));
 
   setupCelebrations();
-  setupInfoButton();
+  setupAboutTab();
   watchPressedState();
   // Part 22: send the log to the online database (only when it is switched on).
   startSync((status) => {
@@ -250,7 +249,7 @@ export function setCurrentStep(stepId) {
 
 // Puts a room's own tool (e.g. "📘 Maths recap") next to its title, so it
 // never crowds the task text underneath. In the card layout it goes into the
-// top bar instead, next to (i) (UI guide: at most 3 buttons there).
+// top bar instead (UI guide: at most 3 buttons there).
 export function addTitleButton(button) {
   const tools = document.getElementById('room-tools');
   if (document.querySelector('.card-layout') && tools) {
