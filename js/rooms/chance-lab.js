@@ -154,7 +154,7 @@ function refreshPrimary() {
   } else if (isPhaseDone('chance') && taskComplete[3]) {
     bar.setPrimary({ label: '🚩 Next: Evidence Board →', ready: true, onClick: () => { location.href = 'evidence-board.html'; } });
   } else if (justRan) {
-    bar.setPrimary({ label: "✅ I'm done testing", onClick: () => finishPhase('chance', chanceFacts).then(refreshPrimary) });
+    bar.setPrimary({ label: "✅ I'm done testing", onClick: () => finishPhase('chance', withYourWork()).then(refreshPrimary) });
   } else {
     bar.setPrimary({ label: `▶ ${runWord(selectedDevice)} ${runSize} times`, onClick: runTrials });
   }
@@ -163,6 +163,15 @@ function refreshPrimary() {
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
   if (currentTask === taskNum) refreshPrimary();
+}
+
+// The facts for the summary card, with the child's "why" for "Your work".
+function withYourWork() {
+  return {
+    ...chanceFacts,
+    reason: document.getElementById('predict-reason').value.trim(),
+    reasonSource: hint ? hint.answerFields().answerSource : null,
+  };
 }
 
 function setupDevicePicker() {

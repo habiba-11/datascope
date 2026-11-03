@@ -134,15 +134,63 @@ const RULES = {
 
 export const FEEDBACK_PHASES = Object.keys(RULES);
 
-// Returns { stars (1 to 3), wins (at most 3), nextTime, learned }.
+// The words under the stars (f7b design), so the stars are never the only
+// signal. Kind at every level: there is no "bad".
+export const STAR_WORDS = { 3: 'Great thinking!', 2: 'Good thinking!', 1: 'Nice start!' };
+
+// Where "Your work" came from, as the small chip on the card says it.
+export const SOURCE_CHIPS = {
+  own: '🧑 your own words',
+  choice: '🧑 your own choice',
+  hint: '💡 a hint',
+  'hint-edited': '💡 a hint you changed',
+  mixed: '🧑💡 your words and a hint',
+};
+
+// One source for an answer made of several boxes (the claim: "I think" + "because").
+export function combineSources(sources) {
+  const known = sources.filter(Boolean);
+  if (known.length === 0) return null;
+  if (known.every((s) => s === known[0])) return known[0];
+  if (known.every((s) => s !== 'own')) return 'hint-edited';
+  return 'mixed';
+}
+
+// "Your work": the child's own answer in this phase, shown back to them (f7b
+// design), or null when the phase has none. `source` may be null for an
+// answer logged before Round 3 (then no chip). Shown with textContent only.
+const YOUR_WORK = {
+  ask: (f) => {
+    if (f.ownQuestion) return { label: 'Your question', text: f.ownQuestion, source: 'own' };
+    return f.question ? { label: 'Your question', text: f.question, source: 'choice' } : null;
+  },
+  plan: (f) => (f.guessText ? { label: 'Your guess', text: f.guessText, source: 'choice' } : null),
+  collect: (f) => (f.guess !== null && f.guess !== undefined ? { label: 'Your guess', text: String(f.guess), source: 'choice' } : null),
+  graph: (f) => (f.notTellText ? { label: 'What the graph can NOT tell', text: f.notTellText, source: f.notTellSource || null } : null),
+  number: (f) => {
+    if (f.revision && f.revision.reason) return { label: 'Why you changed your guess', text: f.revision.reason, source: f.revision.source || null };
+    return f.guess !== null && f.guess !== undefined ? { label: 'Your guess', text: String(f.guess), source: 'choice' } : null;
+  },
+  chance: (f) => (f.reason ? { label: 'How likely, and why', text: `${f.rating}: ${f.reason}`, source: f.reasonSource || null } : null),
+  conclude: (f) => (f.claimText ? { label: 'Your claim', text: f.claimText, source: combineSources(f.claimSources || []) } : null),
+};
+
+export function yourWork(phase, facts = {}) {
+  return YOUR_WORK[phase] ? YOUR_WORK[phase](facts) : null;
+}
+
+// Returns { stars (1 to 3), starWord, wins (at most 3), nextTime, learned, yourWork }.
 export function buildPhaseFeedback(phase, facts = {}) {
   const rule = RULES[phase];
   if (!rule) throw new Error(`No feedback rules for phase "${phase}"`);
   const card = rule(facts);
+  const stars = Math.min(3, Math.max(1, card.stars));
   return {
-    stars: Math.min(3, Math.max(1, card.stars)),
+    stars,
+    starWord: STAR_WORDS[stars],
     wins: card.wins.filter(Boolean).slice(0, 3),
     nextTime: card.nextTime,
     learned: card.learned,
+    yourWork: yourWork(phase, facts),
   };
 }

@@ -156,9 +156,13 @@ function refreshPrimary() {
 // per scenario, so picking another scenario later finishes Ask for that one too.
 function finishAsk() {
   const own = document.getElementById('own-question').value;
+  const ownQuestionClear = own.trim() !== '' && checkQuestion(own).length === 0;
   finishPhase('ask', {
     scenarioTitle: selectedScenario.content.cardTitle,
-    ownQuestionClear: own.trim() !== '' && checkQuestion(own).length === 0,
+    ownQuestionClear,
+    // For "Your work" on the card: their own clear question, or the one they picked.
+    ownQuestion: ownQuestionClear ? own.trim() : null,
+    question: selectedScenario.recipe.question,
   });
 }
 

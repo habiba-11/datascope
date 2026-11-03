@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPhaseFeedback, countWords, FEEDBACK_PHASES } from '../js/helpers/feedback.js';
+import {
+  buildPhaseFeedback, countWords, FEEDBACK_PHASES, STAR_WORDS, SOURCE_CHIPS, combineSources, yourWork,
+} from '../js/helpers/feedback.js';
 import { PHASES } from '../js/helpers/progress.js';
 import { makeEntry } from '../js/helpers/log.js';
 
@@ -102,4 +104,47 @@ test('no "next time" line repeats the words the card already shows ("💡 Next t
       assert.doesNotMatch(buildPhaseFeedback(phase, facts).nextTime, /^next time/i, phase);
     }
   }
+});
+
+// ---------- The f7b summary card: star words, "Your work" and its source ----------
+
+test('every star count has kind words, and none says "bad"', () => {
+  assert.deepEqual(Object.keys(STAR_WORDS), ['1', '2', '3']);
+  for (const words of Object.values(STAR_WORDS)) assert.doesNotMatch(words, /bad|poor|wrong/i);
+  assert.equal(buildPhaseFeedback('plan', { guessText: '9' }).starWord, 'Great thinking!');
+});
+
+test('Your work shows the child\'s own answer in every phase that has one', () => {
+  assert.deepEqual(yourWork('ask', { ownQuestion: 'How many pets do you have this year?', question: 'q' }),
+    { label: 'Your question', text: 'How many pets do you have this year?', source: 'own' });
+  assert.equal(yourWork('ask', { question: 'How many hours did you sleep last night?' }).source, 'choice');
+  assert.equal(yourWork('plan', { guessText: '9' }).text, '9');
+  assert.equal(yourWork('collect', { guess: 8 }).text, '8');
+  assert.equal(yourWork('collect', { guess: null }), null);
+  assert.equal(yourWork('graph', { notTellText: 'Why kids sleep', notTellSource: 'hint' }).source, 'hint');
+  assert.equal(yourWork('number', { guess: 7, revision: { reason: 'the mean is 8.4', source: 'own' } }).label, 'Why you changed your guess');
+  assert.equal(yourWork('number', { guess: 7 }).text, '7');
+  assert.equal(yourWork('chance', { rating: 'Likely', reason: 'red is big', reasonSource: 'hint-edited' }).text, 'Likely: red is big');
+  assert.equal(yourWork('conclude', { claimText: 'I think x because y.', claimSources: ['own', 'own'] }).source, 'own');
+  assert.equal(yourWork('graph', {}), null);
+});
+
+test('an answer logged before Round 3 has no source, so no chip', () => {
+  assert.equal(yourWork('graph', { notTellText: 'Why kids sleep' }).source, null);
+  assert.equal(combineSources([null, undefined]), null);
+});
+
+test('a claim made of two boxes gets one honest source', () => {
+  assert.equal(combineSources(['own', 'own']), 'own');
+  assert.equal(combineSources(['hint', 'hint']), 'hint');
+  assert.equal(combineSources(['hint', 'hint-edited']), 'hint-edited');
+  assert.equal(combineSources(['own', 'hint']), 'mixed');
+  assert.equal(combineSources(['own', null]), 'own');
+  for (const source of ['own', 'choice', 'hint', 'hint-edited', 'mixed']) assert.ok(SOURCE_CHIPS[source], source);
+});
+
+test('Your work never changes the stars (a hint never costs a star)', () => {
+  const own = buildPhaseFeedback('graph', { typesTried: 2, notTellWords: 6, notTellText: 'x', notTellSource: 'own' });
+  const hint = buildPhaseFeedback('graph', { typesTried: 2, notTellWords: 6, notTellText: 'x', notTellSource: 'hint' });
+  assert.equal(own.stars, hint.stars);
 });

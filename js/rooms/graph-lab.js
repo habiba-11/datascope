@@ -206,10 +206,16 @@ async function init() {
     finishPhase('graph', {
       typesTried: typesTried.size,
       notTellWords: countWords(document.getElementById('not-tell').value),
+      // For "Your work" on the card (only words; the stars ignore the source).
+      notTellText: document.getElementById('not-tell').value.trim(),
+      notTellSource: hints['not-tell'].answerFields().answerSource,
     });
     refreshPrimary();
   }
 
+  // A chart is drawn once, on a canvas: wait for the chart font, or the labels
+  // stay in a fallback font (Part 36: the fonts are local, so this is quick).
+  await document.fonts.load(`bold 18px Nunito`).catch(() => {});
   document.querySelector('.segment[data-value="bar"]').click();
   showStep(0);
 }

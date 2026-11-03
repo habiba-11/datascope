@@ -568,6 +568,7 @@ function setupRevision(n, getOldGuess) {
       return;
     }
     numberFacts.changedWithReason = true;
+    numberFacts.revision = { reason, source: reasonHint.answerFields().answerSource }; // "Your work" on the card
     logEvent('number-lab', 'revision', {
       about: recipe.question, scenarioId: recipe.id, changed: true, oldGuess: getOldGuess(), newGuess, reason, ...reasonHint.answerFields(),
     });

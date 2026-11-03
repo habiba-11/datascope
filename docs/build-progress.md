@@ -1,7 +1,7 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 3: Parts 25-34 committed; Part 35 done by Claude (not committed yet); waiting for Habiba's device / keyboard test and her choice on the small navigation labels. Part 36 (deploy) locked until "Prof confirmed".** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
+- Current part: **Round 3: Parts 25-35, Part 36a (deploy prep) and the f7b summary card committed (3 Nov 2026, after "Prof confirmed"). NEXT (Habiba, 4 Nov): follow docs/deploy-guide.md: `npm run pin` (new PIN) → commit → `npm run deploy-check` → `git push` → switch on GitHub Pages → tell Claude what the live link shows; then 36c (live test together, offline copy, demo-video script). Nothing is pushed yet.** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
 - Last updated: 3 Nov 2026 (Round 3, Part 34); `node --test` = 280 passing, 0 failing
@@ -345,7 +345,23 @@
   - Left for Habiba: the step names (16px), mini stepper chips (15px), the code / sound / online line (14 to 15px) are still under 18px (the UI guide allows 15px labels; CLAUDE.md says 18px). On the tutorial's last scene, "Watch again" and "Start exploring" are both green.
 
 ## Next
-- Habiba: commit Part 35; try Round 3 on a real tablet or Chromebook (touch drag of hint answers, the tutorial's timing for a slow reader) and keyboard-only.
+- Part 36a (3 Nov 2026, after Habiba wrote "Prof confirmed"), 293 tests passing:
+  - Fonts stored with the app: css/fonts.css + assets/fonts/ (Baloo 2 and Nunito, SIL Open Font License, Latin + Latin Extended only, 4 files, about 135 KB). Chart.js 4.5.1 stored as js/vendor/chart.umd.min.js (MIT, the same version as before). All 9 pages use them; no page loads anything from the internet.
+  - js/config.js: database OFF for the live site until Prof and the ethics check say yes (decided 27 Oct).
+  - Teacher PIN: no longer written in the docs or the tests (tests use a made-up PIN; checkPin takes the hash). New tool `npm run pin` (dev/pin-hash.mjs) prints only the fingerprint of a new PIN (10+ characters). The old PIN still works until Habiba pastes the new fingerprint into js/helpers/pin.js.
+  - `npm run deploy-check` (dev/deploy-check.mjs): runs the tests and lists blockers (old PIN, uncommitted changes) and the database switch.
+  - tests/deploy.test.js + dev/site-files.mjs: every file the site asks for exists with EXACTLY that spelling (GitHub Pages runs on Linux, which is case-sensitive; 346 references in 96 files), no page loads from the internet, no secret key, database off, .nojekyll present.
+  - .nojekyll (GitHub Pages serves files as they are); .gitattributes keeps the fonts byte-for-byte.
+  - docs/deploy-guide.md: a beginner's guide (what deploying is, new PIN, deploy check, push, switch on Pages, test, updating later, switching the database on later, what to do if something goes wrong).
+  - Found while checking and fixed: Graph Lab drew its chart before the font file had loaded, so chart labels were in a fallback font (canvas text never redraws); it now waits for Nunito first (document.fonts.load).
+  - Checked in Chrome with ALL internet blocked and the site served from /datascope/ like GitHub Pages: fonts load from the app, the tutorial plays, Graph Lab draws charts, every room and the teacher page open; 0 requests to the internet, 0 missing files, 0 page errors.
+- End-of-phase summary card redesigned (3 Nov 2026, Habiba: "make it look like the f7b file"; docs/design/frames/f7b-phase-summary.html), 298 tests passing:
+  - js/feedback-card.js rebuilt, css/modal.css (old fb-* styles replaced by ps-*): a header in the step colour with Pip (hops) and "Step 4 of 5"; three big SVG stars (the middle one bigger, empty ones dashed) popping in 300 ms apart; star words "Great thinking!" / "Good thinking!" / "Nice start!" + "N of 3 stars · Stars are for great thinking, not speed."; "✏️ Your work": the child's own answer in quotes with a chip saying where it came from; "You did great" (green, tick icons, at most 3 wins); "Next time" (yellow, bulb); "I learned" (blue, brain); the 7-stop trail (done ✓, this one glows, the rest dashed); "Next stop": the lock shakes, fades, and an open circle in the next room's colour pops in; Conclude: "🎉 Your whole journey is done!". ONE green button that gently pulses; the ✕ is hidden (Esc still closes). Scrolls inside on a small screen with the button pinned. About 5 s of motion; nothing blocks the button. Reduced motion: everything at once, the lock not shown.
+  - helpers/feedback.js (tested): STAR_WORDS, SOURCE_CHIPS, combineSources, yourWork(phase, facts); buildPhaseFeedback now also returns starWord and yourWork. Stars are unchanged and never depend on the source (tested).
+  - Decided while building: "Your work" per phase: Ask = their own clear bonus question, or the question they picked ("your own choice"); Plan and Collect = their guess ("your own choice", Collect has no written answer); Graph Lab = what the graph can NOT tell; Number Lab = why they changed their guess, or their guess; Chance Lab = "Likely: <reason>"; Conclude = the claim card's sentence. A fourth chip "🧑💡 your words and a hint" for a claim that mixes both (f7b had 3 chips). Answers logged before Round 3 show no chip.
+  - The rooms pass the extra facts to finishPhase (question-studio, graph-lab, number-lab, chance-lab, evidence-board).
+  - Checked in Chrome through all 7 phases the real way: 1366 with reduced motion (all 7 cards: the right colour, step, words, answer, chip, trail, next stop, button in view and focused, no text under 18px, no page errors) and 768 with motion (the lock opens; the only page errors are the known Part 21a page-fade one).
+- Habiba: try Round 3 on a real tablet or Chromebook (touch drag of hint answers, the tutorial's timing for a slow reader) and keyboard-only.
 - Decided 3 Nov 2026 (Habiba, option a): the small navigation labels (step names, mini stepper chips, code / sound / online line) stay at 14 to 16px; they are short labels, not reading text, and 18px would make the step chips wrap on a tablet.
 - Part 36 (deploy) stays locked until Habiba writes "Prof confirmed".
 - Thesis: declare the AI assistance used (GIU regulations).
@@ -369,7 +385,7 @@
 - 25 Oct 2026 (Part 17c): no extra scenario-linked Chance Lab device for now.
 - 25 Oct 2026 (Part 15): done rules as in the plan, but Conclude = card built (saving moves to My Journey); teacher "open all rooms" preview switch keeps the architecture's "a teacher can open any room"; progress per code + scenario (switching back restores it); Explore rooms open in order Graph → Number → Chance.
 - 27 Oct 2026 (Part 22): Supabase backend via plain fetch (no library); save first, send later; children may only add, teacher reads after email login (PIN only when the database is off); no file import/export for children or teacher when the database is on; test codes only until Prof + ethics say yes.
-- 26 Oct 2026: teacher view NOT hidden: a start-page button + PIN (teacher123, stored as a hash). Part 21: GSAP allowed (local copy), Playwright allowed as a dev tool, Pip becomes an original SVG.
+- 26 Oct 2026: teacher view NOT hidden: a start-page button + PIN (stored as a hash; since Part 36 the PIN is not written in the docs, and Habiba sets a new one before deploy). Part 21: GSAP allowed (local copy), Playwright allowed as a dev tool, Pip becomes an original SVG.
 - 26 Oct 2026: Evidence Board audience/form task removed (Habiba); "My findings" summary replaces the maths recap in Conclude.
 - 25 Oct 2026 (Part 19): time per phase is for the teacher only, never shown to the child.
 - Still open (decide before the part that needs it): real rubric levels from the Paper 7 and 13 PDFs (Part 20).

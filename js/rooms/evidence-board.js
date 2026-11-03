@@ -229,6 +229,9 @@ function concludeFacts() {
     evidenceCount: selectedEvidence.size,
     certaintyReasonWords: countWords(document.getElementById('certainty-reason').value),
     teaches: scenarioTeaches,
+    // For "Your work" on the card: the claim as the Evidence Card shows it.
+    claimText: document.getElementById('slot-claim').textContent,
+    claimSources: [claimHint.answerFields().answerSource, becauseHint.answerFields().answerSource],
   };
 }
 

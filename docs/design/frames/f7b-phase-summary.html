@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataScope – Enhanced end-of-phase summary (reference)</title>
+<!-- VISUAL + MOTION REFERENCE ONLY (DataScope Round 3). Replaces docs/design/frames/f7-phasefeedback.html.
+     Values -> css/theme.css variables, m-* classes -> css/motion.css, texts -> helpers/feedback.js.
+     All text here is SYNTHETIC example data. In the real app everything a child typed is shown with textContent. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#17324D;--bg:#E6F4FF;--ask:#FF7A6B;--plan:#FFC531;--collect:#38B6FF;--explore:#4CC26B;--conclude:#A596FF;--green:#217A3B;--line:#9CC6E6;--muted:#3F5A75}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--navy);font-family:'Nunito',sans-serif;font-weight:700}
+h1,h2,h3,.baloo{font-family:'Baloo 2',sans-serif;font-weight:800}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 20px 60px}
+.top h1{margin:0;font-size:30px}.top p{margin:4px 0 14px;font-size:18px;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.bar button,.bar .grp{font:inherit}
+.chip{min-height:48px;padding:0 16px;border:3px solid var(--navy);border-radius:16px;background:#fff;font-family:'Baloo 2';font-weight:800;font-size:18px;color:var(--navy);cursor:pointer;box-shadow:0 4px 0 var(--navy)}
+.chip[aria-pressed=true]{background:var(--c,#fff);box-shadow:0 1px 0 var(--navy);transform:translateY(3px)}
+.chip.go{background:var(--green);color:#fff}
+.sep{width:2px;height:34px;background:var(--line);margin:0 4px}
+.lbl{font-size:16px;color:var(--muted)}
+.stage{position:relative;overflow:hidden;border:3px solid var(--navy);border-radius:28px;box-shadow:0 7px 0 var(--navy);background:var(--bg);min-height:860px}
+.fake{position:absolute;inset:0;padding:16px 28px}
+.fake .logo{display:flex;align-items:center;gap:10px;font-size:26px}
+.fake .card{max-width:900px;height:640px;margin:12px auto 0;background:#fff;border:3px solid var(--navy);border-radius:28px;box-shadow:0 7px 0 var(--navy)}
+.scrim{position:relative;min-height:860px;background:rgba(23,50,77,.55);display:flex;align-items:flex-start;justify-content:center;padding:22px 16px 34px}
+.modal{position:relative;width:100%;max-width:620px;background:#fff;border:3px solid var(--navy);border-radius:30px;box-shadow:0 8px 0 var(--navy);overflow:hidden}
+.mh{display:flex;align-items:center;gap:12px;padding:10px 22px;background:var(--c);border-bottom:3px solid var(--navy)}
+.mh h2{margin:0;font-size:32px;line-height:1.1}
+.mh .step{margin-left:auto;background:#fff;border:3px solid var(--navy);border-radius:999px;padding:2px 14px;font-family:'Baloo 2';font-weight:800;font-size:18px;white-space:nowrap}
+.mb{padding:16px 24px 20px;display:flex;flex-direction:column;gap:12px}
+.stars{display:flex;justify-content:center;align-items:flex-end;gap:10px}
+.starlbl{text-align:center;margin:0}
+.starlbl b{display:block;font-family:'Baloo 2';font-weight:800;font-size:28px;line-height:1.1}
+.starlbl span{font-size:18px;color:var(--muted)}
+.box{border-radius:18px;padding:12px 16px;font-size:19px}
+.box h3{margin:0 0 6px;font-size:20px;display:flex;align-items:center;gap:8px}
+.you{background:#fff;border:3px dashed var(--line)}
+.you .q{margin:0;font-size:21px;font-weight:800;line-height:1.3}
+.src{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:16px;font-weight:800;background:#EEF6FC;border:2px solid var(--line);border-radius:999px;padding:2px 12px;color:var(--muted)}
+.wins{background:#EAF8EE}.wins ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.wins li{display:flex;gap:8px;align-items:flex-start;font-size:19px}
+.wins svg{flex:0 0 auto;margin-top:2px}
+.next{background:#FFF4CF;display:flex;gap:10px;align-items:flex-start}
+.learn{background:#D3EEFF;display:flex;gap:10px;align-items:flex-start}
+.trail{display:flex;align-items:center;justify-content:center;gap:0;padding:2px 0}
+.dot{width:34px;height:34px;border-radius:50%;border:3px solid var(--navy);background:#fff;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2';font-weight:800;font-size:15px;position:relative}
+.dot.done{background:var(--explore)}.dot.now{background:var(--c);box-shadow:0 0 0 4px #fff,0 0 0 7px var(--navy)}
+.dot.lock{border-style:dashed;border-color:var(--line);color:var(--muted)}
+.dot.nextdot{position:relative}
+.seg{width:16px;height:4px;background:var(--line)}.seg.on{background:var(--navy)}
+.nextrow{display:flex;align-items:center;justify-content:center;gap:12px}
+.nextrow .orb{position:relative;width:58px;height:58px}
+.orb>span{position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.orb .op{background:var(--nc);border:3px solid var(--navy)}
+.orb .lk{background:#fff;border:3px dashed var(--line)}
+.nextrow .nm{font-family:'Baloo 2';font-weight:800;font-size:24px}
+.btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center}
+.btn{min-height:56px;padding:0 24px;border:3px solid var(--navy);border-radius:18px;font-family:'Baloo 2';font-weight:800;font-size:22px;cursor:pointer;box-shadow:0 5px 0 var(--navy);display:inline-flex;align-items:center;gap:8px}
+.btn.main{background:var(--green);color:#fff;min-height:60px}
+.btn.alt{background:#fff;color:var(--navy);font-size:19px;min-height:52px}
+.done-all{background:linear-gradient(#FFF4CF,#fff);text-align:center}
+/* motion */
+.m-fade{animation:m-fade .25s ease-out both}
+.m-modal{animation:m-modal .6s cubic-bezier(.34,1.56,.64,1) .1s both}
+.m-star{animation:m-star .6s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i)*300ms + 600ms)}
+.m-rise{animation:m-rise .45s cubic-bezier(.22,1,.36,1) both;animation-delay:var(--d,0ms)}
+.m-pop{animation:m-pop .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:var(--d,0ms)}
+.m-hop{animation:m-hop .7s ease-out .2s both}
+.m-shake{animation:m-shake .4s ease-in-out 3.3s 2}
+.m-lockout{animation:m-lockout .4s ease-in 4.1s both}
+.m-open{animation:m-open .6s cubic-bezier(.34,1.56,.64,1) 4.3s both}
+.m-pulse{animation:m-pulse 1.8s ease-in-out 5s infinite}
+.m-glow{animation:m-glow .8s ease-out var(--d,0ms) both}
+@keyframes m-fade{from{opacity:0}}
+@keyframes m-modal{0%{opacity:0;transform:translateY(40px) scale(.7)}100%{opacity:1;transform:none}}
+@keyframes m-star{0%{opacity:0;transform:scale(0) rotate(-180deg)}70%{transform:scale(1.3) rotate(10deg)}100%{opacity:1;transform:none}}
+@keyframes m-rise{from{opacity:0;transform:translateY(16px)}}
+@keyframes m-pop{0%{opacity:0;transform:scale(.4)}100%{opacity:1;transform:none}}
+@keyframes m-hop{0%,100%{transform:none}40%{transform:translateY(-12px)}}
+@keyframes m-shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+@keyframes m-lockout{to{opacity:0;transform:scale(1.6)}}
+@keyframes m-open{0%{opacity:0;transform:scale(.3)}100%{opacity:1;transform:none}}
+@keyframes m-pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px) scale(1.03)}}
+@keyframes m-glow{0%{box-shadow:0 0 0 0 rgba(255,197,49,.9)}100%{box-shadow:0 0 0 18px rgba(255,197,49,0)}}
+.reduced *{animation:none !important;transition:none !important}.reduced .m-lockout{display:none}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}.m-lockout{display:none}}
+/* notes */
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:26px}
+.n{background:#fff;border:3px solid var(--navy);border-radius:22px;box-shadow:0 5px 0 var(--navy);padding:14px 18px;font-size:18px;font-weight:600}
+.n h3{margin:0 0 6px;font-size:22px}.n ol,.n ul{margin:0;padding-left:22px}.n li{margin:4px 0}
+.n .no{display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;align-items:center;justify-content:center;font-size:16px;margin-right:6px}
+table{border-collapse:collapse;width:100%;font-size:17px;font-weight:600}td,th{border-bottom:2px solid var(--line);padding:5px 6px;text-align:left}
+code{background:#EEF6FC;padding:1px 6px;border-radius:6px;font-size:16px}
+.tag{position:absolute;z-index:3;width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;font-family:'Baloo 2';font-weight:800;font-size:16px;display:none;align-items:center;justify-content:center;border:2px solid #fff;left:-14px;top:50%;transform:translateY(-50%)}
+.showtags .tag{display:flex}.showtags .mod-wrap{padding-left:0}
+.rel{position:relative}
+@media (max-width:640px){.mh h2{font-size:26px}.mh .step{display:none}.mb{padding:14px 16px 18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>End-of-phase summary pop-up – enhanced design</h1>
+    <p>Pick a phase, change the stars, press Replay. Same pop-up after all 7 phases; only the colour, texts and "Your work" change.</p>
+  </div>
+  <div class="bar" id="bar" role="group" aria-label="Choose a phase"></div>
+  <div class="bar">
+    <span class="lbl">Stars:</span>
+    <span id="starbtns"></span>
+    <span class="sep"></span>
+    <button class="chip" id="tagsbtn" aria-pressed="false">Show numbers 1–8</button>
+    <button class="chip" id="rm" aria-pressed="false">Reduced motion</button>
+    <button class="chip go" id="replay">▶ Replay</button>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="fake" aria-hidden="true">
+      <div class="logo baloo"><svg width="40" height="40" viewBox="0 0 48 48"><path d="M24 4l18 10v20L24 44 6 34V14z" fill="#4CC26B"/><circle cx="22" cy="22" r="9" fill="#fff" stroke="#17324D" stroke-width="4"/><line x1="29" y1="29" x2="36" y2="36" stroke="#17324D" stroke-width="4" stroke-linecap="round"/></svg>Data<span style="color:#2E9A4F">Scope</span></div>
+      <div class="card"></div>
+    </div>
+    <div class="scrim m-fade" id="scrim"></div>
+  </div>
+
+  <div class="notes">
+    <div class="n"><h3>What is new (numbers on the pop-up)</h3>
+      <ol>
+        <li><b>Header</b> in the step colour, Pip, bigger title, "Step 3 of 5".</li>
+        <li><b>Stars</b> bigger, plus a word line ("Great thinking!") so stars are never the only signal.</li>
+        <li><b>Your work</b>: the child's own words or choice, shown back to him. Small chip says where it came from (own words, hint, edited hint). Neutral, never a penalty.</li>
+        <li><b>You did great</b>: max 3 wins, 19px, tick icons (not emoji).</li>
+        <li><b>Next time</b>: one tip, yellow.</li>
+        <li><b>I learned</b>: Pip's one-sentence takeaway, blue.</li>
+        <li><b>Trail</b>: 7 dots, this phase lights up, next stop lock → open.</li>
+        <li><b>Button</b>: one green main button only. The room summary lives as a tab in the room (Prof comment 6), not here.</li>
+      </ol></div>
+    <div class="n"><h3>Timeline (ms)</h3>
+      <table>
+        <tr><th>0–100</th><td>Dark scrim fades in</td></tr>
+        <tr><th>100–700</th><td>Pop-up springs up, Pip hops</td></tr>
+        <tr><th>600, 900, 1200</th><td>Stars pop one by one (300 ms apart)</td></tr>
+        <tr><th>1600</th><td>Star words rise</td></tr>
+        <tr><th>1800</th><td>"Your work" rises</td></tr>
+        <tr><th>2100–2500</th><td>Wins rise one by one</td></tr>
+        <tr><th>2800 / 3000</th><td>Next time / I learned rise</td></tr>
+        <tr><th>3200</th><td>Trail dots pop; this phase glows</td></tr>
+        <tr><th>3300–4100</th><td>Lock shakes twice</td></tr>
+        <tr><th>4100–4900</th><td>Lock fades, open circle pops</td></tr>
+        <tr><th>4500</th><td>Buttons rise; main one pulses gently</td></tr>
+      </table>
+      <p style="margin:8px 0 0;font-size:16px">Total about 5 s. Never blocks: all buttons work at once. Reduced motion: no animation, everything shown open.</p></div>
+    <div class="n"><h3>Build notes</h3>
+      <ul>
+        <li>Files: <code>js/feedback-card.js</code>, <code>css/modal.css</code>, <code>helpers/feedback.js</code> (add <code>yourWork</code> + <code>source</code> to each card).</li>
+        <li><b>Your work</b> is read from the log (the child's own question, guess, answer). Show it with <code>textContent</code> only. If empty, hide the box.</li>
+        <li><b>Source chip</b> values: "your own words", "a hint", "a hint you changed". Stars never depend on it unless the rule is about reasoning words (decide with Prof).</li>
+        <li>Star words: 3 = "Great thinking!", 2 = "Good thinking!", 1 = "Nice start!". Never "bad".</li>
+        <li>Keep "Stars are for great thinking, not speed." as small print under the star words.</li>
+        <li>Phone / small Chromebook: pop-up scrolls inside (max-height 90vh); the button row stays pinned at the bottom.</li>
+        <li>Focus goes to the main button; Esc closes (= Look again). <code>role="dialog"</code>, <code>aria-labelledby</code>.</li>
+        <li>Only one button. The last phase (Conclude) shows <b>Finish</b> and the all-done trail.</li>
+        <li>Text sizes: titles 28–32, body 19–21, small print 16. Buttons ≥ 52px high.</li>
+      </ul></div>
+  </div>
+</div>
+
+<script>
+const PH = [
+ {k:'ask',n:'Ask',c:'--ask',step:1,room:'Question Studio',
+  your:{tag:'Your question',q:'"Which playground game do you like best?"',src:'🧑 your own words'},
+  wins:['You picked "Favourite playground game".','You fixed 2 unclear questions.','You wrote your own clear question!'],
+  next:'Ask your real class a question like that!',learn:'A good question is clear, fair and says when.'},
+ {k:'plan',n:'Plan',c:'--plan',step:2,room:'Question Studio',
+  your:{tag:'Your guess',q:'"I think football will be the most popular."',src:'💡 a hint you changed'},
+  wins:['You guessed football before looking.','Guess first, then check. Just like scientists!'],
+  next:'Remember why you guessed that.',learn:'A guess helps you notice surprises in the data.'},
+ {k:'collect',n:'Collect',c:'--collect',step:3,room:'Data Hub',
+  your:{tag:'What you found',q:'"I asked 20 kids. The most common game was Football."',src:'🧑 your own words'},
+  wins:['You asked 20 kids.','Your guess matched the data!','You looked for the most common answer.'],
+  next:'Say what surprised you.',learn:'More kids in the sample gives a more trusted answer.'},
+ {k:'graph',n:'Graph Lab',c:'--explore',step:4,room:'Graph Lab',
+  your:{tag:'What you saw in the graph',q:'"The Football bar is the tallest: 9 kids."',src:'💡 a hint'},
+  wins:['You read the tallest bar.','You used the words "kids" and "games", not only numbers.'],
+  next:'Compare two bars: how many more kids?',learn:'A graph shows many numbers at one glance.'},
+ {k:'number',n:'Number Lab',c:'--explore',step:4,room:'Number Lab',
+  your:{tag:'What you found',q:'"The mean is 4 books, and the middle value is 4 books."',src:'🧑 your own words'},
+  wins:['You found the mean.','You said what the mean tells us.','You checked it with the middle value.'],
+  next:'Say which number is the best "typical" one, and why.',learn:'Mean and middle value both describe a typical number.'},
+ {k:'chance',n:'Chance Lab',c:'--explore',step:4,room:'Chance Lab',
+  your:{tag:'Your prediction',q:'"I predict about 5 heads in 10 flips."',src:'🧑 your own words'},
+  wins:['You predicted before you flipped.','You compared theory and experiment.','You saw: more flips, closer to the theory.'],
+  next:'Try more flips and watch what changes.',learn:'Chance is not luck every time: many tries show a pattern.'},
+ {k:'conclude',n:'Conclude',c:'--conclude',step:5,room:'Evidence Board',
+  your:{tag:'Your answer',q:'"Football is the most popular game: 9 of 20 kids chose it, because it has the tallest bar."',src:'💡 a hint you changed'},
+  wins:['You answered the question.','You used evidence from your data.','You said "because"!'],
+  next:'Share your answer with a friend.',learn:'A good answer uses evidence, not only a feeling.'},
+];
+const WORDS={3:'Great thinking!',2:'Good thinking!',1:'Nice start!'};
+let cur=0,stars=3,reduced=false,tags=false;
+const $=id=>document.getElementById(id);
+const STAR='<path d="M20 3l5 10.2 11.2 1.6-8.1 7.9 1.9 11.2L20 28.6l-10 5.3 1.9-11.2-8.1-7.9L15 13.2z" stroke="#17324D" stroke-width="2.5" stroke-linejoin="round"';
+const star=(on,i,big)=>{const s=big?96:76;return `<svg class="${on?'m-star':'m-fade'}" style="--i:${i};${big?'margin-bottom:12px':''}" width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true">${STAR} fill="${on?'#FFC531':'#fff'}" ${on?'':'stroke-dasharray="4 3" stroke="#7F9AB3"'}/></svg>`};
+const tick='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E9A4F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>';
+const bulb='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:0 0 auto"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>';
+const brain='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:0 0 auto"><path d="M12 4a3 3 0 0 0-5.5 1.6A3.5 3.5 0 0 0 4 9a3.5 3.5 0 0 0 1.5 6A3 3 0 0 0 9 19a3 3 0 0 0 3 1V4zM12 4a3 3 0 0 1 5.5 1.6A3.5 3.5 0 0 1 20 9a3.5 3.5 0 0 1-1.5 6A3 3 0 0 1 15 19a3 3 0 0 1-3 1"/></svg>';
+const lockSvg='<svg class="m-shake" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3F5A75" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>';
+const openSvg='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#17324D" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 6.6-1.6"/></svg>';
+const pip=`<svg class="m-hop" width="58" height="55" viewBox="0 0 200 190" aria-hidden="true"><path d="M40 150c0-56 26-84 60-84s60 28 60 84c0 30-24 40-60 40s-60-10-60-40z" fill="#C98A4B" stroke="#17324D" stroke-width="6"/><path d="M62 78l-6-18 18 10M138 78l6-18-18 10" fill="#C98A4B" stroke="#17324D" stroke-width="6" stroke-linejoin="round"/><circle cx="76" cy="104" r="22" fill="#fff" stroke="#17324D" stroke-width="6"/><circle cx="124" cy="104" r="22" fill="#fff" stroke="#17324D" stroke-width="6"/><circle cx="80" cy="106" r="9" fill="#17324D"/><circle cx="120" cy="106" r="9" fill="#17324D"/><path d="M92 124l8 14 8-14z" fill="#FFC531" stroke="#17324D" stroke-width="5" stroke-linejoin="round"/></svg>`;
+
+function render(){
+  const p=PH[cur], last=cur===PH.length-1, nx=PH[cur+1];
+  const nxc=nx?`var(${nx.c})`:'#fff';
+  const dots=PH.map((q,i)=>{
+    const cls=i<cur?'done':i===cur?'now':(i===cur+1?'lock nextdot':'lock');
+    const d=3200+i*60;
+    return (i?`<span class="seg ${i<=cur?'on':''}"></span>`:'')+`<span class="dot ${cls} ${i===cur?'m-glow':'m-pop'}" style="--d:${d}ms" title="${q.n}">${i<cur?'✓':i+1}</span>`;
+  }).join('');
+  const starsHtml=[0,1,2].map(i=>star(i<stars,i,i===1)).join('');
+  const winList=p.wins.slice(0,3).map((w,i)=>`<li class="m-rise" style="--d:${2100+i*140}ms">${tick}<span>${w}</span></li>`).join('');
+  const nextBlock = nx ? `
+    <div class="nextrow m-rise" style="--d:3200ms;--nc:${nxc}">
+      <span class="lbl" style="font-size:19px;color:var(--navy)">Next stop:</span>
+      <span class="orb"><span class="op m-open">${openSvg}</span><span class="lk m-lockout">${lockSvg}</span></span>
+      <span class="nm">${nx.n}</span>
+    </div>` : `
+    <div class="box done-all m-rise" style="--d:3200ms"><h3 style="justify-content:center">🎉 Your whole journey is done!</h3><span style="font-size:19px">You asked, planned, collected, explored and concluded.</span></div>`;
+  $('scrim').innerHTML=`
+  <div class="modal m-modal" role="dialog" aria-modal="true" aria-labelledby="t" style="--c:var(${p.c})">
+    <div class="mh">${pip}<h2 id="t">${p.n}: done!</h2><span class="step">Step ${p.step} of 5</span><span class="tag">1</span></div>
+    <div class="mb">
+      <div class="rel"><span class="tag">2</span>
+        <div class="stars" role="img" aria-label="${stars} out of 3 thinking stars">${starsHtml}</div>
+        <p class="starlbl m-rise" style="--d:1600ms"><b>${WORDS[stars]}</b><span>${stars} of 3 stars · Stars are for great thinking, not speed.</span></p></div>
+      <div class="box you m-rise rel" style="--d:1800ms"><span class="tag">3</span>
+        <h3>✏️ ${p.your.tag}</h3><p class="q">${p.your.q}</p><span class="src">${p.your.src}</span></div>
+      <div class="box wins rel"><span class="tag">4</span><h3>You did great</h3><ul>${winList}</ul></div>
+      <div class="box next m-rise rel" style="--d:2800ms"><span class="tag">5</span>${bulb}<span><b>Next time:</b> ${p.next}</span></div>
+      <div class="box learn m-rise rel" style="--d:3000ms"><span class="tag">6</span>${brain}<span><b>I learned:</b> ${p.learn}</span></div>
+      <div class="rel"><span class="tag">7</span><div class="trail" role="img" aria-label="Step ${cur+1} of 7 done">${dots}</div></div>
+      ${nextBlock}
+      <div class="btns m-rise rel" style="--d:4500ms"><span class="tag">8</span>
+        <button class="btn main m-pulse">${nx?`Unlock ${nx.n} →`:'🎉 Finish'}</button>
+      </div>
+    </div>
+  </div>`;
+  $('scrim').classList.remove('m-fade');void $('scrim').offsetWidth;$('scrim').classList.add('m-fade');
+  $('scrim').scrollTop=0;
+  document.querySelectorAll('#bar .chip').forEach((b,i)=>b.setAttribute('aria-pressed',i===cur));
+  document.querySelectorAll('#starbtns .chip').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.s===stars));
+  $('stage').classList.toggle('showtags',tags);
+  $('stage').classList.toggle('reduced',reduced);
+}
+$('bar').innerHTML=PH.map((p,i)=>`<button class="chip" style="--c:var(${p.c})" aria-pressed="false" data-i="${i}">${p.n}</button>`).join('');
+$('starbtns').innerHTML=[1,2,3].map(s=>`<button class="chip" data-s="${s}" aria-pressed="false" style="--c:#FFC531">${s} ⭐</button>`).join(' ');
+$('bar').onclick=e=>{const b=e.target.closest('[data-i]');if(b){cur=+b.dataset.i;render()}};
+$('starbtns').onclick=e=>{const b=e.target.closest('[data-s]');if(b){stars=+b.dataset.s;render()}};
+$('replay').onclick=render;
+$('tagsbtn').onclick=()=>{tags=!tags;$('tagsbtn').setAttribute('aria-pressed',tags);render()};
+$('rm').onclick=()=>{reduced=!reduced;$('rm').setAttribute('aria-pressed',reduced);render()};
+render();
+</script>
+<style>.tag{left:-6px;top:6px;transform:none}.mh .tag{left:auto;right:-6px;top:-6px}.mh{position:relative}.rel{position:relative}.box.rel .tag,.btns .tag{left:-18px;top:-8px}.showtags .modal{overflow:visible}.showtags .scrim{padding-left:30px}</style>
+</body>
+</html>

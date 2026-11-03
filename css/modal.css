@@ -62,46 +62,6 @@
   margin: 8px 0;
 }
 
-/* The end-of-phase feedback card (js/feedback-card.js). */
-.fb-stars {
-  margin: 0 0 8px;
-  font-size: 36px;
-}
-
-.fb-star {
-  display: inline-block;
-  animation: modal-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-}
-
-.fb-star.empty {
-  color: var(--color-navy);
-  opacity: 0.45;
-}
-
-.fb-star-text {
-  font-size: 18px;
-  font-weight: 700;
-  vertical-align: middle;
-}
-
-.fb-wins {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.fb-wins li {
-  margin: 6px 0;
-}
-
-.fb-next,
-.fb-learned {
-  margin: 12px 0 0;
-  padding: 8px 12px;
-  border-radius: var(--radius-button);
-  background: var(--color-bg);
-}
-
 /* The maths recap (js/recap.js). */
 .recap-tabs {
   display: flex;
@@ -204,22 +164,317 @@ body.modal-open {
   font-weight: 700;
 }
 
-/* The feedback card (UI guide f7). */
-.fb-why-stars {
-  margin: 0 0 var(--space-1);
+/* ---------- The end-of-phase summary card (js/feedback-card.js, design f7b) ----------
+   It scrolls inside on a small screen, with its one button pinned at the bottom.
+   Each part rises at its moment (--d, in ms); with reduced motion, base.css turns
+   every animation off and everything is shown at once. */
+.modal.phase-summary {
+  max-width: 620px;
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: 30px;
+  animation: ps-modal 0.6s var(--ease-spring) 0.1s both;
+}
+
+.phase-summary .modal-header {
+  padding: 10px 22px;
+}
+
+.phase-summary .modal-title {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+/* One button only: Esc still closes it. */
+.phase-summary .modal-close {
+  display: none;
+}
+
+.phase-summary .modal-pip {
+  animation: ps-hop 0.7s ease-out 0.2s both;
+}
+
+.ps-step {
+  margin-left: auto;
+  padding: 2px 14px;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 999px;
+  font-family: var(--font-heading);
+  font-weight: 800;
   font-size: 18px;
-  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ps-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.phase-summary .modal-body {
+  padding: 16px 24px 12px;
+}
+
+.phase-summary .modal-actions {
+  position: sticky;
+  bottom: 0;
+  justify-content: center;
+  padding: 12px 24px 20px;
+  background: var(--color-card-bg);
+}
+
+.phase-summary .modal-actions .btn-main {
+  min-height: 60px;
+  font-size: 22px;
+}
+
+/* 1. Stars: big, the middle one bigger; an empty star is dashed (a shape, not only a colour). */
+.ps-stars {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.ps-star path {
+  fill: var(--color-card-bg);
+  stroke: var(--color-muted-text);
+  stroke-width: 2.5;
+  stroke-dasharray: 4 3;
+  stroke-linejoin: round;
+}
+
+.ps-star.on path {
+  fill: var(--color-gold);
+  stroke: var(--color-navy);
+  stroke-dasharray: none;
+}
+
+.ps-star:nth-child(2) {
+  margin-bottom: 12px;
+}
+
+.ps-star.on {
+  animation: ps-star 0.6s var(--ease-spring) both;
+  animation-delay: calc(var(--i) * 300ms + 600ms);
+}
+
+.ps-starword {
+  margin: 0;
+  text-align: center;
+}
+
+.ps-starword b {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.ps-starword span {
+  font-size: 18px;
   color: var(--color-muted-text);
 }
 
-.fb-next-stop {
-  margin: var(--space-2) 0 0;
-  font-family: var(--font-heading);
-  font-weight: 800;
+/* 2. The boxes. */
+.ps-box {
+  border-radius: 18px;
+  padding: 12px 16px;
+  font-size: 19px;
+}
+
+.ps-box h3 {
+  margin: 0 0 6px;
   font-size: 20px;
 }
 
-/* The lock shakes a little later, once the stars and wins are in. */
-.fb-next-stop.m-shake {
-  animation-delay: 1.4s;
+.ps-box p {
+  margin: 0;
 }
+
+.ps-you {
+  border: var(--border-width) dashed var(--color-line);
+}
+
+.ps-quote {
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.ps-source {
+  display: inline-block;
+  margin-top: var(--space-1);
+  padding: 2px 12px;
+  background: #EEF6FC;
+  border: 2px solid var(--color-line);
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-muted-text);
+}
+
+.ps-wins {
+  background: #EAF8EE;
+}
+
+.ps-wins ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ps-wins li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.ps-wins svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--color-btn-main-bg);
+}
+
+.ps-next,
+.ps-learn {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.ps-next svg,
+.ps-learn svg {
+  flex: none;
+  color: var(--color-navy);
+}
+
+.ps-next { background: var(--color-plan-light); }
+.ps-learn { background: var(--color-collect-light); }
+
+.ps-done-all {
+  text-align: center;
+  background: linear-gradient(var(--color-plan-light), var(--color-card-bg));
+}
+
+/* 3. The trail: 7 stops. Done = green ✓, this one = its colour with a ring, the rest dashed. */
+.ps-trail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ps-dot {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 50%;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.ps-dot.done { background: var(--color-explore); }
+
+.ps-dot.now {
+  background: var(--modal-accent);
+  box-shadow: 0 0 0 4px var(--color-card-bg), 0 0 0 7px var(--color-navy);
+}
+
+.ps-dot.lock {
+  border-style: dashed;
+  border-color: var(--color-line);
+  color: var(--color-muted-text);
+}
+
+.ps-seg {
+  width: 16px;
+  height: 4px;
+  flex: none;
+  background: var(--color-line);
+}
+
+.ps-seg.on { background: var(--color-navy); }
+
+/* 4. The next stop: the lock shakes and fades, the open circle pops in. */
+.ps-nextrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.ps-next-label { font-size: 19px; }
+
+.ps-next-name {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 24px;
+}
+
+.ps-orb {
+  position: relative;
+  width: 58px;
+  height: 58px;
+}
+
+.ps-orb > span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.ps-open {
+  background: var(--next-colour);
+  border: var(--border-width) solid var(--color-navy);
+  color: var(--color-navy);
+  animation: ps-pop 0.6s var(--ease-spring) 4.3s both;
+}
+
+.ps-lock {
+  background: var(--color-card-bg);
+  border: var(--border-width) dashed var(--color-line);
+  color: var(--color-muted-text);
+  animation: ps-shake 0.4s ease-in-out 3.3s 2, ps-lockout 0.4s ease-in 4.1s forwards;
+}
+
+/* Reduced motion: no animation, so the lock is simply shown open. */
+@media (prefers-reduced-motion: reduce) {
+  .ps-orb > .ps-lock { display: none; }
+}
+
+/* The timeline classes. */
+.ps-rise { animation: m-rise var(--duration-medium) var(--ease-out) both; animation-delay: var(--d, 0ms); }
+.ps-pop { animation: ps-pop 0.5s var(--ease-spring) both; animation-delay: var(--d, 0ms); }
+.ps-glow { animation: ps-glow 0.8s ease-out both; animation-delay: var(--d, 0ms); }
+.ps-pulse { animation: m-pulse 1.8s ease-in-out 5s infinite; }
+
+@keyframes ps-modal { 0% { opacity: 0; transform: translateY(40px) scale(0.7); } 100% { opacity: 1; transform: none; } }
+@keyframes ps-star { 0% { opacity: 0; transform: scale(0) rotate(-180deg); } 70% { transform: scale(1.3) rotate(10deg); } 100% { opacity: 1; transform: none; } }
+@keyframes ps-pop { 0% { opacity: 0; transform: scale(0.4); } 100% { opacity: 1; transform: none; } }
+@keyframes ps-hop { 0%, 100% { transform: none; } 40% { transform: translateY(-12px); } }
+@keyframes ps-shake { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+@keyframes ps-lockout { to { opacity: 0; transform: scale(1.6); } }
+@keyframes ps-glow { 0% { box-shadow: 0 0 0 0 rgba(255, 197, 49, 0.9); } 100% { box-shadow: 0 0 0 4px var(--color-card-bg), 0 0 0 7px var(--color-navy); } }
+
+/* A narrow screen: the step pill goes, the padding shrinks. */
+@media (max-width: 640px) {
+  .phase-summary .modal-title { font-size: 26px; }
+  .ps-step { display: none; }
+  .phase-summary .modal-body { padding: 14px 16px 10px; }
+}
+
