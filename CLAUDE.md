@@ -143,3 +143,17 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 - **Rewards stay about good reasoning, never speed.** No timers, no leaderboards, no comparing children.
 - **Demo data is labelled DEMO** everywhere it appears and is **never exported**.
 - **Deploy is locked** until I write "Prof confirmed".
+
+## Round 3 (Prof feedback, 2 Nov 2026)
+- The Round 3 plan lives in `docs/round-3-plan.md` (Parts 25 to 36). Read it after `docs/build-progress.md` at the start of every session. Deploy is now Part 36 and stays locked until I write "Prof confirmed".
+- **Working mode:** one part at a time. Stop and wait after each part. I make the commits.
+- **Tutorial:** an animation built in the page with Pip, about 6 scenes at the child's pace, with Next and Skip and no timers. It opens by itself on the first visit in a browser, and "▶ Watch again" stays beside the code box. Words only. It shows all rooms, but the step bar stays locked.
+- **Charts:** 18px bold navy text, word labels ("Size 34", "5 kids") and an axis title ("Number of kids"). Line charts use a true number line. Games get no line, and the app explains why.
+- **Hints give answers:** the first 💡 tap shows 3 true answers. Tap is the main way, drag is a bonus, and the child can edit or write their own. A tap adds to any text already in the box. Numbers come from `stats.js`; the words live in `data/content`.
+- **Where hints give answers:** Graph Lab, Chance Lab why, Evidence Board and the change-my-guess reason. Not the fix-its or the bonus question.
+- **Thesis data:** every answer logs `answerSource` (own / hint / hint-edited). Only own and hint-edited answers count as evidence of reasoning, and results report them apart.
+- **Rewards:** stars ignore where an answer came from, so a hint never costs a star. Graph Skeptic, Why-Wizard and Because Builder need own or edited words.
+- **Mean task:** keep 5 numbers, with a worked example beside the question. All-same answers are correct and logged as `allSame`.
+- **Room summary:** a "📖 About this room" tab on the task card. The pop-up still opens once, and the (i) button is removed.
+- **Checker:** accepts specific and regular time phrases, and vague words still ask "When?" (Paper 28).
+- **Live site:** database off until the GIU ethics check is cleared. The repo stays public.

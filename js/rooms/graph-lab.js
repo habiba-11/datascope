@@ -1,7 +1,7 @@
 import { mountShell, exploreCardTabsHTML } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { compareValues } from '../helpers/stats.js';
-import { buildFrequencyData, makeChartConfig, directLabelsPlugin, describeChart } from '../helpers/charts.js';
+import { buildFrequencyData, makeChartConfig, directLabelsPlugin, describeChart, pieKeyPosition, lineFits } from '../helpers/charts.js';
 import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import { logEvent } from '../helpers/log.js';
 import { createHint } from '../helpers/prompts.js';
@@ -78,7 +78,8 @@ async function init() {
         ${pipLineHTML('', recipe.question)}
         ${segmentedHTML(CHART_TYPES, 'Kind of graph')}
         <div class="graph-layout${partner ? ' graph-layout--two' : ''}">
-          <div class="chart-row">${chartBlocks}</div>
+          <div class="chart-row" id="chart-row">${chartBlocks}</div>
+          <p class="no-line-note" id="no-line-note" role="status" hidden></p>
           ${reflectionHTML('tell', graphLab.tell)}
           ${reflectionHTML('not-tell', graphLab.notTell)}
         </div>
@@ -98,8 +99,9 @@ async function init() {
       const canvas = document.getElementById(c.canvasId);
       // Screen readers read this label instead of the (silent) picture.
       const who = partner ? `${c.recipe.title}. ` : '';
-      canvas.setAttribute('aria-label', who + describeChart(type, c.labels, c.data, c.recipe.unit));
-      const config = makeChartConfig(type, c.labels, c.data, c.recipe.unit, sharedMax);
+      canvas.setAttribute('aria-label', who + describeChart(type, c.labels, c.data, c.recipe));
+      const config = makeChartConfig(type, c.labels, c.data, c.recipe, sharedMax);
+      if (type === 'pie') config.options.plugins.legend.position = pieKeyPosition(canvas.parentElement.clientWidth);
       // Part 21c: a new chart grows in with a little bounce. Chart.js does not
       // follow "reduce motion" by itself, so we switch its animation off then.
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -110,8 +112,17 @@ async function init() {
   }
 
   let firstChart = true;
+  const chartRow = document.getElementById('chart-row');
+  const noLineNote = document.getElementById('no-line-note');
   wireChoiceCards(document.querySelector('.segmented'), '.segment', (btn) => {
     const type = btn.dataset.value;
+    // Words have no order: Line explains why instead of drawing. It is not a
+    // graph the child tried, so it is not logged and earns nothing.
+    const noLine = type === 'line' && !lineFits(classes[0].labels);
+    chartRow.hidden = noLine;
+    noLineNote.hidden = !noLine;
+    noLineNote.textContent = noLine ? graphLab.noLine : '';
+    if (noLine) return;
     // Trying another kind of graph is logged (Graph Explorer badge, thesis).
     if (!firstChart && type !== currentType) {
       logEvent('graph-lab', 'chart-switch', { scenarioId: recipe.id, from: currentType, chartType: type });
@@ -148,6 +159,8 @@ async function init() {
 
   function showStep(n) {
     step = n;
+    // The questions need a graph to look at: back to the last one drawn.
+    if (n > 0 && chartRow.hidden) document.querySelector(`.segment[data-value="${currentType}"]`).click();
     document.getElementById('stepper').innerHTML = miniStepperHTML(STEP_LABELS, n);
     document.querySelectorAll('.reflection').forEach((el) => { el.hidden = Number(el.dataset.step) !== n; });
     document.querySelector('.graph-layout').classList.toggle('graph-layout--asking', n > 0);

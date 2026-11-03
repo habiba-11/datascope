@@ -6,6 +6,8 @@
   "question": "How many minutes did you read yesterday?",
   "answerType": "number",
   "unit": "minutes",
+  "chartAxis": "Minutes of reading",
+  "valueLabel": "{value} min",
   "classSize": 18,
   "valuePool": [18, 19, 20, 21, 22],
   "mustInclude": [],

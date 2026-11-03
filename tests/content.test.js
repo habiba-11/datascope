@@ -74,6 +74,15 @@ test('Graph Lab hints: 1 to 3 per question, like the other hints', () => {
   }
 });
 
+test('a scenario with word answers explains why it has no line chart', () => {
+  for (const id of PICKABLE_SCENARIOS) {
+    const recipe = read(`scenarios/${id}.json`);
+    const { noLine } = read(`content/${id}.json`).graphLab;
+    if (recipe.answerType === 'category') assert.ok(noLine, `${id} needs graphLab.noLine`);
+    else assert.equal(noLine, undefined, id);
+  }
+});
+
 test('hints do not start with an emoji (the hint box already adds 🦉)', () => {
   for (const { id, content } of contents) {
     for (const hint of [...content.graphLab.tellHints, ...content.graphLab.notTellHints]) {

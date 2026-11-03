@@ -15,27 +15,128 @@ export function buildFrequencyData(values, allLabels) {
 }
 
 const CHART_NAMES = { bar: 'Bar chart', line: 'Line chart', pie: 'Pie chart', dot: 'Dot plot' };
+const COUNT_AXIS = 'Number of kids';
+// With more values than this (reading minutes: 11), "18 min" and "5 kids" would
+// run into each other. Those charts show plain numbers; the axis titles say what they are.
+const CROWDED_LABELS = 7;
+// Prof's comment 2: all chart text is large, bold and dark.
+const CHART_FONT = { size: 18, weight: 'bold', family: 'Nunito, sans-serif' };
+const CHART_TEXT_COLOUR = '#17324D';
+const LINE_COLOUR = '#0E7CC7'; // darker than the bars' blue, so the line stands out on white
+const LINE_FILL = 'rgba(56, 182, 255, 0.18)';
+// A pie's counts sit this far outside the slice, one 18px line each.
+const PIE_COUNT_GAP = 10;
+const PIE_COUNT_HEIGHT = 22;
+const NARROW_PIE = 560; // px
+// The pie is linked to its key by colour, so each slice needs its own colour
+// (at most 7 answers on a pie today). The first 5 are the bar chart's colours.
+const PIE_PALETTE = [...PALETTE, '#FF9F43', '#F06FB5', '#1FC8B4'];
+
+// The size or answer: "Size 34", "9 hours", "Football" (from the recipe's valueLabel).
+export function valueText(value, recipe) {
+  return recipe?.valueLabel ? recipe.valueLabel.replace('{value}', value) : String(value);
+}
+
+// The count: "1 kid", "6 kids". Never just a number, so it can't be mixed up with a size.
+export function countText(count) {
+  return `${count} kid${count === 1 ? '' : 's'}`;
+}
 
 // A chart drawn on a <canvas> is invisible to screen readers, so we also say
-// what it shows in words, e.g. "Bar chart. 3 hours: 1 classmate. 9 hours: 6 classmates."
-export function describeChart(type, labels, data, unitLabel) {
+// what it shows in words, e.g. "Bar chart. 3 hours: 1 kid. 9 hours: 6 kids."
+export function describeChart(type, labels, data, recipe) {
   const parts = labels
     .map((label, i) => ({ label, count: data[i] }))
     .filter(({ count }) => count > 0)
-    .map(({ label, count }) => {
-      const value = typeof label === 'number' && unitLabel ? `${label} ${unitLabel}` : label;
-      return `${value}: ${count} classmate${count === 1 ? '' : 's'}`;
-    });
+    .map(({ label, count }) => `${valueText(label, recipe)}: ${countText(count)}`);
   return `${CHART_NAMES[type] || 'Chart'}. ${parts.join('. ')}.`;
 }
+
+// The number written on a bar or dot. Graph Lab turns on `kids`; the teacher's
+// charts leave it off and keep their plain numbers.
+export function directLabelText(count, { kids = false } = {}) {
+  return kids ? countText(count) : count;
+}
+
+// Where a pie's counts go: just outside the middle of each slice, the way
+// Habiba's reference picture does it; the names are in the key beside the pie.
+// Counts on the same side are moved up or down just enough never to overlap,
+// and they stay between 0 and `height`.
+export function pieCountLabels(slices, height) {
+  const labels = slices.map((slice) => {
+    const middle = (slice.startAngle + slice.endAngle) / 2;
+    const cos = Math.cos(middle);
+    const reach = slice.outerRadius + PIE_COUNT_GAP;
+    return {
+      index: slice.index,
+      side: cos >= 0 ? 1 : -1,
+      x: slice.x + cos * reach,
+      y: slice.y + Math.sin(middle) * reach,
+    };
+  });
+  for (const side of [1, -1]) {
+    const column = labels.filter((l) => l.side === side).sort((a, b) => a.y - b.y);
+    // Down the column: never above the top, never on the label above.
+    column.forEach((label, i) => {
+      const lowest = i === 0 ? PIE_COUNT_HEIGHT / 2 : column[i - 1].y + PIE_COUNT_HEIGHT;
+      label.y = Math.max(label.y, lowest);
+    });
+    // Back up the column: never below the bottom, never on the label below.
+    for (let i = column.length - 1; i >= 0; i -= 1) {
+      const highest = i === column.length - 1 ? height - PIE_COUNT_HEIGHT / 2 : column[i + 1].y - PIE_COUNT_HEIGHT;
+      column[i].y = Math.min(column[i].y, highest);
+    }
+  }
+  return labels;
+}
+
+// A pie's key sits beside it, or underneath when the chart is narrow (so the
+// counts and the key's title are never cut off).
+export function pieKeyPosition(chartWidth) {
+  return chartWidth < NARROW_PIE ? 'bottom' : 'right';
+}
+
+function drawPieCounts(chart, ctx) {
+  const data = chart.data.datasets[0].data;
+  const slices = chart.getDatasetMeta(0).data.map((element, index) => ({
+    index,
+    x: element.x,
+    y: element.y,
+    startAngle: element.startAngle,
+    endAngle: element.endAngle,
+    outerRadius: element.outerRadius,
+  }));
+  ctx.save();
+  ctx.fillStyle = CHART_TEXT_COLOUR;
+  ctx.font = `bold ${CHART_FONT.size}px Nunito, sans-serif`;
+  ctx.textBaseline = 'middle';
+  for (const label of pieCountLabels(slices, chart.height)) {
+    ctx.textAlign = label.side === 1 ? 'left' : 'right';
+    ctx.fillText(countText(data[label.index]), label.x, label.y);
+  }
+  ctx.restore();
+}
+
+// The steps of a number line. A wide range counts in 5s (reading minutes: 5, 10,
+// 15...), so the 18px labels fit without skipping to odd numbers like 4, 7, 10.
+export function numberLine(labels) {
+  const first = labels[0];
+  const last = labels[labels.length - 1];
+  if (last - first <= 12) return { min: first - 1, max: last + 1, step: 1 };
+  return { min: Math.floor((first - 1) / 5) * 5, max: Math.ceil((last + 1) / 5) * 5, step: 5 };
+}
+
 
 // Draws each value's number directly on the chart, so kids don't have to
 // hover to read it (Shah & Hoeffner, Paper 20: label directly, not a legend).
 export const directLabelsPlugin = {
   id: 'directLabels',
-  afterDatasetsDraw(chart) {
+  afterDatasetsDraw(chart, args, options) {
     const { ctx } = chart;
-    const isPie = chart.config.type === 'pie';
+    if (chart.config.type === 'pie') {
+      drawPieCounts(chart, ctx);
+      return;
+    }
     chart.data.datasets.forEach((dataset, datasetIndex) => {
       const meta = chart.getDatasetMeta(datasetIndex);
       meta.data.forEach((element, index) => {
@@ -46,21 +147,20 @@ export const directLabelsPlugin = {
         const count = typeof value === 'object' ? value.y : value;
         if (count === 0) return; // nothing to label on an empty bar or slice
 
-        // A pie has no x-axis, so each slice also names its value ("Football (6)").
-        // That way colour is never the only way to tell the slices apart.
-        const text = isPie ? `${chart.data.labels[index]} (${count})` : count;
+        const text = directLabelText(count, { kids: options.kids });
         const { x, y } = element.tooltipPosition();
         ctx.save();
-        ctx.fillStyle = '#17324D';
-        ctx.font = 'bold 14px Nunito, sans-serif';
+        ctx.fillStyle = CHART_TEXT_COLOUR;
+        ctx.font = `bold ${options.large ? CHART_FONT.size : 14}px Nunito, sans-serif`;
         ctx.textAlign = 'center';
-        ctx.textBaseline = isPie ? 'middle' : 'bottom';
+        ctx.textBaseline = 'bottom';
         // A white outline behind the text keeps it readable on slice borders.
         ctx.strokeStyle = 'white';
         ctx.lineWidth = 4;
         ctx.lineJoin = 'round';
-        ctx.strokeText(text, x, isPie ? y : y - 8);
-        ctx.fillText(text, x, isPie ? y : y - 8);
+        const lift = chart.config.type === 'line' ? 13 : 8; // clear of a line chart's big dots
+        ctx.strokeText(text, x, y - lift);
+        ctx.fillText(text, x, y - lift);
         ctx.restore();
       });
     });
@@ -79,6 +179,31 @@ function toDotPoints(labels, data) {
   return points;
 }
 
+// A line joins answers in order, so it only makes sense for numbers. Games
+// have no order: a line between them would mean nothing (Paper 20).
+export function lineFits(labels) {
+  return typeof labels[0] !== 'string';
+}
+
+const greatestDivisor = (a, b) => (b === 0 ? a : greatestDivisor(b, a % b));
+
+// The points of a line chart on a true number line. Values nobody chose count
+// as 0, so a gap really shows (nobody slept 4, 5 or 6 hours). It steps by the
+// answers' own step: Class B answers in 5s, so 6 to 9 minutes are not false dips.
+export function linePoints(labels, data) {
+  const chosen = labels.filter((_, i) => data[i] > 0);
+  const step = chosen.reduce((gap, value, i) => (i === 0 ? gap : greatestDivisor(gap, value - chosen[i - 1])), 0) || 1;
+  const counts = new Map(labels.map((label, i) => [label, data[i]]));
+  const first = labels[0];
+  const start = chosen[0] - Math.floor((chosen[0] - first) / step) * step;
+  const points = [];
+  for (let x = start; x <= labels[labels.length - 1]; x += step) {
+    const y = counts.get(x) || 0;
+    points.push({ x, y, top: y > 0 }); // `top`: the labels plugin writes a count here
+  }
+  return points;
+}
+
 // How big a dot can be: at most 9px, and never wider than the gap between two
 // neighbouring values on the x-axis (or the height of one stack step), so the
 // dots never overlap. Chart.js asks again when the chart is resized.
@@ -94,28 +219,73 @@ function dotRadius({ chart }) {
   return dotSize(Math.min(across, up));
 }
 
-// The x-axis of a dot plot. Numbers get a number line from the first to the
-// last label (so two compared classes share the same line). Text answers
-// (e.g. playground games) get one column per category instead.
-function dotXAxis(labels, unitLabel) {
-  const title = { display: true, text: unitLabel || 'value' };
+// The x-axis of a dot plot or line chart. Numbers get a number line from the
+// first to the last label (so two compared classes share the same line). Text
+// answers (e.g. playground games) get one column per category instead.
+function dotXAxis(labels, title, shownValue) {
   if (typeof labels[0] === 'string') {
-    return { type: 'category', labels, offset: true, title };
+    return { type: 'category', labels, offset: true, title, ticks: bigTicks({ autoSkip: false }) };
   }
+  const { min, max, step } = numberLine(labels);
   return {
     type: 'linear',
     title,
-    ticks: { stepSize: 1 },
-    min: labels[0] - 1,
-    max: labels[labels.length - 1] + 1,
+    ticks: bigTicks({ stepSize: step, callback: shownValue }),
+    min,
+    max,
   };
 }
 
+const bigTicks = (extra = {}) => ({ font: CHART_FONT, color: CHART_TEXT_COLOUR, ...extra });
+const axisTitle = (text) => ({ display: true, text, font: CHART_FONT, color: CHART_TEXT_COLOUR });
+
+// A pie, like Habiba's reference picture: counts outside the slices, and a key
+// with the names beside it. Answers nobody chose get no slice and no key row.
+function makePieConfig(labels, data, recipe) {
+  const shown = labels.map((_, i) => i).filter((i) => data[i] > 0);
+  return {
+    type: 'pie',
+    data: {
+      labels: shown.map((i) => valueText(labels[i], recipe)),
+      datasets: [{
+        data: shown.map((i) => data[i]),
+        backgroundColor: shown.map((_, i) => PIE_PALETTE[i % PIE_PALETTE.length]),
+        borderColor: CHART_TEXT_COLOUR,
+        borderWidth: 2,
+        radius: '72%', // leaves room for the counts around the pie
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      // The chart changes width when the question appears beside it, or the tablet turns.
+      onResize: (chart, size) => { chart.options.plugins.legend.position = pieKeyPosition(size.width); },
+      plugins: {
+        directLabels: { kids: true, large: true },
+        legend: {
+          display: true,
+          position: 'right',
+          onClick: () => {}, // tapping the key must not hide a slice
+          title: { display: true, text: recipe?.chartAxis || 'Answer', font: CHART_FONT, color: CHART_TEXT_COLOUR },
+          labels: { font: CHART_FONT, color: CHART_TEXT_COLOUR, boxWidth: 20, boxHeight: 20, padding: 10 },
+        },
+      },
+    },
+  };
+}
+
+// `recipe` gives the words: chartAxis (the axis title) and valueLabel ("Size {value}").
 // `yMax` is optional: when comparing two classes, both charts use the same height.
-export function makeChartConfig(type, labels, data, unitLabel, yMax) {
+export function makeChartConfig(type, labels, data, recipe, yMax) {
+  if (type === 'pie') return makePieConfig(labels, data, recipe);
   const colors = labels.map((_, i) => PALETTE[i % PALETTE.length]);
   // One extra step above the tallest bar, so its number label is not cut off.
   const yTop = (yMax ?? Math.max(...data)) + 1;
+  const crowded = labels.length > CROWDED_LABELS;
+  const shownValue = (value) => (crowded ? String(value) : valueText(value, recipe));
+  const xTitle = axisTitle(recipe?.chartAxis || 'Answer');
+  const yAxis = { title: axisTitle(COUNT_AXIS), beginAtZero: true, ticks: bigTicks({ stepSize: 1 }), max: yTop };
+  const plugins = { legend: { display: false }, directLabels: { kids: !crowded, large: true } };
 
   if (type === 'dot') {
     return {
@@ -132,10 +302,43 @@ export function makeChartConfig(type, labels, data, unitLabel, yMax) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
+        plugins,
         scales: {
-          x: dotXAxis(labels, unitLabel),
-          y: { title: { display: true, text: 'classmate #' }, ticks: { stepSize: 1 }, beginAtZero: true, max: yTop },
+          x: dotXAxis(labels, xTitle, shownValue),
+          y: yAxis,
+        },
+      },
+    };
+  }
+
+  if (type === 'line' && lineFits(labels)) {
+    return {
+      type: 'line',
+      data: {
+        datasets: [{
+          data: linePoints(labels, data),
+          borderColor: LINE_COLOUR,
+          borderWidth: 5,
+          backgroundColor: LINE_FILL,
+          fill: 'origin',
+          tension: 0, // straight lines: a curve would bulge past the real counts
+          pointBackgroundColor: '#38B6FF',
+          pointBorderColor: CHART_TEXT_COLOUR,
+          pointBorderWidth: 2,
+          // Big dots where kids answered, small ones where nobody did (none on a crowded chart).
+          pointRadius: (context) => {
+            if (context.raw?.y > 0) return dotRadius(context);
+            return crowded ? 0 : 3;
+          },
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins,
+        scales: {
+          x: dotXAxis(labels, xTitle, shownValue),
+          y: yAxis,
         },
       },
     };
@@ -144,26 +347,23 @@ export function makeChartConfig(type, labels, data, unitLabel, yMax) {
   return {
     type,
     data: {
-      labels,
+      labels: labels.map(shownValue),
       datasets: [{
         data,
         backgroundColor: colors,
-        borderColor: '#17324D',
+        borderColor: CHART_TEXT_COLOUR,
         borderWidth: 2,
-        tension: 0, // straight lines: a curve would bulge past the real counts
       }],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      // Pie slices are labelled directly, so no legend is needed.
-      plugins: { legend: { display: false } },
-      scales: type === 'pie'
-        ? undefined
-        : {
-            x: { title: { display: true, text: unitLabel || 'value' } },
-            y: { title: { display: true, text: 'classmates' }, beginAtZero: true, ticks: { stepSize: 1 }, max: yTop },
-          },
+      plugins,
+      scales: {
+        // autoSkip off: every answer keeps its label, even on a narrow chart.
+        x: { title: xTitle, ticks: bigTicks({ autoSkip: false }) },
+        y: yAxis,
+      },
     },
   };
 }

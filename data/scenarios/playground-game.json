@@ -3,6 +3,8 @@
   "title": "Favourite playground game",
   "question": "What is your favourite game to play at recess this week?",
   "answerType": "category",
+  "chartAxis": "Game",
+  "valueLabel": "{value}",
   "classSize": 15,
   "valuePool": ["Football", "Football", "Football", "Tag", "Hopscotch", "Swings", "Basketball"],
   "mustInclude": [],

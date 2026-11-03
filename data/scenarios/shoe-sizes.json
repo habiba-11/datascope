@@ -4,6 +4,8 @@
   "question": "What shoe size do you wear this year?",
   "answerType": "number",
   "unit": "EU size",
+  "chartAxis": "Shoe size",
+  "valueLabel": "Size {value}",
   "classSize": 16,
   "valuePool": [34, 35, 36, 37],
   "mustInclude": [],

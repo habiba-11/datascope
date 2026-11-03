@@ -1,10 +1,10 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 2: Parts 13-22 built; Supabase set up by Habiba (js/config.js enabled, not committed yet); Part 23 docs done; waiting for device test, rubric levels (20c), Prof**
+- Current part: **Round 3: Parts 25-27 built (not committed yet), waiting for Habiba's check. Next: Part 28 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
-- Last updated: 28 Oct 2026 (UI round: 3-zone layout in every room)
+- Last updated: 3 Nov 2026 (Round 3, Part 27); `node --test` = 241 passing, 0 failing
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -248,7 +248,29 @@
   - Decided with Habiba (option b): Question Studio marks questions this child already finished (Conclude done, read from the log by finishedScenarios in progress.js, tested) with "✓ Done before" (word + ✓). They can still pick it; it only nudges towards a new question. 211 tests.
   - Hills (Habiba's reference): two soft round hills (ellipses) instead of the wavy bands, on the welcome page and all 7 rooms; 220px tall, behind everything; colours #BFE8C9 / #A6DDB5 in theme.css (--color-hill-back / --color-hill-front).
 
+- Part 25 (3 Nov 2026, Round 3, Prof comments 4 and 8), 221 tests passing:
+  - Number Lab: the button says "🔍 Show statistics"; Pip says "Guess first, then check the statistics!"; the intro is titled "Find the statistics" and explains the word ("Statistics are numbers that sum up data."); the old badge text "after Reveal" changed too. History docs (this file's older entries, docs/ui-audit.md) keep the old wording on purpose.
+  - Checker (js/helpers/checker.js): it was never Supabase. Before: 16 of 64 tried time phrases passed. Now hasTimeframe() uses patterns for this / last / next / every + day, week, term, season...; weekdays and months; at recess, after school, at night; a week, per day; ago. Vague words (lately, recently, these days, now alone, so far) still ask "When?" (Paper 28: a set timeframe).
+  - Bugs fixed: "right now" no longer counts as the leading word "right"; curly apostrophes (tablets) are caught; extra spaces no longer hide a time; a number counts as a time only with a unit or as a year ("Which 3 games?" asks when); more yes/no starters (Am, Had, May, Might...); fewer than 3 words gets a warning ("today?").
+  - Checked in Chrome at 768px with Supabase blocked: new button, intro and Pip line, stats still show, fix-it boxes respond to the new rules, no page errors.
+
+- Part 26 (3 Nov 2026, Round 3, Prof comment 2), 236 tests passing:
+  - docs/round-3-plan.md saved and the Round 3 section added to CLAUDE.md (Habiba agreed).
+  - Each recipe names its chartAxis ("Shoe size") and valueLabel ("Size {value}"). All Graph Lab text is 18px bold navy. Under a bar: "Size 34", "9 hours", "Football". On a bar: "5 kids" ("1 kid"). The y-axis says "Number of kids" on every chart (dot plot too; "classmate #" and "value" are gone). The screen-reader description uses the same words.
+  - Pie (changed twice after Habiba's check; she supplied a reference picture): the count sits just outside each slice ("6 kids", no brackets; pieCountLabels moves counts apart so they never overlap) and a colour key beside the pie gives the names, titled with the axis name. The key moves under the pie when the chart is under 560px wide (pieKeyPosition, also on resize). Answers nobody chose get no slice or key row; every slice has its own colour (PIE_PALETTE, up from 5 colours that repeated). Habiba's decision, against the rule "colour is never the only signal" and Paper 20's "label directly": on the pie, colour is what links a name to its slice (the screen-reader description still gives every name and count; bar, line and dot charts keep direct labels). Tablet: the chart now sits above the question instead of beside it. Dot plot number line counts in 5s across a wide range (numberLine).
+  - Teacher charts keep their plain numbers and 14px labels: the Graph Lab options are turned on per chart (directLabels: kids, large), and the teacher charts do not set them.
+  - Decision to mention to Habiba: reading minutes has 11 values, so its bar, line and dot charts show plain numbers on the axis and above the bars; the axis titles say what they are ("Minutes of reading", "Number of kids"). Their x-axis labels tilt at tablet size. Their pies' keys keep full words ("18 min").
+  - Checked in Chrome, 4 scenarios x 4 chart types at 1366 and 768, plus the chart beside the question: no sideways scroll, no page errors.
+
+- Part 27 (3 Nov 2026, Round 3, Prof comment 2), 241 tests passing:
+  - Line chart on a true number line (linePoints, lineFits): values nobody chose count as 0, so the gap in sleep (no one at 4, 5, 6 hours) really shows. It steps by the answers' own step (Class B in 5s, so no false dips at 6 to 9 minutes). Thick dark-blue line, soft fill, big dots where kids answered, "6 kids" above each.
+  - Games: tapping Line draws nothing and explains in the chart's place (content graphLab.noLine). It is not logged as a chart switch, so it can't earn Graph Explorer or count as a graph tried (checked: bar > line > pie logs only bar > pie). Next returns to the last chart drawn. This replaces the old "line joins games, kept as a talking point".
+  - Known: Class A's reading line is a narrow peak on the shared 5 to 35 scale, so its labels sit close together on narrow charts. The narrow peak beside Class B's wide shape IS the lesson, so the shared scale stays.
+  - Known: bar charts still space values evenly (3 to 7 hours looks like 7 to 8). The plan only asked to fix the line chart.
+  - Checked in Chrome, 4 scenarios at 1366 and 768, plus the chart beside the question: no sideways scroll, no page errors.
+
 ## Next
+- Round 3 next: Habiba checks Parts 25-27; then Part 28.
 - Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).
@@ -257,12 +279,14 @@
 
 ## Known open items
 - Small-group sampling is out of scope (decided 18 Oct 2026); Arabic right-to-left is future work.
-- Graph Lab: a line chart for categories (playground) joins unrelated games (kept as a "what changes?" talking point); bar/pie colours repeat after 5 values (labels carry the meaning).
+- Graph Lab: bar colours repeat after 5 values (labels carry the meaning).
 - The playground guess shows 5 games (more than 3-4 options), because the choices must match the data.
 - Not yet tested on a real Chromebook/tablet or with a real screen reader.
 - Fonts and Chart.js still load from the internet (local copies come with deploy, Part 24). GSAP is already local.
+- Checker: "Do you know what game you like today?" still passes: any open word (what, how...) anywhere in a question cancels the yes/no warning. Not in the agreed bug list, so left as it is.
 
 ## Decisions log
+- 3 Nov 2026 (Round 3, Habiba's answers to the 29 questions, all option a): tutorial = page animation with Pip, about 6 scenes at the child's pace, Next + Skip, opens by itself on the first visit in this browser, "▶ Watch again" beside the code box, words only, shows all rooms while the step bar stays locked. Charts = "Size 34" / "5 kids" / "Number of kids", 18px bold navy, true number line for numbers, games explain why there is no line, same style on the Data Hub tally and Chance Lab bars. Hints = tap main + drag bonus, first 💡 tap shows 3 true answers (old tips go), on Graph Lab 2 boxes, Chance why, Evidence Board 3 boxes, change-my-guess reason (not fix-its or bonus); a tap adds to existing text; numbers from stats.js, words in data/content with {gaps}; stars ignore the source; Graph Skeptic, Why-Wizard and Because Builder need own or edited words; answerSource own / hint / hint-edited, event hint-picked, new thesis columns at the end. Mean task = keep 5 numbers + worked example beside it; all-same answers are correct, logged allSame, Pip asks for different numbers. Room summary = "📖 About this room" tab on the task card with the bullets + "You are done when...", pop-up still opens once, (i) goes. Chance Lab = one row per outcome, no brackets. Deployment still locked; database off on the live site until ethics is cleared; repo stays public; PIN removed from the docs and changed.
 - 25 Oct 2026 (Round 2 start): Prof's 8 comments planned as Parts 13 to 24 (docs/round-2-plan.md). Backend = optional bonus behind a flag; rewards for reasoning, never speed; DEMO data never exported; deploy locked until "Prof confirmed" (all in CLAUDE.md). Number Lab following the chosen scenario (Part 17b) reverses the earlier "by design" note in Known bugs.
 - 25 Oct 2026 (Part 17c): no extra scenario-linked Chance Lab device for now.
 - 25 Oct 2026 (Part 15): done rules as in the plan, but Conclude = card built (saving moves to My Journey); teacher "open all rooms" preview switch keeps the architecture's "a teacher can open any room"; progress per code + scenario (switching back restores it); Explore rooms open in order Graph → Number → Chance.

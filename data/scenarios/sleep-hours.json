@@ -4,6 +4,8 @@
   "question": "How many hours did you sleep last night?",
   "answerType": "number",
   "unit": "hours",
+  "chartAxis": "Hours of sleep",
+  "valueLabel": "{value} hours",
   "classSize": 20,
   "valuePool": [7, 8, 9, 10],
   "mustInclude": [3],
