@@ -25,9 +25,9 @@
   },
   "number": {
     "icon": "🔢",
-    "title": "Find the numbers",
+    "title": "Find the statistics",
     "accent": "explore",
-    "bullets": ["Find the mean, median, mode and range.", "Each one tells a different story."]
+    "bullets": ["Statistics are numbers that sum up data.", "Find the mean, median, mode and range.", "Each one tells a different story."]
   },
   "chance": {
     "icon": "🎲",

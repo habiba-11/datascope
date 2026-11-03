@@ -29,7 +29,7 @@ const TASK_TITLES = {
 };
 // Pip's one line for each task.
 const TASK_PIP = {
-  predict: 'Guess first, then check the numbers!',
+  predict: 'Guess first, then check the statistics!',
   build: 'This time, you choose the numbers!',
   mistake: 'Mia needs a data detective!',
   realLife: 'Numbers are everywhere in real life!',
@@ -122,7 +122,7 @@ function refreshPrimary() {
     return;
   }
   if (task === 'predict') {
-    if (stage.predict === 'guess') bar.setPrimary({ label: '🔍 Show the numbers', onClick: revealNumbers });
+    if (stage.predict === 'guess') bar.setPrimary({ label: '🔍 Show statistics', onClick: revealNumbers });
     else if (stage.predict === 'changing') bar.setPrimary({ label: 'Save my new guess', onClick: saveRevision });
     else bar.setPrimary({ label: '', enabled: false, whyDisabled: '🤔 Keep or change your guess?' });
   } else if (task === 'build') {

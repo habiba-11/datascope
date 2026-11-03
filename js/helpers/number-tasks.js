@@ -43,7 +43,7 @@ export function choicesFor(values) {
 // from the median (sleep: 8.4 vs 9 yes; shoes: 35.3 vs 35 no, no extreme there).
 const PULL_GAP = 0.5;
 
-// What Pip says after Reveal, in Grade 5 words. `guess` is what the child typed
+// What Pip says after "Show statistics", in Grade 5 words. `guess` is what the child typed
 // (or picked); `stats` holds the class's numbers.
 export function revealMessage(kind, guess, stats) {
   if (kind === 'category') {
