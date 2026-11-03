@@ -1,0 +1,87 @@
+{
+  "scenes": [
+    {
+      "id": "hello",
+      "ms": 6000,
+      "title": "Hello",
+      "caption": "Hi! I'm Pip. Welcome to DataScope, a lab for numbers!",
+      "heading": "Hi! I'm Pip.",
+      "bubble": "Welcome to DataScope, a lab for numbers!"
+    },
+    {
+      "id": "mission",
+      "ms": 7000,
+      "title": "Your mission",
+      "caption": "You will be a Data Detective! Ask questions, read graphs, find the centre, test chance.",
+      "heading": "You will be a Data Detective!",
+      "skills": [
+        { "icon": "❓", "name": "Ask", "text": "good questions", "colour": "ask" },
+        { "icon": "📊", "name": "Read", "text": "graphs", "colour": "collect" },
+        { "icon": "🔢", "name": "Find", "text": "the centre of numbers", "colour": "plan" },
+        { "icon": "🎲", "name": "Test", "text": "chance", "colour": "explore" }
+      ]
+    },
+    {
+      "id": "journey",
+      "ms": 9000,
+      "title": "The journey",
+      "caption": "Your adventure has 5 steps. Finish one step to open the next.",
+      "heading": "5 steps. One at a time.",
+      "note": "Finish a step to open the next one 🔓",
+      "steps": [
+        { "icon": "❓", "name": "Ask", "colour": "ask" },
+        { "icon": "🗺️", "name": "Plan", "colour": "plan" },
+        { "icon": "📋", "name": "Collect", "colour": "collect" },
+        { "icon": "📊", "name": "Explore", "colour": "explore" },
+        { "icon": "🚩", "name": "Conclude", "colour": "conclude" }
+      ]
+    },
+    {
+      "id": "rooms",
+      "ms": 9000,
+      "title": "The rooms",
+      "caption": "These are the 6 rooms on your journey.",
+      "heading": "6 rooms to explore",
+      "rooms": [
+        { "icon": "❓🗺️", "name": "Question Studio", "text": "Pick a question and make a guess.", "colour": "ask" },
+        { "icon": "📋", "name": "Data Hub", "text": "Ask a pretend class. Watch the answers arrive.", "colour": "collect" },
+        { "icon": "📊", "name": "Graph Lab", "text": "Turn the answers into graphs.", "colour": "explore" },
+        { "icon": "🔢", "name": "Number Lab", "text": "Find the mean, median, mode and range.", "colour": "explore" },
+        { "icon": "🎲", "name": "Chance Lab", "text": "Flip, roll and spin to test chance.", "colour": "explore" },
+        { "icon": "🚩", "name": "Evidence Board", "text": "Say what you found and show your proof.", "colour": "conclude" }
+      ]
+    },
+    {
+      "id": "howto",
+      "ms": 15000,
+      "title": "How to use it",
+      "caption": "Stuck? Tap the hint button. Use an answer, change it, or write your own.",
+      "heading": "How do I use it?",
+      "roomName": "📊 Graph Lab",
+      "aboutTab": "📖 About this room",
+      "placeholder": "Write your idea here...",
+      "hintBefore": "💡 Need a hint?",
+      "hintAfter": "💡 Answers are below",
+      "nextBefore": "✏️ Write your idea first",
+      "nextAfter": "Next →",
+      "edit": " I can see it on the graph.",
+      "calls": [
+        "Tap 💡 to get answers.",
+        "Tap an answer, or drag it into the box.",
+        "Change the words, or write it all yourself.",
+        "Tap 📖 any time to read about this room."
+      ]
+    },
+    {
+      "id": "ready",
+      "ms": 7000,
+      "title": "Ready",
+      "caption": "Stars are for good thinking, not for speed. Ready, detective?",
+      "heading": "Ready, detective?",
+      "codeLabel": "🔑 Your explorer code",
+      "codeExample": "e.g. OWL-07",
+      "start": "Start exploring →",
+      "stars": "⭐ Stars are for good thinking, not speed."
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 3: Parts 25-32 committed; Part 33 built (not committed yet), waiting for Habiba's check. Next: Part 34 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
+- Current part: **Round 3: Parts 25-33 committed; Part 34 built (not committed yet), waiting for Habiba's check. Next: Part 35 (docs/round-3-plan.md); Part 36 (deploy) locked until "Prof confirmed".** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
-- Last updated: 3 Nov 2026 (Round 3, Part 33); `node --test` = 273 passing, 0 failing
+- Last updated: 3 Nov 2026 (Round 3, Part 34); `node --test` = 280 passing, 0 failing
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -323,8 +323,22 @@
   - Checked in Chrome: all 6 rooms at 1366 and 768, Ask to Plan the real way, keyboard, reload (no pop-up, tab still there), My journey: no sideways scroll, no page errors.
   - Mention to Prof: it is yellow in every room and sits outside the strip, so it does not look like the Explore room tabs. On a phone-width screen it was not tried.
 
+- Part 34 (3 Nov 2026, Round 3, Prof comment 1), 286 tests passing:
+  - A first, simpler version (scenes of cards, Next only) was replaced the same day: Habiba wants it like her design docs/design/frames/f0-tutorial.html.
+  - A 6-scene animated film with Pip, 960 x 540, scaled to fit: 1 Hello (Pip floats and waves, the title letters pop in, a speech bubble); 2 Your mission (4 skill cards); 3 The journey (Pip hops along the 5-step trail, each step gets its colour and a tick, the locks on steps 4 and 5 open); 4 The 6 rooms (numbered cards in their colours); 5 How to use it (a tap circle presses 💡, 3 real answers arrive, one fills the box, words are added, Next wakes up, the 📖 About this room tab bounces); 6 Ready (Pip cheers, a code card with "Start exploring", "Stars are for good thinking, not speed").
+  - Files: js/tutorial.js, css/tutorial.css, data/content/tutorial.json, js/helpers/tutorial-steps.js (sceneButtons, autoplayStep, stageScale, tutorialExample; tested). Pip from pipSVG, the logo from icons.js, colours, fonts and shadows from theme.css, rise / pop / float from motion.css.
+  - Plays by itself: 46 seconds measured (6 to 15 s per scene), with a progress bar; Pause / Play, Back, Next, 6 dots (48px tap areas), arrow keys, Skip and Esc. The last scene's "Start exploring" closes it and puts the cursor in the code box; Next there says "↻ Watch again"; a round ✕ in the film's top-right corner (48px, Habiba's request) closes it there instead of Skip. The words are always in a caption under the scene (and every scene's text is at least 25px, so at least 18px on a tablet, where it is shown at 74%). No sound.
+  - Reduced motion: no autoplay, no Pause, no movement; each scene in its final state; the child uses Next.
+  - Changed from Habiba's design, to keep earlier decisions: "find the centre" (not "middle", Part 9.5 / Paper 9); 📖 About this room (the (i) button is gone, Part 33); scene 5 shows the real hint behaviour and real answers built from the sleep data (the design's own note asks for that); Pip's speech uses our Grade 5 rule; scene 4's caption "These are the 6 rooms on your journey." (the design's "Each step has its own room" is not true: Ask and Plan share a room, Explore has three).
+  - Its autoplay is the one exception to "no timers" (recorded in CLAUDE.md): it never rewards or rushes the child, and Pause holds any scene as long as needed.
+  - It opens by itself once per browser (save.js hasSeenTutorial: there is no code yet, so not per child; the teacher's "clear this device" shows it again). "▶ See how it works (1 minute)" under the green Start button. Not logged: no code yet, and the design's optional tutorial-viewed event would need a code.
+  - Shows all the rooms while the step bar stays locked: mention to Prof (Round 2 comment 2 hides their names).
+  - Checked in Chrome at 1366 and 768, normal and reduced motion: the film plays to the end by itself (46 s), Pause holds a scene, Pip's trail and the hint timeline play, every scene fits with no scrolling and nothing cut off, all buttons at least 48px, all scene text at least 18px on screen; Esc, Skip, Start, arrow keys, reload (does not reopen), the code form still works.
+  - Found by looking at the screens and fixed: my cleanup of the first version left its styles in welcome.css, which squeezed the film to 720px and made the code box huge; welcome.css is back to its committed version.
+  - For Part 35: the start page's help line under the code box is 16px (from before this round). A page error "Transition was aborted because of invalid state" appears when going from the start page to Question Studio with motion on; it comes from the page fade of Part 21a (it happens with no tutorial, and on the commit before Part 34), and children do not see it.
+
 ## Next
-- Round 3 next: Habiba checks Part 33; then Part 34.
+- Round 3 next: Habiba checks Part 34; then Part 35 (full check and docs). Part 36 (deploy) stays locked until "Prof confirmed".
 - Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).

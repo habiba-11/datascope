@@ -97,8 +97,8 @@ Not part of this plan: the literature review, which comes after everything is co
 **You should see:** the tab in every room; it opens and closes inside the card; keyboard works; no (i) button.
 
 ### Part 34: Start-page tutorial (comment 1)
-**Files:** `index.html`, `js/welcome.js`, new `js/tutorial.js`, new content file, `css/welcome.css`, tests.
-**Build:** an animation with Pip, about 6 scenes at the child's pace, with Next and Skip and no timers: the purpose, how to use it, and all the rooms. It opens by itself on the first visit in this browser. "▶ Watch again" stays beside the code box. Words only. It shows all rooms while the step bar stays locked (mention to Prof). Built last so it shows the final UI.
+**Files:** `index.html`, `js/welcome.js`, new `js/tutorial.js`, `js/helpers/tutorial-steps.js`, `data/content/tutorial.json`, `css/tutorial.css`, tests.
+**Build (changed on 3 Nov 2026 to follow Habiba's design, `docs/design/frames/f0-tutorial.html`):** a 6-scene animated film with Pip (hello, your mission, the 5-step journey, the 6 rooms, how to use the hints and the About tab, ready), about 50 seconds. It plays by itself, with Pause, Back, Next, dots, arrow keys, Skip and Esc; the words are always in a caption; no sound. Reduced motion: no autoplay, every scene in its final state. It opens by itself on the first visit in this browser; "▶ See how it works (1 minute)" sits under the green Start button. It shows all rooms while the step bar stays locked (mention to Prof). Built last so it shows the final UI.
 **Risks:** no code exists yet, so seen-state is per browser and the view can't be logged against a child.
 **Tests:** scene text rules, no scene empty.
 **You should see:** it opens on a fresh browser, not on reload; Skip and Watch again work; with reduced motion the scenes show without movement.

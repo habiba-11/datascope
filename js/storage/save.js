@@ -109,6 +109,18 @@ export function markIntroSeen(phase) {
   writeItem(INTROS_KEY, JSON.stringify(all));
 }
 
+// The start-page tutorial (Part 34) opens by itself once per browser: the
+// child has not typed a code yet, so it cannot be remembered per child.
+const TUTORIAL_KEY = 'datascope:tutorialSeen';
+
+export function hasSeenTutorial() {
+  return readItem(TUTORIAL_KEY) === 'yes';
+}
+
+export function markTutorialSeen() {
+  writeItem(TUTORIAL_KEY, 'yes');
+}
+
 // Finished phases (Part 15), per child code AND scenario, so each
 // investigation has its own progress:
 // { "OWL-07": { "sleep-hours": ["ask", "plan"], "shoe-sizes": ["ask"] } }.
@@ -149,10 +161,10 @@ export function setPreviewAll(on) {
 }
 
 // For shared devices: removes the child's code, chosen scenario, reasoning
-// log, seen pop-ups and progress from THIS device, so the next child starts
-// clean. Teacher data is kept.
+// log, seen pop-ups, tutorial and progress from THIS device, so the next child
+// starts clean. Teacher data is kept.
 export function clearChildData() {
-  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY, INTROS_KEY, PROGRESS_KEY, SENT_KEY]) {
+  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY, INTROS_KEY, TUTORIAL_KEY, PROGRESS_KEY, SENT_KEY]) {
     memory.delete(key);
     try {
       localStorage.removeItem(key);
