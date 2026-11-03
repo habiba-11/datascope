@@ -27,13 +27,23 @@
   },
   "evidenceBoard": {
     "claimPrompt": "👀 Look at your findings. Which game do most kids pick?",
-    "claimHints": [
-      "Tap 📋 My findings. Which game got the most votes?",
-      "Use the mode as your reason.",
-      "Try: \"I think most kids pick ___ because ___\""
+    "claimAnswers": [
+      "{top} is the most popular game",
+      "only {lowCount} picks {low}",
+      "kids play {kinds} different games"
+    ],
+    "becauseAnswers": [
+      "{topCount} picked {top}, the most of all",
+      "the mode of the games is {top}",
+      "only {lowCount} picked {low}"
     ]
   },
   "numberLab": {
+    "reasonAnswers": [
+      "{top} got the most votes",
+      "{topCount} in the class picked {top}",
+      "the data showed me something new"
+    ],
     "kind": "category",
     "predictPrompt": "🤔 Guess first! Which game did the most kids pick?",
     "whyNoMean": {

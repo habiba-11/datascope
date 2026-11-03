@@ -1,13 +1,14 @@
 import { mountShell, addTitleButton } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
-import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
+import { loadRecipe, loadPartnerRecipe, loadContent, loadSharedAnswers } from '../helpers/scenarios.js';
 import { CERTAINTY, certaintyButtonsHTML } from '../helpers/certainty.js';
 import { numberLabKind, classStats } from '../helpers/number-tasks.js';
 import { buildJourney } from '../helpers/journey.js';
 import { buildFindings } from '../helpers/findings.js';
 import { logEvent, readLog } from '../helpers/log.js';
-import { createHint } from '../helpers/prompts.js';
+import { createAnswerHint } from '../helpers/prompts.js';
+import { answerFacts, fillSuggestions, becauseText } from '../helpers/suggestions.js';
 import { playSound } from '../sounds.js';
 import { animate, pipReacts, confetti, stamp } from '../motion.js';
 import { openModal } from '../modal.js';
@@ -31,6 +32,8 @@ let lastLoggedClaim = null; // so the same card is not logged twice
 let cardMade = false;
 let bar = null;
 const hints = {};
+let claimHint = null; // the answers for "I think..."
+let becauseHint = null; // the answers for "...because..."
 
 // The 3-zone layout (UI guide): each step on the left, and the child's
 // Evidence Card on the right, filling up slot by slot as they go (f8).
@@ -119,9 +122,17 @@ async function init() {
   });
 
   bar = setupActionBar({ back: { label: 'Chance Lab', href: 'chance-lab.html' }, primary: { label: '' } });
-  hints[1] = createHint('claim', 'evidence-board', evidenceBoard.claimHints);
-  hints[3] = createHint('certainty-why', 'evidence-board');
-  document.getElementById('claim-hints').append(hints[1].list);
+  // The hints give answers built from the class's real numbers.
+  const facts = answerFacts(recipe, values, partner, partnerValues);
+  const { certaintyWhy } = await loadSharedAnswers();
+  const answerHint = (key, boxId, templates) => createAnswerHint(
+    key, 'evidence-board', fillSuggestions(templates, facts), document.getElementById(boxId),
+  );
+  claimHint = answerHint('claim', 'claim-subject', evidenceBoard.claimAnswers);
+  becauseHint = answerHint('claim-because', 'claim-reason', evidenceBoard.becauseAnswers);
+  hints[1] = claimHint;
+  hints[3] = answerHint('certainty-why', 'certainty-reason', certaintyWhy);
+  document.getElementById('claim-hints').append(claimHint.list, becauseHint.list);
   document.getElementById('sure-hints').append(hints[3].list);
   setupClaim();
   setupEvidence();
@@ -240,6 +251,20 @@ function setupClaim() {
   };
   subject.addEventListener('input', show);
   reason.addEventListener('input', show);
+
+  // One Hint button for two boxes, and at most 3 answers on screen: the "I think"
+  // answers first, then the "because" answers once that box has words.
+  const showRightAnswers = () => {
+    const hintOpen = claimHint.button.disabled;
+    const subjectDone = subject.value.trim() !== '';
+    if (hintOpen && subjectDone) becauseHint.open({ focus: false });
+    claimHint.list.hidden = hintOpen && subjectDone;
+    becauseHint.list.hidden = !(hintOpen && subjectDone);
+  };
+  claimHint.button.addEventListener('click', showRightAnswers);
+  subject.addEventListener('change', showRightAnswers);
+  subject.addEventListener('input', () => { if (subject.value.trim() === '') showRightAnswers(); });
+  showRightAnswers();
 }
 
 function setupEvidence() {
@@ -272,7 +297,7 @@ function setupCertainty() {
   const showSure = () => {
     const word = selectedCertainty ? CERTAINTY.find((c) => c.value === selectedCertainty).word : '';
     const why = reasonInput.value.trim();
-    fillSlot('slot-sure', word ? `${word}${why ? ` — because ${why}` : ''}` : '');
+    fillSlot('slot-sure', word ? `${word}${why ? ` — ${becauseText(why)}` : ''}` : '');
   };
 
   buttons.forEach((btn) => {
@@ -321,8 +346,21 @@ function renderCard() {
   const reason = document.getElementById('claim-reason').value.trim();
   const certaintyReason = document.getElementById('certainty-reason').value.trim();
   const evidenceLabels = [...document.querySelectorAll('.evidence-chip.active')].map((c) => c.textContent);
+  // Where each answer came from: own words, a hint, or a hint the child changed.
+  const claimFrom = claimHint.answerFields();
+  const becauseFrom = becauseHint.answerFields();
+  const sureFrom = hints[3].answerFields();
   logClaim({
-    scenarioId, claim: subject, because: reason, evidence: evidenceLabels, certainty: selectedCertainty, certaintyReason,
+    scenarioId,
+    claim: subject,
+    because: reason,
+    evidence: evidenceLabels,
+    certainty: selectedCertainty,
+    certaintyReason,
+    claimSource: claimFrom.answerSource,
+    becauseSource: becauseFrom.answerSource,
+    certaintyReasonSource: sureFrom.answerSource,
+    suggestions: [...(claimFrom.suggestions || []), ...(becauseFrom.suggestions || []), ...(sureFrom.suggestions || [])],
   });
 }
 

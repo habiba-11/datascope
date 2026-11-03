@@ -6,6 +6,8 @@ import {
   numberLabKind, TASKS_BY_KIND, fillTemplate, buildTarget, buildExample, isAllSame, miaSays, choicesFor, revealMessage, classStats,
 } from '../helpers/number-tasks.js';
 import { logEvent, trackMeaningTask } from '../helpers/log.js';
+import { createAnswerHint } from '../helpers/prompts.js';
+import { answerFacts, fillSuggestions } from '../helpers/suggestions.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 import { cheer, encourage, stagger, countUp } from '../motion.js';
 import { finishPhase } from '../phase-progress.js';
@@ -43,6 +45,7 @@ let bar = null;
 let revealNumbers = () => {};
 let checkBuild = () => {};
 let saveRevision = () => {};
+let reasonHint = null; // suggested answers for "I changed my guess because..."
 
 // Number Lab follows the scenario the child picked (Part 17b). The task list
 // depends on the kind of data: see TASKS_BY_KIND in helpers/number-tasks.js.
@@ -67,7 +70,7 @@ async function init() {
   const { values } = generateClassData(recipe);
   const valuesB = partner ? generateClassData(partner).values : null;
   const stats = classStats(kind, values, valuesB);
-  const data = { values, stats };
+  const data = { values, stats, facts: answerFacts(recipe, values, partner, valuesB) };
 
   mountShell({
     step: 'explore',
@@ -105,6 +108,8 @@ function showTask(n) {
   document.getElementById('stepper').innerHTML = miniStepperHTML(tasks.map((t) => STEP_LABELS[t]), n - 1);
   document.querySelector('.task-question').textContent = TASK_TITLES[task];
   pipSay(TASK_PIP[task]);
+  // The Hint button is only there while the child is giving a reason.
+  bar.setHint(task === 'predict' && stage.predict === 'changing' && !taskComplete[n] ? reasonHint.button : null);
   bar.setBack(n === 1
     ? { label: 'Graph Lab', href: 'graph-lab.html' }
     : { label: 'Back', onClick: () => showTask(n - 1) });
@@ -277,6 +282,7 @@ const TASK_HTML = {
           ${guessControl('new-guess', values)}
           <label for="revise-reason">because</label>
           <input type="text" id="revise-reason" class="revise-reason" placeholder="...">
+          <div class="hint-list-slot" id="reason-hints"></div>
         </div>
         <p class="feedback" id="revise-feedback" hidden></p>
       </div>
@@ -349,7 +355,11 @@ const TASK_HTML = {
 };
 
 const TASK_SETUP = {
-  predict: (n, { stats }) => {
+  predict: (n, { stats, facts }) => {
+    reasonHint = createAnswerHint(
+      'revise-reason', 'number-lab', fillSuggestions(content.reasonAnswers, facts), document.getElementById('revise-reason'),
+    );
+    document.getElementById('reason-hints').append(reasonHint.list);
     wireChoiceGroup('predict');
     wireChoiceGroup('new-guess');
     const feedback = document.getElementById('predict-feedback');
@@ -528,6 +538,7 @@ function setupRevision(n, getOldGuess) {
     keepBtn.disabled = true;
     changeBtn.disabled = true;
     form.hidden = true;
+    bar.setHint(null);
     markComplete(n);
     // The choice buttons are now locked, so keyboard users jump straight to the next step.
     document.getElementById('action-primary').focus();
@@ -542,6 +553,7 @@ function setupRevision(n, getOldGuess) {
   changeBtn.addEventListener('click', () => {
     changeBtn.classList.add('active');
     stage.predict = 'changing';
+    bar.setHint(reasonHint.button);
     refreshPrimary();
     form.hidden = false;
     form.querySelector('input, button').focus();
@@ -556,7 +568,7 @@ function setupRevision(n, getOldGuess) {
     }
     numberFacts.changedWithReason = true;
     logEvent('number-lab', 'revision', {
-      about: recipe.question, scenarioId: recipe.id, changed: true, oldGuess: getOldGuess(), newGuess, reason,
+      about: recipe.question, scenarioId: recipe.id, changed: true, oldGuess: getOldGuess(), newGuess, reason, ...reasonHint.answerFields(),
     });
     finish(`✏️ You changed from ${getOldGuess()} to ${newGuess} because ${reason}. Changing your mind with evidence is what data detectives do! 🔎`);
   };

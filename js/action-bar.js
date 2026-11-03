@@ -4,7 +4,7 @@
 // bar; each room fills it with setupActionBar().
 
 // back:    { label, href } or { label, onClick }, or null for no Back
-// hint:    a button made by prompts.js addHintButton (moved into the bar), or null
+// hint:    a button made by prompts.js (moved into the bar), or null
 // primary: see setPrimary below
 // Returns { setPrimary, setBack }, so the room can change the buttons as the task goes on.
 export function setupActionBar({ back = null, hint = null, primary }) {

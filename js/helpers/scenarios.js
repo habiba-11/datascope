@@ -23,3 +23,10 @@ export async function loadContent(scenarioId) {
   const response = await fetch(`../data/content/${scenarioId}.json`);
   return response.json();
 }
+
+// The suggested answers that are the same for every scenario (Chance Lab's why,
+// Evidence Board's "how sure"). {gaps} are filled in by helpers/suggestions.js.
+export async function loadSharedAnswers() {
+  const response = await fetch('../data/content/answers.json');
+  return response.json();
+}

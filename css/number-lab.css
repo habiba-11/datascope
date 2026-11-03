@@ -169,6 +169,11 @@
   min-width: 200px;
 }
 
+/* The suggested reasons take a whole line under the box. */
+.revise-form .hint-list-slot {
+  flex-basis: 100%;
+}
+
 /* Reading minutes: the numbers of Class A and Class B, one row each (Part 17b). */
 .stats-class-title {
   font-size: 18px;

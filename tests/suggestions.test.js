@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  graphFacts, fillSuggestions, appendAnswer, answerSource,
+  answerFacts, fillSuggestions, chanceAnswers, becauseText, appendAnswer, answerSource,
 } from '../js/helpers/suggestions.js';
 import { generateClassData } from '../js/helpers/generator.js';
 import { PICKABLE_SCENARIOS } from '../js/helpers/scenarios.js';
@@ -17,7 +17,7 @@ function graphAnswers(id) {
   const partner = recipe.compareWith ? read(`scenarios/${recipe.compareWith}.json`) : null;
   const values = generateClassData(recipe).values;
   const valuesB = partner ? generateClassData(partner).values : null;
-  const facts = graphFacts(recipe, values, partner, valuesB);
+  const facts = answerFacts(recipe, values, partner, valuesB);
   const { graphLab } = read(`content/${id}.json`);
   return {
     facts,
@@ -27,7 +27,7 @@ function graphAnswers(id) {
 }
 
 test('facts come from the real answers: one mode, two modes, and words', () => {
-  const sleep = graphFacts({ valueLabel: '{value} hours' }, [3, 7, 9, 9, 9]);
+  const sleep = answerFacts({ valueLabel: '{value} hours' }, [3, 7, 9, 9, 9]);
   assert.equal(sleep.top, '9 hours');
   assert.equal(sleep.topCount, '3 kids');
   assert.equal(sleep.low, '3 hours and 7 hours');
@@ -35,10 +35,10 @@ test('facts come from the real answers: one mode, two modes, and words', () => {
   assert.equal(sleep.min, '3 hours');
   assert.equal(sleep.max, '9 hours');
 
-  const shoes = graphFacts({ valueLabel: 'Size {value}' }, [34, 34, 35, 35, 36]);
+  const shoes = answerFacts({ valueLabel: 'Size {value}' }, [34, 34, 35, 35, 36]);
   assert.equal(shoes.top, 'Size 34 and Size 35');
 
-  const games = graphFacts({ valueLabel: '{value}' }, ['Tag', 'Football', 'Football', 'Swings']);
+  const games = answerFacts({ valueLabel: '{value}' }, ['Tag', 'Football', 'Football', 'Swings']);
   assert.equal(games.top, 'Football');
   assert.equal(games.low, 'Swings and Tag');
   assert.equal(games.kinds, 3);
@@ -46,7 +46,7 @@ test('facts come from the real answers: one mode, two modes, and words', () => {
 
 test('two classes also get each class\'s spread and mean', () => {
   const reading = { valueLabel: '{value} min' };
-  const facts = graphFacts(reading, [18, 22], reading, [5, 35]);
+  const facts = answerFacts(reading, [18, 22], reading, [5, 35]);
   assert.equal(facts.minB, '5 min');
   assert.equal(facts.maxB, '35 min');
   assert.equal(facts.rangeA, 4);
@@ -92,6 +92,89 @@ test('the reading answers are true: the same mean, and Class B really is more sp
   const { facts } = graphAnswers('reading-minutes-class-a');
   assert.equal(facts.meanA, facts.meanB);
   assert.ok(facts.rangeB > facts.rangeA);
+});
+
+// Every other room's answers, filled in with each scenario's real data.
+function roomAnswers(id) {
+  const recipe = read(`scenarios/${id}.json`);
+  const partner = recipe.compareWith ? read(`scenarios/${recipe.compareWith}.json`) : null;
+  const values = generateClassData(recipe).values;
+  const valuesB = partner ? generateClassData(partner).values : null;
+  const facts = answerFacts(recipe, values, partner, valuesB);
+  const content = read(`content/${id}.json`);
+  return {
+    facts,
+    claim: fillSuggestions(content.evidenceBoard.claimAnswers, facts),
+    because: fillSuggestions(content.evidenceBoard.becauseAnswers, facts),
+    reason: fillSuggestions(content.numberLab.reasonAnswers, facts),
+    sure: fillSuggestions(read('content/answers.json').certaintyWhy, facts),
+  };
+}
+
+const DEVICES = [
+  { outcomes: ['Heads', 'Tails'], weights: [1, 1], target: 'Heads' },
+  { outcomes: ['1', '2', '3', '4', '5', '6'], weights: [1, 1, 1, 1, 1, 1], target: '6' },
+  { outcomes: ['Red', 'Blue', 'Green', 'Yellow'], weights: [1, 1, 1, 1], target: 'Blue' },
+  { outcomes: ['Red', 'Blue', 'Green', 'Yellow'], weights: [4, 1, 1, 1], target: 'Red' },
+];
+
+test('every other box has 3 answers that meet the rules, with every gap filled', () => {
+  const allLists = PICKABLE_SCENARIOS.flatMap((id) => {
+    const { claim, because, reason, sure } = roomAnswers(id);
+    return [claim, because, reason, sure];
+  });
+  const whyWords = read('content/answers.json').chanceWhy;
+  allLists.push(...DEVICES.map((device) => chanceAnswers(whyWords, device)));
+  for (const list of allLists) {
+    assert.equal(list.length, 3);
+    for (const { text } of list) {
+      assert.doesNotMatch(text, /[{}]|undefined/, `"${text}"`);
+      assert.ok(countWords(text) >= 5, `"${text}" is under 5 words`);
+      assert.ok(text.length >= 10, `"${text}"`);
+      assert.ok(longestSentence(text) <= 12, `"${text}"`);
+      assert.doesNotMatch(text, /middle/i, `"${text}"`);
+    }
+  }
+});
+
+test('Chance Lab answers come from the device: its chance, and fair or unfair', () => {
+  const whyWords = read('content/answers.json').chanceWhy;
+  const coin = chanceAnswers(whyWords, DEVICES[0]).map((s) => s.text);
+  assert.deepEqual(coin, [
+    'Because there are 2 things that could happen.',
+    'Because the chance of Heads is 1 in 2.',
+    'Because every outcome has the same chance.',
+  ]);
+  const unfair = chanceAnswers(whyWords, DEVICES[3]).map((s) => s.text);
+  assert.equal(unfair[1], 'Because the chance of Red is 4 in 7.');
+  assert.equal(unfair[2], 'Because the Red part is bigger than the others.');
+});
+
+test('Evidence Board and Number Lab answers say the real numbers of each scenario', () => {
+  const text = (id, list) => roomAnswers(id)[list].map((s) => s.text).join(' | ');
+  assert.match(text('sleep-hours', 'because'), /the median is 9 hours/);
+  assert.match(text('sleep-hours', 'because'), /the mode is 9 hours/);
+  assert.match(text('sleep-hours', 'because'), /the mean is 8\.4 hours/);
+  assert.match(text('shoe-sizes', 'because'), /the modes are Size 34 and Size 35/);
+  assert.match(text('shoe-sizes', 'because'), /the median size is Size 35/);
+  assert.match(text('playground-game', 'because'), /6 kids picked Football, the most of all/);
+  assert.match(text('reading-minutes-class-a', 'because'), /Class B's range is 30, and Class A's is 4/);
+  assert.match(text('reading-minutes-class-a', 'reason'), /the mean of both classes is 20/);
+  assert.match(text('sleep-hours', 'sure'), /we only asked 20 pretend kids/);
+  assert.match(text('reading-minutes-class-a', 'sure'), /we only asked 36 pretend kids/);
+});
+
+test('an "I think" answer fits its one-line box', () => {
+  for (const id of PICKABLE_SCENARIOS) {
+    for (const { text } of roomAnswers(id).claim) assert.ok(text.length <= 45, `${id}: "${text}"`);
+  }
+});
+
+test('the Evidence Card says "because" only once', () => {
+  assert.equal(becauseText('we asked 20 kids'), 'because we asked 20 kids');
+  assert.equal(becauseText('Because we asked 20 kids'), 'Because we asked 20 kids');
+  assert.equal(becauseText('because of the data'), 'because of the data');
+  assert.equal(becauseText('becausethe'), 'because becausethe');
 });
 
 test('a tap fills an empty box, and adds to a box that has words', () => {

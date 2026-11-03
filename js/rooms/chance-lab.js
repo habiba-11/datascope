@@ -1,10 +1,11 @@
 import { mountShell, exploreCardTabsHTML } from '../app.js';
 import { logEvent } from '../helpers/log.js';
-import { createHint } from '../helpers/prompts.js';
+import { createAnswerHint } from '../helpers/prompts.js';
+import { chanceAnswers } from '../helpers/suggestions.js';
 import { playSound } from '../sounds.js';
 import { stagger } from '../motion.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
-import { loadContent } from '../helpers/scenarios.js';
+import { loadContent, loadSharedAnswers } from '../helpers/scenarios.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 import { toPct, theoryText, theoryWords, outcomeRows, trialMessage, needleAngle } from '../helpers/chance.js';
 import { certaintyButtonsHTML } from '../helpers/certainty.js';
@@ -30,7 +31,8 @@ const RUN_SIZES = [10, 50, 500];
 const taskComplete = { 1: false, 2: false, 3: false };
 let currentTask = 1;
 let bar = null;
-let hint = null;
+let hint = null; // the "why" answers: they follow the device the child picked
+let whyWords = null;
 let runSize = 10; // chosen on the 10 / 50 / 500 switch
 let justRan = false; // after a run the primary offers "I'm done testing"
 let rating = null; // the certainty word picked in step 2
@@ -45,6 +47,7 @@ const chanceFacts = { rating: '', target: '', runSizes: [], pct500: null, theory
 async function init() {
   // Only the story follows the scenario; the 4 devices stay the same for everyone.
   const { chanceLab } = await loadContent(getSelectedScenarioId());
+  whyWords = (await loadSharedAnswers()).chanceWhy;
 
   story = chanceLab.story;
   mountShell({
@@ -103,8 +106,6 @@ async function init() {
   bar = setupActionBar({ back: null, primary: { label: '' } });
   setupDevicePicker();
   setupPredict();
-  hint = createHint('chance-why', 'chance-lab');
-  document.getElementById('why-hints').append(hint.list);
   setupTrials();
   showTask(1);
 }
@@ -169,6 +170,13 @@ function setupDevicePicker() {
   const chips = document.getElementById('outcome-chips');
 
   wireChoiceCards(document.getElementById('device-grid'), '.device-card', (card) => {
+    const reasonBox = document.getElementById('predict-reason');
+    // Another device means another question, so its answers and its "why" start afresh.
+    if (DEVICES[card.dataset.key] !== selectedDevice) {
+      reasonBox.value = '';
+      hint = createAnswerHint('chance-why', 'chance-lab', chanceAnswers(whyWords, DEVICES[card.dataset.key]), reasonBox);
+      document.getElementById('why-hints').replaceChildren(hint.list);
+    }
     selectedDevice = DEVICES[card.dataset.key];
     previousRun = null;
     chanceFacts.runSizes = []; // a new device starts a new experiment
@@ -298,7 +306,7 @@ function setupPredict() {
   function logCertainty() {
     if (!chosen || !reasonInput.value.trim()) return;
     logEvent('chance-lab', 'certainty', {
-      device: selectedDevice.label, outcome: selectedDevice.target, rating: chosen, reason: reasonInput.value.trim(),
+      device: selectedDevice.label, outcome: selectedDevice.target, rating: chosen, reason: reasonInput.value.trim(), ...hint.answerFields(),
     });
   }
 

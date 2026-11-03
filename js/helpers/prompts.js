@@ -3,46 +3,11 @@
 import { logEvent } from './log.js';
 import { appendAnswer, answerSource } from './suggestions.js';
 
-// Each list goes from a gentle nudge to a sentence starter. A child sees
-// one hint per tap, so they only get as much help as they ask for.
-export const HINTS = {
-  'chance-why': [
-    'Look at the list. How many things could happen?',
-    'Are all the parts the same size?',
-    'Try: "There are ___ outcomes, and..."',
-  ],
-  // Evidence Board uses the scenario's own claim hints (data/content); this is the fallback.
-  claim: [
-    'What did you find out about our pretend class?',
-    'Use a number as your reason, like the median.',
-    'Try: "I think most kids ___ because ___"',
-  ],
-  'certainty-why': [
-    'How many kids did we ask? Is that a lot?',
-    'Was anything surprising, like one very different answer?',
-    'Try: "I am ___ sure because..."',
-  ],
-};
-
-// Returns hint number `index` (0, 1, 2...) for a question, or null if there are no more.
-export function getHint(key, index) {
-  return HINTS[key]?.[index] ?? null;
-}
-
-// Adds a "Need a hint?" button right after `anchor` (usually a text box).
-// `key` names the question in the log; `hints` can replace the list in HINTS
-// (e.g. Question Studio's fix-it hints, which follow the chosen scenario).
-export function addHintButton(anchor, key, room, hints = HINTS[key] || []) {
-  const box = document.createElement('div');
-  box.className = 'hint-box';
-  const { button, list } = createHint(key, room, hints);
-  box.append(button, list);
-  anchor.after(box);
-}
-
-// The same hint button and its list, kept apart: in the card layout the
-// button goes into the action bar and the hints appear in the task card.
-export function createHint(key, room, hints = HINTS[key] || []) {
+// Tips, one per tap (Question Studio's fix-its: fixing the question is the skill
+// itself, so those hints stay words to read). The button and its list are kept
+// apart: the button goes into the action bar, the hints appear in the task card.
+// `key` names the question in the log.
+export function createHint(key, room, hints) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'btn hint-btn';
@@ -77,7 +42,8 @@ const DRAG_START = 8;
 // Hints that give answers (Prof's comment 3). The first tap on the button shows
 // the suggested answers. A child can tap one, or drag it into `box`, then change
 // it, or write their own. `suggestions`: [{ id, text }] (helpers/suggestions.js).
-// All text goes in with textContent. Returns { button, list, answerFields }:
+// All text goes in with textContent. Returns { button, list, open, answerFields }:
+// open() shows the answers (a room with one button for two boxes calls it), and
 // answerFields() is what to log with the answer (where it came from).
 export function createAnswerHint(key, room, suggestions, box) {
   const button = document.createElement('button');
@@ -163,7 +129,8 @@ export function createAnswerHint(key, room, suggestions, box) {
     return item;
   }
 
-  button.addEventListener('click', () => {
+  function open({ focus = true } = {}) {
+    if (chips.length) return; // already open
     const help = document.createElement('li');
     help.className = 'suggestion-help';
     help.textContent = '👆 Tap one, or drag it into the box. You can change the words.';
@@ -171,8 +138,9 @@ export function createAnswerHint(key, room, suggestions, box) {
     logEvent(room, 'hint', { prompt: key, hintNumber: 1 });
     button.textContent = '💡 Answers are below';
     button.disabled = true;
-    chips[0].focus();
-  });
+    if (focus) chips[0].focus();
+  }
+  button.addEventListener('click', () => open());
 
   // An emptied box starts again: nothing in it came from a hint any more.
   box.addEventListener('input', () => {
@@ -187,5 +155,5 @@ export function createAnswerHint(key, room, suggestions, box) {
     return fields;
   }
 
-  return { button, list, answerFields };
+  return { button, list, open, answerFields };
 }

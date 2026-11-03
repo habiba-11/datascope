@@ -26,13 +26,23 @@
   },
   "evidenceBoard": {
     "claimPrompt": "👀 Look at your findings. How long do most kids sleep?",
-    "claimHints": [
-      "Tap 📋 My findings. Which number comes up a lot?",
-      "Use a number as your reason, like the median.",
-      "Try: \"I think most kids sleep ___ because ___\""
+    "claimAnswers": [
+      "a typical kid sleeps about {median}",
+      "the most common sleep time is {top}",
+      "only {lowCount} sleeps {low}"
+    ],
+    "becauseAnswers": [
+      "the median is {median}",
+      "the mode is {top}",
+      "the mean is {mean} hours"
     ]
   },
   "numberLab": {
+    "reasonAnswers": [
+      "the mean of the class is {mean} hours",
+      "the median of the class is {median}",
+      "the data showed me something new"
+    ],
     "kind": "number",
     "predictPrompt": "🤔 Guess first! If every kid slept the same, how many hours would that be?",
     "build": "😴 5 friends slept some hours. Their mean is {target}. Type 5 numbers that fit.",

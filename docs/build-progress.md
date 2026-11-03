@@ -1,10 +1,10 @@
 # DataScope build progress
 
 ## Status
-- Current part: **Round 3: Parts 25-29 committed; Part 30 built (not committed yet), waiting for Habiba's check. Next: Part 31 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
+- Current part: **Round 3: Parts 25-30 committed; Part 31 built (not committed yet), waiting for Habiba's check. Next: Part 32 (docs/round-3-plan.md).** Round 2: Parts 13-22 built; Part 23 docs done; waiting for device test, rubric levels (20c), Prof
 - Still waiting for Habiba's test: **12a-d** (sounds, motions, badge shelf, levels + confetti) and **11d** (real Chromebook/tablet checklist)
 - Starting point: `node --test` = 68 passing, 0 failing (25 Oct 2026)
-- Last updated: 3 Nov 2026 (Round 3, Part 30); `node --test` = 259 passing, 0 failing
+- Last updated: 3 Nov 2026 (Round 3, Part 31); `node --test` = 260 passing, 0 failing
 
 ## Done
 - Architecture approved by Prof (docs/architecture.md).
@@ -292,8 +292,19 @@
   - Checked in Chrome, 4 scenarios at 1366 and 768, plus tap, edit, clear, own words, tap after own words, a real mouse drag, a drag that misses the box, keyboard, and a touch tap: all logged correctly; no sideways scroll, no page errors. A touch DRAG has not been tried on a real tablet.
   - Until Part 32: a tapped answer still earns Graph Skeptic and counts towards Because Builder. Part 32 changes those rules and adds the thesis columns.
 
+- Part 31 (3 Nov 2026, Round 3, Prof comment 3), 260 tests passing:
+  - The same answer hints in Chance Lab's why, the 3 Evidence Board boxes and Number Lab's change-my-guess reason. Question Studio's fix-its and the bonus question keep their tips, as decided.
+  - Chance Lab: answers come from the device (chanceAnswers): how many outcomes, the chance of the target, then "every outcome has the same chance" or, for the unfair spinner, "the Red part is bigger". Words shared by all scenarios are in data/content/answers.json. Picking another device empties the why box and gives new answers (decided while building: a why about another device no longer fits).
+  - Evidence Board: one Hint button for the two boxes in step 1, at most 3 answers on screen: the "I think" answers first, the "because" answers once that box has words (each logged as its own hint). The claim log now has claimSource, becauseSource, certaintyReasonSource and suggestions. The boxes are full width, so a suggested answer stays readable.
+  - Number Lab: the Hint button is only there while the child is changing their guess; the revision log has answerSource.
+  - Old tips removed: HINTS, getHint, addHintButton and their tests/prompts.test.js (4 tests); content claimHints. Their rules (3 answers, Grade 5, no "middle") are now tested on the answers, for all 4 scenarios and 4 devices.
+  - Bug found by looking at the card and fixed: "Likely — because Because we only asked..." (the card adds "because", and the box's own placeholder invites it too); becauseText, tested.
+  - Checked in Chrome: Chance Lab at 1366 and 768, Evidence Board for all 4 scenarios at both sizes, Number Lab for 3 kinds of data at 1366: all logged correctly; no sideways scroll, no page errors.
+  - Known: a suggested reason is true, but it may not fit the child's choice ("You changed from Basketball to Tag because Football got the most votes."). The same can happen with a rating. Left as it is: it is the child's choice to make, and the log keeps it. Worth mentioning to Prof.
+  - Known, for Part 35: on a narrow Evidence Card the "Checked!" stamp covers part of the card's title (from before this round).
+
 ## Next
-- Round 3 next: Habiba checks Part 30; then Part 31.
+- Round 3 next: Habiba checks Part 31; then Part 32.
 - Habiba: test with TEST codes (Supabase is set up); commit js/config.js when ready.
 - Habiba: test Round 2 in Live Server and on a Chromebook/tablet (docs/device-test-checklist.md; also the 12a-d sounds/badges checks).
 - Part 20c: rubric coding of each claim (waiting for the real levels from Papers 7 and 13).

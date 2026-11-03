@@ -5,7 +5,7 @@ import { buildFrequencyData, makeChartConfig, directLabelsPlugin, describeChart,
 import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import { logEvent } from '../helpers/log.js';
 import { createAnswerHint } from '../helpers/prompts.js';
-import { graphFacts, fillSuggestions } from '../helpers/suggestions.js';
+import { answerFacts, fillSuggestions } from '../helpers/suggestions.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
 import { countWords } from '../helpers/feedback.js';
@@ -134,7 +134,7 @@ async function init() {
 
   // The hints give answers built from the class's real numbers. Their button
   // sits in the action bar while their question is on screen.
-  const facts = graphFacts(recipe, classes[0].values, partner, partner ? classes[1].values : null);
+  const facts = answerFacts(recipe, classes[0].values, partner, partner ? classes[1].values : null);
   const answerHint = (id, key, templates) => createAnswerHint(
     key, 'graph-lab', fillSuggestions(templates, facts), document.getElementById(id),
   );

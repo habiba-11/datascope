@@ -2,7 +2,7 @@
 // suggested answer into the box, change it, or write their own. Pure, tested in
 // Node (tests/suggestions.test.js). The numbers come from the data with stats.js;
 // the words come from data/content, with {gaps} filled in here.
-import { mean, range, formatMean } from './stats.js';
+import { mean, median, range, formatMean } from './stats.js';
 import { buildFrequencyData, valueText, countText } from './charts.js';
 import { fillTemplate } from './number-tasks.js';
 
@@ -12,8 +12,8 @@ function joinWords(words) {
   return `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`;
 }
 
-// The facts Graph Lab's suggested answers can use, from the class's real answers.
-export function graphFacts(recipe, values, partner = null, valuesB = null) {
+// The facts the suggested answers can use, from the class's real answers.
+export function answerFacts(recipe, values, partner = null, valuesB = null) {
   const { labels, data } = buildFrequencyData(values);
   const most = Math.max(...data);
   const least = Math.min(...data);
@@ -26,7 +26,12 @@ export function graphFacts(recipe, values, partner = null, valuesB = null) {
     kinds: labels.length,
     min: valueText(labels[0], recipe),
     max: valueText(labels[labels.length - 1], recipe),
+    n: values.length + (valuesB ? valuesB.length : 0),
   };
+  if (recipe.answerType === 'number') {
+    facts.mean = formatMean(mean(values));
+    facts.median = valueText(median(values), recipe);
+  }
   if (partner) {
     const b = buildFrequencyData(valuesB).labels;
     Object.assign(facts, {
@@ -44,6 +49,22 @@ export function graphFacts(recipe, values, partner = null, valuesB = null) {
 // The suggested answers for one question, each with an id for the reasoning log.
 export function fillSuggestions(templates, facts) {
   return templates.map((template, i) => ({ id: `s${i + 1}`, text: fillTemplate(template, facts) }));
+}
+
+// Chance Lab's suggested "why" answers, worked out from the device itself. The
+// third one depends on the device: an unfair spinner has one bigger part.
+export function chanceAnswers(words, device) {
+  const total = device.weights.reduce((a, b) => a + b, 0);
+  const weight = device.weights[device.outcomes.indexOf(device.target)];
+  const isFair = new Set(device.weights).size === 1;
+  const facts = { outcomes: device.outcomes.length, target: device.target, weight, total };
+  return fillSuggestions([words.outcomes, words.chance, isFair ? words.fair : words.unfair], facts);
+}
+
+// A reason as the Evidence Card shows it, with "because" only once, whether or
+// not the child's answer already starts with it.
+export function becauseText(reason) {
+  return /^because\b/i.test(reason) ? reason : `because ${reason}`;
 }
 
 // A tap adds to what is already in the box, so a child's own words are never lost.

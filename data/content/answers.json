@@ -1,0 +1,13 @@
+{
+  "chanceWhy": {
+    "outcomes": "Because there are {outcomes} things that could happen.",
+    "chance": "Because the chance of {target} is {weight} in {total}.",
+    "fair": "Because every outcome has the same chance.",
+    "unfair": "Because the {target} part is bigger than the others."
+  },
+  "certaintyWhy": [
+    "Because we only asked {n} pretend kids.",
+    "Because another class might give different answers.",
+    "Because the graph and the numbers show the same thing."
+  ]
+}
