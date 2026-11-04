@@ -33,6 +33,9 @@ const CHART_TYPES = [
 // What to tap, in the helper's words.
 const TAP_WORD = { bar: 'bar', line: 'dot', pie: 'slice', dot: 'column of dots' };
 
+// Game names stay level on a chart at least this wide (px); narrower, they may slant.
+const LEVEL_WORDS_WIDTH = 520;
+
 // A real answer, not just "ok": both reflections need at least this many characters.
 const MIN_REFLECTION = 10;
 
@@ -218,7 +221,8 @@ async function init() {
         config.options.scales.y.title.display = false;
         // Level words are easier for children to read than slanted ones (games).
         // Many numbers may still slant, so they never run into each other.
-        if (typeof c.labels[0] === 'string') config.options.scales.x.ticks.maxRotation = 0;
+        // On a narrow chart (a phone) they may slant, so they never run into each other.
+        if (typeof c.labels[0] === 'string' && canvas.parentElement.clientWidth >= LEVEL_WORDS_WIDTH) config.options.scales.x.ticks.maxRotation = 0;
       }
       // A pie's key goes beside it, or under it on a narrow chart.
       if (type === 'pie') config.options.plugins.legend.position = pieKeyPosition(canvas.parentElement.clientWidth);

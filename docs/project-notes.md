@@ -130,6 +130,8 @@ reasoning log; add new ones instead.
 - **English only** for the pilot (Arabic right-to-left is future work);
   small-group sampling is out of scope.
 
+- **Phones (5 Nov 2026):** checked at 390px and 360px: nothing sticks out sideways. Below 560px the step bar is smaller, the logo shows its picture only, wide grids shrink (minmax(min(Npx, 100%), 1fr)), Chance Lab cards go 2 across, My journey hides the 7 stop names under its circles, the tally names are 14px and each column is as wide as its name, and game names on a narrow chart may slant.
+
 ## 7. Known open items
 
 - Not yet tested on a real Chromebook or tablet, or with a real screen reader.

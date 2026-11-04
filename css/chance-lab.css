@@ -665,3 +665,29 @@
   min-height: 60px;
   font-size: 22px;
 }
+
+/* Phones: the outcome cards 2 across (the die: 3 rows of 2), so the numbers fit. */
+@media (max-width: 560px) {
+  .outcome-rows {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Phones: "⭐ we track this" may take two lines, and the big numbers are a
+   little smaller, so everything stays inside its card. */
+@media (max-width: 560px) {
+  .tracked {
+    white-space: normal;
+    border-radius: 12px;
+  }
+
+  .bar-value {
+    font-size: 20px;
+  }
+
+  /* No room for "Should" and "16.7%" side by side: the number goes underneath. */
+  .bar-head {
+    flex-wrap: wrap;
+    column-gap: 4px;
+  }
+}

@@ -5,7 +5,7 @@
 /* Seats and tally side by side; on a tablet the tally goes underneath, with
    the full width, so long words like "Basketball" fit whole at 18px. */
 .hub-panels {
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
 }
 
 @media (min-width: 1000px) {
@@ -152,4 +152,26 @@
   font-size: 18px;
   font-weight: 800;
   text-align: center;
+}
+
+/* Phones: the 5 game names under the tally are short labels (14 to 16px allowed,
+   decided 3 Nov 2026). Each column is at least as wide as its own name (a long
+   name takes room from a short one like "Tag"), so no word breaks or overlaps. */
+@media (max-width: 560px) {
+  .tally {
+    gap: 4px;
+  }
+
+  .tally-col {
+    min-width: max-content;
+  }
+
+  .tally-track {
+    width: calc(100% + 4px);
+  }
+
+  .tally-label {
+    font-size: 14px;
+    white-space: nowrap;
+  }
 }

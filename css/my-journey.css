@@ -645,3 +645,24 @@
     width: 30px;
   }
 }
+
+/* Phones: 7 stop names don't fit under the circles, so only the circles (each
+   with its own picture) show; the cards below name every stop. */
+@media (max-width: 560px) {
+  .j-strip {
+    padding: 30px 4px 10px;
+  }
+
+  .j-dot > span:nth-child(2) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .j-rail {
+    left: calc(4px + (100% - 8px) / 14);
+    right: calc(4px + (100% - 8px) / 14);
+  }
+}

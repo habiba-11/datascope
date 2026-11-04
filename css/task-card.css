@@ -153,7 +153,7 @@
 /* Up to 2 panels side by side; they stack when the screen is narrow. */
 .card-panels {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: var(--space-3);
 }
 
@@ -406,4 +406,27 @@
 .hint-list-slot > .hint-btn {
   margin-top: var(--space-1);
   align-self: flex-start;
+}
+
+/* Phones: less space around the card's content, and a label that wraps stays a
+   rounded box instead of a squashed pill. */
+@media (max-width: 560px) {
+  .task-card-body {
+    padding: var(--space-2);
+  }
+
+  .task-card-strip {
+    padding: 8px var(--space-2);
+  }
+
+  .task-card-pill {
+    border-radius: 14px;
+    font-size: 16px;
+  }
+
+  .action-bar,
+  .status-line {
+    padding-left: var(--space-2);
+    padding-right: var(--space-2);
+  }
 }
