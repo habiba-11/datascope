@@ -1,138 +1,493 @@
-/* "My journey" (Part 19): a trail of 7 stops, a Detective ID card, what I learned. */
-.journey-scenario {
-  font-family: var(--font-heading);
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0 0 12px;
-}
-
-/* Two panels: the trail on the left; the ID card, what I learned and the
-   quiet extras on the right. */
-.journey-panels {
-  align-items: start;
-}
-
-.journey-top {
+/* "My journey" (Part 19), laid out like the f10 design (Part 37c, 4 Nov 2026):
+   a slim celebration line, then 3 tabs: What I learned, My journey, My ID. */
+.j-body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 18px;
 }
 
-.id-card,
-.learned {
-  border: var(--border-width) solid var(--color-navy);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-button);
-  padding: 12px 18px;
-}
-
-.id-card {
-  background: var(--color-plan);
-  min-width: 220px;
-}
-
-.id-card h2,
-.learned h2 {
-  font-size: 20px;
-  margin: 0 0 6px;
-}
-
-.id-card p {
-  margin: 4px 0;
-  font-weight: 700;
-}
-
-.id-code {
+.j-body h2,
+.j-body h3,
+.j-body h4 {
   font-family: var(--font-heading);
-  font-size: 22px;
+  font-weight: 800;
 }
 
-.learned {
-  flex: 1;
-  min-width: 240px;
-  background: var(--color-bg);
+/* A white rounded pill: the code, the stars, "✓ Done". */
+.j-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 999px;
+  padding: 1px 14px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 18px;
+  white-space: nowrap;
 }
 
-/* The trail: one stop per phase, joined by a dashed line like the step bar. */
-.trail {
-  list-style: none;
-  margin: 0;
-  padding: 0 0 0 24px;
-  border-left: 4px dashed var(--color-navy);
+.j-pill.ok {
+  background: var(--color-btn-main-bg);
+  color: var(--color-btn-main-text);
 }
 
-.stop {
-  position: relative;
-  margin: 0 0 16px;
-  padding: 10px 16px;
-  background: white;
-  border: 2px solid var(--color-navy);
-  border-radius: var(--radius-card);
-  animation: pop-in 0.35s ease-out backwards; /* the stops pop in one by one */
-}
-
-/* A dot on the trail line; a done stop has a filled dot AND the word "Done". */
-.stop::before {
-  content: '';
-  position: absolute;
-  left: -38px;
-  top: 18px;
-  width: 20px;
-  height: 20px;
-  border: 3px solid var(--color-navy);
-  border-radius: 50%;
-  background: white;
-}
-
-.stop.done::before {
-  background: var(--color-explore);
-}
-
-.stop:not(.done) {
-  border-style: dashed;
-  background: var(--color-bg);
-}
-
-.stop-head {
+/* ---------- the slim celebration line ---------- */
+.j-slim {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 14px;
+  background: linear-gradient(135deg, var(--color-plan-light), var(--color-conclude-light));
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 22px;
+  padding: 8px 18px;
 }
 
-.stop-icon {
-  font-size: 28px;
-}
-
-.stop-name {
-  font-size: 20px;
+.j-slim h2 {
   margin: 0;
   flex: 1;
+  min-width: 200px;
+  font-size: 26px;
+  line-height: 1.1;
 }
 
-.stop-status {
+.j-slim-pip {
+  width: 56px;
+  flex-shrink: 0;
+}
+
+/* ---------- the tabs ---------- */
+.j-tabs {
+  display: flex;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-button);
+  margin-bottom: 20px;
+}
+
+.j-tab {
+  flex: 1;
+  position: relative;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--color-plan-light);
+  border: 0;
+  border-right: var(--border-width) solid var(--color-navy);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 21px;
+  color: var(--color-navy);
+  cursor: pointer;
+}
+
+.j-tab:last-child {
+  border-right: 0;
+}
+
+/* The open tab: blue AND a thick navy line under it (not colour alone). */
+.j-tab[aria-selected="true"] {
+  background: var(--color-collect);
+}
+
+.j-tab[aria-selected="true"]::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 8px;
+  background: var(--color-navy);
+}
+
+.j-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.j-panel[hidden] {
+  display: none;
+}
+
+/* A section heading with a short grey line under it. */
+.j-sect h2 {
+  margin: 0 0 4px;
+  font-size: 26px;
+}
+
+.j-sub {
+  margin: 0 0 10px;
+  font-size: 18px;
+  color: var(--color-muted-text);
+}
+
+/* ---------- tab 1: What I learned ---------- */
+.j-big {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  align-items: center;
+  background: var(--color-collect-light);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+  box-shadow: 0 6px 0 var(--color-navy);
+  padding: 18px 24px;
+}
+
+.j-big-pip {
+  width: 110px;
+}
+
+.j-tag {
+  display: inline-block;
+  background: var(--color-navy);
+  color: #FFFFFF;
+  border-radius: 999px;
+  padding: 0 14px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.j-big h3 {
+  margin: 6px 0 4px;
+  font-size: 32px;
+  line-height: 1.15;
+}
+
+.j-big p {
+  margin: 0;
+  font-size: 21px;
   font-weight: 700;
 }
 
-.stop-stars {
-  margin: 4px 0;
+.j-ans {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 18px;
+  background: var(--color-conclude-light);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 24px;
+  padding: 14px 20px;
+}
+
+.j-claim {
+  margin: 0 0 8px;
+  padding-left: 14px;
+  border-left: 8px solid var(--color-conclude);
+  font-size: 23px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.j-proof {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.j-proof span {
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 12px;
+  padding: 0 12px;
+  font-size: 18px;
+}
+
+.j-sure h4 {
+  margin: 0 0 6px;
   font-size: 20px;
 }
 
-.stop-line {
-  margin: 4px 0;
+.j-sure-word {
+  color: var(--color-muted-text);
 }
 
-.journey-actions {
+.j-sure-bar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.j-sure-bar i {
+  height: 18px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 6px;
+  background: var(--color-card-bg);
+}
+
+.j-sure-bar i.on {
+  background: var(--color-conclude);
+}
+
+.j-sure-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 18px;
+  color: var(--color-muted-text);
+}
+
+.j-sure-why {
+  margin: 8px 0 0;
+  font-size: 18px;
+}
+
+/* The skill cards and the stop cards share one look: a header in the room colour. */
+.j-skills,
+.j-stops {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.j-skill,
+.j-stop {
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 22px;
+  box-shadow: var(--shadow-button);
+  overflow: hidden;
+  scroll-margin-top: 12px;
+}
+
+.j-skill.todo,
+.j-stop.todo {
+  border-style: dashed;
+  box-shadow: none;
+  background: var(--color-locked-light);
+}
+
+.j-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--c);
+  border-bottom: var(--border-width) solid var(--color-navy);
+}
+
+.todo .j-card-head {
+  background: var(--color-card-bg);
+  border-bottom: var(--border-width) dashed var(--color-line);
+}
+
+.j-icon {
+  font-size: 26px;
+}
+
+.j-card-head h3 {
+  margin: 0;
+  flex: 1;
+  font-size: 21px;
+  line-height: 1.15;
+}
+
+.j-card-body {
+  padding: 10px 16px 14px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
-  margin-top: var(--space-2);
+  gap: 8px;
+  font-size: 19px;
 }
 
-/* "See more" under a stop: the rest of the child's answers, folded away. */
-.stop-more summary {
+.j-card-body p {
+  margin: 0;
+}
+
+.j-learned {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.j-learned small,
+.j-showed small {
+  display: block;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-muted-text);
+}
+
+.j-showed {
+  background: var(--color-bg);
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 18px;
+}
+
+.j-later {
+  color: var(--color-muted-text);
+  font-size: 18px;
+}
+
+.j-next {
+  background: var(--color-plan-light);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 22px;
+  padding: 12px 20px;
+}
+
+.j-next h2 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.j-next ul {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.j-next li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 20px;
+}
+
+.j-next li i {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 16px;
+}
+
+/* ---------- tab 2: My journey ---------- */
+.j-strip {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  background: var(--color-bg);
+  border: var(--border-width) solid var(--color-line);
+  border-radius: 20px;
+  padding: 30px 12px 10px;
+}
+
+.j-dot {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 48px;
+  text-decoration: none;
+  text-align: center;
+  color: var(--color-navy);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 1.1;
+}
+
+.j-dot-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: var(--border-width) solid var(--color-navy);
+  background: var(--c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.j-dot.todo .j-dot-circle {
+  background: var(--color-card-bg);
+  border-style: dashed;
+  border-color: var(--color-line);
+}
+
+.j-dot-stars {
+  min-height: 20px;
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: #B07800; /* gold that passes contrast on the pale blue */
+}
+
+/* The rail runs from the first stop's centre; its fill grows to the last done stop. */
+.j-rail {
+  position: absolute;
+  left: calc(12px + (100% - 24px) / 14);
+  right: calc(12px + (100% - 24px) / 14);
+  top: 51px;
+  height: 6px;
+  background: var(--color-line);
+  border-radius: 3px;
+}
+
+.j-rail-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--color-btn-main-bg);
+  border-radius: 3px;
+  transition: width 1.4s ease-in-out 0.3s;
+}
+
+.j-walk-pip {
+  position: absolute;
+  z-index: 2;
+  top: -6px;
+  left: 0;
+  width: 40px;
+  pointer-events: none;
+  transition: left 1.4s ease-in-out 0.3s;
+}
+
+.no-walk .j-rail-fill,
+.no-walk .j-walk-pip {
+  transition: none;
+}
+
+.j-stars {
+  font-size: 18px;
+  color: var(--color-muted-text);
+}
+
+.j-star-on {
+  color: #B07800;
+  font-size: 22px;
+}
+
+.j-star-off {
+  color: var(--color-locked);
+  font-size: 22px;
+}
+
+.j-quote {
+  padding-left: 12px;
+  border-left: 6px solid var(--c);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.j-more summary {
   min-height: 48px;
   display: inline-flex;
   align-items: center;
@@ -140,66 +495,153 @@
   cursor: pointer;
 }
 
-/* A quiet text button for the CSV copy (still 48px tall to tap). */
-.link-btn {
-  background: none;
-  border: none;
-  min-height: 48px;
-  padding: 0 4px;
-  font-family: var(--font-body);
-  font-size: 16px;
-  color: var(--color-text);
-  text-decoration: underline;
-  cursor: pointer;
+.j-more p {
+  margin: 4px 0;
+  font-size: 18px;
 }
 
-/* Printing: just the journey, no buttons, sidebar, step bar or hills. */
-@media print {
-  .shell-header,
-  .sidebar,
-  .hills,
-  .journey-actions,
-  .action-bar,
-  .status-line,
-  .preview-banner {
-    display: none !important;
+/* ---------- tab 3: My ID ---------- */
+.j-id {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  background: var(--color-plan);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 22px;
+  box-shadow: var(--shadow-button);
+  padding: 14px 20px;
+}
+
+.j-id p {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.j-id-pip {
+  width: 84px;
+}
+
+.j-id .j-id-code {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 30px;
+}
+
+.j-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.j-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 20px;
+  box-shadow: var(--shadow-button);
+  padding: 12px 18px;
+}
+
+.j-tile-k {
+  font-size: 18px;
+  color: var(--color-muted-text);
+}
+
+.j-tile-v {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 42px;
+  line-height: 1.1;
+}
+
+.j-tile-v small {
+  font-size: 22px;
+  color: var(--color-muted-text);
+}
+
+.j-tile-v--small {
+  font-size: 26px;
+}
+
+.j-tile-note {
+  font-size: 18px;
+  color: var(--color-muted-text);
+}
+
+.j-meter {
+  height: 16px;
+  margin: 6px 0 4px;
+  background: var(--color-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.j-meter i {
+  display: block;
+  height: 100%;
+  background: var(--color-plan);
+}
+
+.j-online {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ---------- a tablet or phone: one column ---------- */
+@media (max-width: 820px) {
+  .j-big {
+    grid-template-columns: minmax(0, 1fr);
+    text-align: center;
   }
 
-  .room-content {
-    border: none;
-    box-shadow: none;
+  .j-big-pip {
+    width: 72px;
+    margin: 0 auto;
   }
 
-  .stop {
-    animation: none;
-    break-inside: avoid;
+  .j-big h3 {
+    font-size: 27px;
   }
-}
 
-/* Pip hops down the trail to the last finished stop (Part 21b). Pip sits in
-   the box around the list, which starts exactly where the list starts. */
-#journey-trail {
-  position: relative;
-}
+  .j-ans,
+  .j-skills,
+  .j-stops,
+  .j-tiles {
+    grid-template-columns: minmax(0, 1fr);
+  }
 
-/* Centred on the dashed trail line, standing on the stop's dot. */
-.trail-pip {
-  position: absolute;
-  top: 0;
-  left: -20px;
-  width: 36px;
-  pointer-events: none;
-}
+  .j-tab {
+    flex-direction: column;
+    gap: 0;
+    min-height: 64px;
+    font-size: 18px;
+  }
 
-@media print {
-  .trail-pip {
+  .j-dot {
+    font-size: 14px; /* short labels may be 14px (decided 3 Nov 2026) */
+  }
+
+  .j-dot-circle {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .j-dot-stars {
     display: none;
   }
-}
 
-/* Part 22: with the online database on, the work is already sent. */
-.online-note {
-  font-weight: 700;
-  font-size: 20px;
-  margin: 0;
+  .j-rail {
+    top: 45px;
+  }
+
+  .j-walk-pip {
+    width: 30px;
+  }
 }

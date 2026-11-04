@@ -34,6 +34,13 @@ export function taskCardHTML({ title, pill = '', tabsHTML = '', bodyHTML }) {
     </section>`;
 }
 
+// The "words, not numbers" box for games (Habiba, 4 Nov 2026): an icon and
+// a title as well as the colour. `text` comes from data/content.
+export function wordsNoteHTML(text) {
+  return `<p class="words-note"><span class="words-note-icon" aria-hidden="true">🔤</span>
+    <span><strong>Words, not numbers!</strong> ${text}</span></p>`;
+}
+
 // Pip, small, with ONE sentence. `data-pip-text` lets other code change what Pip says.
 // The question is the page's h1 (what the child must answer).
 export function pipLineHTML(text, question = '') {

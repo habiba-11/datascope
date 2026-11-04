@@ -58,6 +58,7 @@ export function showBadgePopup(badge, onLanded) {
   }
   body.append(why);
 
+  let chime = null; // the stamp's chime, cancelled if the pop-up closes first
   const done = openModal({
     title: badge.name,
     body,
@@ -68,10 +69,11 @@ export function showBadgePopup(badge, onLanded) {
       // Pip cheers in the corner of the pop-up (wings up).
       dialog.querySelector('.modal-pip .pip')?.classList.replace('pip--happy', 'pip--cheer');
       // A soft chime when the badge is stamped (only if sound is on: playSound checks).
-      setTimeout(() => playSound('badgeFound'), reduceMotion() ? 0 : STAMP_MS);
+      chime = setTimeout(() => playSound('badgeFound'), reduceMotion() ? 0 : STAMP_MS);
     },
     // Before the pop-up goes, remember where the badge is, so a copy can fly from there.
     beforeClose: (dialog) => {
+      clearTimeout(chime);
       const face = dialog.querySelector('.bp-front svg');
       flyFrom = { svg: face.cloneNode(true), box: face.getBoundingClientRect() };
       // A second badge waits until this one has landed.

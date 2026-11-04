@@ -2,6 +2,7 @@
   "scenarioId": "playground-game",
   "emoji": "⚽",
   "cardTitle": "What do we play at recess?",
+  "wordsNote": "Games are words. We can't add them, so there is no mean, median or range. We use the mode: the game picked the most.",
   "fixIts": [
     { "flawed": "Isn't football the best game?", "fix": "Which game did you play most at recess this week?" },
     { "flawed": "Do you like games?", "fix": "What is your favourite recess game this week?" }
@@ -10,7 +11,7 @@
   "graphLab": {
     "tell": "📊 What does this graph tell us about recess games?",
     "notTell": "🤔 What can't this graph tell us?",
-    "noLine": "🤔 Games have no order. A line between them means nothing. Try a bar!",
+    "noLine": "Games have no order. A line between them could fool you. So we show dots on sticks instead.",
     "tellAnswers": [
       "{top} is the most common answer, with {topCount}.",
       "Only {lowCount} picked {low}.",

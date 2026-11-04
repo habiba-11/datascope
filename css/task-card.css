@@ -101,6 +101,24 @@
   padding: var(--space-3);
 }
 
+/* Games only: "Words, not numbers!" (no mean, median or range). */
+.words-note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  padding: 12px 16px;
+  background: var(--color-plan-light);
+  border: var(--border-width) dashed var(--color-navy);
+  border-radius: var(--radius-step);
+  font-size: var(--font-size-base);
+}
+
+.words-note-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
 /* Pip's one line next to the big question. */
 .pip-line {
   display: flex;
@@ -222,25 +240,70 @@
   min-width: 180px;
 }
 
-/* Quiet: the child's code, the sound switch and the online status. */
+/* Quiet, under a dashed line, so it never looks like the task's own buttons.
+   Left: what is true (code, saved online?) as flat labels, no border or shadow.
+   Right: what you can do (sound, exit) as real buttons; Exit is coral, "leave". */
 .status-line {
   max-width: 1000px;
   margin: var(--space-3) auto 120px;
-  padding: 0 var(--space-3);
+  padding: var(--space-2) var(--space-3) 0;
+  border-top: var(--border-width) dashed var(--color-line);
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
   align-items: center;
   gap: var(--space-2);
   font-size: 15px;
 }
 
-.status-line .sound-toggle {
-  min-height: 48px;
-  font-size: 15px;
+.status-info,
+.status-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
 }
 
-.status-line .sync-status {
+.status-info .code-badge,
+.status-info .sync-status {
   margin: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-muted-text);
+}
+
+/* Not sent yet / offline: it stands out (yellow AND the ⚠️ / 📴 words). */
+.status-info .sync-status[data-status="error"],
+.status-info .sync-status[data-status="offline"] {
+  padding: 2px 12px;
+  background: var(--color-plan-light);
+  border: 2px solid var(--color-plan);
+  border-radius: 999px;
+  color: var(--color-navy);
+}
+
+/* No code yet: still a link to tap, so it keeps its look. */
+.status-info .code-badge.missing {
+  padding: 8px 16px;
+  background: var(--color-plan);
+  border: 2px solid var(--color-navy);
+  color: var(--color-navy);
+}
+
+.status-line .sound-toggle,
+.status-line .exit-btn {
+  min-height: 48px;
+  font-size: 16px;
+}
+
+.status-line .exit-btn {
+  background: var(--color-ask-light);
+  border-color: var(--color-ask);
+  color: var(--color-navy);
 }
 
 /* The Explore rooms as tabs filling the card's header strip (Number Lab,
@@ -334,7 +397,13 @@
   outline-color: var(--color-plan);
 }
 
-/* The hints of the question on screen (the Hint button is in the action bar). */
+/* The hints of the question on screen, under its Hint button. */
 .hint-list-slot .hint-list {
   margin-top: var(--space-1);
+}
+
+/* The Hint button, right under the question and its box (4 Nov 2026). */
+.hint-list-slot > .hint-btn {
+  margin-top: var(--space-1);
+  align-self: flex-start;
 }

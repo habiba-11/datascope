@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import {
   buildFrequencyData, makeChartConfig, describeChart, dotSize, valueText, countText, directLabelText,
-  pieCountLabels, pieKeyPosition, numberLine, lineFits, linePoints,
+  pieCountLabels, pieKeyPosition, tallestIndex, numberLine, lineFits, linePoints,
 } from '../js/helpers/charts.js';
 
 const SLEEP = { chartAxis: 'Hours of sleep', valueLabel: '{value} hours' };
@@ -42,7 +42,7 @@ test('a chart is also described in words for screen readers', () => {
 });
 
 test('dots shrink to fit when answers are close on a long number line, and never vanish', () => {
-  assert.equal(dotSize(60), 9); // lots of room: the normal size
+  assert.equal(dotSize(60), 14); // lots of room: the big f13 size
   assert.equal(dotSize(14), 6); // Class A on the shared 4-36 line: 2 x 6 = 12 px < 14 px, no overlap
   assert.equal(dotSize(4), 3); // very tight: still a visible dot
 });
@@ -185,6 +185,28 @@ test('the key moves under a narrow pie, and follows the chart when it resizes', 
   assert.equal(options.plugins.legend.position, 'bottom');
   options.onResize(chart, { width: 900 });
   assert.equal(options.plugins.legend.position, 'right');
+});
+
+test('numbers: the one tallest bar is gold, the rest blue; a tie has no gold', () => {
+  assert.equal(tallestIndex([1, 6, 4]), 1);
+  assert.equal(tallestIndex([5, 2, 5]), -1);
+  const colours = makeChartConfig('bar', [3, 9, 10], [1, 6, 4], SLEEP).data.datasets[0].backgroundColor;
+  assert.deepEqual(colours, ['#38B6FF', '#FFC531', '#38B6FF']);
+  // Words keep one colour each.
+  const games = makeChartConfig('bar', ['Football', 'Tag'], [6, 3], GAMES).data.datasets[0].backgroundColor;
+  assert.equal(new Set(games).size, 2);
+});
+
+test('games on a line chart: dots on stems, no line between them', () => {
+  const config = makeChartConfig('line', ['Football', 'Tag'], [6, 3], GAMES);
+  assert.equal(config.data.datasets[0].showLine, false);
+  assert.equal(config.options.plugins.directLabels.stems, true);
+  assert.equal(config.options.scales.y.title.text, 'Number of kids');
+});
+
+test('every chart keeps the real answers, for the tap-to-read helper', () => {
+  assert.deepEqual(makeChartConfig('bar', [34, 35], [5, 3], SHOES).data.datasets[0].values, [34, 35]);
+  assert.deepEqual(makeChartConfig('pie', [5, 18], [0, 2], SLEEP).data.datasets[0].values, [18]);
 });
 
 test('answers nobody chose get no slice and no key row', () => {

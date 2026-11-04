@@ -75,11 +75,13 @@ function landInBackpack(count) {
   counter.setAttribute('aria-label', backpackLabel(count));
   restartClass(counter, 'bp-bump');
   restartClass(counter.querySelector('.badge-count'), 'bp-count-pop');
+  playSound('badgeLand'); // every badge lands with the same pop
 
   if (level.name !== levelBefore) {
     pipSays(`Level up: you are now a ${level.icon} ${level.name}!`);
-    confetti(); // only now: the badge pop-up (and its own confetti) is closed
-    setTimeout(() => playSound('levelUp'), 300);
+    // Only now: the badge pop-up (and its own confetti) is closed. The fanfare
+    // comes just after the badge's landing pop, with the confetti.
+    setTimeout(() => confetti({ sound: 'levelUp' }), 400);
   }
 }
 

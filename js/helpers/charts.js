@@ -24,10 +24,14 @@ const CHART_FONT = { size: 18, weight: 'bold', family: 'Nunito, sans-serif' };
 const CHART_TEXT_COLOUR = '#17324D';
 const LINE_COLOUR = '#0E7CC7'; // darker than the bars' blue, so the line stands out on white
 const LINE_FILL = 'rgba(56, 182, 255, 0.18)';
+// f13 (4 Nov 2026): number answers are blue, and the ONE tallest bar or point is
+// gold (the read-out says "tallest" in words too, so colour is not the only signal).
+const BLUE = '#38B6FF';
+const GOLD = '#FFC531';
 // A pie's counts sit this far outside the slice, one 18px line each.
 const PIE_COUNT_GAP = 10;
 const PIE_COUNT_HEIGHT = 22;
-const NARROW_PIE = 560; // px
+const NARROW_PIE = 700; // px: narrower, and the key title (e.g. "Minutes of reading") would be cut off beside the pie
 // The pie is linked to its key by colour, so each slice needs its own colour
 // (at most 7 answers on a pie today). The first 5 are the bar chart's colours.
 const PIE_PALETTE = [...PALETTE, '#FF9F43', '#F06FB5', '#1FC8B4'];
@@ -90,6 +94,13 @@ export function pieCountLabels(slices, height) {
   return labels;
 }
 
+// The index of the one tallest value, or -1 when two or more share the top
+// (then nothing is gold: there is no single tallest).
+export function tallestIndex(data) {
+  const max = Math.max(...data);
+  return max > 0 && data.filter((d) => d === max).length === 1 ? data.indexOf(max) : -1;
+}
+
 // A pie's key sits beside it, or underneath when the chart is narrow (so the
 // counts and the key's title are never cut off).
 export function pieKeyPosition(chartWidth) {
@@ -131,6 +142,25 @@ export function numberLine(labels) {
 // hover to read it (Shah & Hoeffner, Paper 20: label directly, not a legend).
 export const directLabelsPlugin = {
   id: 'directLabels',
+  // Games on a "line" chart: each dot stands on a dashed stem, not on a line
+  // (games have no order, so a line between them would mean nothing).
+  beforeDatasetsDraw(chart, args, options) {
+    if (!options.stems) return;
+    const { ctx } = chart;
+    const bottom = chart.scales.y.getPixelForValue(0);
+    ctx.save();
+    ctx.strokeStyle = CHART_TEXT_COLOUR;
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.setLineDash([2, 9]);
+    chart.getDatasetMeta(0).data.forEach((point) => {
+      ctx.beginPath();
+      ctx.moveTo(point.x, bottom);
+      ctx.lineTo(point.x, point.y);
+      ctx.stroke();
+    });
+    ctx.restore();
+  },
   afterDatasetsDraw(chart, args, options) {
     const { ctx } = chart;
     if (chart.config.type === 'pie') {
@@ -158,7 +188,8 @@ export const directLabelsPlugin = {
         ctx.strokeStyle = 'white';
         ctx.lineWidth = 4;
         ctx.lineJoin = 'round';
-        const lift = chart.config.type === 'line' ? 13 : 8; // clear of a line chart's big dots
+        // Clear of the big dots (line chart, dot plot, stems); bars need less.
+        const lift = chart.config.type === 'bar' ? 8 : (element.options?.radius || 8) + 6;
         ctx.strokeText(text, x, y - lift);
         ctx.fillText(text, x, y - lift);
         ctx.restore();
@@ -204,16 +235,17 @@ export function linePoints(labels, data) {
   return points;
 }
 
-// How big a dot can be: at most 9px, and never wider than the gap between two
+const MAX_DOT = 14; // f13: big dots, one per kid
+// How big a dot can be: at most 14px, and never wider than the gap between two
 // neighbouring values on the x-axis (or the height of one stack step), so the
 // dots never overlap. Chart.js asks again when the chart is resized.
 export function dotSize(pixelsPerStep) {
-  return Math.max(3, Math.min(9, Math.floor(pixelsPerStep / 2) - 1));
+  return Math.max(3, Math.min(MAX_DOT, Math.floor(pixelsPerStep / 2) - 1));
 }
 
 function dotRadius({ chart }) {
   const { x, y } = chart.scales;
-  if (!x || !y) return 9;
+  if (!x || !y) return MAX_DOT;
   const across = Math.abs(x.getPixelForValue(1) - x.getPixelForValue(0));
   const up = Math.abs(y.getPixelForValue(1) - y.getPixelForValue(0));
   return dotSize(Math.min(across, up));
@@ -253,6 +285,8 @@ function makePieConfig(labels, data, recipe) {
         borderColor: CHART_TEXT_COLOUR,
         borderWidth: 2,
         radius: '72%', // leaves room for the counts around the pie
+        hoverBorderWidth: 5,
+        values: shown.map((i) => labels[i]), // the real answers, for the tap-to-read helper
       }],
     },
     options: {
@@ -278,7 +312,13 @@ function makePieConfig(labels, data, recipe) {
 // `yMax` is optional: when comparing two classes, both charts use the same height.
 export function makeChartConfig(type, labels, data, recipe, yMax) {
   if (type === 'pie') return makePieConfig(labels, data, recipe);
-  const colors = labels.map((_, i) => PALETTE[i % PALETTE.length]);
+  const words = typeof labels[0] === 'string';
+  const tallest = tallestIndex(data);
+  // Words: one colour each. Numbers: blue, and the one tallest in gold.
+  const colors = labels.map((_, i) => {
+    if (words) return PALETTE[i % PALETTE.length];
+    return i === tallest ? GOLD : BLUE;
+  });
   // One extra step above the tallest bar, so its number label is not cut off.
   const yTop = (yMax ?? Math.max(...data)) + 1;
   const crowded = labels.length > CROWDED_LABELS;
@@ -322,9 +362,10 @@ export function makeChartConfig(type, labels, data, recipe, yMax) {
           backgroundColor: LINE_FILL,
           fill: 'origin',
           tension: 0, // straight lines: a curve would bulge past the real counts
-          pointBackgroundColor: '#38B6FF',
+          // The one tallest point is gold, the others blue.
+          pointBackgroundColor: (context) => (context.raw?.x === labels[tallest] ? GOLD : BLUE),
           pointBorderColor: CHART_TEXT_COLOUR,
-          pointBorderWidth: 2,
+          pointBorderWidth: 3,
           // Big dots where kids answered, small ones where nobody did (none on a crowded chart).
           pointRadius: (context) => {
             if (context.raw?.y > 0) return dotRadius(context);
@@ -344,6 +385,36 @@ export function makeChartConfig(type, labels, data, recipe, yMax) {
     };
   }
 
+  if (type === 'line') {
+    // Games: big dots on dashed stems instead of a line (the stems are drawn by
+    // directLabelsPlugin), and Graph Lab shows a "Careful!" note.
+    return {
+      type: 'line',
+      data: {
+        labels: labels.map(shownValue),
+        datasets: [{
+          data,
+          showLine: false,
+          pointRadius: 15,
+          pointHoverRadius: 17,
+          pointBackgroundColor: colors,
+          pointBorderColor: CHART_TEXT_COLOUR,
+          pointBorderWidth: 3,
+          values: labels,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { ...plugins, directLabels: { ...plugins.directLabels, stems: true } },
+        scales: {
+          x: { title: xTitle, offset: true, ticks: bigTicks({ autoSkip: false }) },
+          y: yAxis,
+        },
+      },
+    };
+  }
+
   return {
     type,
     data: {
@@ -353,6 +424,9 @@ export function makeChartConfig(type, labels, data, recipe, yMax) {
         backgroundColor: colors,
         borderColor: CHART_TEXT_COLOUR,
         borderWidth: 2,
+        hoverBorderWidth: 5,
+        borderRadius: 8,
+        values: labels, // the real answers, for the tap-to-read helper
       }],
     },
     options: {

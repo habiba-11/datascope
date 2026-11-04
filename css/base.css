@@ -285,7 +285,7 @@ h1 {
   border: 2px solid var(--color-plan);
   border-radius: 12px;
   padding: 8px 12px;
-  font-size: 16px;
+  font-size: 18px; /* reading text: at least 18px (was 16px, found 4 Nov 2026) */
   font-weight: 600;
 }
 
@@ -458,3 +458,61 @@ h1 {
 .pip--cheer .pip-wing-left { transform: rotate(55deg); }
 .pip--cheer .pip-wing-right { transform: rotate(-55deg); }
 .pip--cheer .pip-sparkles { opacity: 1; transform: scale(1); }
+
+/* The last fix-it hint: its idea is a chip to tap (js/helpers/prompts.js). */
+.hint-list .hint-answer {
+  margin-top: 8px;
+}
+
+/* The "how likely / how sure" scale (Chance Lab and Evidence Board, 4 Nov 2026):
+   a ruler from red to green, then the 5 words, each in its own soft colour
+   along the ruler (the word is the signal; the colour helps). */
+/* A ruler from red (won't happen) to green (will happen), above the 5 words. */
+.likely-ruler {
+  height: 12px;
+  margin: 0 0 4px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--color-ask), var(--color-plan), #FFFFFF, #9ADFAE, var(--color-explore));
+}
+
+.likely-ends {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 2px 8px;
+  font-size: 18px;
+  color: var(--color-muted-text);
+}
+
+.likely-scale {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.likely-scale .certainty-btn {
+  min-height: 78px;
+  padding: 4px;
+  flex-direction: column;
+  line-height: 1.1;
+  font-size: 20px;
+}
+
+/* Each word has its own soft colour along the ruler (the word is the signal). */
+.likely-scale .certainty-btn:nth-child(1) { background: var(--color-ask-light); }
+.likely-scale .certainty-btn:nth-child(2) { background: var(--color-plan-light); }
+.likely-scale .certainty-btn:nth-child(3) { background: var(--color-card-bg); }
+.likely-scale .certainty-btn:nth-child(4) { background: var(--color-explore-light); }
+.likely-scale .certainty-btn:nth-child(5) { background: #B9E8C6; }
+
+.likely-scale .certainty-btn.active {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 0 var(--color-navy), 0 0 0 4px #FFFFFF, 0 0 0 7px var(--color-navy);
+}
+
+@media (max-width: 860px) {
+  .likely-scale {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,10 +1,10 @@
 // Shell layer: the action bar under the task card (UI guide, zone 3). Always in
-// the same place: Back (quiet) on the left; Hint (white) and the ONE primary
-// button (green) on the right. mountShell({ layout: 'card' }) makes the empty
-// bar; each room fills it with setupActionBar().
+// the same place: Back (quiet) on the left, the ONE primary button (green) on
+// the right. The Hint button sits under the question (setHint).
+// mountShell({ layout: 'card' }) makes the empty bar; each room fills it with setupActionBar().
 
 // back:    { label, href } or { label, onClick }, or null for no Back
-// hint:    a button made by prompts.js (moved into the bar), or null
+// hint:    a button made by prompts.js (placed under the question, see setHint), or null
 // primary: see setPrimary below
 // Returns { setPrimary, setBack }, so the room can change the buttons as the task goes on.
 export function setupActionBar({ back = null, hint = null, primary }) {
@@ -35,23 +35,28 @@ export function setupActionBar({ back = null, hint = null, primary }) {
   // label:       what happens next, e.g. "▶ Run survey"
   // enabled:     false shows `whyDisabled` on the button instead (e.g. "Write your idea first")
   // onClick:     what the button does
-  // ready:       true makes it breathe gently (only once the task is ready)
+  // ready:       true gives it the "press me" nudge: a small hop and a ring
+  //              (only once the task is ready; Habiba, 4 Nov 2026)
   function setPrimary({ label, enabled = true, whyDisabled = '', onClick = null, ready = false }) {
     primaryBtn.textContent = enabled || !whyDisabled ? label : whyDisabled;
     primaryBtn.disabled = !enabled;
-    primaryBtn.classList.toggle('m-pulse', enabled && ready);
+    primaryBtn.classList.toggle('m-nudge', enabled && ready);
     onPrimary = onClick;
   }
 
   // The Hint button of the task on screen (or null for none).
   let hintBtn = null;
+  // It goes right under the question, at the top of the hint slot of the task
+  // on screen (so the button and its answers are together; Habiba, 4 Nov 2026).
+  // A page without a hint slot keeps it in the bar.
   function setHint(button) {
     if (hintBtn) hintBtn.remove();
     hintBtn = button;
-    if (button) {
-      button.classList.add('btn-secondary');
-      right.prepend(button);
-    }
+    if (!button) return;
+    button.classList.add('btn-secondary');
+    const slot = [...document.querySelectorAll('.hint-list-slot')].find((s) => s.offsetParent !== null);
+    if (slot) slot.prepend(button);
+    else right.prepend(button);
   }
 
   setBack(back);

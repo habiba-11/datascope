@@ -1,259 +1,667 @@
+/* Chance Lab, laid out like the f12 design (Part 38c, 4 Nov 2026):
+   real-looking devices (js/chance-devices.js), a lab table for the test,
+   10 / 50 / 500 as round dials, and one card per outcome (should vs did). */
+
+/* ---------- the devices (sized in em: set font-size on the box around them) ---------- */
+.cl-dev {
+  position: relative;
+  display: inline-block;
+  width: 8em;
+  height: 8em;
+}
+
+.cl-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 0.2em;
+  width: 5.6em;
+  height: 1em;
+  margin-left: -2.8em;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(23, 50, 77, 0.45), rgba(23, 50, 77, 0) 70%);
+}
+
+.cl-persp {
+  position: absolute;
+  inset: 0;
+  perspective: 50em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Coin: 9 thin gold discs make the thick edge; owl on Heads, feather on Tails. */
+.cl-coin {
+  position: relative;
+  width: 5.6em;
+  height: 5.6em;
+  transform-style: preserve-3d;
+  transform: rotateX(-18deg);
+}
+
+.cl-disc,
+.cl-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.cl-disc {
+  background: #B8860B;
+  border: 0.1em solid #7A5A06;
+}
+
+.cl-face {
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 32% 28%, #FFF2B0 0, #FFD84A 35%, #E5A81A 75%, #C98A0C 100%);
+  border: 0.14em solid var(--color-navy);
+  box-shadow: inset 0 0 0 0.32em #F7C93E, inset 0 0 0 0.38em #B8860B;
+}
+
+.cl-face svg {
+  width: 62%;
+  height: 62%;
+}
+
+.cl-face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.55) 0, rgba(255, 255, 255, 0) 40%);
+}
+
+/* Die: a white cube with navy pips (the 1 is red), tilted so 3 faces show. */
+.cl-dtilt {
+  transform-style: preserve-3d;
+  transform: rotateX(-24deg) rotateY(-30deg);
+}
+
+.cl-cube {
+  display: block;
+  position: relative;
+  width: 4.6em;
+  height: 4.6em;
+  transform-style: preserve-3d;
+}
+
+.cl-pips {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  gap: 0.05em;
+  padding: 0.55em;
+  background: linear-gradient(145deg, #FFFFFF 0, #F1F6FB 70%, #D9E4EE 100%);
+  border: 0.13em solid var(--color-navy);
+  border-radius: 0.7em;
+  backface-visibility: hidden;
+}
+
+.cl-pips i {
+  width: 0.95em;
+  height: 0.95em;
+  margin: auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #4A6580, var(--color-navy) 70%);
+}
+
+.cl-pips i.red {
+  background: radial-gradient(circle at 35% 30%, #FF9A9E, #E0282F 70%);
+}
+
+.cl-f1 { transform: translateZ(2.3em); }
+.cl-f6 { transform: rotateY(180deg) translateZ(2.3em); }
+.cl-f3 { transform: rotateY(90deg) translateZ(2.3em); }
+.cl-f4 { transform: rotateY(-90deg) translateZ(2.3em); }
+.cl-f2 { transform: rotateX(90deg) translateZ(2.3em); }
+.cl-f5 { transform: rotateX(-90deg) translateZ(2.3em); }
+
+/* Spinner: a glossy wheel lying back a little, with a metal needle and hub. */
+.cl-spin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7em;
+  height: 7em;
+  margin: -3.6em 0 0 -3.5em;
+  transform: rotateX(38deg);
+  transform-style: preserve-3d;
+}
+
+.cl-wheel {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 0.16em solid var(--color-navy);
+  box-shadow: 0 0.45em 0 var(--color-navy);
+}
+
+.cl-wheel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0) 48%);
+}
+
+.cl-needle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  z-index: 3;
+  transform-origin: 0 0;
+}
+
+.cl-needle b {
+  position: absolute;
+  left: -0.34em;
+  top: -3.1em;
+  width: 0.68em;
+  height: 3.1em;
+  background: linear-gradient(90deg, #FFFFFF 0, var(--color-navy) 20%, var(--color-navy) 100%);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  filter: drop-shadow(0.15em 0.2em 0 rgba(23, 50, 77, 0.35));
+}
+
+.cl-hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  width: 1.1em;
+  height: 1.1em;
+  margin: -0.55em 0 0 -0.55em;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #FFFFFF, #9CB4C9 60%, #4A6580);
+  border: 0.12em solid var(--color-navy);
+}
+
+.cl-slab {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.8em;
+  color: var(--color-navy);
+  text-shadow: 0 0 0.2em #FFFFFF;
+}
+
+/* The devices float gently (none with reduced motion: base.css). */
+.cl-floaty .cl-persp,
+.cl-floaty .cl-spin {
+  animation: cl-float 3.4s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+.cl-floaty .cl-shadow {
+  animation: cl-shadow 3.4s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+.cl-floaty .cl-spin {
+  animation-name: cl-float-tilted;
+}
+
+@keyframes cl-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -0.45em; } }
+@keyframes cl-float-tilted { 0%, 100% { translate: 0 0; } 50% { translate: 0 -0.45em; } }
+@keyframes cl-shadow { 0%, 100% { scale: 1; } 50% { scale: 0.82; opacity: 0.7; } }
+
+.tab-hidden .cl-floaty * {
+  animation-play-state: paused;
+}
+
+/* A round token for one outcome: colour, 🦉 / 🪶 or the number (the name is written next to it). */
+.cl-token {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: var(--border-width) solid var(--color-navy);
+  background: var(--c);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 15px;
+}
+
+/* ---------- Task 1: pick a game ---------- */
 .device-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
-  margin: 16px 0;
+  margin: 8px 0 0;
 }
 
 .device-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  min-height: 120px;
-  justify-content: center;
+  padding: 8px 8px 12px;
   background: var(--color-card-bg);
   color: var(--color-text);
   border: var(--border-width) solid var(--color-navy);
-  border-radius: 20px;
-  box-shadow: var(--shadow-button);
-  padding: var(--space-2);
+  border-radius: 24px;
+  box-shadow: 0 6px 0 var(--color-navy);
   cursor: pointer;
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: 19px;
+  font-size: 22px;
   transition: transform var(--duration-fast) var(--ease-out);
 }
 
-/* Chosen (a radio choice card): it lifts and turns soft green; ✓ badge in base.css. */
+.device-art {
+  width: 100%;
+  margin-bottom: 6px;
+  padding-top: 6px;
+  display: flex;
+  justify-content: center;
+  border-radius: 16px;
+  background: var(--art);
+  font-size: 14px; /* the device's size */
+}
+
+.device-sub {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-muted-text);
+}
+
+/* Chosen (a radio choice card): it lifts and turns soft green, with a ✓ badge. */
 .device-card.selected {
   background: var(--color-explore-light);
   transform: translateY(-4px);
 }
 
 .device-card.selected::after {
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   background: var(--color-btn-main-bg);
   color: #FFFFFF;
-}
-
-.device-emoji {
-  font-size: 34px;
+  border: var(--border-width) solid var(--color-navy);
+  font-size: 18px;
 }
 
 .outcomes-box {
-  margin-top: 16px;
+  margin-top: 14px;
+  padding: 10px 16px;
+  background: var(--color-bg);
+  border: var(--border-width) dashed var(--color-line);
+  border-radius: 22px;
+}
+
+.outcomes-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.outcomes-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.outcomes-spinner {
+  font-size: 16px;
 }
 
 .outcome-chips {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
-  margin-top: 8px;
+  gap: 10px;
 }
 
 .outcome-chip {
-  background: white;
-  border: 2px solid var(--color-navy);
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-weight: 700;
-}
-
-/* The device, its last result and the 10 / 50 / 500 switch, in one row. */
-.trial-side {
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-1) var(--space-3);
-  margin-bottom: var(--space-2);
-}
-
-/* "Should" bars are striped, "did" bars solid (and each line has its word). */
-.bar-fill.theory {
-  background: repeating-linear-gradient(135deg, var(--color-collect-light) 0 5px, var(--color-card-bg) 5px 10px);
-}
-
-.compare-empty {
-  color: var(--color-muted-text);
-  font-weight: 700;
-}
-
-/* One row per outcome (Prof's comment 7): big, bold, every number says what it is. */
-.outcome-row {
-  display: grid;
-  grid-template-columns: 84px 1fr;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-1) 0;
-  border-bottom: 2px solid var(--color-soft);
-}
-
-.outcome-name {
-  font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 24px;
-}
-
-.outcome-bars {
-  display: grid;
-  gap: 6px;
-}
-
-.bar-line {
-  display: grid;
-  grid-template-columns: 110px 1fr 220px;
-  align-items: center;
-  gap: var(--space-1);
-  font-size: 18px;
-  font-weight: 800;
-}
-
-/* Narrow screens: the bar gets its own line. */
-@media (max-width: 720px) {
-  .bar-line {
-    grid-template-columns: 110px 1fr;
-  }
-
-  .bar-track {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-}
-
-.bar-track {
-  flex: 1;
-  height: 22px;
-  background: var(--color-bg);
-  border: 2px solid var(--color-navy);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.bar-fill {
-  height: 100%;
-  animation: bar-grow 0.6s ease-out; /* bars grow from the left after each run */
-  transform-origin: left;
-}
-
-@keyframes bar-grow {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
-/* The chosen device tumbles while the trials run. */
-.trial-device {
-  font-size: 56px;
-  text-align: center;
-  line-height: 1.2;
-}
-
-/* Part 21c: the coin/dice face and the small spinner move with GSAP (chance-lab.js). */
-.trial-device {
-  perspective: 600px; /* so the coin's flip looks 3D */
-}
-
-.device-face {
-  display: inline-block;
-}
-
-.mini-spinner {
-  position: relative;
-  width: 110px;
-  height: 110px;
-  margin: 0 auto;
-  border-radius: 50%;
+  gap: 8px;
+  padding: 4px 14px 4px 6px;
+  background: var(--color-card-bg);
   border: var(--border-width) solid var(--color-navy);
-}
-
-/* The needle stands on the centre and turns around its bottom end. Placed
-   with left/top (not transform), so GSAP only ever changes its rotation. */
-.mini-spinner .needle {
-  position: absolute;
-  left: calc(50% - 3px);
-  top: calc(50% - 46px);
-  width: 6px;
-  height: 46px;
-  background: var(--color-navy);
-  border-radius: 3px;
-  transform-origin: 50% 100%;
-}
-
-/* The last trial's result, in words. */
-.trial-result {
-  text-align: center;
+  border-radius: 16px;
   font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 21px;
+}
+
+.outcome-chip small {
+  font-family: var(--font-body);
   font-weight: 700;
-  font-size: 20px;
-  min-height: 28px;
-  margin: 4px 0 8px;
+  font-size: 18px;
+  color: var(--color-muted-text);
 }
 
-/* The end of a "should" bar is dashed. */
-.bar-fill.theory {
-  border-right: 2px dashed var(--color-navy);
+/* ---------- Task 2: how likely? ---------- */
+.predict-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 20px;
+  align-items: center;
 }
 
-.bar-fill.experiment {
-  background: var(--color-explore);
+.predict-art {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 4px;
+  background: var(--color-collect-light);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 24px;
+  box-shadow: var(--shadow-button);
+  font-size: 22px;
 }
+
 
 .reason-label {
   display: block;
+  margin: 8px 0 4px;
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: 800;
+  font-size: 21px;
 }
 
 .reason-input {
   width: 100%;
-  max-width: 500px;
-  font-family: var(--font-body);
-  font-size: 16px;
+  padding: 10px 14px;
   border: var(--border-width) solid var(--color-navy);
-  border-radius: 12px;
-  padding: 8px 12px;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 19px;
   resize: vertical;
-  margin-top: 6px;
 }
 
-/* The spinner drawing: slice sizes come from the device's weights (chance-lab.js). */
-.spinner-picture {
-  width: 140px;
-  height: 140px;
+/* ---------- Task 3: test it ---------- */
+.test-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* The lab table: a big device, the result in big words, the run-size dials. */
+.lab-table {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px 16px;
+  background: linear-gradient(#E3F4FF, #C9E8FA);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 26px;
+  box-shadow: 0 6px 0 var(--color-navy);
+}
+
+.trial-device {
+  margin-top: 6px;
+  font-size: 22px;
+}
+
+.trial-result {
+  min-height: 46px;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 30px;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.size-dials {
+  display: flex;
+  gap: 10px;
+}
+
+/* 10 / 50 / 500 as round dials (a radio group: chance-lab.js wires it). */
+.size-dial {
+  width: 88px;
+  height: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
   border-radius: 50%;
   border: var(--border-width) solid var(--color-navy);
-  margin: 8px 0 12px;
-  position: relative;
+  background: var(--color-card-bg);
+  box-shadow: 0 5px 0 var(--color-navy);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 30px;
+  color: var(--color-navy);
+  cursor: pointer;
 }
 
-/* The little arrow in the middle, so it reads as a spinner. */
-.spinner-picture::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 6px;
-  height: 52px;
-  background: var(--color-navy);
-  border-radius: 3px;
-  transform: translate(-50%, -100%) rotate(30deg);
-  transform-origin: 50% 100%;
+.size-dial small {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-muted-text);
 }
 
-/* The scenario's one-line story above the chance games. */
-.chance-story {
-  font-weight: 700;
+.size-dial.selected {
+  background: var(--color-explore);
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--color-navy);
+}
+
+.compare-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 8px;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 24px;
+}
+
+.compare-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+}
+
+.compare-key i {
+  width: 34px;
+  height: 20px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 6px;
+}
+
+.key-should,
+.bar-fill.should {
+  background: repeating-linear-gradient(135deg, var(--color-collect-light) 0 6px, #FFFFFF 6px 12px);
+}
+
+.key-did {
+  background: var(--color-btn-main-bg);
+}
+
+/* The last results as small tokens, popping in one after another. */
+.recent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  margin-bottom: 10px;
+}
+
+.recent-label {
+  font-size: 18px;
+  color: var(--color-muted-text);
+}
+
+.recent-token {
+  display: inline-flex;
+  animation: m-pop var(--duration-medium) var(--ease-spring) both;
+  animation-delay: calc(var(--i) * 60ms);
+}
+
+.compare-empty {
+  margin: 6px 0;
+  font-size: 20px;
+  color: var(--color-muted-text);
+}
+
+/* The outcome cards side by side (--cols from chance-lab.js: 3 for the die,
+   2 for the others), so all of them and the goal are in view at once. */
+.outcome-rows {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+  gap: 10px;
+}
+
+/* One small card per outcome: Should (striped) above Did (solid, the outcome's colour). */
+.outcome-card {
+  min-width: 0;
+  padding: 8px 12px 10px;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 20px;
+  box-shadow: 0 4px 0 var(--color-navy);
+}
+
+/* The goal (the outcome we track): a gold frame and a soft gold card, plus its ⭐ words. */
+.outcome-card.goal {
+  background: var(--color-plan-light);
+  box-shadow: 0 4px 0 var(--color-navy), 0 0 0 4px var(--color-gold);
+}
+
+.outcome-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-bottom: 4px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.tracked {
+  padding: 0 10px;
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-navy);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.bar-line {
+  margin: 6px 0 2px;
+}
+
+/* "Should" on the left, the big % on the right, the bar under them. */
+.bar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.bar-word {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-muted-text);
+}
+
+.bar-track {
+  height: 22px;
+  overflow: hidden;
   background: var(--color-bg);
-  border-radius: var(--radius-button);
-  padding: 8px 12px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 999px;
 }
 
-/* The spinner again, smaller, in "How likely?" (Task 2). */
-.spinner-picture.small {
-  width: 100px;
-  height: 100px;
+.bar-fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  transition: width 0.9s var(--ease-out);
 }
 
-.spinner-picture.small::after {
-  height: 36px;
+.bar-fill.should {
+  border-right: var(--border-width) dashed var(--color-navy);
+}
+
+.bar-fill.did {
+  background: var(--c);
+  border-right: var(--border-width) solid var(--color-navy);
+}
+
+.bar-fill[data-width="0%"] {
+  border-right: 0;
+}
+
+.bar-value {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+/* "1 in 6" / "7 of 50 times" under the bar. */
+.bar-small {
+  display: block;
+  text-align: right;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-muted-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar-fill {
+    transition: none;
+  }
+}
+
+/* A tablet or phone: picker 2 x 2, the lab table above the cards. */
+@media (max-width: 860px) {
+  .device-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .device-art {
+    font-size: 12px;
+  }
+
+  .predict-layout,
+  .test-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+
+}
+
+/* The run button, under the device on the lab table (Habiba, 4 Nov 2026). */
+.run-btn {
+  min-width: 220px;
+  min-height: 60px;
+  font-size: 22px;
 }

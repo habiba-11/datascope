@@ -86,6 +86,7 @@ async function init() {
     const label = partner ? `▶ Survey ${shortName(c.recipe)}` : '▶ Run survey';
     bar.setPrimary({
       label,
+      ready: true, // the one thing to do here: the button invites a tap
       onClick: () => runSurvey(c, allKeys, {
         onProgress: (n) => bar.setPrimary({ label, enabled: false, whyDisabled: `⏳ Asking... ${n} of ${c.data.values.length}` }),
         onDone: () => {

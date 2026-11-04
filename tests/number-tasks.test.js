@@ -18,6 +18,10 @@ test('the worked example is right: the same total and the same mean, before and 
   assert.deepEqual(example.moved, [3, 5, 4, 4, 4]);
   assert.equal(mean(example.start), mean(example.moved));
   assert.equal(example.total, 20);
+  // Every step shows its sum, worked out from the numbers.
+  assert.equal(example.startSum, '4 + 4 + 4 + 4 + 4 = 20');
+  assert.equal(example.movedSum, '3 + 5 + 4 + 4 + 4 = 20');
+  assert.equal(example.checkSum, '20 ÷ 5 = 4');
 });
 
 test('the worked example never gives away the answer', () => {
@@ -31,8 +35,8 @@ test('the worked example never gives away the answer', () => {
 });
 
 test('the worked example follows the Grade 5 rule (12 words or fewer per sentence)', () => {
-  const { title, startText, movedText, endText } = buildExample(8);
-  for (const text of [title, startText, movedText, endText]) assert.ok(longestSentence(text) <= 12, text);
+  const { title, startText, movedText, checkText, endText } = buildExample(8);
+  for (const text of [title, startText, movedText, checkText, endText]) assert.ok(longestSentence(text) <= 12, text);
 });
 
 test('all the same is noticed; different numbers are not', () => {

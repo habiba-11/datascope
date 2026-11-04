@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataScope – Graph Lab, enhanced (reference)</title>
+<!-- VISUAL + MOTION REFERENCE ONLY (DataScope Round 3). A WORKING prototype of the 3 Graph Lab steps (look, what it tells, what it can NOT tell).
+     Answers Prof comments 2 (bigger bold dark text, word labels, better line chart, size vs count) and 3 (tap / drag / edit suggested answers).
+     The charts are drawn as SVG here so this file works alone; in the app they stay Chart.js (see build notes). All data is SYNTHETIC. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#17324D;--bg:#E6F4FF;--explore:#4CC26B;--explore-l:#D5F2DC;--collect:#38B6FF;--collect-l:#D3EEFF;--plan:#FFC531;--plan-l:#FFF0C2;--ask:#FF7A6B;--ask-l:#FFD9D4;--conclude:#A596FF;--conclude-l:#E3DEFF;--green:#217A3B;--line:#9CC6E6;--muted:#3F5A75}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--navy);font-family:'Nunito',sans-serif;font-weight:700}
+h1,h2,h3,h4,.baloo{font-family:'Baloo 2',sans-serif;font-weight:800}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 20px 60px}
+.tool h1{margin:0;font-size:30px}.tool p{margin:4px 0 12px;font-size:18px;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.chip{min-height:48px;padding:0 16px;border:3px solid var(--navy);border-radius:16px;background:#fff;font-family:'Baloo 2';font-weight:800;font-size:18px;color:var(--navy);cursor:pointer;box-shadow:0 4px 0 var(--navy)}
+.chip[aria-pressed=true]{background:#FFF0C2;box-shadow:0 1px 0 var(--navy);transform:translateY(3px)}
+.sep{width:2px;height:34px;background:var(--line);margin:0 4px}.lbl{font-size:16px;color:var(--muted)}
+.stage{border:3px solid var(--navy);border-radius:28px;box-shadow:0 7px 0 var(--navy);background:var(--bg);overflow:hidden;padding-bottom:22px}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 24px 0}
+.logo{display:flex;align-items:center;gap:8px;font-family:'Baloo 2';font-weight:800;font-size:30px;min-height:48px}.logo b{color:#2E9A4F}
+.card{margin:6px 24px 0;background:#fff;border:3px solid var(--navy);border-radius:28px;box-shadow:0 7px 0 var(--navy);overflow:hidden}
+.tabsrow{display:flex}.tabsrow span{flex:1;text-align:center;min-height:52px;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--explore);border-right:3px solid var(--navy);border-bottom:3px solid var(--navy);font-family:'Baloo 2';font-weight:800;font-size:19px}
+.tabsrow span:nth-child(2){background:#fff}.tabsrow span:last-child{border-right:0}
+.body{padding:14px 24px 18px;display:flex;flex-direction:column;gap:14px}
+.stp{display:flex;gap:10px;flex-wrap:wrap}
+.stp button{display:flex;align-items:center;gap:8px;min-height:48px;padding:0 16px 0 8px;border-radius:999px;border:3px solid var(--navy);background:#fff;font-family:'Baloo 2';font-weight:800;font-size:19px;color:var(--navy);cursor:pointer}
+.stp button i{width:32px;height:32px;border-radius:50%;border:3px solid var(--navy);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:16px;background:#fff}
+.stp button.now{background:var(--explore)}.stp button.done i{background:var(--green);color:#fff}
+.pipline{display:flex;gap:12px;align-items:center}
+.pipline .b{position:relative;background:var(--plan-l);border:3px solid var(--navy);border-radius:18px;padding:8px 16px;font-size:20px}
+.pipline .b::before{content:"";position:absolute;left:-12px;top:50%;margin-top:-9px;border:9px solid transparent;border-right-color:var(--navy);border-left:0}
+.qtitle{margin:0;font-size:28px;line-height:1.2}
+/* chart-kind tiles */
+.kinds{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kind{display:flex;align-items:center;gap:12px;min-height:72px;padding:6px 14px;border:3px solid var(--navy);border-radius:18px;background:#fff;box-shadow:0 5px 0 var(--navy);cursor:pointer;font-family:'Baloo 2';font-weight:800;font-size:22px;color:var(--navy);text-align:left}
+.kind svg{flex:0 0 auto;width:52px;height:44px}
+.kind small{display:block;font-family:'Nunito';font-weight:700;font-size:16px;color:var(--muted);line-height:1.1}
+.kind[aria-pressed=true]{background:var(--explore-l);transform:translateY(3px);box-shadow:0 2px 0 var(--navy);outline:4px solid var(--navy);outline-offset:2px}
+/* chart area */
+.charts{display:grid;gap:14px}.charts.two{grid-template-columns:1fr 1fr}
+.cb{border:3px solid var(--navy);border-radius:22px;background:#fff;padding:8px 8px 4px;box-shadow:0 5px 0 var(--navy)}
+.cb h3{margin:0 0 2px 8px;font-size:22px}
+.cb svg{display:block;width:100%;height:auto;overflow:visible}
+.cb svg text{font-family:'Nunito',sans-serif;fill:#17324D;font-weight:800}
+.cb svg .vl{paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
+.mark{cursor:pointer;outline:none}
+.mark:focus-visible .hit,.mark.sel .hit{stroke:#17324D;stroke-width:5}
+.dim .mark:not(.sel){opacity:.45}
+.grow{transform-box:fill-box;transform-origin:50% 100%;animation:grow .8s cubic-bezier(.34,1.3,.5,1) both;animation-delay:var(--d,0ms)}
+.drop{animation:drop .6s cubic-bezier(.34,1.56,.64,1) both;animation-delay:var(--d,0ms)}
+.fadein{animation:fadein .6s ease-out both;animation-delay:var(--d,0ms)}
+.draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:draw 1.1s ease-out .2s forwards}
+.sweep{transform-box:fill-box;transform-origin:50% 50%;animation:sweep .7s cubic-bezier(.22,1,.36,1) both;animation-delay:var(--d,0ms)}
+@keyframes grow{from{transform:scaleY(0)}}@keyframes drop{from{transform:translateY(-40px);opacity:0}}
+@keyframes fadein{from{opacity:0}}@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes sweep{from{transform:scale(.2);opacity:0}}
+/* read-it helper */
+.read{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:3px dashed var(--line);border-radius:20px;padding:10px 16px;background:#F7FBFF;min-height:76px}
+.read .hint{font-size:21px;color:var(--muted)}
+.rc{display:inline-flex;flex-direction:column;border:3px solid var(--navy);border-radius:14px;padding:2px 14px 4px;line-height:1.1;font-family:'Baloo 2';font-weight:800;font-size:26px}
+.rc small{font-family:'Nunito';font-weight:800;font-size:15px;letter-spacing:.4px;text-transform:uppercase;color:var(--navy);opacity:.8}
+.rc.what{background:var(--collect-l)}.rc.many{background:var(--plan-l)}
+.arrow{font-size:30px;font-family:'Baloo 2'}
+.sent{font-size:22px;font-weight:800;flex:1;min-width:220px}
+.warn{display:flex;gap:10px;align-items:flex-start;background:var(--ask-l);border:3px solid var(--navy);border-radius:18px;padding:8px 14px;font-size:20px}
+.legendrow{display:flex;gap:16px;flex-wrap:wrap;font-size:18px;color:var(--muted)}
+.legendrow span{display:inline-flex;align-items:center;gap:6px}.legendrow i{width:22px;height:16px;border:3px solid var(--navy);border-radius:5px}
+/* step 2/3 layout */
+.ask{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:start}
+.panel{border:3px solid var(--navy);border-radius:22px;padding:12px 16px 16px;background:#fff;box-shadow:0 5px 0 var(--navy);display:flex;flex-direction:column;gap:10px}
+.panel h3{margin:0;font-size:25px;line-height:1.2}
+.ideas{display:flex;flex-direction:column;gap:8px}
+.ideas .t{font-size:18px;color:var(--muted);display:block;line-height:1.3}
+.idea{display:flex;align-items:center;gap:10px;text-align:left;min-height:56px;padding:6px 14px;border:3px solid var(--navy);border-radius:16px;background:var(--plan-l);font:inherit;font-size:20px;font-weight:800;color:var(--navy);cursor:grab;box-shadow:0 4px 0 var(--navy)}
+.idea:active{cursor:grabbing}
+.idea .g{font-size:22px;opacity:.6;flex:0 0 auto}
+.idea.used{background:var(--explore-l)}
+.reasonbox{position:relative}
+.reasonbox textarea{width:100%;border:3px solid var(--navy);border-radius:16px;padding:10px 14px;font:inherit;font-size:21px;font-weight:700;resize:vertical;min-height:110px}
+.reasonbox.over textarea{background:#F2FFF5;border-style:dashed;outline:4px solid var(--explore)}
+.srcrow{display:flex;gap:8px;align-items:center;min-height:36px;flex-wrap:wrap;font-size:17px;color:var(--muted)}
+.srcchip{display:inline-flex;align-items:center;gap:6px;background:#EEF6FC;border:2px solid var(--line);border-radius:999px;padding:0 12px;font-weight:800;color:var(--navy)}
+.clear{border:0;background:none;font:inherit;font-size:17px;text-decoration:underline;cursor:pointer;color:var(--muted);min-height:36px}
+.actbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 24px 0;flex-wrap:wrap}
+.btn{min-height:56px;padding:0 24px;border:3px solid var(--navy);border-radius:18px;font-family:'Baloo 2';font-weight:800;font-size:21px;cursor:pointer;box-shadow:0 5px 0 var(--navy);background:#fff;color:var(--navy)}
+.btn.main{background:var(--green);color:#fff;min-height:60px}.btn:disabled{opacity:.5;box-shadow:none;cursor:not-allowed}
+.why{font-size:18px;color:var(--muted);margin-left:8px}
+.fb{background:var(--explore-l);border:3px solid var(--navy);border-radius:18px;padding:8px 16px;font-size:21px}
+.reduced *{animation:none !important;transition:none !important}.reduced .draw{stroke-dashoffset:0}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}.draw{stroke-dashoffset:0}}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-top:26px}
+.n{background:#fff;border:3px solid var(--navy);border-radius:22px;box-shadow:0 5px 0 var(--navy);padding:14px 18px;font-size:18px;font-weight:600}
+.n h3{margin:0 0 6px;font-size:22px}.n ul{margin:0;padding-left:22px}.n li{margin:4px 0}
+code{background:#EEF6FC;padding:1px 6px;border-radius:6px;font-size:16px}
+@media (max-width:900px){.kinds{grid-template-columns:repeat(2,minmax(0,1fr))}.kind small{display:none}.kind{min-height:64px;font-size:20px}.kind svg{width:40px}.charts.two,.ask{grid-template-columns:minmax(0,1fr)}.body{padding:12px}.card,.actbar{margin-left:10px;margin-right:10px}.qtitle{font-size:23px}.tabsrow span{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tool"><h1>Graph Lab – enhanced design (working prototype)</h1>
+  <p>Switch the investigation, try the 4 kinds of graph, tap a bar to read it, then answer with a suggested idea (tap or drag) or your own words.</p></div>
+  <div class="bar" id="scen" role="group" aria-label="Investigation"></div>
+  <div class="bar"><button class="chip" id="rm" aria-pressed="false">Reduced motion</button><button class="chip" id="reset">↺ Start again</button></div>
+  <div class="stage" id="stage"></div>
+
+  <div class="notes">
+    <div class="n"><h3>Prof comment 2: what changed</h3><ul>
+      <li><b>Bigger, bold, dark text:</b> axis numbers and words 17–18 px bold navy (today ≈ 12 px light grey), axis titles 19 px, value labels 18 px with a white halo.</li>
+      <li><b>Words, not only numbers:</b> “9 hours”, “20 min”, “6 kids”, “Football”; the axis title says what it is (“Hours of sleep”, “Number of kids”).</li>
+      <li><b>Size vs count (my guess: the value measured vs how many kids):</b> the two axis titles are colour-coded pills, <span style="background:var(--collect-l);padding:0 8px;border-radius:8px">WHAT: blue</span> and <span style="background:var(--plan-l);padding:0 8px;border-radius:8px">HOW MANY: yellow</span>. Tap any bar and the helper shows the same two colours: <b>[9 hours] → [6 kids]</b> and a full sentence.  Please confirm this is what Prof meant.</li>
+      <li><b>Better line chart:</b> thick line, big dots, light filled area, labels on every point, the highest point in gold. For <b>word categories</b> (games) a line is misleading, so we draw dots on stems instead and show a “Careful!” note.</li>
+      <li>Pie: every slice is named (“Football · 9 kids”) so colour is not the only clue. Dot plot: one dot per kid.</li>
+    </ul></div>
+    <div class="n"><h3>Prof comment 3: answers you can tap or drag</h3><ul>
+      <li>Steps 2 and 3 show <b>3 suggested ideas</b> built from the chart’s real numbers. <b>Tap</b> one (works on Chromebook/tablet) or <b>drag</b> it into the box. Then he can <b>edit</b> it, or clear it and write his own.</li>
+      <li>A small tag shows where the text came from: <b>🧑 your own words · 💡 from a hint · ✏️ hint, edited by you</b>. This can be logged as a new column (decision with Prof: what counts for stars, 10-letter rule, badges).</li>
+      <li>No star is lost for using ideas. Suggestions are computed with <code>stats.js</code> / chart data; never hard-coded.</li>
+    </ul></div>
+    <div class="n"><h3>Build notes</h3><ul>
+      <li>Files: <code>js/helpers/charts.js</code> (config + plugin), <code>js/rooms/graph-lab.js</code>, <code>css/graph-lab.css</code>, <code>js/helpers/prompts.js</code> (ideas).</li>
+      <li>In the app keep Chart.js: <code>ticks.font</code> = <code>{ size: 17, weight: '800' }</code>, <code>ticks.color = '#17324D'</code>, axis <code>title.font</code> 19; word ticks via <code>callback</code> (“9 hours”); <code>directLabelsPlugin</code> text → “6 kids”, font 18. The coloured axis-title pills and the tap-to-read helper are drawn with HTML/CSS next to the canvas (<code>onClick</code> gives the index).</li>
+      <li>Line chart: <code>borderWidth 5</code>, <code>pointRadius 8</code>, <code>fill: true</code>; for category data use <code>showLine: false</code> + stems plugin, and show the “Careful” note.</li>
+      <li>Keep: <code>chart-switch</code> log, <code>describeChart()</code> for screen readers, the same <code>yMax</code> for two classes, 3 steps and the hint button.</li>
+      <li>Keyboard/touch: every bar is a button (Chart.js: use the list under the chart). Min tap 48 px. Reduced motion: no growing.</li>
+    </ul></div>
+  </div>
+</div>
+<script>
+const PAL=['#FF7A6B','#FFC531','#38B6FF','#4CC26B','#A596FF'];
+const SC={
+ games:{label:'Playground game (words)',q:'Which playground game do you like best?',cat:true,xTitle:'Game',what:'Game',
+   classes:[{name:'',labels:['Football','Tag','Hide and seek','Basketball','Skipping'],data:[9,5,3,2,1]}],
+   tick:l=>l,sent:(l,c)=>`${c} ${c===1?'kid likes':'kids like'} ${l} best.`,chipWhat:l=>l},
+ sleep:{label:'Sleep hours (numbers)',q:'How many hours do kids in our class sleep?',cat:false,xTitle:'Hours of sleep',what:'Hours of sleep',
+   classes:[{name:'',labels:[6,7,8,9,10,11],data:[1,2,4,6,5,2]}],
+   tick:l=>`${l} hours`,sent:(l,c)=>`${c} ${c===1?'kid sleeps':'kids sleep'} ${l} hours.`,chipWhat:l=>`${l} hours`},
+ reading:{label:'Reading minutes (two classes)',q:'How many minutes do kids read each day?',cat:false,xTitle:'Minutes of reading',what:'Minutes',
+   classes:[{name:'📖 Class A',labels:[10,15,20,25,30,40],data:[2,4,8,4,2,0]},{name:'📖 Class B',labels:[10,15,20,25,30,40],data:[4,2,4,2,4,4]}],
+   tick:l=>`${l} min`,sent:(l,c)=>`${c} ${c===1?'kid reads':'kids read'} ${l} minutes.`,chipWhat:l=>`${l} min`}
+};
+const KINDS=[['bar','Bar','compare heights',`<svg viewBox="0 0 52 44"><rect x="4" y="22" width="11" height="18" rx="2" fill="#FF7A6B" stroke="#17324D" stroke-width="3"/><rect x="20" y="8" width="11" height="32" rx="2" fill="#FFC531" stroke="#17324D" stroke-width="3"/><rect x="36" y="28" width="11" height="12" rx="2" fill="#38B6FF" stroke="#17324D" stroke-width="3"/></svg>`],
+ ['line','Line','follow the shape',`<svg viewBox="0 0 52 44"><path d="M4 34L18 18L32 26L48 8" fill="none" stroke="#17324D" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="34" r="4.5" fill="#fff" stroke="#17324D" stroke-width="3"/><circle cx="18" cy="18" r="4.5" fill="#fff" stroke="#17324D" stroke-width="3"/><circle cx="32" cy="26" r="4.5" fill="#fff" stroke="#17324D" stroke-width="3"/><circle cx="48" cy="8" r="4.5" fill="#FFC531" stroke="#17324D" stroke-width="3"/></svg>`],
+ ['pie','Pie','parts of the whole',`<svg viewBox="0 0 52 44"><circle cx="26" cy="22" r="17" fill="#38B6FF" stroke="#17324D" stroke-width="3"/><path d="M26 22V5A17 17 0 0 1 43 22z" fill="#FFC531" stroke="#17324D" stroke-width="3" stroke-linejoin="round"/><path d="M26 22L43 22A17 17 0 0 1 32 38z" fill="#FF7A6B" stroke="#17324D" stroke-width="3" stroke-linejoin="round"/></svg>`],
+ ['dot','Dot plot','one dot per kid',`<svg viewBox="0 0 52 44"><g fill="#38B6FF" stroke="#17324D" stroke-width="2.5"><circle cx="10" cy="34" r="5"/><circle cx="10" cy="22" r="5"/><circle cx="26" cy="34" r="5"/><circle cx="26" cy="22" r="5"/><circle cx="26" cy="10" r="5"/><circle cx="42" cy="34" r="5"/></g></svg>`]];
+const pip='<svg viewBox="0 0 200 190" aria-hidden="true" width="100%"><path d="M40 150c0-56 26-84 60-84s60 28 60 84c0 30-24 40-60 40s-60-10-60-40z" fill="#C98A4B" stroke="#17324D" stroke-width="6"/><path d="M62 78l-6-18 18 10M138 78l6-18-18 10" fill="#C98A4B" stroke="#17324D" stroke-width="6" stroke-linejoin="round"/><circle cx="76" cy="104" r="22" fill="#fff" stroke="#17324D" stroke-width="6"/><circle cx="124" cy="104" r="22" fill="#fff" stroke="#17324D" stroke-width="6"/><circle cx="80" cy="106" r="9" fill="#17324D"/><circle cx="120" cy="106" r="9" fill="#17324D"/><path d="M92 124l8 14 8-14z" fill="#FFC531" stroke="#17324D" stroke-width="5" stroke-linejoin="round"/></svg>';
+let S,rm=false;const $=id=>document.getElementById(id);
+function init(sc='sleep'){S={sc,type:'bar',step:0,sel:null,tell:'',not:'',src:{tell:null,not:null},base:{tell:'',not:''},done:false}}
+const kid=n=>n===1?'1 kid':`${n} kids`;const vl=(c,f)=>f.band<52?String(c):kid(c);
+function wrapWords(t,max=11){const w=t.split(' ');const out=[''];w.forEach(x=>{const last=out[out.length-1];if((last+' '+x).trim().length>max&&last)out.push(x);else out[out.length-1]=(last+' '+x).trim()});return out}
+/* ---------- chart drawing (SVG) ---------- */
+function frame(cl,n,compact,W=640){
+  const H=compact?330:360,l=W<400?62:84,r=W<400?12:22,t=34,b=96;
+  const ymax=Math.max(...cl.yAll)+1;const step=ymax>9?2:1;const pw=W-l-r,ph=H-t-b;
+  const yp=v=>t+ph-(v/ymax)*ph;const band=pw/n;const xc=i=>l+band*(i+.5);
+  let g='';for(let v=0;v<=ymax;v+=step){g+=`<line x1="${l}" x2="${W-r}" y1="${yp(v)}" y2="${yp(v)}" stroke="${v===0?'#17324D':'#C3D9EA'}" stroke-width="${v===0?3:2}"/><text x="${l-12}" y="${yp(v)+6}" text-anchor="end" font-size="18">${v}</text>`}
+  // axis title pills: WHAT (blue) and HOW MANY (yellow)
+  const ytxt='Number of kids';
+  g+=`<g transform="translate(${W<400?14:22} ${t+ph/2}) rotate(-90)"><rect x="-84" y="-17" width="168" height="30" rx="15" fill="#FFF0C2" stroke="#17324D" stroke-width="2.5"/><text text-anchor="middle" y="5" font-size="17">HOW MANY: kids</text></g>`;
+  return {W,H,l,r,t,b,pw,ph,yp,band,xc,ymax,base:g};
+}
+function xLabels(f,sc,labels,compact){
+  let s='';labels.forEach((lab,i)=>{const t=sc.tick(lab);const lines=sc.cat?wrapWords(t,10):((compact||f.band<75)?String(t).split(' '):[t]);
+    s+=`<text text-anchor="middle" x="${f.xc(i)}" y="${f.t+f.ph+26}" font-size="${f.band<52?14:(compact?17:18)}">${lines.map((ln,k)=>`<tspan x="${f.xc(i)}" dy="${k?20:0}">${ln}</tspan>`).join('')}</text>`});
+  const w=Math.max(180,(sc.xTitle.length+6)*9.6+30);
+  s+=`<g><rect x="${f.l+f.pw/2-w/2}" y="${f.H-34}" width="${w}" height="30" rx="15" fill="#D3EEFF" stroke="#17324D" stroke-width="2.5"/><text text-anchor="middle" x="${f.l+f.pw/2}" y="${f.H-13}" font-size="17">WHAT: ${sc.xTitle}</text></g>`;return s}
+function marks(attrs,i,inner){return `<g class="mark" tabindex="0" role="button" ${attrs} data-i="${i}">${inner}</g>`}
+function drawBar(sc,cl,ci,f,compact){
+  const max=Math.max(...cl.data);const bw=Math.min(78,f.band*.64);let s=f.base+xLabels(f,sc,cl.labels,compact);
+  cl.labels.forEach((lab,i)=>{const c=cl.data[i],x=f.xc(i)-bw/2,y=f.yp(c),h=f.yp(0)-y;
+    const fill=sc.cat?PAL[i%5]:(c===max&&c>0&&cl.data.filter(v=>v===max).length===1?'#FFC531':'#38B6FF');
+    s+=marks(`data-c="${ci}" aria-label="${sc.tick(lab)}: ${kid(c)}"`,i,`<rect class="hit" x="${x}" y="${y}" width="${bw}" height="${Math.max(h,0)}" rx="8" fill="${fill}" stroke="#17324D" stroke-width="3"><title>${sc.tick(lab)}</title></rect>${c?`<text class="vl" text-anchor="middle" x="${f.xc(i)}" y="${y-9}" font-size="19">${vl(c,f)}</text>`:''}`).replace('<rect class="hit"','<rect class="hit grow" style="--d:'+i*90+'ms"')});
+  return s}
+function drawLine(sc,cl,ci,f,compact){
+  const max=Math.max(...cl.data);let s=f.base+xLabels(f,sc,cl.labels,compact);
+  const pts=cl.labels.map((_,i)=>[f.xc(i),f.yp(cl.data[i])]);
+  if(sc.cat){ // points on stems: a line between games would mislead
+    cl.labels.forEach((lab,i)=>{const [x,y]=pts[i],c=cl.data[i];
+      s+=marks(`data-c="${ci}" aria-label="${sc.tick(lab)}: ${kid(c)}"`,i,`<line x1="${x}" x2="${x}" y1="${f.yp(0)}" y2="${y}" stroke="#17324D" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 9"/><circle class="hit drop" style="--d:${i*110}ms" cx="${x}" cy="${y}" r="15" fill="${PAL[i%5]}" stroke="#17324D" stroke-width="3"/><text class="vl" text-anchor="middle" x="${x}" y="${y-22}" font-size="19">${vl(c,f)}</text>`)});
+    return s}
+  const path=pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join(' ');const len=Math.round(pts.reduce((a,p,i)=>i?a+Math.hypot(p[0]-pts[i-1][0],p[1]-pts[i-1][1]):0,0))+4;
+  s+=`<path d="${path} L${pts[pts.length-1][0]} ${f.yp(0)} L${pts[0][0]} ${f.yp(0)} Z" fill="#38B6FF" opacity=".18" class="fadein" style="--d:600ms"/>`;
+  s+=`<path class="draw" style="--len:${len}" d="${path}" fill="none" stroke="#17324D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`;
+  cl.labels.forEach((lab,i)=>{const [x,y]=pts[i],c=cl.data[i];
+    s+=marks(`data-c="${ci}" aria-label="${sc.tick(lab)}: ${kid(c)}"`,i,`<circle class="hit drop" style="--d:${300+i*110}ms" cx="${x}" cy="${y}" r="${c===max?14:11}" fill="${c===max&&c>0&&cl.data.filter(v=>v===max).length===1?'#FFC531':'#fff'}" stroke="#17324D" stroke-width="4"/><text class="vl" text-anchor="middle" x="${x}" y="${y-22}" font-size="19">${vl(c,f)}</text>`)});
+  return s}
+function drawDot(sc,cl,ci,f,compact){
+  let s=f.base+xLabels(f,sc,cl.labels,compact);const r=Math.max(7,Math.min(15,f.band/2-6,(f.ph/f.ymax)/2-2));
+  cl.labels.forEach((lab,i)=>{const c=cl.data[i];let d='';for(let k=1;k<=c;k++)d+=`<circle class="drop" style="--d:${i*80+k*70}ms" cx="${f.xc(i)}" cy="${f.yp(k-.5)}" r="${r}" fill="#38B6FF" stroke="#17324D" stroke-width="3"/>`;
+    s+=marks(`data-c="${ci}" aria-label="${sc.tick(lab)}: ${kid(c)}"`,i,`<rect class="hit" x="${f.xc(i)-f.band/2+6}" y="${f.t}" width="${f.band-12}" height="${f.ph}" rx="10" fill="rgba(255,255,255,0)" stroke="none"/>${d}${c?`<text class="vl" text-anchor="middle" x="${f.xc(i)}" y="${f.yp(c)-6}" font-size="19">${vl(c,f)}</text>`:''}`)});
+  return s}
+function arc(cx,cy,r,a0,a1){const p=a=>[cx+r*Math.sin(a),cy-r*Math.cos(a)];const [x0,y0]=p(a0),[x1,y1]=p(a1);return `M${cx} ${cy} L${x0} ${y0} A${r} ${r} 0 ${a1-a0>Math.PI?1:0} 1 ${x1} ${y1} Z`}
+function drawPie(sc,cl,ci,compact,W=640){
+  const H=compact?330:360,cx=W/2,cy=H/2-4,R=compact?84:108;const tot=cl.data.reduce((a,b)=>a+b,0);let a=0;const L=[];let s='';
+  cl.labels.forEach((lab,i)=>{const c=cl.data[i];if(!c)return;const a1=a+c/tot*Math.PI*2,mid=(a+a1)/2;
+    s+=marks(`data-c="${ci}" aria-label="${sc.tick(lab)}: ${kid(c)}"`,i,`<path class="hit sweep" style="--d:${i*110}ms" d="${arc(cx,cy,R,a,a1)}" fill="${PAL[i%5]}" stroke="#17324D" stroke-width="3.5" stroke-linejoin="round"/>`);
+    L.push({i,lab,c,mid,side:Math.sin(mid)>=0?1:-1,x0:cx+(R+4)*Math.sin(mid),y0:cy-(R+4)*Math.cos(mid),y:cy-(R+26)*Math.cos(mid)});a=a1});
+  [1,-1].forEach(side=>{const arr=L.filter(o=>o.side===side).sort((p,q)=>p.y-q.y);for(let k=1;k<arr.length;k++)if(arr[k].y-arr[k-1].y<26)arr[k].y=arr[k-1].y+26;arr.forEach(o=>{o.y=Math.min(H-14,Math.max(22,o.y))});
+    arr.forEach(o=>{const x=cx+side*(R+46);const t=sc.cat?o.lab:sc.tick(o.lab);
+      s+=`<g class="fadein" style="--d:700ms"><polyline points="${o.x0},${o.y0} ${cx+side*(R+26)},${o.y} ${x-side*6},${o.y}" fill="none" stroke="#17324D" stroke-width="2.5"/><text class="vl" x="${x}" y="${o.y+6}" text-anchor="${side>0?'start':'end'}" font-size="19">${t} · ${kid(o.c)}</text></g>`})});
+  return s}
+function chartSVG(sc,cl,ci,type,compact,W=640){
+  cl.yAll=cl.yAll||cl.data;const n=cl.labels.length;
+  let inner='';
+  if(type==='pie')inner=drawPie(sc,cl,ci,compact,W);
+  else{const f=frame(cl,n,compact,W);inner=({bar:drawBar,line:drawLine,dot:drawDot})[type](sc,cl,ci,f,compact)}
+  return `<svg viewBox="0 0 ${W} ${compact?330:360}" role="img" aria-label="${KINDS.find(k=>k[0]===type)[1]} chart">${inner}</svg>`;
+}
+/* ---------- ideas computed from the data (never hard-coded in the app) ---------- */
+function ideas(sc,kind){
+  const cl=sc.classes[0],idx=cl.data.map((c,i)=>[c,i]).sort((a,b)=>b[0]-a[0]);const [c1,i1]=idx[0],[c2,i2]=idx[1];const low=idx.filter(x=>x[0]>0).slice(-1)[0];
+  const top=sc.tick(cl.labels[i1]),sec=sc.tick(cl.labels[i2]),lo=sc.tick(cl.labels[low[1]]);
+  const comp=sc.classes.length>1;
+  if(kind==='tell'){
+    if(comp)return [`Class A has a tall bar at ${sc.tick(sc.classes[0].labels[sc.classes[0].data.indexOf(Math.max(...sc.classes[0].data))])}: ${kid(Math.max(...sc.classes[0].data))}.`,`Class B is more spread out than Class A.`,`Both classes have a bar at 20 min, but Class A has more kids there.`];
+    return sc.cat?[`${top} has the tallest bar: ${kid(c1)} like it best.`,`${top} is the most common answer, then ${sec}.`,`Only ${kid(low[0])} chose ${lo}.`]
+      :[`The tallest bar is ${top}: ${kid(c1)}.`,`Most kids sleep about ${top}.`,`Only ${kid(low[0])} ${sc.tick(cl.labels[low[1]])===top?'is':'is'} at ${lo}.`].map(x=>x.replace('sleep about','are about'));}
+  return comp?[`It can't show why Class B reads so differently.`,`It can't show which kids read the most.`,`It can't show what they read.`]
+   :[`It can't show why they chose it.`,`It can't show the kids we did not ask.`,`It can't show which kid chose what.`];
+}
+/* ---------- screen ---------- */
+function render(){
+  const sc=SC[S.sc],two=sc.classes.length>1;
+  $('stage').className='stage'+(rm?' reduced':'');
+  const ymaxAll=Math.max(...sc.classes.flatMap(c=>c.data));sc.classes.forEach(c=>c.yAll=[ymaxAll]);
+  const stp=['Look','What it tells','What it can NOT tell'].map((l,i)=>`<button class="${S.step===i?'now':''} ${S.step>i?'done':''}" data-s="${i}"><i>${S.step>i?'✓':i+1}</i>${l}</button>`).join('');
+  const pipsay=['Same data, different graphs. Try each one! Tap a bar to read it.','Look at the graph. What does it show?','Now the tricky one. What is missing?'][S.step];
+  const compact=S.step>0||two;const NARROW=window.innerWidth<700;const CW=NARROW?(two?330:340):(S.step>0?(two?560:470):(two?540:640));
+  const charts=sc.classes.map((c,ci)=>`<div class="cb ${S.sel&&S.sel.c!==ci?'':''}">${two?`<h3>${c.name}</h3>`:''}<div class="${S.sel?'dim':''}" data-ci="${ci}">${chartSVG(sc,c,ci,S.type,compact,CW)}</div></div>`).join('');
+  const kinds=S.step===0?`<div class="kinds" role="group" aria-label="Kind of graph">${KINDS.map(k=>`<button class="kind" data-k="${k[0]}" aria-pressed="${S.type===k[0]}">${k[3]}<span>${k[1]}<small>${k[2]}</small></span></button>`).join('')}</div>`:'';
+  const careful=(S.type==='line'&&sc.cat)?`<div class="warn"><span style="font-size:26px">⚠️</span><span><b>Careful!</b> Games are not in order, so a line between them could fool you. We show dots instead.</span></div>`:'';
+  let read=`<div class="read" aria-live="polite">`;
+  if(S.sel){const c=sc.classes[S.sel.c],lab=c.labels[S.sel.i],cnt=c.data[S.sel.i];
+    read+=`<span class="rc what"><small>What</small>${sc.chipWhat(lab)}</span><span class="arrow">→</span><span class="rc many"><small>How many kids</small>${kid(cnt)}</span><span class="sent">${sc.sent(sc.cat?lab:lab,cnt)}</span>`}
+  else read+=`<span style="font-size:30px">👆</span><span class="hint">Tap a ${S.type==='pie'?'slice':S.type==='dot'?'column of dots':S.type==='line'?'point':'bar'} to read it.</span><span class="legendrow"><span><i style="background:#D3EEFF"></i>WHAT we asked</span><span><i style="background:#FFF0C2"></i>HOW MANY kids</span></span>`;
+  read+='</div>';
+  let main='';
+  if(S.step===0)main=`${kinds}${careful}<div class="charts ${two?'two':''}">${charts}</div>${read}<div class="legendrow">${sc.cat?'':'<span><i style="background:#FFC531"></i>gold = the one tallest bar</span>'}<span>Tap to read · 4 kinds of graph</span></div>`;
+  else{const kind=S.step===1?'tell':'not';const q=S.step===1?'What does this graph show?':'What can this graph NOT tell you?';const I=ideas(sc,S.step===1?'tell':'not');
+    const srcLabel={own:'🧑 your own words',hint:'💡 from a hint',edit:'✏️ hint, edited by you'}[S.src[kind]];
+    main=`<div class="ask"><div>${careful}<div class="charts">${charts}</div>${read}</div>
+     <div class="panel"><h3>${S.step===1?'📊':'🔍'} ${q}</h3>
+      <div class="ideas"><span class="t">💡 Pick an idea <b>(tap it or drag it into the box)</b>, or write your own:</span>${I.map((t,i)=>`<button class="idea ${S.base[kind]===t&&S[kind]?'used':''}" draggable="true" data-t="${t.replace(/"/g,'&quot;')}"><span class="g" aria-hidden="true">⠿</span><span>${t}</span></button>`).join('')}</div>
+      <div class="reasonbox" id="rb"><label for="ans" class="sr" style="position:absolute;left:-9999px">Your answer</label><textarea id="ans" placeholder="Write your idea here…">${S[kind]}</textarea></div>
+      <div class="srcrow">${S.src[kind]?`<span class="srcchip">${srcLabel}</span>`:'<span>You can change any idea. It is your answer!</span>'}${S[kind]?`<button class="clear" id="clr">clear</button>`:''}</div></div></div>`}
+  const ready=S.step===0||(S.step===1&&S.tell.trim().length>=10)||(S.step===2&&S.tell.trim().length>=10&&S.not.trim().length>=10);
+  const primary=S.step===0?'Next: What it tells →':S.step===1?'Next: What it can NOT tell →':(S.done?'🔢 Next: Number Lab →':"✅ I'm done");
+  $('stage').innerHTML=`<header class="hdr"><div class="logo"><svg width="40" height="40" viewBox="0 0 48 48"><path d="M24 4l18 10v20L24 44 6 34V14z" fill="#4CC26B"/><circle cx="22" cy="22" r="9" fill="#fff" stroke="#17324D" stroke-width="4"/><line x1="29" y1="29" x2="36" y2="36" stroke="#17324D" stroke-width="4" stroke-linecap="round"/></svg>Data<b>Scope</b></div></header>
+  <div class="card"><div class="tabsrow" aria-hidden="true"><span>🔢 Number Lab</span><span>📊 Graph Lab</span><span>🎲 Chance Lab</span></div>
+   <div class="body"><div class="stp">${stp}</div><div class="pipline"><div style="width:62px;flex:0 0 auto">${pip}</div><div class="b">${pipsay}</div></div>
+   <h2 class="qtitle">${sc.q}</h2>${main}${S.done&&S.step===2?'<div class="fb">✅ Great thinking! Number Lab is open.</div>':''}</div></div>
+  <div class="actbar"><button class="btn" id="back">${S.step===0?'← Data Hub':'← Back'}</button><span style="display:flex;align-items:center"><button class="btn main" id="next" ${ready?'':'disabled'}>${primary}</button>${ready?'':`<span class="why">✏️ Write your idea first</span>`}</span></div>`;
+  wire();
+  document.querySelectorAll('.stp button').forEach(b=>b.onclick=()=>{const n=+b.dataset.s;if(n<=S.step||(n===1)||(n===2&&S.tell.trim().length>=10)){S.step=n;S.sel=null;render()}});
+}
+function select(c,i){S.sel=(S.sel&&S.sel.c===c&&S.sel.i===i)?null:{c,i};render()}
+function wire(){
+  document.querySelectorAll('.kind').forEach(b=>b.onclick=()=>{S.type=b.dataset.k;S.sel=null;render()});
+  document.querySelectorAll('.mark').forEach(m=>{const f=()=>select(+m.dataset.c,+m.dataset.i);m.onclick=f;m.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}});
+  $('back').onclick=()=>{if(S.step>0){S.step--;S.sel=null;render()}};
+  $('next').onclick=()=>{if(S.step<2){S.step++;S.sel=null;render()}else if(!S.done){S.done=true;render()}};
+  if(S.step>0){const kind=S.step===1?'tell':'not';
+    const put=t=>{S[kind]=t;S.base[kind]=t;S.src[kind]='hint';render()};
+    document.querySelectorAll('.idea').forEach(b=>{b.onclick=()=>put(b.dataset.t);b.ondragstart=e=>{e.dataTransfer.setData('text/plain',b.dataset.t)}});
+    const rb=$('rb'),ta=$('ans');
+    ta.ondragover=e=>{e.preventDefault();rb.classList.add('over')};ta.ondragleave=()=>rb.classList.remove('over');
+    ta.ondrop=e=>{e.preventDefault();rb.classList.remove('over');put(e.dataTransfer.getData('text/plain'))};
+    ta.oninput=()=>{S[kind]=ta.value;S.src[kind]=!ta.value?null:(S.base[kind]&&ta.value!==S.base[kind]?'edit':S.base[kind]&&ta.value===S.base[kind]?'hint':'own');
+      if(!S.base[kind]||S.src[kind]==='own'){} const ready=S.step===1?S.tell.trim().length>=10:S.not.trim().length>=10&&S.tell.trim().length>=10;$('next').disabled=!ready;
+      const row=document.querySelector('.srcrow');const lab={own:'🧑 your own words',hint:'💡 from a hint',edit:'✏️ hint, edited by you'}[S.src[kind]];row.innerHTML=(S.src[kind]?`<span class="srcchip">${lab}</span>`:'<span>You can change any idea. It is your answer!</span>')+(ta.value?'<button class="clear" id="clr">clear</button>':'');const c=$('clr');if(c)c.onclick=clear};
+    const clear=()=>{S[kind]='';S.base[kind]='';S.src[kind]=null;render()};const c=$('clr');if(c)c.onclick=clear}
+}
+$('scen').innerHTML=Object.entries(SC).map(([k,v])=>`<button class="chip" data-k="${k}" aria-pressed="false">${v.label}</button>`).join('');
+$('scen').onclick=e=>{const b=e.target.closest('[data-k]');if(b){init(b.dataset.k);mark();render()}};
+function mark(){document.querySelectorAll('#scen .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===S.sc))}
+$('rm').onclick=()=>{rm=!rm;$('rm').setAttribute('aria-pressed',rm);render()};$('reset').onclick=()=>{init(S.sc);render()};
+init();mark();render();
+</script>
+</body>
+</html>

@@ -14,7 +14,7 @@ import { finishPhase } from '../phase-progress.js';
 import { whenIntroClosed } from '../phase-intro.js';
 import { addRecapButton, autoOpenRecap } from '../recap.js';
 import { mountCardSort } from '../card-sort.js';
-import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
+import { taskCardHTML, pipLineHTML, miniStepperHTML, wordsNoteHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { pipSay } from '../pip.js';
 
@@ -61,7 +61,8 @@ const numberFacts = { guess: null, changedWithReason: false, teaches: '' };
 async function init() {
   recipe = await loadRecipe(getSelectedScenarioId());
   const partner = await loadPartnerRecipe(recipe);
-  content = (await loadContent(recipe.id)).numberLab;
+  const allContent = await loadContent(recipe.id);
+  content = allContent.numberLab;
   kind = numberLabKind(recipe);
   tasks = TASKS_BY_KIND[kind];
   tasks.forEach((task, i) => { taskComplete[i + 1] = false; });
@@ -82,6 +83,7 @@ async function init() {
       tabsHTML: exploreCardTabsHTML(),
       bodyHTML: `
         <div id="stepper"></div>
+        ${kind === 'category' ? wordsNoteHTML(allContent.wordsNote) : ''}
         ${pipLineHTML(TASK_PIP[tasks[0]], TASK_TITLES[tasks[0]])}
         ${tasks.map((task, i) => TASK_HTML[task](i + 1, data)).join('')}`,
     }),
@@ -230,7 +232,7 @@ function statsHTML(stats) {
   if (kind === 'category') {
     return `<div class="stats-grid">
       ${statCard('Mode', modeText(stats.mode))}
-      ${statCard('Mean or median', '✖ not for words')}
+      ${statCard('Mean, median, range', '✖ not for words')}
     </div>`;
   }
   const grid = (m, md, mo, r) => `<div class="stats-grid">
@@ -244,23 +246,35 @@ function statsHTML(stats) {
   return grid(stats.mean, stats.median, stats.mode, stats.range);
 }
 
-// The worked example beside "Build it". The ⬇ and ⬆ mark the two numbers that
-// changed (an icon as well as a colour), and the total shows nothing was lost.
-function buildExampleHTML(example) {
+// The worked example beside "Build it" (made clearer 4 Nov 2026): 3 numbered
+// steps, each with its sum written out. The two numbers that changed say
+// "−1" and "+1" (words as well as a colour), and the check shows the mean.
+function buildExampleHTML(example, target) {
   const chips = (numbers, start) => numbers.map((number, i) => {
-    let mark = '';
-    if (number < start[i]) mark = ' ⬇';
-    if (number > start[i]) mark = ' ⬆';
-    return `<span class="example-chip${mark ? ' example-chip--moved' : ''}">${number}${mark}</span>`;
+    let tag = '';
+    if (number < start[i]) tag = '<small>−1</small>';
+    if (number > start[i]) tag = '<small>+1</small>';
+    return `<span class="example-chip${tag ? ' example-chip--moved' : ''}">${number}${tag}</span>`;
   }).join('');
+  const step = (n, text, row, sum) => `
+    <li class="example-step">
+      <span class="example-num" aria-hidden="true">${n}</span>
+      <div>
+        <p>${text}</p>
+        ${row ? `<div class="example-row">${row}</div>` : ''}
+        <p class="example-sum">${sum}</p>
+      </div>
+    </li>`;
   return `
     <aside class="build-example" aria-label="A worked example">
       <p class="build-example-title">${example.title}</p>
-      <p>${example.startText}</p>
-      <div class="example-row">${chips(example.start, example.start)}<span class="example-total">Total: ${example.total}</span></div>
-      <p>${example.movedText}</p>
-      <div class="example-row">${chips(example.moved, example.start)}<span class="example-total">Total: ${example.total}</span></div>
+      <ol class="example-steps">
+        ${step(1, example.startText, chips(example.start, example.start), example.startSum)}
+        ${step(2, example.movedText, chips(example.moved, example.start), example.movedSum)}
+        ${step(3, example.checkText, '', example.checkSum)}
+      </ol>
       <p class="build-example-end">${example.endText}</p>
+      <p class="build-example-turn">✏️ Your turn: make a mean of ${target}!</p>
     </aside>`;
 }
 
@@ -298,7 +312,7 @@ const TASK_HTML = {
             ${[1, 2, 3, 4, 5].map((i) => `<input type="number" class="build-input" aria-label="Number ${i}">`).join('')}
           </div>
         </div>
-        ${buildExampleHTML(buildExample(buildTarget(values)))}
+        ${buildExampleHTML(buildExample(buildTarget(values)), buildTarget(values))}
       </div>
       <p class="feedback" id="build-feedback" hidden></p>
     </section>`,
@@ -554,9 +568,9 @@ function setupRevision(n, getOldGuess) {
   changeBtn.addEventListener('click', () => {
     changeBtn.classList.add('active');
     stage.predict = 'changing';
+    form.hidden = false; // first, so the Hint button can go under the question
     bar.setHint(reasonHint.button);
     refreshPrimary();
-    form.hidden = false;
     form.querySelector('input, button').focus();
   });
 

@@ -75,37 +75,91 @@
 
 .build-example .build-example-end {
   margin: var(--space-1) 0 0;
+  font-family: var(--font-heading);
+  font-size: 22px;
   font-weight: 800;
+}
+
+.build-example .build-example-turn {
+  margin: var(--space-1) 0 0;
+  padding: 6px 12px;
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-navy);
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+/* The 3 steps, each with a big number badge. */
+.example-steps {
+  list-style: none;
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.example-step {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.example-num {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-navy);
+  color: #FFFFFF;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 20px;
 }
 
 .example-row {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   gap: 6px;
-  margin-bottom: var(--space-2);
+  margin-bottom: 4px;
 }
 
 .example-chip {
-  min-width: 40px;
+  min-width: 42px;
   padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background: var(--color-card-bg);
   border: 2px solid var(--color-navy);
   border-radius: 10px;
   font-family: var(--font-heading);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
-  text-align: center;
+  line-height: 1.1;
 }
 
+/* A number that changed: gold, with "−1" or "+1" written under it. */
 .example-chip--moved {
   background: var(--color-plan);
 }
 
-.example-total {
-  margin-left: var(--space-1);
+.example-chip small {
+  font-family: var(--font-body);
+  font-size: 15px;
   font-weight: 800;
-  white-space: nowrap;
+}
+
+/* The sum of each step, big, so the total visibly stays the same. */
+.build-example .example-sum {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 800;
 }
 
 .build-row {

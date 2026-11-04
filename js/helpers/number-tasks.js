@@ -36,15 +36,22 @@ export function buildExample(target) {
   const exampleMean = target === 4 ? 5 : 4;
   const start = [1, 2, 3, 4, 5].map(() => exampleMean);
   const moved = [exampleMean - 1, exampleMean + 1, exampleMean, exampleMean, exampleMean];
+  const total = moved.reduce((sum, n) => sum + n, 0);
+  const shownMean = mean(moved);
+  // 3 steps, each with its sum written out (4 Nov 2026: clearer for the child).
   return {
-    mean: mean(moved),
+    mean: shownMean,
     start,
     moved,
-    total: moved.reduce((sum, n) => sum + n, 0),
-    title: `👀 See how! Make a mean of ${exampleMean}.`,
-    startText: '1. Start with 5 of the same.',
-    movedText: '2. One goes down, one goes up.',
-    endText: `The total stays the same, so the mean stays ${exampleMean}!`,
+    total,
+    title: `👀 Example: make a mean of ${exampleMean}`,
+    startText: `Write ${exampleMean} five times.`,
+    startSum: `${start.join(' + ')} = ${total}`,
+    movedText: 'Take 1 from one number. Give it to another.',
+    movedSum: `${moved.join(' + ')} = ${total}`,
+    checkText: 'Check: share the total fairly.',
+    checkSum: `${total} ÷ ${moved.length} = ${shownMean}`,
+    endText: `✅ The mean is still ${exampleMean}!`,
   };
 }
 

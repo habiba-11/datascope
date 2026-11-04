@@ -1,54 +1,275 @@
-/* Graph Lab (3-zone layout). The segmented chart switch is in task-card.css. */
+/* Graph Lab (3-zone layout), laid out like the f13 design (4 Nov 2026). */
 
-/* Step 1 (Look): the chart(s) fill the card. Steps 2 and 3: the chart and the
-   question sit side by side, so the child can look while writing. With two
-   classes, both charts stay in a row and the question goes underneath. */
+/* ---------- the 4 chart tiles ---------- */
+.kind-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: var(--space-2);
+}
+
+.kind-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 6px 14px;
+  background: var(--color-card-bg);
+  color: var(--color-navy);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 18px;
+  box-shadow: var(--shadow-button);
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 22px;
+  text-align: left;
+}
+
+.kind-tile svg {
+  flex-shrink: 0;
+  width: 52px;
+  height: 44px;
+}
+
+.kind-tile small {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.1;
+  color: var(--color-muted-text);
+}
+
+/* The chosen kind: pressed down, soft green, a thick outline AND a ✓. */
+.kind-tile.selected {
+  background: var(--color-explore-light);
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--color-navy);
+  outline: 4px solid var(--color-navy);
+  outline-offset: 2px;
+}
+
+.kind-tile.selected span::before {
+  content: '✓ ';
+}
+
+/* ---------- layout ---------- */
+/* Step 1 (Look): the chart(s) fill the card. Steps 2 and 3: the chart on the
+   left, the question in a panel on the right (stacked on a tablet). */
 .graph-layout {
   display: grid;
   gap: var(--space-3);
 }
 
-.graph-layout--asking:not(.graph-layout--two) {
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* tablets: chart above the question, so a pie keeps its side labels */
-  align-items: start;
+/* Steps 2 and 3 (Habiba, 4 Nov 2026: the question beside the chart was
+   squeezed): the question panel goes on TOP, full width, and the chart under
+   it, a little shorter, so the child reads, looks, then writes. */
+.graph-layout--asking {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.graph-layout--asking .ask-panel {
+  order: -1;
+}
+
+.graph-layout--asking .chart-wrap {
+  height: 260px;
+}
+
+.graph-layout--asking .reflection textarea {
+  min-height: 80px;
+}
+
+.graph-look {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
 }
 
 /* One chart, or two side by side when comparing classes. */
 .chart-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); /* a tablet: one under the other */
+  gap: 14px;
+}
+
+/* Two classes as dot plots: one above the other, full width, the same number line. */
+.chart-row--stacked {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.chart-row--stacked .chart-wrap {
+  height: 240px;
+}
+
+.chart-box {
+  min-width: 0;
+  padding: 8px 10px 10px;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 22px;
+  box-shadow: var(--shadow-button);
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-
-.chart-block {
-  flex: 1;
-  min-width: 260px;
-}
-
-.chart-wrap {
-  position: relative;
-  height: 300px;
-  width: 100%;
-}
-
-/* Words have no line chart: this explains why, in the chart's place. */
-.no-line-note {
-  margin: 0;
-  padding: var(--space-4) var(--space-3);
-  background: var(--color-plan-light);
-  border: var(--border-width) dashed var(--color-navy);
-  border-radius: var(--radius-button);
-  font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 24px;
-  line-height: 1.3;
-  text-align: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* "📖 Reading minutes: Class A" above each compared chart. */
 .chart-title {
-  font-size: 19px;
-  margin: 0 0 var(--space-1);
+  align-self: flex-start;
+  margin: 0 0 4px 6px;
+  font-size: 21px;
+}
+
+.chart-frame {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.chart-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 320px;
+  border-radius: 14px;
+}
+
+.chart-wrap:focus-visible {
+  outline: 4px solid var(--color-collect);
+}
+
+.chart-row--pie .axis-pill {
+  display: none; /* a pie has no axes */
+}
+
+/* The axis titles as coloured pills: WHAT we asked (blue), HOW MANY kids (yellow). */
+.axis-pill {
+  padding: 2px 14px;
+  border: 2px solid var(--color-navy);
+  border-radius: 999px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 17px;
+  white-space: nowrap;
+}
+
+.axis-pill--what {
+  margin-top: 4px;
+  background: var(--color-collect-light);
+}
+
+.axis-pill--many {
+  background: var(--color-plan-light);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 14px 2px;
+}
+
+/* Games on a line chart: why there are dots on sticks, not a line. */
+.careful-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 14px;
+  background: var(--color-ask-light);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 18px;
+  font-size: 20px;
+}
+
+/* ---------- tap to read ---------- */
+.read-out {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  min-height: 76px;
+  padding: 10px 16px;
+  background: var(--color-bg);
+  border: var(--border-width) dashed var(--color-line);
+  border-radius: 20px;
+}
+
+.read-hand {
+  font-size: 30px;
+}
+
+.read-hint {
+  font-size: 21px;
+  color: var(--color-muted-text);
+}
+
+.read-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 18px;
+  color: var(--color-muted-text);
+}
+
+.read-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.read-legend i {
+  width: 22px;
+  height: 16px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 5px;
+}
+
+.key-what { background: var(--color-collect-light); }
+.key-many { background: var(--color-plan-light); }
+
+.read-chip {
+  display: inline-flex;
+  flex-direction: column;
+  padding: 2px 14px 4px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 14px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.read-chip small {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.read-chip--what { background: var(--color-collect-light); }
+.read-chip--many { background: var(--color-plan-light); }
+
+.read-arrow {
+  font-family: var(--font-heading);
+  font-size: 30px;
+}
+
+.read-sentence {
+  flex: 1;
+  min-width: 220px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* ---------- steps 2 and 3: the question panel ---------- */
+.ask-panel {
+  padding: 12px 16px 16px;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 22px;
+  box-shadow: var(--shadow-button);
 }
 
 .reflection {
@@ -60,15 +281,29 @@
 .reflection label {
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: 22px;
+  font-size: 25px;
   line-height: 1.2;
 }
 
 .reflection textarea {
+  min-height: 110px;
+  padding: 10px 14px;
   font-family: var(--font-body);
-  font-size: 19px;
+  font-size: 21px;
+  font-weight: 700;
   border: var(--border-width) solid var(--color-navy);
-  border-radius: 12px;
-  padding: 10px 12px;
+  border-radius: 16px;
   resize: vertical;
+}
+
+/* ---------- a tablet: tiles 2 x 2, the question under the chart ---------- */
+@media (max-width: 900px) {
+  .kind-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kind-tile small {
+    display: none;
+  }
+
 }

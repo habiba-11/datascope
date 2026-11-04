@@ -1,0 +1,40 @@
+{
+  "note": "Words for My journey (f10 design, 4 Nov 2026). One skill per stop; the learned lines match helpers/feedback.js. (\"New words I know\" was removed, Habiba, 4 Nov 2026.)",
+  "bigIdeaMore": "Before, you guessed. Now you can check your guess with data.",
+  "skills": {
+    "ask": {
+      "skill": "Asking a clear question",
+      "learned": "A good question is clear, fair and says when."
+    },
+    "plan": {
+      "skill": "Making a guess first",
+      "learned": "A guess helps you notice surprises in the data."
+    },
+    "collect": {
+      "skill": "Collecting data",
+      "learned": "Data is a set of answers, one from each person."
+    },
+    "graph": {
+      "skill": "Reading a graph",
+      "learned": "A graph shows how many, but not why."
+    },
+    "number": {
+      "skill": "Finding a typical value",
+      "learned": "Mean, median and mode each tell a different story.",
+      "learnedWords": "For words, the mode is the typical answer."
+    },
+    "chance": {
+      "skill": "Chance and many tries",
+      "learned": "More trials usually get closer to what should happen."
+    },
+    "conclude": {
+      "skill": "Proving an answer",
+      "learned": "A claim needs proof and how sure you are."
+    }
+  },
+  "nextTime": [
+    "Ask a question about my real class.",
+    "Try a new question and compare the answers.",
+    "Say why I think something, with a number as proof."
+  ]
+}

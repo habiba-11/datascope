@@ -112,18 +112,23 @@ const RULES = {
     };
   },
 
-  // facts: { evidenceCount, certaintyReasonWords, teaches }
+  // facts: { evidenceCount, evidenceOptions, certaintyReasonWords, teaches }
+  // evidenceOptions = how many proof chips there were. Games (words) have only
+  // one, the mode, so picking it is full proof (Habiba, 4 Nov 2026).
   conclude: (f) => {
-    const twoNumbers = f.evidenceCount >= 2;
+    const onlyMode = f.evidenceOptions === 1;
+    const enoughProof = onlyMode ? f.evidenceCount >= 1 : f.evidenceCount >= 2;
     const explained = f.certaintyReasonWords >= EXPLAINED;
     let nextTime = 'Now share your claim with your class!';
-    if (!twoNumbers) nextTime = 'Use two numbers as proof next time.';
+    if (!enoughProof) nextTime = 'Use two numbers as proof next time.';
     else if (!explained) nextTime = 'Say more about why you are that sure.';
+    let proofWin = enoughProof ? `You used ${f.evidenceCount} numbers as proof.` : 'You used a number as proof.';
+    if (onlyMode) proofWin = 'You used the mode as proof.';
     return {
-      stars: 1 + (twoNumbers ? 1 : 0) + (explained ? 1 : 0),
+      stars: 1 + (enoughProof ? 1 : 0) + (explained ? 1 : 0),
       wins: [
         'You made a claim and said why.',
-        twoNumbers ? `You used ${f.evidenceCount} numbers as proof.` : 'You used a number as proof.',
+        proofWin,
         explained && 'You said how sure you are, and why.',
       ],
       nextTime,

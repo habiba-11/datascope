@@ -156,9 +156,12 @@ export function stamp(element) {
 
 // Confetti in the five room colours falls over the page (big moments only:
 // a finished phase, or leveling up). Skipped with reduced motion.
+// It ALWAYS plays a sound with it (the sparkle, or e.g. 'levelUp'), even with
+// reduced motion, so the same moment always sounds the same (4 Nov 2026).
 const CONFETTI_COLOURS = ['ask', 'plan', 'collect', 'explore', 'conclude'];
 
-export function confetti() {
+export function confetti({ sound = 'confetti' } = {}) {
+  playSound(sound);
   if (reduceMotion()) return;
   for (let i = 0; i < 40; i++) {
     const piece = document.createElement('span');

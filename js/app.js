@@ -9,6 +9,7 @@ import { lineIcon, LOGO_SVG } from './icons.js';
 import { watchPressedState } from './pressed-state.js';
 import { startSync, STATUS_TEXT } from './storage/sync.js';
 import { backendReady } from './config.js';
+import { EXIT_BUTTON_HTML, setupExitButton } from './exit-button.js';
 
 // `icon` is a line icon from icons.js (step bar); `emoji` is used in Pip's words.
 const STEPS = [
@@ -64,6 +65,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
         <div class="pip-mascot">${pipSVG()}</div>
         ${codeBadge()}
         <button class="btn sound-toggle" id="sound-toggle" type="button" aria-pressed="false">🔇 Sound: off</button>
+        ${EXIT_BUTTON_HTML}
         ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}
       </aside>
       <main class="room-content" style="--accent: var(--color-${accent})">
@@ -91,6 +93,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   setupCelebrations();
   setupAboutTab();
   watchPressedState();
+  setupExitButton();
   // Part 22: send the log to the online database (only when it is switched on).
   startSync((status) => {
     const label = document.getElementById('sync-status');
@@ -146,16 +149,22 @@ function stepBarHTML(newStep = null) {
 }
 
 // Zone 2 and zone 3 of the card layout: the room's task card, the action bar
-// (filled by the room with setupActionBar), and a quiet status line with the
-// child's code, the sound switch and the online status.
+// (filled by the room with setupActionBar), and a quiet status line: on the
+// left what is TRUE (the child's code, saved online?), as flat labels; on the
+// right what you can DO (sound, exit), as buttons (Habiba, 4 Nov 2026).
 function cardBodyHTML(accent, contentHTML) {
   return `
     <main class="room-content card-layout" style="--accent: var(--color-${accent})">${contentHTML}</main>
     <nav class="action-bar" id="action-bar" aria-label="What to do next"></nav>
     <footer class="status-line">
-      ${codeBadge()}
-      <button class="btn btn-quiet sound-toggle" id="sound-toggle" type="button" aria-pressed="false">🔇 Sound: off</button>
-      ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}
+      <div class="status-info">
+        ${codeBadge()}
+        ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}
+      </div>
+      <div class="status-tools">
+        <button class="btn btn-quiet sound-toggle" id="sound-toggle" type="button" aria-pressed="false">🔇 Sound: off</button>
+        ${EXIT_BUTTON_HTML}
+      </div>
     </footer>`;
 }
 

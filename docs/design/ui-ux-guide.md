@@ -88,7 +88,8 @@
 | `m-pop` | scales from 0.6 with a bounce | choice cards, chips, seats, stars |
 | `m-ring` | a pulsing ring around the current trail step | "you are here" |
 | `m-grow` | bars grow from the bottom (`scaleY`) | tally, Graph Lab, Chance Lab bars |
-| `m-pulse` | gentle 4% breathing | the primary button, only once the task is ready |
+| `m-nudge` | a small hop + a yellow ring every 2.4 s ("press me"; still ring with reduced motion) | the primary button, only once the task is ready (4 Nov 2026) |
+| `m-pulse` | gentle 4% breathing | the one button on the end-of-phase card |
 | `m-float` | slow up/down | Pip on the welcome screen |
 | `m-shake` | small left/right wobble | lock before it opens; a gentle "try again" (never as a punishment) |
 

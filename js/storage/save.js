@@ -44,6 +44,16 @@ export function setExplorerCode(code) {
   writeItem(CODE_KEY, code);
 }
 
+// "🚪 Exit": this device forgets the code (the log itself is kept until sent).
+export function clearExplorerCode() {
+  memory.delete(CODE_KEY);
+  try {
+    localStorage.removeItem(CODE_KEY);
+  } catch {
+    // Storage is blocked: only the in-memory copy existed.
+  }
+}
+
 // The reasoning log is a list of entries, stored as JSON text.
 export function getLogEntries() {
   try {

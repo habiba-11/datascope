@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataScope – My journey page v2, "What I learned" first (reference)</title>
+<!-- VISUAL + MOTION REFERENCE ONLY (DataScope Round 3). Replaces the layout of rooms/my-journey.html + css/my-journey.css + js/rooms/my-journey.js.
+     All text is SYNTHETIC example data. Real app: child texts via textContent; "I learned" lines come from helpers/feedback.js (learned) and the scenario (teaches).
+     Time per phase is NOT shown (teacher only). Demo data labelled DEMO, never exported. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#17324D;--bg:#E6F4FF;--ask:#FF7A6B;--plan:#FFC531;--collect:#38B6FF;--explore:#4CC26B;--conclude:#A596FF;
+--ask-l:#FFD9D4;--plan-l:#FFF0C2;--collect-l:#D3EEFF;--explore-l:#D5F2DC;--conclude-l:#E3DEFF;--green:#217A3B;--line:#9CC6E6;--muted:#3F5A75}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--navy);font-family:'Nunito',sans-serif;font-weight:700}
+h1,h2,h3,h4,.baloo{font-family:'Baloo 2',sans-serif;font-weight:800}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 20px 60px}
+.tool h1{margin:0;font-size:30px}.tool p{margin:4px 0 12px;font-size:18px;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.chip{min-height:48px;padding:0 16px;border:3px solid var(--navy);border-radius:16px;background:#fff;font-family:'Baloo 2';font-weight:800;font-size:18px;color:var(--navy);cursor:pointer;box-shadow:0 4px 0 var(--navy)}
+.chip[aria-pressed=true]{background:#FFF0C2;box-shadow:0 1px 0 var(--navy);transform:translateY(3px)}
+.chip.go{background:var(--green);color:#fff}
+.stage{border:3px solid var(--navy);border-radius:28px;box-shadow:0 7px 0 var(--navy);background:var(--bg);overflow:hidden;position:relative}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 0}
+.logo{display:flex;align-items:center;gap:8px;font-family:'Baloo 2';font-weight:800;font-size:30px;min-height:48px}.logo b{color:#2E9A4F}
+.ib{width:48px;height:48px;border-radius:14px;border:3px solid var(--navy);background:#fff;box-shadow:0 4px 0 var(--navy);display:inline-flex;align-items:center;justify-content:center;margin-left:8px}
+.miniTrail{display:flex;justify-content:center;align-items:center;padding:6px 0 8px}
+.mt{display:flex;flex-direction:column;align-items:center;width:100px;gap:4px;font-family:'Baloo 2';font-weight:800;font-size:17px}
+.mt i{width:44px;height:44px;border-radius:50%;border:3px solid var(--navy);background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-style:normal}
+.mt.cur i{box-shadow:0 0 0 4px #fff,0 0 0 7px var(--navy);background:var(--conclude);color:var(--navy)}
+.mc{width:30px;height:5px;background:var(--green);border-radius:3px;margin-top:-22px}
+.pcard{margin:4px 24px 28px;background:#fff;border:3px solid var(--navy);border-radius:28px;box-shadow:0 7px 0 var(--navy);overflow:hidden}
+.ptitle{display:flex;align-items:center;gap:12px;padding:10px 24px;background:var(--conclude);border-bottom:3px solid var(--navy)}
+.ptitle h2{margin:0;font-size:26px}
+.pbody{padding:18px 24px 24px;display:flex;flex-direction:column;gap:18px}
+/* slim celebration */
+.slim{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,#FFF0C2,#E3DEFF);border:3px solid var(--navy);border-radius:22px;padding:8px 18px;position:relative;overflow:hidden}
+.slim h3{margin:0;font-size:26px;line-height:1.1;flex:1;min-width:200px}
+.slim .pipS{width:56px;flex:0 0 auto}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:3px solid var(--navy);border-radius:999px;padding:1px 14px;font-family:'Baloo 2';font-weight:800;font-size:19px;white-space:nowrap}
+/* TABS */
+.tabs{display:flex;gap:0;border:3px solid var(--navy);border-radius:20px;overflow:hidden;box-shadow:0 5px 0 var(--navy)}
+.tab{flex:1;min-height:60px;display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 10px;background:var(--plan-l);border:0;border-right:3px solid var(--navy);font-family:'Baloo 2';font-weight:800;font-size:21px;color:var(--navy);cursor:pointer;position:relative}
+.tab:last-child{border-right:0}
+.tab[aria-selected=true]{background:var(--collect)}
+.tab[aria-selected=true]::after{content:"";position:absolute;left:0;right:0;bottom:0;height:8px;background:var(--navy)}
+.tab .new{background:var(--ask);border:2px solid var(--navy);border-radius:999px;font-size:14px;padding:0 8px}
+.panel[hidden]{display:none}
+.panel{display:flex;flex-direction:column;gap:20px}
+/* LEARNED panel */
+.big{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;background:var(--collect-l);border:3px solid var(--navy);border-radius:26px;box-shadow:0 6px 0 var(--navy);padding:18px 24px}
+.big .tagl{display:inline-block;background:var(--navy);color:#fff;border-radius:999px;padding:0 14px;font-family:'Baloo 2';font-weight:800;font-size:17px;letter-spacing:.5px;text-transform:uppercase}
+.big h3{margin:6px 0 4px;font-size:34px;line-height:1.15}
+.big p{margin:0;font-size:21px;font-weight:700}
+.sect>h3,.sh{margin:0 0 4px;font-size:26px;display:flex;align-items:center;gap:8px}
+.sect>.sub{margin:0 0 10px;font-size:18px;color:var(--muted)}
+.ans{background:var(--conclude-l);border:3px solid var(--navy);border-radius:24px;padding:14px 20px;display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+.ans .claim{font-size:23px;font-weight:800;line-height:1.3;margin:0 0 8px;border-left:8px solid var(--conclude);padding-left:14px}
+.proof{display:flex;flex-wrap:wrap;gap:8px}
+.proof span{background:#fff;border:3px solid var(--navy);border-radius:12px;padding:0 12px;font-size:18px}
+.sure h4{margin:0 0 6px;font-size:20px}
+.sureBar{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.sureBar i{height:18px;border:3px solid var(--navy);border-radius:6px;background:#fff}
+.sureBar i.on{background:var(--conclude)}
+.sureLbl{display:flex;justify-content:space-between;font-size:15px;color:var(--muted);margin-top:4px}
+.skills{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.sk{background:#fff;border:3px solid var(--navy);border-radius:22px;box-shadow:0 5px 0 var(--navy);overflow:hidden}
+.sk.todo{border-style:dashed;box-shadow:none;background:#F4FAFF}
+.sk .h{display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--c);border-bottom:3px solid var(--navy)}
+.sk.todo .h{background:#fff;border-bottom:3px dashed var(--line)}
+.sk .h .ic{font-size:26px}
+.sk .h h4{margin:0;font-size:21px;flex:1;line-height:1.15}
+.sk .h .chk{width:34px;height:34px;border-radius:50%;background:var(--green);border:3px solid var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.sk .b{padding:10px 16px 14px;display:flex;flex-direction:column;gap:8px}
+.sk .l{margin:0;font-size:20px;font-weight:800;line-height:1.3}
+.sk .l small{display:block;font-size:15px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:1px}
+.sk .proofline{margin:0;background:#F4FAFF;border-radius:12px;padding:6px 12px;font-size:18px;font-weight:600}
+.sk .proofline small{font-weight:800;color:var(--muted)}
+.sk .later{margin:0;font-size:18px;color:var(--muted)}
+.words{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.w{background:#fff;border:3px solid var(--navy);border-radius:18px;padding:8px 14px;border-top-width:8px;border-top-color:var(--c)}
+.w b{display:block;font-family:'Baloo 2';font-weight:800;font-size:22px}
+.w span{font-size:18px;font-weight:600}
+.next{background:var(--plan-l);border:3px solid var(--navy);border-radius:22px;padding:12px 20px}
+.next ul{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.next li{display:flex;gap:10px;align-items:flex-start;font-size:20px}
+.next li i{flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:#fff;border:3px solid var(--navy);display:flex;align-items:center;justify-content:center;font-style:normal;font-family:'Baloo 2';font-weight:800;font-size:16px}
+/* journey panel */
+.stripline{position:relative;display:flex;justify-content:space-between;background:#F4FAFF;border:3px solid var(--line);border-radius:20px;padding:14px 18px 10px}
+.sd{display:flex;flex-direction:column;align-items:center;gap:4px;width:calc(100%/7);text-decoration:none;color:var(--navy);position:relative;z-index:1;font-family:'Baloo 2';font-weight:800;font-size:16px;text-align:center;line-height:1.1}
+.sd .dotc{width:48px;height:48px;border-radius:50%;border:3px solid var(--navy);background:var(--c);display:flex;align-items:center;justify-content:center;font-size:22px}
+.sd.todo .dotc{background:#fff;border-style:dashed;border-color:var(--line)}
+.sd .st{font-size:17px;letter-spacing:1px}.sd .st s{text-decoration:none;color:#9AAFC2}.sd .st b{color:#E5A100;-webkit-text-stroke:1px var(--navy)}
+.rail{position:absolute;left:calc(100%/14 + 18px);right:calc(100%/14 + 18px);top:37px;height:6px;background:var(--line);border-radius:3px;z-index:0}
+.rail i{display:block;height:100%;background:var(--green);border-radius:3px;width:0;transition:width 1.4s ease-in-out .3s}
+.pipw{position:absolute;top:-26px;left:0;width:44px;transition:left 1.4s ease-in-out .3s;z-index:2;pointer-events:none}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.sc{background:#fff;border:3px solid var(--navy);border-radius:22px;box-shadow:0 5px 0 var(--navy);overflow:hidden;scroll-margin-top:12px}
+.sc.todo{border-style:dashed;box-shadow:none;background:#F4FAFF}
+.sc .h{display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--c);border-bottom:3px solid var(--navy)}
+.sc.todo .h{background:#fff;border-bottom:3px dashed var(--line)}
+.sc .h h4{margin:0;font-size:22px;flex:1}
+.pill.ok{background:var(--green);color:#fff;font-size:16px}.pill.no{font-size:16px}
+.sc .b{padding:10px 16px 12px;font-size:19px}
+.sc .stars{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:17px;color:var(--muted)}
+.sc .quote{margin:0;font-size:20px;font-weight:800;line-height:1.3;border-left:6px solid var(--c);padding-left:12px}
+.sc details{margin-top:6px}.sc summary{min-height:48px;display:flex;align-items:center;font-weight:800;cursor:pointer;font-size:18px}
+.sc details p{margin:4px 0;font-size:18px}.sc .later{margin:0;color:var(--muted);font-size:18px}
+/* ID panel */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tile{background:#fff;border:3px solid var(--navy);border-radius:20px;box-shadow:0 5px 0 var(--navy);padding:12px 18px;display:flex;flex-direction:column;gap:2px}
+.tile .k{font-size:18px;color:var(--muted)}.tile .v{font-family:'Baloo 2';font-weight:800;font-size:42px;line-height:1.1}.tile .v small{font-size:22px;color:var(--muted)}
+.meter{height:16px;background:#EEF6FC;border:3px solid var(--navy);border-radius:999px;overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;background:var(--plan);border-right:3px solid var(--navy);width:80%}
+.badgerow{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.bdg{width:36px;height:36px;border-radius:50%;border:3px solid var(--navy);display:flex;align-items:center;justify-content:center;font-size:16px}
+.idc{background:var(--plan);border:3px solid var(--navy);border-radius:22px;box-shadow:0 5px 0 var(--navy);padding:14px 20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.idc .code{font-family:'Baloo 2';font-weight:800;font-size:30px}
+/* actions */
+.acts{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-top:3px dashed var(--line);padding-top:16px}
+.btn{min-height:56px;padding:0 24px;border:3px solid var(--navy);border-radius:18px;font-family:'Baloo 2';font-weight:800;font-size:21px;cursor:pointer;box-shadow:0 5px 0 var(--navy);background:#fff;color:var(--navy);display:inline-flex;align-items:center;gap:8px}
+.btn.main{background:var(--green);color:#fff;min-height:60px;font-size:22px}
+.btn.quiet{box-shadow:none;border-width:2px;font-size:18px;min-height:48px}
+.demo{margin:0;text-align:center;font-size:16px;color:var(--muted)}
+/* motion */
+.m-fade{animation:m-fade .4s ease-out both}
+.m-rise{animation:m-rise .5s cubic-bezier(.22,1,.36,1) both;animation-delay:var(--d,0ms)}
+.m-pop{animation:m-pop .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:var(--d,0ms)}
+.m-hop{animation:m-hop .7s ease-out .6s 2}
+@keyframes m-fade{from{opacity:0}}
+@keyframes m-rise{from{opacity:0;transform:translateY(18px)}}
+@keyframes m-pop{0%{opacity:0;transform:scale(.4)}100%{opacity:1;transform:none}}
+@keyframes m-hop{0%,100%{transform:none}40%{transform:translateY(-12px)}}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;top:-12px;width:10px;height:14px;border-radius:3px;animation:fall 2.2s ease-in var(--d) both}
+@keyframes fall{to{transform:translateY(120px) rotate(540deg);opacity:0}}
+.reduced *,.reduced{animation:none !important;transition:none !important}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+@media print{.hdr,.miniTrail,.acts .btn,.tool,.notes,.confetti,.tabs{display:none!important}.panel[hidden]{display:flex}.sc details{display:block}.sc summary{display:none}.grid,.skills{grid-template-columns:1fr}.sk,.sc,.w{break-inside:avoid}.stage{border:0;box-shadow:none}}
+@media (max-width:820px){.wrap{padding:12px 8px}.pcard{margin:4px 10px 20px}.pbody{padding:14px 12px 18px}.ptitle h2{font-size:22px}.big{grid-template-columns:minmax(0,1fr);text-align:center;padding:14px}.big>div:first-child{width:72px;margin:0 auto}.big h3{font-size:27px}.ans{grid-template-columns:minmax(0,1fr)}.skills,.grid{grid-template-columns:minmax(0,1fr)}.tiles{grid-template-columns:minmax(0,1fr)}.tab{font-size:17px;flex-direction:column;gap:0;min-height:64px}.miniTrail{display:none}.stripline{padding:10px 4px}.sd .dotc{width:34px;height:34px;font-size:15px}.sd{font-size:11px}.sd .st{display:none}.rail{top:27px}.pipw{width:30px;top:-20px}.acts{justify-content:center}.acts .btn.main{width:100%;justify-content:center}}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-top:26px}
+.n{background:#fff;border:3px solid var(--navy);border-radius:22px;box-shadow:0 5px 0 var(--navy);padding:14px 18px;font-size:18px;font-weight:600}
+.n h3{margin:0 0 6px;font-size:22px}.n ul{margin:0;padding-left:22px}.n li{margin:4px 0}
+code{background:#EEF6FC;padding:1px 6px;border-radius:6px;font-size:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tool"><h1>My journey v2 – “What I learned” comes first</h1>
+  <p>The first tab is the most important one and opens by itself. Click the tabs, change the state, replay.</p></div>
+  <div class="bar">
+    <button class="chip" id="s7" aria-pressed="true">All 7 stops done</button>
+    <button class="chip" id="s4" aria-pressed="false">Teacher preview: 4 done</button>
+    <button class="chip" id="rm" aria-pressed="false">Reduced motion</button>
+    <button class="chip go" id="replay">▶ Replay</button>
+  </div>
+  <div class="stage" id="stage"></div>
+
+  <div class="notes">
+    <div class="n"><h3>What changed in v2</h3><ul>
+      <li><b>3 tabs, “What I learned” first</b> and selected on arrival: 🧠 What I learned · 🗺️ My journey · 🪪 My ID. Same tab pattern as the room summary tabs (Prof comment 6).</li>
+      <li>The long list of stops moved to the 2nd tab; the stats moved to the 3rd. The page opens straight on the learning.</li>
+      <li>The celebration is now one slim line so the learning is on screen at once.</li>
+    </ul></div>
+    <div class="n"><h3>Inside “What I learned” (top to bottom)</h3><ul>
+      <li><b>1 The big idea</b>: the scenario’s <code>teaches</code> sentence, large, with Pip.</li>
+      <li><b>2 My answer</b>: the child’s own claim + because, the proof numbers as chips, and a 4-step “how sure” bar.</li>
+      <li><b>3 Skills I practised</b>: one card per stop: the skill name, “I learned …”, and “I showed it when …” with the child’s own words. Not-done stops are dashed.</li>
+      <li><b>4 New words I know</b>: only words he met (mean, median, mode, sample, prediction, evidence…), each with a one-line kid definition.</li>
+      <li><b>5 Next time I can…</b>: 3 small challenges (try a new question, a bigger class, ask a real class).</li>
+    </ul></div>
+    <div class="n"><h3>Build notes</h3><ul>
+      <li>Files: <code>js/rooms/my-journey.js</code> (new <code>learnedNode()</code>, tabs), <code>css/my-journey.css</code>. Uses <code>buildJourney()</code>; log and exports unchanged.</li>
+      <li>“I learned” lines: reuse <code>learned</code> from <code>helpers/feedback.js</code> (one per phase). The lines for Collect, Graph, Number, Chance, Conclude in this mock-up are examples; check them against the real file.</li>
+      <li>“New words” list: from a small content file (<code>data/content/words.json</code>), shown only for rooms the child finished. Ask Habiba to approve the definitions.</li>
+      <li>“I showed it when”: the child’s own text, <code>textContent</code> only. If empty, hide the line.</li>
+      <li>Tabs: <code>role="tablist"</code>, arrow keys, first tab selected, ≥ 56px high. Print shows ALL panels, answers open.</li>
+      <li>Rewards stay about reasoning: no scores in this tab, no speed, no time.</li>
+    </ul></div>
+  </div>
+</div>
+<script>
+const P=[
+ {k:'ask',n:'Ask',ic:'❓',c:'--ask',st:3,skill:'Asking a clear question',learn:'A good question is clear, fair and says when.',show:'“Which playground game do you like best?”',q:'You picked: Favourite playground game',m:[]},
+ {k:'plan',n:'Plan',ic:'🗺️',c:'--plan',st:3,skill:'Making a guess first',learn:'A guess helps you notice surprises in the data.',show:'“I think Football will be the most popular.”',q:'Your guess: Football',m:[]},
+ {k:'collect',n:'Collect',ic:'📋',c:'--collect',st:2,skill:'Collecting data',learn:'More kids in the sample gives a more trusted answer.',show:'You asked 20 pretend classmates.',q:'You asked 20 pretend classmates.',m:[]},
+ {k:'graph',n:'Graph Lab',ic:'📊',c:'--explore',st:3,skill:'Reading a graph',learn:'A graph shows many numbers at one glance, but not the reasons.',show:'“Football is the tallest bar, 9 kids.”',q:'It shows: “Football is the tallest bar, 9 kids.”',m:['It can’t show: “why they chose it.”']},
+ {k:'number',n:'Number Lab',ic:'🔢',c:'--explore',st:2,skill:'Finding a typical number',learn:'The mean, median and mode each say what is typical in a different way.',show:'“One big number pulls the mean up.”',q:'You guessed 4. The mean was 4.',m:['You changed to 5 because “one big number pulls the mean up”.']},
+ {k:'chance',n:'Chance Lab',ic:'🎲',c:'--explore',st:3,skill:'Chance and many tries',learn:'With more tries, the result gets closer to what should happen.',show:'100 tries: heads came up 52%. It should be 50%.',q:'Coin: you said “maybe”.',m:[]},
+ {k:'conclude',n:'Conclude',ic:'🚩',c:'--conclude',st:3,skill:'Proving an answer',learn:'A good answer uses evidence, not only a feeling.',show:'“Football … because it has the tallest bar.”',q:'I think Football is the most popular because it has the tallest bar.',m:[]},
+];
+const WORDS=[
+ ['Sample','A small group we ask, to learn about a bigger group.','--collect',2],
+ ['Prediction','A guess you make before you look.','--plan',1],
+ ['Mean','Share everything out equally. The “fair share” number.','--explore',4],
+ ['Median','The middle number when you line them up.','--explore',4],
+ ['Mode','The number or answer that shows up most.','--explore',3],
+ ['Evidence','Facts from your data that prove your answer.','--conclude',6],
+];
+const pip='<svg viewBox="0 0 200 190" aria-hidden="true" width="100%"><path d="M40 150c0-56 26-84 60-84s60 28 60 84c0 30-24 40-60 40s-60-10-60-40z" fill="#C98A4B" stroke="#17324D" stroke-width="6"/><path d="M62 78l-6-18 18 10M138 78l6-18-18 10" fill="#C98A4B" stroke="#17324D" stroke-width="6" stroke-linejoin="round"/><circle cx="76" cy="104" r="22" fill="#fff" stroke="#17324D" stroke-width="6"/><circle cx="124" cy="104" r="22" fill="#fff" stroke="#17324D" stroke-width="6"/><circle cx="80" cy="106" r="9" fill="#17324D"/><circle cx="120" cy="106" r="9" fill="#17324D"/><path d="M92 124l8 14 8-14z" fill="#FFC531" stroke="#17324D" stroke-width="5" stroke-linejoin="round"/></svg>';
+let done=7,rm=false,tab=0;
+const $=id=>document.getElementById(id);
+const starsHTML=n=>`<span class="st" aria-hidden="true">${'<b>★</b>'.repeat(n)}${'<s>☆</s>'.repeat(3-n)}</span>`;
+const tick='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>';
+function learnedPanel(){
+  const skills=P.map((p,i)=>{const ok=i<done;return `<article class="sk ${ok?'':'todo'} m-rise" style="--c:var(${p.c});--d:${500+i*80}ms"><div class="h"><span class="ic" aria-hidden="true">${p.ic}</span><h4>${ok?p.skill:p.n}</h4>${ok?`<span class="chk">${tick}</span>`:'<span class="pill no" style="font-size:15px">🔒 Not yet</span>'}</div><div class="b">${ok?`<p class="l"><small>I learned</small>${p.learn}</p><p class="proofline"><small>I showed it when: </small>${p.show}</p>`:'<p class="later">Finish this stop to unlock what you learned.</p>'}</div></article>`}).join('');
+  const seen=WORDS.filter(w=>w[3]<=done);
+  const words=seen.map((w,i)=>`<div class="w m-pop" style="--c:var(${w[2]});--d:${900+i*90}ms"><b>${w[0]}</b><span>${w[1]}</span></div>`).join('');
+  const concl=done>=7;
+  return `
+  <section class="big m-rise" style="--d:0ms"><div style="width:120px" class="m-hop">${pip}</div><div><span class="tagl">The big idea</span><h3>Graphs and numbers help us answer a question with proof, not only a feeling.</h3><p>Before, you guessed. Now you can check your guess with real data.</p></div></section>
+  ${concl?`<section class="sect m-rise" style="--d:150ms"><h3>🚩 My answer</h3><p class="sub">This is what you found out, in your own words.</p>
+    <div class="ans"><div><p class="claim">I think Football is the most popular game because it has the tallest bar.</p><div class="proof" aria-label="My proof"><span>Football: 9 kids</span><span>Tag: 5 kids</span><span>20 kids asked</span></div></div>
+    <div class="sure"><h4>How sure am I? <span style="color:var(--muted)">Quite sure</span></h4><div class="sureBar" role="img" aria-label="Quite sure: 3 of 4"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div><div class="sureLbl"><span>Not sure</span><span>Very sure</span></div><p style="margin:8px 0 0;font-size:18px">“We asked 20 kids.”</p></div></div></section>`
+   :`<section class="sect"><h3>🚩 My answer</h3><p class="sub">You will write your answer in Conclude. It will show here.</p></section>`}
+  <section class="sect"><h3>🧩 Skills I practised</h3><p class="sub">One skill for each stop. Every card has what you learned and where you showed it.</p><div class="skills">${skills}</div></section>
+  <section class="sect"><h3>📖 New words I know</h3><p class="sub">Words you met in the rooms. Now you can use them like a scientist.</p><div class="words">${words}</div></section>
+  <section class="next m-rise" style="--d:1500ms"><h3 class="sh" style="margin:0">🚀 Next time I can…</h3><ul>
+    <li><i>1</i><span>Ask a question about my <b>real class</b>.</span></li>
+    <li><i>2</i><span>Use a <b>bigger sample</b> and see if the answer changes.</span></li>
+    <li><i>3</i><span>Say <b>why</b> I think something, with a number as proof.</span></li></ul></section>`;
+}
+function journeyPanel(){
+  const last=done-1;
+  const strip=P.map((p,i)=>`<a class="sd ${i<done?'':'todo'}" style="--c:var(${p.c})" href="#c-${p.k}" aria-label="${p.n}${i<done?`, ${p.st} of 3 stars`:', not done yet'}"><span class="dotc">${i<done?p.ic:'🔒'}</span><span>${p.n}</span>${i<done?starsHTML(p.st):'<span class="st">&nbsp;</span>'}</a>`).join('');
+  const cards=P.map((p,i)=>{const ok=i<done;return `<article class="sc ${ok?'':'todo'}" id="c-${p.k}" style="--c:var(${p.c})"><div class="h"><span style="font-size:26px" aria-hidden="true">${p.ic}</span><h4>${p.n}</h4>${ok?'<span class="pill ok">✓ Done</span>':'<span class="pill no">🔒 Not done yet</span>'}</div><div class="b">${ok?`<div class="stars"><span aria-hidden="true">${starsHTML(p.st)}</span><span>${p.st} of 3 stars</span></div><p class="quote">${p.q}</p>${p.m.length?`<details><summary>See more</summary>${p.m.map(x=>`<p>${x}</p>`).join('')}</details>`:''}`:'<p class="later">You will see your answers here when this stop is done.</p>'}</div></article>`}).join('');
+  return `<section class="sect"><h3>My journey at a glance</h3><div class="stripline"><div class="rail" aria-hidden="true"><i id="rfill"></i></div><div class="pipw" id="pipw" aria-hidden="true">${pip}</div>${strip}</div></section>
+  <section class="sect"><h3>What I did at each stop</h3><div class="grid">${cards}</div></section>`;
+}
+function idPanel(){
+  const stars=P.slice(0,done).reduce((a,p)=>a+p.st,0);
+  return `<section class="idc"><div style="width:84px">${pip}</div><div><div style="font-size:18px;color:var(--navy)">🪪 My Detective ID</div><div class="code">🔑 OWL-07</div><div style="font-size:20px">🕵️ Data Detective</div></div></section>
+  <div class="tiles"><div class="tile"><span class="k">⭐ Stars</span><span class="v">${stars} <small>of 21</small></span><span style="font-size:16px;color:var(--muted)">for great thinking, not speed</span></div>
+  <div class="tile"><span class="k">🎒 Badges</span><span class="v">12</span><div class="badgerow" aria-hidden="true">${['#FF7A6B','#FFC531','#38B6FF','#4CC26B','#A596FF'].map(c=>`<span class="bdg" style="background:${c}">★</span>`).join('')}<span class="bdg" style="background:#fff">+7</span></div></div>
+  <div class="tile"><span class="k">🔼 Next level</span><span class="v" style="font-size:28px">Evidence Expert</span><div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="12" aria-label="12 of 15 badges"><i></i></div><span style="font-size:16px;color:var(--muted)">3 more badges to go</span></div></div>`;
+}
+const TABS=[['🧠','What I learned',learnedPanel,true],['🗺️','My journey',journeyPanel],['🪪','My ID',idPanel]];
+function render(){
+  const conf=Array.from({length:22},(_,i)=>`<i style="left:${(i*37)%100}%;background:${['#FF7A6B','#FFC531','#38B6FF','#4CC26B','#A596FF'][i%5]};--d:${(i%9)*110}ms"></i>`).join('');
+  $('stage').className='stage'+(rm?' reduced':'');
+  $('stage').innerHTML=`
+  <header class="hdr"><div class="logo"><svg width="40" height="40" viewBox="0 0 48 48"><path d="M24 4l18 10v20L24 44 6 34V14z" fill="#4CC26B"/><circle cx="22" cy="22" r="9" fill="#fff" stroke="#17324D" stroke-width="4"/><line x1="29" y1="29" x2="36" y2="36" stroke="#17324D" stroke-width="4" stroke-linecap="round"/></svg>Data<b>Scope</b></div><div><span class="ib">ℹ️</span><span class="ib">🎒</span></div></header>
+  <nav class="miniTrail" aria-hidden="true">${['Ask','Plan','Collect','Explore','Conclude'].map((n,i)=>(i?'<span class="mc"></span>':'')+`<span class="mt ${i==4?'cur':''}"><i>${i==4?'🚩':'✓'}</i>${n}</span>`).join('')}</nav>
+  <div class="pcard"><div class="ptitle"><span style="font-size:28px">🗺️</span><h2>My journey · ⚽ Favourite playground game</h2></div>
+   <div class="pbody">
+    <section class="slim m-fade" aria-label="Well done">${rm?'':`<div class="confetti" aria-hidden="true">${conf}</div>`}<div class="pipS">${pip}</div><h3>${done===7?'You finished your whole investigation!':'Look how far you came!'}</h3><span class="pill">🔑 OWL-07</span><span class="pill">⭐ ${P.slice(0,done).reduce((a,p)=>a+p.st,0)} of 21</span></section>
+    <div class="tabs" role="tablist" aria-label="My journey">${TABS.map((t,i)=>`<button class="tab" role="tab" id="tab${i}" aria-selected="${i===tab}" aria-controls="pn${i}" tabindex="${i===tab?0:-1}"><span aria-hidden="true">${t[0]}</span>${t[1]}${t[3]?'':''}</button>`).join('')}</div>
+    ${TABS.map((t,i)=>`<div class="panel" role="tabpanel" id="pn${i}" aria-labelledby="tab${i}" ${i===tab?'':'hidden'}>${i===tab?t[2]():''}</div>`).join('')}
+    <div class="acts"><div><button class="btn quiet">🖨️ Print my journey</button> <button class="btn quiet">or save it as a table (CSV)</button></div><button class="btn main">📤 Save my work for my teacher</button></div>
+    <p class="demo">Example data for this design. In the app it is the child’s own log. Demo data is always labelled DEMO and never exported.</p>
+   </div></div>`;
+  document.querySelectorAll('.tab').forEach((b,i)=>{b.onclick=()=>{tab=i;render()};b.onkeydown=e=>{if(e.key==='ArrowRight'){tab=(tab+1)%3;render();$('tab'+tab).focus()}if(e.key==='ArrowLeft'){tab=(tab+2)%3;render();$('tab'+tab).focus()}}});
+  if(tab===1){const rail=$('rfill'),pw=$('pipw'),line=rail.parentElement,frac=(done-1)/6;
+    pw.style.left=(line.offsetLeft-pw.offsetWidth/2)+'px';
+    const go=()=>{rail.style.width=(frac*100)+'%';pw.style.left=(line.offsetLeft+frac*line.offsetWidth-pw.offsetWidth/2)+'px'};
+    if(rm){rail.style.transition=pw.style.transition='none';go()}else setTimeout(go,60);}
+  ['s7','s4','rm'].forEach(id=>$(id).setAttribute('aria-pressed',({s7:done===7,s4:done===4,rm})[id]));
+}
+$('s7').onclick=()=>{done=7;render()};$('s4').onclick=()=>{done=4;render()};
+$('rm').onclick=()=>{rm=!rm;render()};$('replay').onclick=()=>{tab=0;render()};
+render();
+</script>
+</body>
+</html>

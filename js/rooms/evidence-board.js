@@ -6,18 +6,18 @@ import { CERTAINTY, certaintyButtonsHTML } from '../helpers/certainty.js';
 import { numberLabKind, classStats } from '../helpers/number-tasks.js';
 import { buildJourney } from '../helpers/journey.js';
 import { buildFindings } from '../helpers/findings.js';
+import { openFindings } from '../findings-popup.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { createAnswerHint } from '../helpers/prompts.js';
 import { answerFacts, fillSuggestions, becauseText } from '../helpers/suggestions.js';
 import { playSound } from '../sounds.js';
-import { animate, pipReacts, confetti, stamp } from '../motion.js';
-import { openModal } from '../modal.js';
+import { animate, pipReacts, confetti, stamp, MOTION } from '../motion.js';
 import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
 import { whenIntroClosed } from '../phase-intro.js';
 import { countWords } from '../helpers/feedback.js';
 import { pipSay } from '../pip.js';
-import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
+import { taskCardHTML, pipLineHTML, miniStepperHTML, wordsNoteHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 
 // Claim -> Evidence -> How sure (Paper 17's three parts). The audience/form task
@@ -48,9 +48,11 @@ async function init() {
   scenarioId = recipe.id;
   scenarioTeaches = recipe.teaches;
   const partner = await loadPartnerRecipe(recipe);
-  const { evidenceBoard } = await loadContent(recipe.id); // the claim question and hints
+  const { evidenceBoard, wordsNote } = await loadContent(recipe.id); // the claim question and hints
   const { values } = generateClassData(recipe);
   const partnerValues = partner ? generateClassData(partner).values : null;
+  // Games are words: the only proof is the mode, so Pip does not ask for "numbers".
+  if (wordsNote) STEPS[1].pip = 'Games are words, so your proof is the mode. Tap it!';
 
   let evidenceChips;
   if (partner) {
@@ -96,13 +98,16 @@ async function init() {
             </section>
 
             <section class="task" data-task="2" hidden>
+              ${wordsNote ? wordsNoteHTML(wordsNote) : ''}
               <div class="evidence-grid" id="evidence-grid">
                 ${evidenceChips.map((c, i) => `<button class="btn choice-btn evidence-chip m-pop" style="--i: ${i}" data-id="${c.id}" type="button">${c.label}</button>`).join('')}
               </div>
             </section>
 
             <section class="task" data-task="3" hidden>
-              <div class="certainty-scale" id="certainty-scale">
+              <div class="likely-ruler" aria-hidden="true"></div>
+              <div class="likely-ends" aria-hidden="true"><span>won't happen</span><span>will happen</span></div>
+              <div class="certainty-scale likely-scale" id="certainty-scale" role="group" aria-label="How sure">
                 ${certaintyButtonsHTML('choice-btn')}
               </div>
               <label for="certainty-reason" class="reason-label">✏️ Why are you that sure?</label>
@@ -143,7 +148,7 @@ async function init() {
   // remember them while writing the claim. Opens by itself after the intro
   // (until Conclude is done), and the button reopens it at any time.
   const kind = numberLabKind(recipe);
-  const lines = buildFindings({
+  const findings = buildFindings({
     kind,
     question: recipe.question,
     values,
@@ -154,29 +159,9 @@ async function init() {
   findingsBtn.type = 'button';
   findingsBtn.className = 'btn';
   findingsBtn.textContent = '📋 My findings';
-  findingsBtn.addEventListener('click', () => showFindings(lines, false));
+  findingsBtn.addEventListener('click', () => openFindings(findings, { auto: false, wordsNote }));
   addTitleButton(findingsBtn);
-  if (!isPhaseDone('conclude')) whenIntroClosed().then(() => showFindings(lines, true));
-}
-
-function showFindings(lines, auto) {
-  const list = document.createElement('ul');
-  list.className = 'findings-list';
-  for (const { icon, label, text } of lines) {
-    const item = document.createElement('li');
-    const strong = document.createElement('strong');
-    strong.textContent = `${icon} ${label}: `;
-    item.append(strong, text); // text may be what the child typed: plain text only
-    list.append(item);
-  }
-  logEvent('evidence-board', 'findings-viewed', { auto });
-  return openModal({
-    icon: '📋',
-    title: 'My findings',
-    accent: 'conclude',
-    body: list,
-    buttons: [{ label: "✍️ Let's write my claim", value: 'go', main: true }],
-  });
+  if (!isPhaseDone('conclude')) whenIntroClosed().then(() => openFindings(findings, { auto: true, wordsNote }));
 }
 
 function showTask(n) {
@@ -205,7 +190,7 @@ function refreshPrimary() {
   } else if (currentTask === 2) {
     bar.setPrimary(selectedEvidence.size > 0
       ? { label: 'Next: How sure? →', ready: true, onClick: () => showTask(3) }
-      : { label: '', enabled: false, whyDisabled: '👆 Pick at least one number' });
+      : { label: '', enabled: false, whyDisabled: '👆 Pick your proof' });
   } else if (cardMade) {
     bar.setPrimary({ label: '🗺️ See my journey →', ready: true, onClick: () => { location.href = 'my-journey.html'; } });
   } else if (!selectedCertainty) {
@@ -213,7 +198,7 @@ function refreshPrimary() {
   } else if (!filled('certainty-reason')) {
     bar.setPrimary({ label: '', enabled: false, whyDisabled: '✏️ Say why first' });
   } else {
-    bar.setPrimary({ label: '🏅 Make my Evidence Card', onClick: makeCard });
+    bar.setPrimary({ label: '🏅 Make my Evidence Card', ready: true, onClick: makeCard });
   }
 }
 
@@ -227,6 +212,7 @@ function markComplete(taskNum) {
 function concludeFacts() {
   return {
     evidenceCount: selectedEvidence.size,
+    evidenceOptions: document.querySelectorAll('.evidence-chip').length,
     certaintyReasonWords: countWords(document.getElementById('certainty-reason').value),
     teaches: scenarioTeaches,
     // For "Your work" on the card: the claim as the Evidence Card shows it.
@@ -315,10 +301,11 @@ function setupCertainty() {
   reasonInput.addEventListener('input', () => { showSure(); refreshPrimary(); });
 }
 
+const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function makeCard() {
   renderCard();
   cardMade = true;
-  playSound('done');
   // A "Checked!" stamp thumps onto the card (in words, not only a picture).
   const card = document.getElementById('evidence-card');
   card.querySelector('.card-stamp')?.remove();
@@ -327,8 +314,12 @@ function makeCard() {
   mark.textContent = '✅ Checked!';
   card.append(mark);
   stamp(mark);
+  // The thud and the confetti come when the stamp lands (stamp() takes MOTION.medium).
+  setTimeout(() => {
+    playSound('stamp');
+    confetti();
+  }, reduceMotion() ? 0 : MOTION.medium * 1000);
   animate(card, 'cheer');
-  confetti();
   pipReacts('hop');
   markComplete(3);
   refreshPrimary();

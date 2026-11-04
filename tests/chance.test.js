@@ -24,8 +24,8 @@ test('a child sees theory with no brackets; older log entries are shown the same
 test('each outcome has one row: should and did, and every number says what it is', () => {
   const results = new Map([['Red', 30], ['Blue', 20]]);
   assert.deepEqual(outcomeRows(['Red', 'Blue'], [4, 1], results, 50), [
-    { name: 'Red', shouldPct: 80, shouldText: '4 in 5, about 80%', didPct: 60, didText: '30 of 50, 60%' },
-    { name: 'Blue', shouldPct: 20, shouldText: '1 in 5, about 20%', didPct: 40, didText: '20 of 50, 40%' },
+    { name: 'Red', shouldPct: 80, shouldText: '4 in 5, about 80%', didPct: 60, didText: '30 of 50, 60%', shouldBig: '80%', shouldSmall: '4 in 5', didBig: '60%', didSmall: '30 of 50 times' },
+    { name: 'Blue', shouldPct: 20, shouldText: '1 in 5, about 20%', didPct: 40, didText: '20 of 50, 40%', shouldBig: '20%', shouldSmall: '1 in 5', didBig: '40%', didSmall: '20 of 50 times' },
   ]);
 });
 
@@ -33,7 +33,7 @@ test('what a child sees in Chance Lab has no brackets', () => {
   const rows = outcomeRows(['Heads', 'Tails'], [1, 1], new Map([['Heads', 6], ['Tails', 4]]), 10);
   const previous = { count: 10, pct: 60, gap: 0.1 };
   const texts = [
-    ...rows.flatMap((row) => [row.shouldText, row.didText]),
+    ...rows.flatMap((row) => [row.shouldText, row.didText, row.shouldBig, row.shouldSmall, row.didBig, row.didSmall]),
     trialMessage({ ...base, count: 10, timesHit: 3, pct: 30, previous: null, gap: 0.27 }),
     trialMessage({ ...base, count: 500, timesHit: 290, pct: 58, previous, gap: 0.01 }),
     trialMessage({ ...base, count: 500, timesHit: 200, pct: 40, previous, gap: 0.3 }),

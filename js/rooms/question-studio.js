@@ -181,7 +181,7 @@ function renderFixIts() {
     // A new scenario gets new hints: the old hint list goes.
     const { button, list } = createHint(id, 'question-studio', [
       'Fix one tip at a time, starting at the top.',
-      `Here is one idea: "${fix}"`,
+      { text: 'Here is one idea. Tap it to use it:', answer: fix, box: textarea },
     ]);
     hintButtons[id] = button;
     document.getElementById(`hint-slot-${i + 1}`).replaceChildren(list);

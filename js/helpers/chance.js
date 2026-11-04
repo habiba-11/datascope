@@ -34,6 +34,11 @@ export function outcomeRows(outcomes, weights, results, count) {
       shouldText: theoryWords(weights[i], totalWeight),
       didPct: toPct(times, count),
       didText: `${times} of ${count}, ${toPct(times, count)}%`,
+      // The f12 cards: a BIG number and small words under it, no brackets.
+      shouldBig: `${toPct(weights[i], totalWeight)}%`,
+      shouldSmall: `${weights[i]} in ${totalWeight}`,
+      didBig: `${toPct(times, count)}%`,
+      didSmall: `${times} of ${count} ${times === 1 ? 'time' : 'times'}`,
     };
   });
 }

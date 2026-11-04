@@ -73,6 +73,13 @@ test('Conclude: two numbers as proof and a real reason earn stars', () => {
   assert.match(high.nextTime, /share your claim/);
 });
 
+test('Conclude for games: the mode is the only proof, so one chip is enough', () => {
+  const card = buildPhaseFeedback('conclude', { evidenceCount: 1, evidenceOptions: 1, certaintyReasonWords: 8 });
+  assert.equal(card.stars, 3);
+  assert.equal(card.wins[1], 'You used the mode as proof.');
+  assert.doesNotMatch(card.nextTime, /two numbers/);
+});
+
 test('a card never has more than 3 wins, and always 1 to 3 stars and a nudge', () => {
   for (const phase of PHASES) {
     const card = buildPhaseFeedback(phase, {

@@ -6,7 +6,25 @@ import { appendAnswer, answerSource } from './suggestions.js';
 // Tips, one per tap (Question Studio's fix-its: fixing the question is the skill
 // itself, so those hints stay words to read). The button and its list are kept
 // apart: the button goes into the action bar, the hints appear in the task card.
-// `key` names the question in the log.
+// `key` names the question in the log. A hint can also be { text, answer, box }:
+// then `answer` shows as a chip the child can tap to put it in `box` (the last
+// fix-it hint, Habiba, 4 Nov 2026). It replaces the box's text (the flawed
+// question) and is logged as hint-picked, so the thesis data knows.
+function answerChip(key, room, { answer, box }) {
+  const chip = document.createElement('button');
+  chip.type = 'button';
+  chip.className = 'suggestion-chip hint-answer';
+  chip.textContent = `👆 ${answer}`;
+  chip.addEventListener('click', () => {
+    box.value = answer;
+    chip.disabled = true;
+    logEvent(room, 'hint-picked', { prompt: key, suggestionId: 'fix', how: 'tap' });
+    box.dispatchEvent(new Event('input', { bubbles: true })); // the checker runs again
+    box.focus();
+  });
+  return chip;
+}
+
 export function createHint(key, room, hints) {
   const button = document.createElement('button');
   button.type = 'button';
@@ -24,7 +42,8 @@ export function createHint(key, room, hints) {
     shown += 1;
 
     const item = document.createElement('li');
-    item.textContent = `🦉 ${hint}`;
+    item.textContent = `🦉 ${hint.text || hint}`;
+    if (hint.answer) item.append(answerChip(key, room, hint));
     list.append(item);
     logEvent(room, 'hint', { prompt: key, hintNumber: shown });
 

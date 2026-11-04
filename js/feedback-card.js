@@ -7,7 +7,7 @@
 import { openModal } from './modal.js';
 import { STEP_OF_PHASE, PHASES } from './helpers/progress.js';
 import { SOURCE_CHIPS } from './helpers/feedback.js';
-import { playSound } from './sounds.js';
+import { playSound, playStars } from './sounds.js';
 import { pipReacts } from './motion.js';
 
 const PHASE_NAMES = {
@@ -51,6 +51,19 @@ function starsNode(count) {
     row.insertAdjacentHTML('beforeend', `<svg class="ps-star${on ? ' on' : ''}" style="--i:${i}" width="${size}" height="${size}" viewBox="0 0 40 40" aria-hidden="true"><path d="${STAR_PATH}"/></svg>`);
   }
   return row;
+}
+
+// The stars' sound (sounds.js playStars): one note as each star pops in. The
+// stars' CSS delay (css/modal.css) is 600 ms + 300 ms each; each note comes
+// when its star is at its biggest. It runs when the card is really on screen
+// (it may wait in line behind a badge pop-up). Reduced motion: the stars are
+// all there at once, so one "done" tune.
+function playStarSound(count) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    playSound('done');
+    return;
+  }
+  playStars(count);
 }
 
 // A coloured box with an icon and words: "Next time" (yellow), "I learned" (blue).
@@ -128,7 +141,6 @@ export function showFeedbackCard(phase, card) {
     body.append(done);
   }
 
-  playSound('done');
   pipReacts('hop');
 
   return openModal({
@@ -138,6 +150,7 @@ export function showFeedbackCard(phase, card) {
     body,
     buttons: [{ label: next ? `Unlock ${PHASE_NAMES[next]} →` : '🎉 Finish', value: 'next', main: true }],
     onOpen: (dialog) => {
+      playStarSound(card.stars);
       // "Step 3 of 5" in the header, and the one button gently pulses when it is ready.
       const step = el('span', `Step ${STEP_ORDER.indexOf(STEP_OF_PHASE[phase]) + 1} of ${STEP_ORDER.length}`, 'ps-step');
       dialog.querySelector('.modal-header').append(step);

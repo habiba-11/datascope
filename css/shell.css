@@ -1,10 +1,24 @@
+/* Logo left, the step bar in the MIDDLE, the buttons right (Habiba, 4 Nov
+   2026). The two side columns are equal, so the steps sit at the true centre. */
 .shell-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-areas: "logo steps actions";
   align-items: center;
-  justify-content: space-between;
   padding: 16px 24px;
-  flex-wrap: wrap;
   gap: 12px;
+}
+
+.shell-header .logo { grid-area: logo; justify-self: start; }
+.shell-header .step-bar { grid-area: steps; justify-self: center; }
+.shell-header .header-actions { grid-area: actions; justify-self: end; }
+
+/* A smaller screen (tablet): the steps get their own row, still centred. */
+@media (max-width: 1100px) {
+  .shell-header {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "logo actions" "steps steps";
+  }
 }
 
 /* A room's own tool (📘 Maths recap, 📋 My findings) sits in the top bar. */
@@ -61,10 +75,11 @@
   justify-content: center;
 }
 
-/* Done: green with a white ✓ (and "(done)" for screen readers). */
+/* Done: still in the room's own colour (Habiba, 4 Nov 2026), with a navy ✓
+   (and "(done)" for screen readers), so colour is never the only signal. */
 .step.done .step-icon {
-  background: var(--color-btn-main-bg);
-  color: #FFFFFF;
+  background: var(--step-color);
+  color: var(--color-navy);
 }
 
 .step-check {
@@ -100,7 +115,7 @@
 }
 
 .connector--done {
-  background: var(--color-btn-main-bg);
+  background: var(--color-navy);
 }
 
 .connector--soon {
@@ -251,7 +266,6 @@
 
 /* The ℹ️ and backpack buttons sit together on the right of the header. */
 .header-actions {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 12px;
