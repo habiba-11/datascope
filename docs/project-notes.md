@@ -1,0 +1,160 @@
+# DataScope: project notes (the one file to read later)
+
+Written 5 Nov 2026, the day after the site went live. It replaces the old build
+log, round plans, change summaries and guides (they are still in Git history:
+see the end). Kept beside it: `architecture.md` (the approved design),
+`literature-key-findings.md` (the papers and their numbers) and `design/`
+(UI guide, badge spec and the design frames f0 to f13).
+
+## 1. What it is
+
+- **DataScope: The Evidence Lab**, a website for Grade 5 PYP children (age 10 to 11).
+  A child runs a full data investigation: Ask, Plan, Collect, Explore, Conclude.
+- **Live:** https://habiba-11.github.io/datascope/ (GitHub Pages, from `main`, folder `/`).
+- **Repo:** https://github.com/habiba-11/datascope (public on purpose).
+- Plain HTML, CSS and JavaScript modules. No build step. Chart.js, GSAP and the
+  two fonts are stored inside the app, so nothing loads from the internet.
+
+| Step | Room | File |
+|---|---|---|
+| Ask + Plan | Question Studio | `js/rooms/question-studio.js` |
+| Collect | Data Hub | `js/rooms/data-hub.js` |
+| Explore | Graph Lab, Number Lab, Chance Lab | `js/rooms/graph-lab.js`, `number-lab.js`, `chance-lab.js` |
+| Conclude | Evidence Board, then My journey | `js/rooms/evidence-board.js`, `my-journey.js` |
+
+- **4 scenarios** (`data/scenarios/`, words in `data/content/`): sleep hours (an
+  extreme value: mean vs median), shoe sizes (two modes), playground game (words:
+  only the mode), reading minutes Class A vs B (same mean, different spread).
+- The class data is **synthetic** ("a pretend class"), made by a seeded generator
+  that checks its own mean, median, mode and range. Scenario + seed are logged.
+- Teacher's view: `teacher/index.html` (email + password login).
+
+## 2. Working on it
+
+| Job | How |
+|---|---|
+| Run it locally | VS Code, **Live Server** on `index.html` (ES modules don't work from `file://`) |
+| Run the tests | `npm test` (Node's built-in runner, about 306 tests) |
+| Before every push | `npm run deploy-check`: runs the tests, checks every file the site asks for exists with the right spelling, no secret key, database switch |
+| Put a change online | `git add .` → `git commit -m "..."` → `git push`. The site updates in 1 to 2 minutes (Ctrl + Shift + R if the browser shows the old one) |
+| Screenshots for the thesis | `npm run shots` → `dev/screenshots/` |
+
+Code layout: `js/app.js` (shell: step bar, status line), `js/rooms/` (one per
+room), `js/helpers/` (stats, generator, charts, checker, log, findings... most
+are tested), `js/storage/` (save.js = the browser, sync.js = the database),
+`css/theme.css` (every colour, font and size in one place).
+
+**During the pilot:** only fix real bugs, and note the date and commit of every
+change, so the thesis data stays comparable. Never rename a field in the
+reasoning log; add new ones instead.
+
+## 3. The online database (Supabase)
+
+- Settings: `js/config.js` (`enabled: true`, the project URL and the
+  **publishable** key). Database script: `backend/schema.sql`.
+- **Offline-first:** every moment is saved in the browser at once and sent when
+  there is internet (retry, no duplicates). The status line shows ☁️ Saved online,
+  ⏳ Sending..., 📴 Offline or ⚠️ Not sent yet.
+- **Who may do what (enforced by the database's row-level security, not just the
+  website):** children's browsers may only ADD log entries; only a logged-in
+  account listed in the `teachers` table may READ or DELETE. Public sign-up is off.
+- **Never** put the secret key (`sb_secret_...`) or the database password in the
+  code or on GitHub. The publishable key is meant to be public.
+- **Free projects pause after about 7 days without use.** Open the Supabase
+  dashboard (or the teacher view) before each school session. If it is paused:
+  open the project, click **Restore project**, wait a few minutes.
+
+| Problem | Cause | Fix |
+|---|---|---|
+| ⚠️ Not sent, console (F12) says 401 / invalid key | wrong key | copy the publishable key again into `js/config.js` |
+| Console says 403, permission denied | the schema script did not run fully | run `backend/schema.sql` again in the SQL Editor |
+| Console says 400, check constraint | that entry broke a rule (e.g. a code with no digit) | use a code like `TEST-01`; the app skips it and goes on |
+| Teacher login: invalid credentials | wrong email or password | Supabase → Authentication → Users |
+| Teacher logged in but sees no children | the account is not in `teachers` | add its exact email to the `teachers` table |
+| Nothing saves, project paused | 7 days unused | Restore project |
+
+## 4. Before the pilot (do these)
+
+1. **Delete the test data.** Supabase → SQL Editor → run:
+   ```sql
+   delete from public.log_entries where code like 'TEST-%' or code like 'OWL-%';
+   delete from public.teacher_tags where code like 'TEST-%' or code like 'OWL-%';
+   ```
+2. Hand out the real anonymous codes (letters + a digit, e.g. `OWL-07`). Only the
+   teacher knows which child has which code; that list never goes into DataScope.
+3. On every child device, make sure the teacher **Preview** (all rooms open) is off.
+4. Try it once on a real Chromebook or tablet (touch, the tutorial's speed, sound).
+
+## 5. Privacy and ethics (approved 4 Nov 2026 by Prof and the GIU ethics check)
+
+- **Stored:** the anonymous code, and the reasoning-log moments (type, room, time,
+  what the child chose or typed, whether an answer was their own words or a hint,
+  the scenario and seed). Teacher tags on a code. The teacher's login (Supabase Auth).
+- **Not stored:** names, emails, photos, birthdays, school or class. The code rule
+  is checked by the app AND the database, so a plain name cannot be a code.
+- **Honest risk:** children type free text, so a child could type a name. Remind
+  them not to; the teacher can delete one child's data (teacher view → the child →
+  🗑️ Delete all of CODE's data, two taps).
+- After the study: delete the Supabase project (Project Settings → General).
+- Still to decide with Prof and the school: how long data is kept, the consent
+  wording, and the Supabase region to name in the thesis.
+
+## 6. Decisions that still hold
+
+- **Rewards are for good reasoning, never speed.** No timers (the tutorial's
+  autoplay is the one exception), no leaderboards, no comparing children. Stars
+  ignore where an answer came from, so a hint never costs a star.
+- **Hints give answers:** the first 💡 tap shows 3 true answers; tap (main) or
+  drag (bonus); the child can edit them. The 💡 button sits under the question.
+  Used in Graph Lab, the Chance Lab "why", Evidence Board and the change-my-guess
+  reason; the fix-its only let the last idea be tapped.
+- **Thesis data:** every answer logs `answerSource` (own / hint / hint-edited);
+  only own and hint-edited answers count as evidence of reasoning.
+- **Look ("Explorer's Toolkit"):** sky-blue background, navy outlines, a colour per
+  step (Ask coral, Plan yellow, Collect blue, Explore green, Conclude purple),
+  Baloo 2 + Nunito, Pip the owl. Text at least 18px (short navigation labels may be
+  14 to 16px). Colour is never the only signal. Tap targets at least 48px.
+  Reduced motion is respected everywhere.
+- **Sound is ON by default** (changed 5 Nov 2026), with a remembered on/off
+  toggle. Every sound belongs to a motion and is timed to it; every confetti and
+  every badge landing has its sound.
+- **Charts:** 18px bold navy, words on the labels ("Size 34", "5 kids"), WHAT
+  (blue) and HOW MANY (yellow) axis pills, number answers on a true number line,
+  two classes as dot plots stacked on the same line, games get dots on stems
+  (no line) with a "Careful!" note, the pie shows counts + a colour key.
+- **Games (words)** have only the mode: a "Words, not numbers!" box explains it, and
+  the mode alone is full proof on the Conclude card.
+- **No files:** children don't save files and the teacher doesn't import any;
+  everything goes online. Demo data is labelled DEMO and never exported.
+- **Teacher PIN** is stored only as a hash and only asked when the database is off.
+- **English only** for the pilot (Arabic right-to-left is future work);
+  small-group sampling is out of scope.
+
+## 7. Known open items
+
+- Not yet tested on a real Chromebook or tablet, or with a real screen reader.
+- The page fade between rooms sometimes logs "Transition was aborted" in the
+  console. Children don't see it.
+- Graph Lab bar colours repeat after 5 values (the labels carry the meaning).
+- The playground guess shows 5 games (more than 3 choices), because the choices
+  must match the data.
+- The question checker lets "Do you know what game you like today?" pass (any open
+  word cancels the yes/no warning).
+- Rubric coding of each claim waits for the real levels from Papers 7 and 13.
+- Thesis: declare the AI assistance used (GIU regulations, section 7).
+
+## 8. Getting an old file back
+
+Every deleted doc is still in Git history (deleted on 5 Nov 2026). In the VS
+Code terminal (PowerShell):
+
+```powershell
+git log --oneline -- docs/build-progress.md          # find the last commit that had it
+git show 26aef10:docs/build-progress.md > old-build-progress.md   # copy it out
+```
+
+The old files were: build-progress.md (the full build log, Parts 0 to 41),
+round-2-plan.md, round-3-plan.md, round-3-prompt.md, review-prompt.md,
+change-summary-*.md, ui-audit.md, backend-setup-guide.md (the step-by-step
+Supabase setup), deploy-guide.md, privacy-note.md, device-test-checklist.md and
+screenshots/ (UI before and after).

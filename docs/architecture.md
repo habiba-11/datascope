@@ -267,7 +267,7 @@ The stack comes from your project overview. It is deliberately small so a beginn
 
 ## 9. Round 2 changes after Prof feedback, Oct 2026
 
-*Added 28 Oct 2026. Sections 1 to 8 above are the design Prof approved; this section records what changed after her 8 comments (25 Oct 2026). The detailed plan is `docs/round-2-plan.md`; the day-by-day record is `docs/build-progress.md`.*
+*Added 28 Oct 2026. Sections 1 to 8 above are the design Prof approved; this section records what changed after her 8 comments (25 Oct 2026). The detailed plan and the day-by-day record were in `docs/round-2-plan.md` and `docs/build-progress.md` (in Git history since 5 Nov 2026; today's notes: `docs/project-notes.md`).*
 
 ### 9.1 What Prof asked for, and where it is now
 
@@ -303,8 +303,8 @@ Teacher's browser ── email + password login ──► reads log_entries, tea
 - **Row-level security:** a child's browser (publishable key) may only **add** log entries with a valid code; it can never read. Only accounts listed in the `teachers` table may read or delete. The secret key is never in the website.
 - **Status in the sidebar:** ☁️ Saved online · ⏳ Sending... · 📴 Offline · ⚠️ Not sent yet.
 - **Switch:** `js/config.js` (`enabled`). With it off, the app works exactly as before, with file export and import.
-- **Privacy:** anonymous codes only; a teacher can delete everything for one code. Draft privacy note: `docs/privacy-note.md`. Only made-up test codes are used until Prof and the GIU ethics check agree.
-- Free Supabase projects pause after about 7 days without use (see `docs/backend-setup-guide.md`, Step 10).
+- **Privacy:** anonymous codes only; a teacher can delete everything for one code. Privacy note: `docs/project-notes.md`, section 5. Only made-up test codes are used until Prof and the GIU ethics check agree.
+- Free Supabase projects pause after about 7 days without use (see `docs/project-notes.md`, section 3).
 
 ### 9.4 New in the reasoning log
 
@@ -316,7 +316,7 @@ Teacher's browser ── email + password login ──► reads log_entries, tea
 ### 9.5 Still open (decide with Prof)
 
 - Rubric coding of each claim (Part 20c): waits for the real level descriptions from Papers 7 and 13.
-- Data retention and consent wording in `docs/privacy-note.md`.
+- Data retention and consent wording: `docs/project-notes.md`, section 5 (still to decide).
 - Testing on a real Chromebook or tablet, and with children (after ethics approval).
 - Deployment to GitHub Pages (Part 24, locked).
 
@@ -324,7 +324,7 @@ Teacher's browser ── email + password login ──► reads log_entries, tea
 
 ## 10. Round 3 changes after Prof feedback, Nov 2026
 
-*Added 3 Nov 2026. Prof's 9 comments from the meeting on 2 Nov 2026. The plan is `docs/round-3-plan.md`; the part-by-part record is `docs/change-summary-round-3.md` and `docs/build-progress.md`.*
+*Added 3 Nov 2026. Prof's 9 comments from the meeting on 2 Nov 2026. The plan and the part-by-part record were in `docs/round-3-plan.md`, `docs/change-summary-round-3.md` and `docs/build-progress.md` (in Git history since 5 Nov 2026).*
 
 ### 10.1 What Prof asked for, and where it is now
 
@@ -360,10 +360,10 @@ Teacher's browser ── email + password login ──► reads log_entries, tea
 - **The database is on** for the live site: children's work goes online by itself, and the teacher logs in with the email and password in the database.
 - **No files:** the child's "Save my work" files and the teacher's file import are removed. The browser keeps each moment only until it is sent (offline-first, so a dropped connection loses nothing).
 - **The teacher PIN stays** as it is, stored only as a hash; it is only asked when the database is switched off.
-- Fonts and Chart.js are stored with the app; a deploy check and a path test guard every push (`docs/deploy-guide.md`).
+- Fonts and Chart.js are stored with the app; a deploy check and a path test guard every push (`docs/project-notes.md`, section 2).
 
 ### 10.5 Still open
 
-- Switching on GitHub Pages: Habiba, from github.com (`docs/deploy-guide.md`).
+- Switching on GitHub Pages: Habiba, from github.com (done 4 Nov 2026; live at https://habiba-11.github.io/datascope/).
 - Testing on a real tablet or Chromebook, and keyboard-only: Habiba.
 - Rubric coding of claims (Papers 7 and 13), data retention and consent wording: as in 9.5.

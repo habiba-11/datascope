@@ -4,7 +4,7 @@
 - I am **Habiba**, a bachelor student at GIU. I build and test this project. My supervisor (Prof) is **Dr. Nada Ahmed Hamed Sharaf**.
 - **DataScope: The Evidence Lab** is a real website (not a mockup) for **Grade 5 PYP students (age 10 to 11)**. Children run a full data investigation: Ask, Plan, Collect, Explore, Conclude.
 - The full approved design is in `docs/architecture.md`. The research behind every design rule is in `docs/literature-key-findings.md` (paper numbers match). Read both before planning anything. Never invent facts about the papers.
-- Progress between sessions is kept in `docs/build-progress.md`. Read it at the start of every session.
+- Notes between sessions are kept in `docs/project-notes.md` (how to run, test and deploy, the database rules, the decisions, the open items). Read it at the start of every session. (Since 5 Nov 2026 it replaces the old build log, plans and guides; they are in Git history, see its last section.)
 
 ## My setup
 - Windows 11, VS Code, Git, Node.js and a GitHub account are all installed. Give terminal commands for **PowerShell** in the VS Code terminal.
@@ -93,7 +93,7 @@ datascope/
   data/scenarios/       (one JSON recipe per scenario)
   assets/               (mascot, icons, sounds)
   tests/                (node --test files)
-  docs/                 (architecture, literature, build-progress)
+  docs/                 (architecture, literature, project-notes, design/)
 ```
 
 ## Build plan (adapt with me; one part at a time)
@@ -130,22 +130,22 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 - Be honest about difficulty. If a part is too big, split it.
 
 ## Session routine
-- **Start:** read `docs/build-progress.md`, then ask what part we're on, whether the last part worked, and how much time I have today.
-- **End:** update `docs/build-progress.md` with what's done, what's next, known bugs, and decisions made.
+- **Start:** read `docs/project-notes.md`, then ask what we're working on, whether the last change worked, and how much time I have today.
+- **End:** update `docs/project-notes.md` (keep it ONE short file): new decisions, open items and anything needed later.
 
 ## Round 2 (Prof feedback, 25 Oct 2026)
-- The Round 2 plan lives in `docs/round-2-plan.md` (Parts 13 to 24). Read it right after `docs/build-progress.md` at the start of every session. It replaces Parts 11 to 12 of the build plan above (deploy is now Part 24).
+- Round 2 is finished. Its plan (`docs/round-2-plan.md`) was removed on 5 Nov 2026 and is in Git history; the decisions that still hold are below and in `docs/project-notes.md`.
 - **Backend (decided 27 Oct 2026, replaces "optional bonus"):** Supabase (PostgreSQL + row-level security + teacher login), called with plain `fetch()` (no Supabase library). Settings in `js/config.js` (`enabled` switch). Offline-first: the log is saved in the browser at once and sent to the database when online (retry, no duplicates).
   - **No files for children or the teacher:** with the database on, children's work goes online by itself and the teacher sees it on the dashboard after an email + password login (replaces the PIN). **Changed 4 Nov 2026 (Habiba): no files at all.** The child's "Save my work" files and the teacher's file import were removed; everything goes online. The browser keeps each moment only until it is sent (offline-first).
   - **Security:** children (publishable key) may only ADD log entries; only a logged-in teacher (listed in the `teachers` table) may read or delete. Never put the secret key in the website.
-  - **Ethics:** Prof and the GIU ethics check agreed (Habiba, 4 Nov 2026), so real children's work may go online, under anonymous codes only. Delete the TEST- codes from the database before the pilot (`docs/backend-setup-guide.md`, Step 11).
-  - Beginner setup guide: `docs/backend-setup-guide.md`. Database script: `backend/schema.sql`.
+  - **Ethics:** Prof and the GIU ethics check agreed (Habiba, 4 Nov 2026), so real children's work may go online, under anonymous codes only. Delete the TEST- codes from the database before the pilot (`docs/project-notes.md`, section 4).
+  - Database notes: `docs/project-notes.md`, section 3 (the step-by-step setup guide is in Git history). Database script: `backend/schema.sql`.
 - **Rewards stay about good reasoning, never speed.** No timers, no leaderboards, no comparing children.
 - **Demo data is labelled DEMO** everywhere it appears and is **never exported**.
 - **Deploy is locked** until I write "Prof confirmed".
 
 ## Round 3 (Prof feedback, 2 Nov 2026)
-- The Round 3 plan lives in `docs/round-3-plan.md` (Parts 25 to 36). Read it after `docs/build-progress.md` at the start of every session. Deploy is now Part 36 and stays locked until I write "Prof confirmed".
+- Round 3 is finished and the site is live (https://habiba-11.github.io/datascope/, since 4 Nov 2026). Its plan was removed on 5 Nov 2026 and is in Git history; the decisions below still hold.
 - **Working mode:** one part at a time. Stop and wait after each part. I make the commits.
 - **Tutorial (changed 3 Nov 2026, Habiba: "like the f0 tutorial file"):** follows `docs/design/frames/f0-tutorial.html`. A 6-scene animated film with Pip, about 50 seconds, that plays by itself, with Pause, Back, Next, dots, arrow keys, Skip and Esc. Words always on screen in a caption; no sound. Reduced motion: no autoplay, no movement. It opens by itself on the first visit in a browser; "▶ See how it works (1 minute)" sits under the green Start button. It shows all rooms, but the step bar stays locked. Its autoplay is the one exception to "no timers": it never rewards or rushes the child.
 - **Charts:** 18px bold navy text, word labels ("Size 34", "5 kids") and an axis title ("Number of kids"). Line charts use a true number line. Games get no line, and the app explains why.

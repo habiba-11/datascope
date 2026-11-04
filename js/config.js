@@ -1,5 +1,5 @@
 // Settings for the online database (Part 22). How to fill these in, step by
-// step: docs/backend-setup-guide.md.
+// step: docs/project-notes.md, section 3.
 //
 // enabled:        true = children's work goes online by itself, and the teacher
 //                 logs in with email + password. (false: work stays in each
@@ -10,7 +10,7 @@
 //                 NEVER put the secret key ('sb_secret_...') or the database password here.
 //
 // ON since 4 Nov 2026: Prof and the GIU ethics check agreed that children's
-// work may go online (anonymous codes only, docs/privacy-note.md).
+// work may go online (anonymous codes only, docs/project-notes.md, section 5).
 export const BACKEND = {
   enabled: true,
   url: 'https://auzqfqphiycppiwjplkl.supabase.co',
