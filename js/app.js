@@ -64,7 +64,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
         <div class="speech-bubble" data-pip-text>${pipMessage}</div>
         <div class="pip-mascot">${pipSVG()}</div>
         ${codeBadge()}
-        <button class="btn sound-toggle" id="sound-toggle" type="button" aria-pressed="false">🔇 Sound: off</button>
+        <button class="btn sound-toggle" id="sound-toggle" type="button" aria-pressed="true">🔊 Sound: on</button>
         ${EXIT_BUTTON_HTML}
         ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}
       </aside>
@@ -162,7 +162,7 @@ function cardBodyHTML(accent, contentHTML) {
         ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}
       </div>
       <div class="status-tools">
-        <button class="btn btn-quiet sound-toggle" id="sound-toggle" type="button" aria-pressed="false">🔇 Sound: off</button>
+        <button class="btn btn-quiet sound-toggle" id="sound-toggle" type="button" aria-pressed="true">🔊 Sound: on</button>
         ${EXIT_BUTTON_HTML}
       </div>
     </footer>`;

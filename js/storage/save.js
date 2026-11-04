@@ -74,11 +74,12 @@ export function addLogEntry(entry) {
   writeItem(LOG_KEY, JSON.stringify(entries));
 }
 
-// Sound effects are OFF unless the child turns them on (CLAUDE.md).
+// Sound effects are ON unless the child turns them off (Habiba, 5 Nov 2026;
+// was off by default). Only a saved "off" switches them off.
 const SOUND_KEY = 'datascope:sound';
 
 export function getSoundOn() {
-  return readItem(SOUND_KEY) === 'on';
+  return readItem(SOUND_KEY) !== 'off';
 }
 
 export function setSoundOn(on) {

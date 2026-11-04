@@ -1,6 +1,6 @@
 // Shell layer: every sound effect in DataScope, in one place.
 // Sounds are made by the browser (Web Audio), so there are no sound files.
-// They only play if the child turned sound on (off by default, CLAUDE.md).
+// They play unless the child turned sound off (on by default, CLAUDE.md).
 import { getSoundOn } from './storage/save.js';
 
 let audio = null; // one shared AudioContext, made on the first sound

@@ -71,7 +71,7 @@ The app must be **colourful, playful, engaging for young kids, and very simple**
 - **Engagement:**
   - Small happy animations (answers popping into the table, the tally growing).
   - Confetti or stars when the child explains their reasoning (badges reward good reasoning, never speed).
-  - Sound effects off by default, with a toggle.
+  - Sound effects on by default, with a toggle to turn them off (changed 5 Nov 2026, Habiba; was off).
 - **Kids and classroom rules:**
   - Works on Chromebooks and tablets: touch-friendly, tap targets at least 48px, no hover-only features.
   - Colour is never the only signal (always add an icon or word).

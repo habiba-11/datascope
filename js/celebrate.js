@@ -2,7 +2,7 @@
 // (helpers/badges.js checkBadges), it is logged once as "badge-earned", the
 // "You found a badge!" pop-up shows it (js/badge-popup.js), and when it lands
 // in the backpack the counter goes up. A level-up gets Pip's words, confetti
-// and a fanfare. All sounds live in js/sounds.js (off by default).
+// and a fanfare. All sounds live in js/sounds.js (on by default, with a toggle).
 import { checkBadges, earnedPatches, findBadge, levelFor } from './helpers/badges.js';
 import { readLog, logEvent } from './helpers/log.js';
 import { getExplorerCode, getSoundOn, setSoundOn } from './storage/save.js';
@@ -99,7 +99,7 @@ function pipSays(message) {
   pipReacts('hop');
 }
 
-// The "Sound: off / on" button in the sidebar. Off by default.
+// The "Sound: on / off" button in the status line. On by default.
 function setupSoundToggle() {
   const button = document.getElementById('sound-toggle');
   function show() {
