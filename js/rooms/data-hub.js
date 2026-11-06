@@ -157,10 +157,10 @@ function classPanelsHTML(c, twoClasses) {
 // Reading minutes, step 3: both tallies side by side, on one scale.
 function comparePanelsHTML(classes) {
   return `
-    <div class="card-panels" id="compare-panels" hidden>
-      ${classes.map((c) => `
-        <section>
-          <h2 class="panel-title">${shortName(c.recipe)}</h2>
+    <div class="card-panels compare-panels" id="compare-panels" hidden>
+      ${classes.map((c, i) => `
+        <section class="compare-class compare-class--${i === 0 ? 'a' : 'b'}">
+          <h2 class="panel-title compare-name">${i === 0 ? '📗' : '📘'} ${shortName(c.recipe)}</h2>
           <div class="tally" id="${c.p}-tally-compare"></div>
           <p class="tally-unit">${c.recipe.chartAxis}</p>
         </section>`).join('')}

@@ -175,3 +175,28 @@
     white-space: nowrap;
   }
 }
+
+/* Compare (Round 4, Habiba 6 Nov 2026: "separate them clearly"): each class in
+   its own box with its own soft colour and a name badge, with a clear gap
+   between them, so the two tallies never read as one chart. */
+.compare-panels {
+  gap: var(--space-4);
+}
+
+.compare-class {
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+}
+
+.compare-class--a { background: var(--color-plan-light); }
+.compare-class--b { background: var(--color-collect-light); }
+
+.compare-name {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  padding: 4px 14px;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 999px;
+}
