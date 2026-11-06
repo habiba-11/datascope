@@ -3,10 +3,10 @@ import { normalizeCode, isValidCode } from './helpers/log.js';
 import { getExplorerCode, setExplorerCode, hasSeenTutorial, markTutorialSeen } from './storage/save.js';
 import { pipSVG } from './pip.js';
 import { LOGO_SVG } from './icons.js';
-import { openTutorial } from './tutorial.js';
+import { openStory } from './story.js';
 import { mountSky } from './ambient.js';
 
-// Part 43a: the living background (sun, clouds, birds, flowers), no room touch here.
+// Part 43a: the living background (clouds only on the start page).
 mountSky('welcome');
 
 // Pip greets the child on the start page (cheering, wings up).
@@ -22,15 +22,16 @@ const help = document.getElementById('code-help');
 const savedCode = getExplorerCode();
 if (savedCode) input.value = savedCode;
 
-// The tutorial (Prof's comment 1): by itself the first time in this browser,
-// then from the "See how it works" button under the green one.
-const tutorialWords = fetch('data/content/tutorial.json').then((r) => r.json());
+// The story (Part 44, Round 4; it replaced the film of Part 34): by itself the
+// first time in this browser, then from "Watch the story again" under the
+// green button. When it ends, the child types their code.
+const storyWords = fetch('data/content/story.json').then((r) => r.json());
 const seeHow = document.getElementById('see-how');
-seeHow.addEventListener('click', async () => openTutorial(await tutorialWords, seeHow, input));
+seeHow.addEventListener('click', async () => openStory(await storyWords, seeHow));
 
 if (!hasSeenTutorial()) {
   markTutorialSeen();
-  tutorialWords.then((words) => openTutorial(words, input, input));
+  storyWords.then((words) => openStory(words, input));
 }
 
 form.addEventListener('submit', (event) => {

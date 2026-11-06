@@ -49,6 +49,8 @@ export const SOUNDS = {
   // same note to the same note as tryAgain, so a new room sounded like a
   // mistake (Habiba, 6 Nov 2026). Now only "try again" goes down (tested).
   hoot: { wave: 'sine', volume: 0.1, notes: [[440, 0, 0.18], [587, 0.22, 0.3]] },
+  // Part 44: Sara's little chirp with her lines in the story (when read-aloud is off).
+  sara: { wave: 'triangle', volume: 0.07, notes: [[620, 0, 0.07], [780, 0.08, 0.07], [700, 0.16, 0.09]] },
   // Pip winks when a hint is used: a quick bright blink of sound.
   wink: { wave: 'triangle', volume: 0.06, notes: [[1319, 0, 0.06], [1568, 0.08, 0.09]] },
   // Part 43d: a very soft tap for every button press, and a whoosh when a new room opens.

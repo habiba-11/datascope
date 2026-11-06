@@ -132,8 +132,9 @@ export function markIntroSeen(phase) {
   writeItem(INTROS_KEY, JSON.stringify(all));
 }
 
-// The start-page tutorial (Part 34) opens by itself once per browser: the
-// child has not typed a code yet, so it cannot be remembered per child.
+// The start-page story (Part 44; before it, the film of Part 34) opens by itself
+// once per browser: the child has not typed a code yet, so it cannot be
+// remembered per child.
 const TUTORIAL_KEY = 'datascope:tutorialSeen';
 
 export function hasSeenTutorial() {

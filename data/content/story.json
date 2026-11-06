@@ -1,0 +1,89 @@
+{
+  "start": {
+    "title": "Meet Sara, a young investigator!",
+    "sub": "Watch her story. Then it is YOUR turn.",
+    "button": "Start the story",
+    "soundNote": "Sound is on. Use the buttons at the top to change it."
+  },
+  "speakers": { "pip": "Pip", "sara": "Sara", "kids": "The class" },
+  "buttons": {
+    "next": "Next",
+    "nextScene": "Next scene",
+    "end": "Start mission",
+    "back": "Back",
+    "skip": "Skip story",
+    "again": "Hear this again"
+  },
+  "scenes": [
+    {
+      "id": "ask",
+      "step": 0,
+      "chip": "Step 1: Ask",
+      "lines": [
+        { "who": "pip", "text": "Hi! I am Pip the owl. Watch Sara solve a mystery, then it will be YOUR turn!" },
+        { "who": "sara", "text": "Hmm... do my classmates sleep enough?" },
+        { "who": "pip", "text": "Every investigation starts with a QUESTION. That is the Ask step!" }
+      ]
+    },
+    {
+      "id": "plan",
+      "step": 1,
+      "chip": "Step 2: Plan",
+      "lines": [
+        { "who": "sara", "text": "I think they sleep about 8 hours." },
+        { "who": "pip", "text": "Good plan! Scientists GUESS first, then check with data." }
+      ]
+    },
+    {
+      "id": "collect",
+      "step": 2,
+      "chip": "Step 3: Collect",
+      "lines": [
+        { "who": "sara", "text": "Hi! How many hours did you sleep last night?" },
+        { "who": "kids", "text": "Nine! ... Eight!" },
+        { "who": "kids", "text": "Ten! ... Only three... yawn!" },
+        { "who": "pip", "text": "Every answer is a piece of DATA. Now Sara can look for a pattern." }
+      ]
+    },
+    {
+      "id": "graph",
+      "step": 3,
+      "chip": "Step 4: Explore, graph",
+      "lines": [
+        { "who": "sara", "text": "I will draw a graph, so I can SEE the answers." },
+        { "who": "sara", "text": "Most kids sleep 8 or 9 hours. But one kid sleeps only 3!" },
+        { "who": "pip", "text": "Graphs help us see the answer. The tallest bar is what most kids said." }
+      ]
+    },
+    {
+      "id": "numbers",
+      "step": 3,
+      "chip": "Step 4: Explore, numbers and chance",
+      "lines": [
+        { "who": "sara", "text": "Now numbers! The centre number is 9 and the mean is 7.8." },
+        { "who": "pip", "text": "Sara guessed 8 hours. That was very close!" },
+        { "who": "pip", "text": "Chance tells us how SURE we can be. Watch the die roll!" }
+      ]
+    },
+    {
+      "id": "conclude",
+      "step": 4,
+      "chip": "Step 5: Conclude",
+      "lines": [
+        { "who": "sara", "text": "I think most kids sleep 8 to 9 hours. My proof: the centre number is 9." },
+        { "who": "sara", "text": "I am quite sure. I say: LIKELY!" },
+        { "who": "kids", "text": "Hooray! Great thinking, Sara!" }
+      ]
+    },
+    {
+      "id": "mission",
+      "step": 5,
+      "chip": "Your mission",
+      "lines": [
+        { "who": "pip", "text": "Now it is YOUR turn! You are the investigator." },
+        { "who": "pip", "text": "You will study a pretend class, just like Sara. Try it again and again!" },
+        { "who": "pip", "text": "At the end you make your own Evidence Card. Ready for your mission?" }
+      ]
+    }
+  ]
+}
