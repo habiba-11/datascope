@@ -185,6 +185,10 @@ Parts 42 to 51. Claude commits each part; nothing is pushed until Habiba says "p
 | 43c | 6 Nov | `fe6f142` | **Big Pip, alive and talking:** stands in the left margin at 1240px+ (180px wide at 1366, 148px at 1280) with a speech bubble; idle moves every 6 to 10 s; a line (from `data/content/pip-lines.json`, 6 to 8 per event, editable) with a move for: room opens (wave + hoot), right answer (jump), wrong answer (kind tilt), hint (wink + chirp), badge, phase done (dance). Below 1240px the card Pip grows to 80px and talks in its line. No new log events. |
 | 43d | 6 Nov | `ffee561` | **Sound fix (bug, Habiba):** opening a room sounded like "try again": Pip's hoot fell G to E like the try-again sound. The hoot now rises; a test keeps every happy sound from going down or starting like try-again. No bird sounds (Pip's chirp is now "wink"). **Music:** the story's C-Am-F-G loop (104 bpm, 8 bars), on and quiet, own 🎵 switch, stops when the tab is hidden. A soft tap for every button, a whoosh when a room opens. |
 | 43e | 6 Nov | `573b1bc` | **Idle help:** 10 s without a tap, key, typing or scroll: Pip wiggles and offers help once per screen, with "💡 Yes, help me!" (opens the hint). New log events `idle-help-shown` (screen, hintButton) and `idle-help-taken` (screen). |
+| 42d undone | 6 Nov | `f9c0d25` | "For your mission" removed again (Habiba did not like it). |
+| fix | 6 Nov | `c9019f9` | Data Hub compare: Class A and Class B in their own boxes (yellow / blue, 📗 / 📘 badges, a clear gap). |
+| fix | 6 Nov | `7713eda` | Number Lab "Which spreads out more?": a reminder of each class (lowest, highest, mean, range worked out, a ruler on one shared scale). |
+| fix | 6 Nov | `2ac19ea` | Fireworks behind the cards, where they can be seen, with a real firework sound (whistle, bang, crackles); My journey loops them every 1.3 s. |
 
 **Decisions (Habiba, 6 Nov 2026):** no stickers on the Evidence Card, no mission
 bar, no audience sentence ("tell the principal") anywhere. Pip stands beside the
