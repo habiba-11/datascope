@@ -27,6 +27,8 @@ export const EVENT_TYPES = [
   'build-varied', // Number Lab: after 8, 8, 8, 8, 8 the child also made different numbers with the same mean
   // Round 4 (pilot feedback, 5 Nov 2026): new events only, no field renamed.
   'mission-seen', // Part 42a: Pip's Mission card was shown after picking a scenario (scenarioId)
+  'idle-help-shown', // Part 43e: no tap for 10 s, Pip offered help (screen, hintButton: a 💡 button was there)
+  'idle-help-taken', // Part 43e: the child tapped Pip's "Yes, help me!" (screen)
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];

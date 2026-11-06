@@ -2,8 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  PIP_EVENTS, IDLE_MOVES, pickLine, nextIdleMove, idleGap,
+  PIP_EVENTS, IDLE_MOVES, pickLine, nextIdleMove, idleGap, IDLE_HELP_SECONDS, screenKey, shouldOfferHelp,
 } from '../js/helpers/pip-lines.js';
+import { EVENT_TYPES } from '../js/helpers/log.js';
 import { longestSentence, MAX_SENTENCE_WORDS } from '../js/helpers/readability.js';
 
 const bank = JSON.parse(readFileSync(new URL('../data/content/pip-lines.json', import.meta.url), 'utf8'));
@@ -45,4 +46,16 @@ test('idle moves never repeat, and wait 6 to 10 seconds', () => {
   }
   assert.equal(idleGap(() => 0), 6000);
   assert.equal(idleGap(() => 1), 10000);
+});
+
+test('idle help: after 10 seconds, once per screen, and logged with known events', () => {
+  assert.equal(IDLE_HELP_SECONDS, 10);
+  const offered = new Set();
+  const screen = screenKey('/rooms/number-lab.html', ' 2 Build it ');
+  assert.equal(screen, '/rooms/number-lab.html#2 Build it');
+  assert.equal(shouldOfferHelp(screen, offered), true);
+  offered.add(screen);
+  assert.equal(shouldOfferHelp(screen, offered), false);
+  assert.equal(shouldOfferHelp(screenKey('/rooms/number-lab.html', '3 Real life'), offered), true);
+  assert.ok(EVENT_TYPES.includes('idle-help-shown') && EVENT_TYPES.includes('idle-help-taken'));
 });

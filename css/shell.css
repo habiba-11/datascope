@@ -537,3 +537,22 @@
 @keyframes pip-wing-up-left { 0%, 100% { transform: rotate(0); } 30%, 70% { transform: rotate(55deg); } }
 @keyframes pip-wing-up-right { 0%, 100% { transform: rotate(0); } 30%, 70% { transform: rotate(-55deg); } }
 @keyframes pip-wink { 0%, 100% { transform: scaleY(0); } 30%, 60% { transform: scaleY(1); } }
+
+/* Part 43e: Pip's "Yes, help me!" button in the bubble (idle help). */
+.pip-stand-bubble .pip-help-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 10px;
+  font-size: 16px;
+  min-height: 48px;
+  pointer-events: auto; /* the stand lets taps through; this button takes them */
+}
+
+.pip-move-wiggle { animation: pip-wiggle 0.9s ease-in-out; }
+
+@keyframes pip-wiggle {
+  0%, 100% { transform: rotate(0); }
+  15%, 45%, 75% { transform: rotate(-6deg); }
+  30%, 60%, 90% { transform: rotate(6deg); }
+}

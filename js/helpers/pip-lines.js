@@ -14,6 +14,8 @@ export const PIP_EVENTS = {
   badge: { move: 'cheer', sound: null },
   phaseDone: { move: 'dance', sound: null },
   hint: { move: 'wink', sound: 'wink' },
+  // Part 43e: the child has not tapped for a while; Pip wiggles and offers help.
+  idle: { move: 'wiggle', sound: 'hoot' },
 };
 
 // Pip's idle life: one small move every few seconds, never the same twice in a row.
@@ -44,4 +46,18 @@ export function nextIdleMove(last = '', random = Math.random) {
 export function idleGap(random = Math.random) {
   const { min, max } = IDLE_GAP_SECONDS;
   return Math.round((min + random() * (max - min)) * 1000);
+}
+
+// Part 43e: idle help (Habiba: after 10 seconds, at most once per screen).
+// Never a countdown and never a penalty: Pip only offers help.
+export const IDLE_HELP_SECONDS = 10;
+
+// One name per screen: the page and the step the child is on.
+export function screenKey(page, step = "") {
+  return `${page}#${step.trim()}`;
+}
+
+// Pip offers help on a screen only once (offered: a Set of screen keys).
+export function shouldOfferHelp(screen, offered) {
+  return !offered.has(screen);
 }

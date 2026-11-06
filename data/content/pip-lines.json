@@ -51,5 +51,13 @@
     "Hints never cost a star!",
     "Hints are a smart tool!",
     "Use the hint, then think!"
+  ],
+  "idle": [
+    "Need help? I can give you ideas!",
+    "Stuck? That is okay. Want a hint?",
+    "Take your time. I am right here!",
+    "Read the question again with me.",
+    "Thinking hard? Tap 💡 for ideas!",
+    "Want a little help? Just ask!"
   ]
 }
