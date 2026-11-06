@@ -10,15 +10,22 @@ import { appendAnswer, answerSource } from './suggestions.js';
 // then `answer` shows as a chip the child can tap to put it in `box` (the last
 // fix-it hint, Habiba, 4 Nov 2026). It replaces the box's text (the flawed
 // question) and is logged as hint-picked, so the thesis data knows.
-function answerChip(key, room, { answer, box }) {
+// A hint can also be { text, answer, onPick, id } (Number Lab's Build it, Habiba
+// 6 Nov 2026): then tapping the chip runs onPick (e.g. fills 5 boxes) and is
+// logged as hint-picked with that id.
+function answerChip(key, room, { answer, box, onPick, id = 'fix' }) {
   const chip = document.createElement('button');
   chip.type = 'button';
   chip.className = 'suggestion-chip hint-answer';
   chip.textContent = `👆 ${answer}`;
   chip.addEventListener('click', () => {
-    box.value = answer;
     chip.disabled = true;
-    logEvent(room, 'hint-picked', { prompt: key, suggestionId: 'fix', how: 'tap' });
+    logEvent(room, 'hint-picked', { prompt: key, suggestionId: id, how: 'tap' });
+    if (onPick) {
+      onPick();
+      return;
+    }
+    box.value = answer;
     box.dispatchEvent(new Event('input', { bubbles: true })); // the checker runs again
     box.focus();
   });

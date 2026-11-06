@@ -7,7 +7,7 @@ import {
   rangeSummary, rulerSpan,
 } from '../helpers/number-tasks.js';
 import { logEvent, trackMeaningTask } from '../helpers/log.js';
-import { createAnswerHint } from '../helpers/prompts.js';
+import { createAnswerHint, createHint } from '../helpers/prompts.js';
 import { answerFacts, fillSuggestions } from '../helpers/suggestions.js';
 import { getSelectedScenarioId } from '../storage/save.js';
 import { cheer, encourage, stagger, countUp } from '../motion.js';
@@ -47,6 +47,7 @@ let revealNumbers = () => {};
 let checkBuild = () => {};
 let saveRevision = () => {};
 let reasonHint = null; // suggested answers for "I changed my guess because..."
+let buildHint = null; // Build it: "write the mean 5 times", then fill it in (Habiba, 6 Nov 2026)
 
 // Number Lab follows the scenario the child picked (Part 17b). The task list
 // depends on the kind of data: see TASKS_BY_KIND in helpers/number-tasks.js.
@@ -111,8 +112,11 @@ function showTask(n) {
   document.getElementById('stepper').innerHTML = miniStepperHTML(tasks.map((t) => STEP_LABELS[t]), n - 1);
   document.querySelector('.task-question').textContent = TASK_TITLES[task];
   pipSay(TASK_PIP[task]);
-  // The Hint button is only there while the child is giving a reason.
-  bar.setHint(task === 'predict' && stage.predict === 'changing' && !taskComplete[n] ? reasonHint.button : null);
+  // The Hint button is there while the child is giving a reason, and in Build it.
+  let hint = null;
+  if (task === 'predict' && stage.predict === 'changing' && !taskComplete[n]) hint = reasonHint.button;
+  if (task === 'build' && !taskComplete[n]) hint = buildHint && buildHint.button;
+  bar.setHint(hint);
   bar.setBack(n === 1
     ? { label: 'Graph Lab', href: 'graph-lab.html' }
     : { label: 'Back', onClick: () => showTask(n - 1) });
@@ -312,6 +316,7 @@ const TASK_HTML = {
           <div class="build-row">
             ${[1, 2, 3, 4, 5].map((i) => `<input type="number" class="build-input" aria-label="Number ${i}">`).join('')}
           </div>
+          <div class="hint-list-slot" id="build-hint-slot"></div>
         </div>
         ${buildExampleHTML(buildExample(buildTarget(values)), buildTarget(values))}
       </div>
@@ -455,6 +460,27 @@ const TASK_SETUP = {
     const feedback = document.getElementById('build-feedback');
     const tracker = trackMeaningTask('number-lab', 'build-mean', { scenarioId: recipe.id, target });
     let allSameSolved = false;
+    let filledByHint = false; // for the thesis: the hint wrote the numbers (logged as usedHint)
+
+    // The hint (Habiba, 6 Nov 2026): first an idea, then a chip that fills all
+    // 5 boxes with the mean. The child still taps "Check my numbers".
+    buildHint = createHint('build-mean', 'number-lab', [
+      `Try writing the mean, ${target}, in all 5 boxes!`,
+      {
+        text: 'Here it is. Tap it to fill the boxes:',
+        answer: `Fill it in for me: ${Array(5).fill(target).join(', ')}`,
+        id: 'fill-mean',
+        onPick: () => {
+          inputs.forEach((box) => { box.value = target; });
+          filledByHint = true;
+          inputs[0].focus();
+        },
+      },
+    ]);
+    document.getElementById('build-hint-slot').replaceChildren(buildHint.list);
+    if (tasks[currentTask - 1] === 'build') bar.setHint(buildHint.button);
+    // Typing again means the child's own numbers again.
+    inputs.forEach((input) => input.addEventListener('input', () => { filledByHint = false; }));
 
     // After all-the-same numbers, the child may take up Pip's challenge. No
     // button needed: Pip notices as soon as the numbers differ and still fit.
@@ -481,8 +507,9 @@ const TASK_SETUP = {
         show(feedback, allSameSolved
           ? `✅ Yes! The mean is exactly ${target}. 🤔 Can you make them different? Try one down, one up.`
           : `✅ Yes! The mean of your numbers is exactly ${target}. 🎉`);
-        tracker.solved({ allSame: allSameSolved });
+        tracker.solved({ allSame: allSameSolved, usedHint: filledByHint });
         cheer(feedback);
+        bar.setHint(null);
         markComplete(n);
       } else {
         // The hint shows the idea behind the mean: the total, shared fairly.
