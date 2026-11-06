@@ -3,7 +3,8 @@
 // the task card shows the same words, and more, at any time (Prof's comment 6).
 // Texts: data/content/phases.json.
 // Part 42c (Round 4): each phase also says WHY the room exists ("🎯 Why?"), in
-// the pop-up, the tab's panel and next to the tab; games get their own words.
+// the pop-up and next to the tab; games get their own words. Not in the tab's
+// panel: the line is right above it (Habiba, 6 Nov 2026: "repetitive").
 import { openModal } from './modal.js';
 import { logEvent } from './helpers/log.js';
 import { hasSeenIntro, markIntroSeen, getSelectedScenarioId } from './storage/save.js';
@@ -99,7 +100,6 @@ async function fillAboutPanel(panel, phase) {
   if (!intro) return;
   panel.replaceChildren(
     el('p', `${intro.icon} ${intro.title}`, 'about-title'),
-    whyParagraph(intro.why),
     ...introNodes(phase, intro),
     el('p', `✅ You are done when: ${intro.doneWhen}`, 'about-done'),
   );
