@@ -177,7 +177,9 @@ Parts 42 to 51. Claude commits each part; nothing is pushed until Habiba says "p
 | 42b | 6 Nov | `17e4ed7`, reverted in `4b8fb4f` | A mission bar under the step bar. **Removed: Habiba did not like it.** |
 | 42c | 6 Nov | `4fd9e05` | **"🎯 Why?"** line per room (phases.json `why`), next to the About tab (no extra height) and first in the intro pop-up; bullets cut to 2; games get their own Number Lab words. |
 | fix | 6 Nov | `0747fc8` | Bug (Habiba): the Question Fixer badge showed after the Plan intro. The intro now waits one turn, so: Ask card, badge, Plan intro. |
+| 42c+ | 6 Nov | `39b4021` | The "Why?" box removed from the About panel (Habiba: "repetitive"); the line next to the tab stays. |
 | 42d | 6 Nov | `512f46d` | **"🎯 For your mission:"** under "I learned" on every end-of-room card, from the child's own work (e.g. "Your graph shows the most common answer: 9 hours."; games: "The mode is Tag"). |
+| 43a | 6 Nov | `0b4d866` | **Living background** on every child page: clouds, sun, birds (flap, then glide), swaying hills and flowers, a butterfly, one touch per room (stars in Chance Lab, bars in Graph Lab, shapes, never digits, in Number Lab). Behind the card; taps go through. Start page birds stay above the title. Reduced motion: a still picture. Below 1100px the room touches are hidden (no side space). |
 
 **Decisions (Habiba, 6 Nov 2026):** no stickers on the Evidence Card, no mission
 bar, no audience sentence ("tell the principal") anywhere. Pip stands beside the
@@ -185,6 +187,8 @@ card at 1366 and grows inside it below that; idle help after 10 seconds, at most
 once per screen; background music on but quiet, with its own switch; read-aloud
 only in the story (Part 44) for now. Children use **laptops and PC screens only**
 (1366x768 is the size that matters most; 768 is still checked).
+
+**Speed (43a, Chrome with the CPU slowed 4x, 1366x768, 6s):** Graph Lab and Chance Lab run at 60 frames/s with or without the background in 2 of 3 runs; every version (even with no background) had one slower first run (51 to 55). Not measured on a real school laptop.
 
 **Measured (Chrome, 6 Nov 2026):** the main green button is already below the
 screen at 1366x768 in Data Hub, Graph Lab and Evidence Board (Part 49 fixes this).
