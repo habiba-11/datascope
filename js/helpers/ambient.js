@@ -3,13 +3,15 @@
 // js/ambient.js draws it and css/ambient.css moves it. No DOM here, so the
 // rules below are tested (tests/ambient.test.js).
 //
+// Habiba's choice (6 Nov 2026): only clouds drifting, plus each room's own
+// shapes in the side margins (no birds, sun, flowers or butterfly).
+//
 // Rules (Habiba's Round 4 limits):
 // - Only transform and opacity move, behind the card (never over a question or a button).
 // - Nothing that blinks (changes opacity) is faster than one cycle per second
 //   (the limit is "no flashing faster than 3 times a second").
-// - The room's own touch stays in the side margins (left of 12vw or right of 88vw).
+// - The room's shapes stay in the side margins (left of 12vw or right of 88vw).
 // - At most MAX_MOVERS moving things, so it stays fast on a school laptop.
-// The drawings follow the approved story design (docs/design/frames/datascope-story-ui.html).
 
 export const MAX_MOVERS = 14;
 export const MIN_BLINK_SECONDS = 1;
@@ -23,72 +25,63 @@ const CLOUDS = [
   { top: 64, scale: 0.5, seconds: 120, delay: -90, restX: 80 },
 ];
 
-// Two real birds (body, head, beak, tail, two wings that flap in bursts, then
-// glide) and a far-away flock. They cross now and then, in a gentle wave.
-const BIRDS = [
-  { kind: 'flock', top: 40, scale: 0.55, seconds: 60, delay: -12, restX: 60 },
-  { kind: 'bird', colour: 'purple', top: 220, scale: 0.72, seconds: 44, delay: -30, restX: 4 },
-  { kind: 'bird', colour: 'coral', top: 340, scale: 0.9, seconds: 32, delay: -6, restX: 90 },
-];
-
-// The start page has no card to hide behind, so its birds stay up in the sky,
-// above the big title (Habiba's rule: nothing moves over the words or buttons).
-export const WELCOME_BIRDS = [
-  { top: 50, scale: 0.5 },
-  { top: 4, scale: 0.6 },
-  { top: 40, scale: 0.7 },
-];
-
-// Flowers sway on the hills; a butterfly flutters near them (left side).
-const FLOWERS = [
-  { x: 4, colour: 'ask', seconds: 3.2 },
-  { x: 95, colour: 'plan', seconds: 3.4 },
-];
-
-// Each room's own small touch, in its colour (only shapes: the games scenario
-// visits Number Lab too, so it never shows digits).
-export const ROOM_TOUCH = {
-  ask: { shape: 'question', colour: 'ask', motion: 'float' },
-  plan: { shape: 'pin', colour: 'plan', motion: 'float' },
-  collect: { shape: 'speech', colour: 'collect', motion: 'float' },
-  graph: { shape: 'bars', colour: 'explore', motion: 'float' },
-  number: { shape: 'shapes', colour: 'explore', motion: 'spin' },
-  chance: { shape: 'star', colour: 'plan', motion: 'twinkle' },
-  conclude: { shape: 'star', colour: 'conclude', motion: 'twinkle' },
+// Each room's shapes: small pictures of what the room is about, in its colour.
+// `motion`: 'float' (bobs and tilts), 'spin' (turns slowly) or 'twinkle' (stars).
+// Number Lab shows plain shapes, never digits: the games scenario visits it too.
+export const ROOM_SHAPES = {
+  ask: { colour: 'ask', shapes: ['question', 'speech', 'exclaim', 'magnifier'] },
+  plan: { colour: 'plan', shapes: ['bulb', 'pin', 'question', 'star'] },
+  collect: { colour: 'collect', shapes: ['speech', 'clipboard', 'tally', 'person'] },
+  graph: { colour: 'explore', shapes: ['bars', 'pie', 'line', 'dots'] },
+  number: { colour: 'explore', shapes: ['circle', 'triangle', 'square', 'diamond'] },
+  chance: { colour: 'plan', shapes: ['star', 'die', 'coin', 'spinner'] },
+  conclude: { colour: 'conclude', shapes: ['star', 'flag', 'check', 'trophy'] },
 };
 
-// Where the 4 touch items sit: in the side margins, at different heights.
-const TOUCH_SPOTS = [
-  { x: 4, y: 42, seconds: 4.2, delay: 0 },
-  { x: 9, y: 68, seconds: 5, delay: -1.5 },
-  { x: 90, y: 34, seconds: 4.6, delay: -0.8 },
-  { x: 95, y: 62, seconds: 3.8, delay: -2.2 },
+// Shapes that turn slowly as a whole (they look the same from every side),
+// and shapes that twinkle. All the others float.
+const SPINNERS = new Set(['circle', 'triangle', 'square', 'diamond', 'spinner', 'coin', 'die']);
+const TWINKLERS = new Set(['star']);
+
+// Where the 10 shapes sit: 5 down each side margin, at different heights and
+// sizes (px), each with its own speed, so they never move in step.
+const SPOTS = [
+  { x: 4, y: 24, size: 30, seconds: 4.2, delay: 0 },
+  { x: 10, y: 38, size: 44, seconds: 5.6, delay: -1.2 },
+  { x: 3, y: 54, size: 36, seconds: 4.8, delay: -2.6 },
+  { x: 9, y: 68, size: 26, seconds: 3.8, delay: -0.6 },
+  { x: 5, y: 76, size: 40, seconds: 6.2, delay: -3.1 },
+  { x: 92, y: 22, size: 38, seconds: 5.2, delay: -0.9 },
+  { x: 96, y: 36, size: 28, seconds: 4.0, delay: -2.0 },
+  { x: 90, y: 50, size: 46, seconds: 6.0, delay: -3.4 },
+  { x: 96, y: 66, size: 32, seconds: 4.6, delay: -1.6 },
+  { x: 91, y: 76, size: 30, seconds: 5.0, delay: -2.8 },
 ];
 
-// The whole plan for one page. `room`: a key of ROOM_TOUCH, or anything else
-// (e.g. 'welcome') for no room touch.
+function motionFor(shape) {
+  if (TWINKLERS.has(shape)) return 'twinkle';
+  return SPINNERS.has(shape) ? 'spin' : 'float';
+}
+
+// The whole plan for one page. `room`: a key of ROOM_SHAPES, or anything else
+// (e.g. 'welcome') for clouds only.
 export function skyPlan(room) {
-  const touch = ROOM_TOUCH[room];
-  return {
-    sun: { glowSeconds: 3.4, raysSeconds: 40 },
-    clouds: CLOUDS,
-    birds: room === 'welcome' ? BIRDS.map((b, i) => ({ ...b, ...WELCOME_BIRDS[i] })) : BIRDS,
-    flowers: FLOWERS,
-    butterfly: { x: 2, bottom: 120, seconds: 24 },
-    touches: touch ? TOUCH_SPOTS.map((spot) => ({ ...spot, ...touch })) : [],
-  };
+  const set = ROOM_SHAPES[room];
+  const touches = set
+    ? SPOTS.map((spot, i) => {
+      const shape = set.shapes[i % set.shapes.length];
+      return { ...spot, shape, colour: set.colour, motion: motionFor(shape), turn: i % 2 ? 1 : -1 };
+    })
+    : [];
+  return { clouds: CLOUDS, touches };
 }
 
-// How many things move at once (each cloud, bird, flower, touch, the sun and
-// the butterfly). Wings and rays move with their own thing, so they don't count.
+// How many things move at once (each cloud and each shape).
 export function moverCount(plan) {
-  return 2 + plan.clouds.length + plan.birds.length + plan.flowers.length + plan.touches.length;
+  return plan.clouds.length + plan.touches.length;
 }
 
-// The loops that change opacity (blink or glow), with their length in seconds.
+// The loops that change opacity (the twinkling stars), with their length in seconds.
 export function blinkLoops(plan) {
-  return [
-    plan.sun.glowSeconds,
-    ...plan.touches.filter((t) => t.motion === 'twinkle').map((t) => t.seconds),
-  ];
+  return plan.touches.filter((t) => t.motion === 'twinkle').map((t) => t.seconds);
 }

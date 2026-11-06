@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  skyPlan, moverCount, blinkLoops, ROOM_TOUCH, MAX_MOVERS, MIN_BLINK_SECONDS,
+  skyPlan, moverCount, blinkLoops, ROOM_SHAPES, MAX_MOVERS, MIN_BLINK_SECONDS,
 } from '../js/helpers/ambient.js';
 
-const ROOMS = [...Object.keys(ROOM_TOUCH), 'welcome'];
+const ROOMS = [...Object.keys(ROOM_SHAPES), 'welcome'];
 
 test(`at most ${MAX_MOVERS} things move on any page (fast on a school laptop)`, () => {
   for (const room of ROOMS) assert.ok(moverCount(skyPlan(room)) <= MAX_MOVERS, room);
@@ -16,29 +16,37 @@ test('nothing blinks faster than once a second (limit: 3 flashes a second)', () 
   }
 });
 
-test("a room's touch stays in the side margins, away from the card", () => {
+test("a room's shapes stay in the side margins, away from the card", () => {
   for (const room of ROOMS) {
     for (const t of skyPlan(room).touches) assert.ok(t.x < 12 || t.x > 88, `${room}: x ${t.x}vw`);
   }
 });
 
-test('each room gets its own touch in its colour; the start page gets none', () => {
-  assert.equal(skyPlan('chance').touches[0].shape, 'star');
-  assert.equal(skyPlan('graph').touches[0].shape, 'bars');
-  assert.equal(skyPlan('welcome').touches.length, 0);
+test('every room shows all its different shapes, in its colour, in different sizes', () => {
+  for (const [room, set] of Object.entries(ROOM_SHAPES)) {
+    const touches = skyPlan(room).touches;
+    assert.deepEqual(new Set(touches.map((t) => t.shape)), new Set(set.shapes), room);
+    assert.ok(touches.every((t) => t.colour === set.colour), room);
+    assert.ok(new Set(touches.map((t) => t.size)).size >= 3, `${room}: sizes vary`);
+  }
 });
 
-test('Number Lab shows shapes, never digits (the games scenario has no numbers)', () => {
-  assert.doesNotMatch(ROOM_TOUCH.number.shape, /digit|number/);
+test('only clouds on the start page (Habiba: no birds, sun or flowers)', () => {
+  const plan = skyPlan('welcome');
+  assert.equal(plan.touches.length, 0);
+  assert.deepEqual(Object.keys(plan), ['clouds', 'touches']);
 });
 
-test('clouds drift slowly, and every mover has a still place for reduced motion', () => {
-  const plan = skyPlan('ask');
-  for (const c of plan.clouds) assert.ok(c.seconds >= 30, `cloud crosses in ${c.seconds}s`);
-  for (const m of [...plan.clouds, ...plan.birds]) assert.equal(typeof m.restX, 'number');
+test('Number Lab shows plain shapes, never digits (the games scenario has no numbers)', () => {
+  for (const shape of ROOM_SHAPES.number.shapes) assert.doesNotMatch(shape, /digit|number|\d/);
 });
 
-test('on the start page (no card) the birds stay above the title, in the top 100px', () => {
-  // A bird is 60px tall at scale 1 and waves 14px up and down.
-  for (const b of skyPlan('welcome').birds) assert.ok(b.top + 60 * b.scale + 14 <= 100, `top ${b.top}`);
+test('only stars twinkle; clouds drift slowly and rest in view with reduced motion', () => {
+  for (const room of ROOMS) {
+    for (const t of skyPlan(room).touches) assert.equal(t.motion === 'twinkle', t.shape === 'star', `${room}: ${t.shape}`);
+  }
+  for (const c of skyPlan('ask').clouds) {
+    assert.ok(c.seconds >= 30, `cloud crosses in ${c.seconds}s`);
+    assert.equal(typeof c.restX, 'number');
+  }
 });
