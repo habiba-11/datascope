@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  numberLabKind, TASKS_BY_KIND, fillTemplate, buildTarget, buildExample, isAllSame, miaSays, choicesFor, revealMessage, classStats,
+  numberLabKind, TASKS_BY_KIND, fillTemplate, buildTarget, buildExample, isAllSame, miaSays, choicesFor, revealMessage, classStats, rangeSummary, rulerSpan,
 } from '../js/helpers/number-tasks.js';
 import { mean, median, mode } from '../js/helpers/stats.js';
 import { longestSentence } from '../js/helpers/readability.js';
@@ -135,4 +135,17 @@ test('reveal message: same mean, different range (reading)', () => {
 test('reveal message: category guess right and wrong', () => {
   assert.match(revealMessage('category', 'Football', { mode: ['Football'] }), /Yes! Most kids picked Football/);
   assert.match(revealMessage('category', 'Tag', { mode: ['Football'] }), /not Tag/);
+});
+
+test('rangeSummary: the reminder for "Which spreads out more?" comes from the real answers', () => {
+  const a = rangeSummary([18, 19, 20, 21, 22, 20]);
+  assert.deepEqual(a, { low: 18, high: 22, mean: 20, range: 4 });
+  const b = rangeSummary([5, 35, 20, 20]);
+  assert.equal(b.range, 30);
+  assert.equal(b.range, b.high - b.low); // the card shows "35 − 5 = 30"
+});
+
+test('rulerSpan: both classes on one shared ruler from 0 to the biggest answer', () => {
+  assert.deepEqual(rulerSpan({ low: 5, high: 35 }, 40), { left: 12.5, width: 75 });
+  assert.deepEqual(rulerSpan({ low: 18, high: 22 }, 40), { left: 45, width: 10 });
 });

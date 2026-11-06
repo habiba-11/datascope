@@ -113,3 +113,18 @@ export function classStats(kind, values, valuesB = null) {
   }
   return stats;
 }
+
+// Round 4 (Habiba, 6 Nov 2026): "Which spreads out more?" shows a reminder of
+// each class's data next to the question, because a child may have forgotten
+// them. Lowest, highest, mean and range, from the real answers (stats.js).
+export function rangeSummary(values) {
+  const low = Math.min(...values);
+  const high = Math.max(...values);
+  return { low, high, mean: formatMean(mean(values)), range: range(values) };
+}
+
+// Where a class's answers sit on a shared ruler from 0 to `scaleMax`, in
+// percent (for the little range bar): { left, width }.
+export function rulerSpan({ low, high }, scaleMax) {
+  return { left: (low / scaleMax) * 100, width: ((high - low) / scaleMax) * 100 };
+}

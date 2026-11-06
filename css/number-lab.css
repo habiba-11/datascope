@@ -304,3 +304,64 @@
   font-weight: 700;
   font-size: 18px;
 }
+
+/* Round 4: the reminder of each class's data next to "Which spreads out more?"
+   (js/rooms/number-lab.js rangeReminderHTML). Same colours and badges as the
+   two classes in Data Hub. The ruler shows where the answers go, from lowest
+   to highest, on one shared scale: a long bar = a big spread. */
+.range-reminder {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: var(--space-3);
+  margin: var(--space-2) 0 var(--space-3);
+}
+
+.range-card {
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+}
+
+.range-card--a { background: var(--color-plan-light); }
+.range-card--b { background: var(--color-collect-light); }
+
+.range-name {
+  display: inline-block;
+  margin: 0 0 var(--space-1);
+  padding: 2px 12px;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 999px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+}
+
+.range-facts {
+  margin: 0 0 var(--space-2);
+  padding-left: 22px;
+  line-height: 1.5;
+}
+
+.range-ruler {
+  position: relative;
+  height: 18px;
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-navy);
+  border-radius: 999px;
+}
+
+.range-span {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  background: var(--color-navy);
+  border-radius: 999px;
+}
+
+.range-ends {
+  display: flex;
+  justify-content: space-between;
+  margin: 2px 0 0;
+  font-size: 16px; /* a short label */
+  font-weight: 700;
+}

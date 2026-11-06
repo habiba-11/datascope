@@ -4,6 +4,7 @@ import { mean, median, mode, formatMean, compareValues } from '../helpers/stats.
 import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import {
   numberLabKind, TASKS_BY_KIND, fillTemplate, buildTarget, buildExample, isAllSame, miaSays, choicesFor, revealMessage, classStats,
+  rangeSummary, rulerSpan,
 } from '../helpers/number-tasks.js';
 import { logEvent, trackMeaningTask } from '../helpers/log.js';
 import { createAnswerHint } from '../helpers/prompts.js';
@@ -71,7 +72,7 @@ async function init() {
   const { values } = generateClassData(recipe);
   const valuesB = partner ? generateClassData(partner).values : null;
   const stats = classStats(kind, values, valuesB);
-  const data = { values, stats, facts: answerFacts(recipe, values, partner, valuesB) };
+  const data = { values, valuesB, stats, facts: answerFacts(recipe, values, partner, valuesB) };
 
   mountShell({
     step: 'explore',
@@ -360,14 +361,46 @@ const TASK_HTML = {
       <p class="feedback" id="why-feedback" hidden></p>
     </section>`,
 
-  compareRange: (n) => `
+  compareRange: (n, data) => `
     <section class="task" data-task="${n}" hidden>
       <p>${content.compareRange.story}</p>
+      ${rangeReminderHTML(data)}
       <p><strong>${content.compareRange.question}</strong></p>
       <div class="choice-row" id="range-choices">${choiceButtons(['Class A', 'Class B'])}</div>
       <p class="feedback" id="range-feedback" hidden></p>
     </section>`,
 };
+
+// Round 4 (Habiba, 6 Nov 2026): a reminder of each class's data next to "Which
+// spreads out more?": lowest, highest, mean, the range worked out, and a little
+// ruler on one shared scale (0 to the biggest answer), so the spread can be SEEN.
+// The same colours and badges as the two classes in Data Hub. Numbers only, from
+// stats.js (no child text), so this HTML is safe.
+function rangeReminderHTML({ values, valuesB }) {
+  const unit = recipe.unit || '';
+  const classes = [
+    { name: '📗 Class A', css: 'a', ...rangeSummary(values) },
+    { name: '📘 Class B', css: 'b', ...rangeSummary(valuesB) },
+  ];
+  const scaleMax = Math.max(classes[0].high, classes[1].high);
+  const cards = classes.map((c) => {
+    const span = rulerSpan(c, scaleMax);
+    return `
+      <div class="range-card range-card--${c.css}">
+        <p class="range-name">${c.name}</p>
+        <ul class="range-facts">
+          <li>Lowest: <b>${c.low}</b> · Highest: <b>${c.high}</b></li>
+          <li>Mean: <b>${c.mean}</b> ${unit}</li>
+          <li>Range: ${c.high} − ${c.low} = <b>${c.range}</b> ${unit}</li>
+        </ul>
+        <div class="range-ruler" role="img" aria-label="${c.name.slice(3)}: answers from ${c.low} to ${c.high} ${unit}">
+          <span class="range-span" style="left: ${span.left}%; width: ${span.width}%"></span>
+        </div>
+        <p class="range-ends"><span>0</span><span>${scaleMax} ${unit}</span></p>
+      </div>`;
+  }).join('');
+  return `<div class="range-reminder">${cards}</div>`;
+}
 
 const TASK_SETUP = {
   predict: (n, { stats, facts }) => {
