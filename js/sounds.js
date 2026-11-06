@@ -109,14 +109,74 @@ export function playStars(count) {
   });
 }
 
-// Fireworks (motion.js fireworks, Part 43b): each burst is a soft low "pop"
-// and a little sparkle above it, at the burst's time (seconds). Gentle, never a bang.
-export function playBursts(times) {
-  play({
-    wave: 'sine',
-    volume: 0.08,
-    notes: times.flatMap((t, i) => [[196, t, 0.1], [988 + i * 60, t + 0.06, 0.18, 0.05], [1480 + i * 60, t + 0.14, 0.14, 0.04]]),
-  });
+// A real firework (Round 4, Habiba 6 Nov 2026: "a real sound of fireworks"):
+// a rising whistle, then a soft bang with a low thump, then crackles. Made by
+// the browser from noise and tones; the crackles are at fixed times, so every
+// firework sounds the same. `at`: seconds from now when the WHISTLE starts
+// (the bang comes FIREWORK_WHISTLE later); `loudness`: 1 = normal, less in a loop.
+export const FIREWORK_WHISTLE = 0.5;
+export const FIREWORK_CRACKLES = [0.06, 0.11, 0.15, 0.22, 0.27, 0.31, 0.38, 0.46, 0.52, 0.61];
+let noiseBuffer = null;
+
+function noise(c, t, seconds, volume, filterType, from, to) {
+  if (!noiseBuffer) {
+    noiseBuffer = c.createBuffer(1, c.sampleRate, c.sampleRate); // 1 second of noise, made once
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  }
+  const source = c.createBufferSource();
+  source.buffer = noiseBuffer;
+  const filter = c.createBiquadFilter();
+  filter.type = filterType;
+  filter.frequency.setValueAtTime(from, t);
+  filter.frequency.exponentialRampToValueAtTime(to, t + seconds);
+  const gain = c.createGain();
+  gain.gain.setValueAtTime(volume, t);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + seconds);
+  source.connect(filter).connect(gain).connect(c.destination);
+  source.start(t);
+  source.stop(t + seconds + 0.05);
+}
+
+export function playFirework(at = 0, loudness = 1) {
+  if (!getSoundOn()) return;
+  const c = audioContext();
+  if (!c) return;
+  if (c.state !== 'running') {
+    c.resume().catch(() => {}); // still asleep (no tap yet): this one is skipped, never late
+    return;
+  }
+  try {
+    const t = c.currentTime + at;
+    // The whistle: a thin tone that rises as the rocket goes up.
+    const whistle = c.createOscillator();
+    const whistleGain = c.createGain();
+    whistle.type = 'sine';
+    whistle.frequency.setValueAtTime(500, t);
+    whistle.frequency.exponentialRampToValueAtTime(1600, t + FIREWORK_WHISTLE);
+    whistleGain.gain.setValueAtTime(0.0001, t);
+    whistleGain.gain.exponentialRampToValueAtTime(0.025 * loudness, t + 0.1);
+    whistleGain.gain.exponentialRampToValueAtTime(0.0001, t + FIREWORK_WHISTLE);
+    whistle.connect(whistleGain).connect(c.destination);
+    whistle.start(t);
+    whistle.stop(t + FIREWORK_WHISTLE + 0.05);
+    // The bang: a burst of soft noise and a low thump.
+    const bang = t + FIREWORK_WHISTLE;
+    noise(c, bang, 0.7, 0.16 * loudness, 'lowpass', 2400, 300);
+    const thump = c.createOscillator();
+    const thumpGain = c.createGain();
+    thump.frequency.setValueAtTime(110, bang);
+    thump.frequency.exponentialRampToValueAtTime(40, bang + 0.3);
+    thumpGain.gain.setValueAtTime(0.18 * loudness, bang);
+    thumpGain.gain.exponentialRampToValueAtTime(0.0001, bang + 0.35);
+    thump.connect(thumpGain).connect(c.destination);
+    thump.start(bang);
+    thump.stop(bang + 0.4);
+    // The crackles: tiny bright pops, as the sparks fall.
+    for (const crackle of FIREWORK_CRACKLES) noise(c, bang + 0.2 + crackle, 0.03, 0.05 * loudness, 'highpass', 4000, 6000);
+  } catch {
+    // No sound support: the fireworks still show.
+  }
 }
 
 function play(sound) {

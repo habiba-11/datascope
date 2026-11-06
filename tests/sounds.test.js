@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { SOUNDS, FALLING_SOUNDS } from '../js/sounds.js';
+import { SOUNDS, FALLING_SOUNDS, FIREWORK_WHISTLE, FIREWORK_CRACKLES } from '../js/sounds.js';
 import { PIP_EVENTS } from '../js/helpers/pip-lines.js';
 
 const first = (s) => s.notes[0][0];
@@ -31,4 +31,10 @@ test("every sound Pip uses exists, and there is no bird sound (birds were remove
 
 test('sounds stay gentle: no sound is louder than the badge stamp', () => {
   for (const [name, sound] of Object.entries(SOUNDS)) assert.ok(sound.volume <= 0.2, name);
+});
+
+test('a firework always sounds the same: whistle, then bang, then fixed crackles within a second', () => {
+  assert.equal(FIREWORK_WHISTLE, 0.5);
+  assert.deepEqual([...FIREWORK_CRACKLES].sort((a, b) => a - b), FIREWORK_CRACKLES);
+  assert.ok(FIREWORK_CRACKLES.every((t) => t > 0 && t < 1));
 });

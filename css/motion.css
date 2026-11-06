@@ -143,13 +143,21 @@
   75% { rotate: 5deg; }
 }
 
-/* Fireworks (js/motion.js fireworks): sparks fly out from one point and fade once. */
-.firework {
+/* Fireworks (js/motion.js): sparks fly out from one point and fade once.
+   They burst in a layer BEHIND the cards (Habiba, 6 Nov 2026: "not on the
+   cards"): over the sky and the hills, under the task card and buttons. */
+.firework-sky {
   position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none; /* never blocks a tap */
+}
+
+.firework {
+  position: absolute;
   width: 0;
   height: 0;
-  z-index: 1000;
-  pointer-events: none; /* never blocks a tap */
 }
 
 .firework i {
@@ -168,4 +176,12 @@
   0% { transform: translate(0, 0) scale(0.3); opacity: 1; }
   70% { opacity: 1; }
   100% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 0; }
+}
+
+/* The finale loop on My journey: bigger sparks. */
+.firework--big i {
+  left: -7px;
+  top: -7px;
+  width: 14px;
+  height: 14px;
 }

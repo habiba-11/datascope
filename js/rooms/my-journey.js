@@ -19,7 +19,7 @@ import {
 } from '../storage/save.js';
 import { guardJourney } from '../phase-progress.js';
 import { pipSVG, pipMoodFor } from '../pip.js';
-import { confetti, fireworks } from '../motion.js';
+import { confetti, fireworksLoop } from '../motion.js';
 import { taskCardHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 
@@ -399,11 +399,12 @@ async function init() {
     }
   });
   document.getElementById('journey').append(celebrationNode(journey, code), tabs);
-  // The whole journey is done: the big finale (Part 43b), confetti and 6 bursts
-  // of fireworks. With reduced motion only their sounds play.
+  // The whole journey is done: the big finale (Part 43b), confetti, then
+  // fireworks popping in the background for as long as the page is open
+  // (Habiba, 6 Nov 2026). With reduced motion: one firework sound only.
   if (journey.phasesDone === STOPS.length) {
     confetti();
-    fireworks({ bursts: 6 });
+    fireworksLoop();
   }
 }
 

@@ -4,7 +4,7 @@
 // GSAP (js/vendor/gsap.min.js, loaded by each room page): they also do nothing
 // with reduced motion, and if GSAP is missing the page still works, just still.
 // The sounds still follow the sound toggle.
-import { playSound, playBursts } from './sounds.js';
+import { playSound, playFirework, FIREWORK_WHISTLE } from './sounds.js';
 import { pipMoodFor } from './pip.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -184,37 +184,83 @@ export function confetti({ sound = 'confetti' } = {}) {
   }
 }
 
-// Fireworks (Part 43b, Round 4): bursts of coloured sparks, one after another,
-// for a finished phase (3 bursts) or the end of the whole journey (6 bursts).
-// Each burst has a soft pop (sounds.js playBursts), at fixed times, so the same
-// moment always sounds the same; with reduced motion only the sound plays.
-// The sparks only fade out once (no flashing) and never block a tap.
+// Fireworks (Part 43b; changed 6 Nov 2026, Habiba): bursts of coloured sparks
+// in the BACKGROUND, behind the cards (never over them), each with a real
+// firework sound (sounds.js playFirework: whistle, bang, crackles).
+// A finished phase or the stamped Evidence Card: 3 bursts. My journey: a loop
+// (fireworksLoop) while the page is open. With reduced motion only the sound
+// plays (once). The sparks only fade out once (no flashing), never block a tap.
 export const BURST_GAP = 0.35; // seconds between two bursts
-const SPARKS = 14;
+const SPARKS = 16;
+
+// The layer behind the cards (css/motion.css .firework-sky), made once per page.
+function fireworkSky() {
+  let sky = document.querySelector('.firework-sky');
+  if (!sky) {
+    sky = document.createElement('div');
+    sky.className = 'firework-sky';
+    sky.setAttribute('aria-hidden', 'true');
+    document.body.append(sky); // after the hills, so the sparks show over them
+  }
+  return sky;
+}
+
+// Where a burst can be SEEN, since the card hides the middle: the left margin,
+// the right margin and the band above the card, in turn (x and y ranges, vw / vh).
+const BURST_ZONES = [
+  { x: [3, 12], y: [15, 65] },
+  { x: [88, 97], y: [15, 65] },
+  { x: [20, 80], y: [3, 9] },
+];
+
+// One burst of sparks, `delay` seconds from now (when its bang sounds).
+function burst(delay, colourStart, big = false) {
+  const zone = BURST_ZONES[colourStart % BURST_ZONES.length];
+  const between = ([from, to]) => from + Math.random() * (to - from);
+  const spot = document.createElement('span');
+  spot.className = big ? 'firework firework--big' : 'firework';
+  spot.style.left = `${between(zone.x)}vw`;
+  spot.style.top = `${between(zone.y)}vh`;
+  for (let i = 0; i < SPARKS; i++) {
+    const angle = (i / SPARKS) * 2 * Math.PI;
+    const distance = (big ? 100 : 70) + Math.random() * 50;
+    const spark = document.createElement('i');
+    spark.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+    spark.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+    spark.style.setProperty('--c', `var(--color-${CONFETTI_COLOURS[(colourStart + i) % CONFETTI_COLOURS.length]})`);
+    spark.style.setProperty('--d', `${delay}s`);
+    spot.append(spark);
+  }
+  fireworkSky().append(spot);
+  setTimeout(() => spot.remove(), (delay + 1.4) * 1000);
+}
 
 export function fireworks({ bursts = 3 } = {}) {
-  const times = Array.from({ length: bursts }, (_, i) => i * BURST_GAP);
-  playBursts(times);
-  if (reduceMotion()) return;
-  times.forEach((time, b) => {
-    const burst = document.createElement('span');
-    burst.className = 'firework';
-    burst.setAttribute('aria-hidden', 'true');
-    burst.style.left = `${15 + Math.random() * 70}vw`;
-    burst.style.top = `${12 + Math.random() * 35}vh`;
-    for (let i = 0; i < SPARKS; i++) {
-      const angle = (i / SPARKS) * 2 * Math.PI;
-      const distance = 70 + Math.random() * 40;
-      const spark = document.createElement('i');
-      spark.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
-      spark.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
-      spark.style.setProperty('--c', `var(--color-${CONFETTI_COLOURS[(b + i) % CONFETTI_COLOURS.length]})`);
-      spark.style.setProperty('--d', `${time}s`);
-      burst.append(spark);
-    }
-    document.body.append(burst);
-    setTimeout(() => burst.remove(), (time + 1.4) * 1000);
-  });
+  for (let b = 0; b < bursts; b++) {
+    const whistle = b * BURST_GAP;
+    playFirework(whistle);
+    if (!reduceMotion()) burst(whistle + FIREWORK_WHISTLE, b);
+  }
+}
+
+// The finale on My journey: a new firework about every 1.3 s, for as long as
+// the page is open, a bit softer than a single one. It rests while the tab is
+// hidden. Returns a function that stops it. Reduced motion: one sound, no loop.
+export const LOOP_GAP_MS = 1300;
+
+export function fireworksLoop() {
+  if (reduceMotion()) {
+    playFirework(0);
+    return () => {};
+  }
+  let n = 0;
+  const timer = setInterval(() => {
+    if (document.hidden) return;
+    playFirework(0, 0.5);
+    burst(FIREWORK_WHISTLE, n, true);
+    n += 1;
+  }, LOOP_GAP_MS);
+  return () => clearInterval(timer);
 }
 
 // A right answer: a chime, the feedback box bounces, and Pip hops.
