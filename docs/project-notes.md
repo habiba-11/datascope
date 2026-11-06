@@ -46,7 +46,8 @@ are tested), `js/storage/` (save.js = the browser, sync.js = the database),
 
 **During the pilot:** only fix real bugs, and note the date and commit of every
 change, so the thesis data stays comparable. Never rename a field in the
-reasoning log; add new ones instead.
+reasoning log; add new ones instead. **Round 4 (section 9) overrides the "only
+bugs" rule:** deliberate changes based on the pilot children's feedback.
 
 ## 3. The online database (Supabase)
 
@@ -160,3 +161,30 @@ round-2-plan.md, round-3-plan.md, round-3-prompt.md, review-prompt.md,
 change-summary-*.md, ui-audit.md, backend-setup-guide.md (the step-by-step
 Supabase setup), deploy-guide.md, privacy-note.md, device-test-checklist.md and
 screenshots/ (UI before and after).
+
+## 9. Round 4 (pilot feedback, 5 Nov 2026)
+
+Habiba ran a pilot with real Grade 5 children. Their feedback: they did not
+understand the purpose ("like a game without knowing what you try to reach"),
+all said it looks boring, and several screens were unclear (fix the question,
+the bonus, the helper buttons, the graph switch, buttons below the screen, a
+second guess, number words in the games scenario). Work starts 6 Nov 2026, in
+Parts 42 to 51. Claude commits each part; nothing is pushed until Habiba says "push".
+
+| Part | Date | Commit | What changed and why |
+|---|---|---|---|
+| 42a | 6 Nov | `432c8d9` | **Mission card:** after picking a scenario, Pip shows its mission ("Find out how long Grade 5 kids sleep at night.") and names the product ("At the end, you make your Evidence Card."). New log event `mission-seen`. |
+| 42b | 6 Nov | `17e4ed7`, reverted in `4b8fb4f` | A mission bar under the step bar. **Removed: Habiba did not like it.** |
+| 42c | 6 Nov | `4fd9e05` | **"🎯 Why?"** line per room (phases.json `why`), next to the About tab (no extra height) and first in the intro pop-up; bullets cut to 2; games get their own Number Lab words. |
+| fix | 6 Nov | `0747fc8` | Bug (Habiba): the Question Fixer badge showed after the Plan intro. The intro now waits one turn, so: Ask card, badge, Plan intro. |
+| 42d | 6 Nov | `512f46d` | **"🎯 For your mission:"** under "I learned" on every end-of-room card, from the child's own work (e.g. "Your graph shows the most common answer: 9 hours."; games: "The mode is Tag"). |
+
+**Decisions (Habiba, 6 Nov 2026):** no stickers on the Evidence Card, no mission
+bar, no audience sentence ("tell the principal") anywhere. Pip stands beside the
+card at 1366 and grows inside it below that; idle help after 10 seconds, at most
+once per screen; background music on but quiet, with its own switch; read-aloud
+only in the story (Part 44) for now. Children use **laptops and PC screens only**
+(1366x768 is the size that matters most; 768 is still checked).
+
+**Measured (Chrome, 6 Nov 2026):** the main green button is already below the
+screen at 1366x768 in Data Hub, Graph Lab and Evidence Board (Part 49 fixes this).

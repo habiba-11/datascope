@@ -157,3 +157,12 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 - **Room summary:** a "📖 About this room" tab on the task card. The pop-up still opens once, and the (i) button is removed.
 - **Checker:** accepts specific and regular time phrases, and vague words still ask "When?" (Paper 28).
 - **Live site (changed 4 Nov 2026):** the database is ON (Prof and the ethics check agreed). The teacher logs in with the email + password in the database. The PIN stays as it is, stored only as a hash; it is only asked when the database is off. Claude commits and pushes; Habiba switches on GitHub Pages herself. The repo stays public.
+
+## Round 4 (pilot feedback, 5 Nov 2026)
+- Real Grade 5 children tried DataScope. Their feedback (purpose unclear, "boring", several unclear screens) is fixed in Parts 42 to 51. Every part's date and commit is in `docs/project-notes.md`, section 9. This overrides "only fix real bugs during the pilot".
+- **Working mode:** one part at a time; after each part run `npm test`, check Chrome at 1366 and 768, then Claude commits. **Never push until Habiba writes "push".**
+- **Reasoning log:** never rename a field; add new events or fields (so far: `mission-seen`).
+- **Purpose (Part 42):** a Mission card per scenario after picking it, a "🎯 Why?" line per room, and "🎯 For your mission:" on each end-of-room card. **Rejected by Habiba (6 Nov 2026), do not add back:** Evidence Card stickers, a mission bar, an audience sentence ("tell the principal").
+- **Liveliness (Part 43, decided 6 Nov 2026):** Pip beside the card at 1366, bigger inside the card below that; idle help after 10 seconds, at most once per screen; background music on but quiet, with its own switch; one composed loop shared with the story.
+- **Story (Part 44):** build `docs/design/frames/datascope-story-ui.html` exactly; read-aloud in the story only for now, with the clearest English voice available.
+- **Devices:** laptops and PC screens only (1366x768 matters most).
