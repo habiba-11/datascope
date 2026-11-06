@@ -11,7 +11,7 @@ import { logEvent, readLog } from '../helpers/log.js';
 import { createAnswerHint } from '../helpers/prompts.js';
 import { answerFacts, fillSuggestions, becauseText } from '../helpers/suggestions.js';
 import { playSound } from '../sounds.js';
-import { animate, pipReacts, confetti, stamp, MOTION } from '../motion.js';
+import { animate, pipReacts, confetti, fireworks, stamp, MOTION } from '../motion.js';
 import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
 import { whenIntroClosed } from '../phase-intro.js';
@@ -318,6 +318,7 @@ function makeCard() {
   setTimeout(() => {
     playSound('stamp');
     confetti();
+    fireworks(); // Part 43b: the Evidence Card is done
   }, reduceMotion() ? 0 : MOTION.medium * 1000);
   animate(card, 'cheer');
   pipReacts('hop');

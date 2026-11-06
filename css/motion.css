@@ -97,3 +97,75 @@
     transform: none;
   }
 }
+
+/* ---------- Part 43b (Round 4, "it looks boring"): more motion on the interface ---------- */
+
+/* Buttons squish when pressed (fast) and spring back when let go (bouncy). */
+.btn {
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.08s;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(var(--press-depth)) scale(0.96, 0.92);
+  transition-duration: 0.06s;
+}
+
+/* Answer buttons pop in, one after another, each time their task appears
+   (a hidden task restarts its animations when it is shown again).
+   :where() keeps these rules weakest, so a button's own motion (a wobble,
+   a cheer, m-pop with --i) always wins. */
+:where(.task:not([hidden])) :where(.choice-btn) {
+  animation: m-pop var(--duration-medium) var(--ease-spring) both;
+}
+
+:where(.task:not([hidden])) :where(.choice-btn:nth-child(2)) { animation-delay: calc(var(--stagger) * 1); }
+:where(.task:not([hidden])) :where(.choice-btn:nth-child(3)) { animation-delay: calc(var(--stagger) * 2); }
+:where(.task:not([hidden])) :where(.choice-btn:nth-child(4)) { animation-delay: calc(var(--stagger) * 3); }
+:where(.task:not([hidden])) :where(.choice-btn:nth-child(5)) { animation-delay: calc(var(--stagger) * 4); }
+:where(.task:not([hidden])) :where(.choice-btn:nth-child(n + 6)) { animation-delay: calc(var(--stagger) * 5); }
+
+/* The step you are on gives a happy hop when the room opens. */
+.step.current .step-icon {
+  animation: step-arrive 0.7s var(--ease-spring) 0.25s both;
+}
+
+@keyframes step-arrive {
+  0%, 100% { transform: scale(1) translateY(0); }
+  40% { transform: scale(1.22) translateY(-5px); }
+}
+
+/* Data Hub: a tapped tally column wiggles (rotate, so its growing bar keeps its own transform). */
+.tally-col { cursor: pointer; }
+.tally-wiggle .tally-track { animation: tally-wiggle 0.45s ease-in-out; }
+
+@keyframes tally-wiggle {
+  25% { rotate: -5deg; }
+  75% { rotate: 5deg; }
+}
+
+/* Fireworks (js/motion.js fireworks): sparks fly out from one point and fade once. */
+.firework {
+  position: fixed;
+  width: 0;
+  height: 0;
+  z-index: 1000;
+  pointer-events: none; /* never blocks a tap */
+}
+
+.firework i {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--color-navy);
+  border-radius: 50%;
+  background: var(--c);
+  animation: firework-fly 1.1s var(--ease-out) var(--d) both;
+}
+
+@keyframes firework-fly {
+  0% { transform: translate(0, 0) scale(0.3); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 0; }
+}

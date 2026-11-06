@@ -84,6 +84,16 @@ export function playStars(count) {
   });
 }
 
+// Fireworks (motion.js fireworks, Part 43b): each burst is a soft low "pop"
+// and a little sparkle above it, at the burst's time (seconds). Gentle, never a bang.
+export function playBursts(times) {
+  play({
+    wave: 'sine',
+    volume: 0.08,
+    notes: times.flatMap((t, i) => [[196, t, 0.1], [988 + i * 60, t + 0.06, 0.18, 0.05], [1480 + i * 60, t + 0.14, 0.14, 0.04]]),
+  });
+}
+
 function play(sound) {
   if (!sound || !getSoundOn()) return;
   try {

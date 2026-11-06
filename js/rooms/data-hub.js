@@ -6,7 +6,7 @@ import { tallyKeys, colourFor, seatLabels, countAnswers, tallyWords } from '../h
 import { valueText } from '../helpers/charts.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { playSound } from '../sounds.js';
-import { pipReacts } from '../motion.js';
+import { pipReacts, animate } from '../motion.js';
 import { pipSay } from '../pip.js';
 import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
 import { finishPhase } from '../phase-progress.js';
@@ -180,6 +180,11 @@ function renderTally(c, allKeys, scaleMax, where = '') {
       </div>`).join('');
   }
   tally.querySelectorAll('.tally-col').forEach((col) => {
+    // Part 43b: a tapped column wiggles with a tick (just for fun; it changes nothing).
+    if (!col.dataset.wiggle) {
+      col.dataset.wiggle = 'on';
+      col.addEventListener('click', () => { animate(col, 'tally-wiggle'); playSound('tick'); });
+    }
     const key = c.keys.find((k) => String(k) === col.dataset.key);
     const count = counts.get(key);
     const share = count / scaleMax;
