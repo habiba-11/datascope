@@ -92,6 +92,24 @@ export function audioContext() {
   }
 }
 
+// Part 44c: a little tune made on the spot (the story's scene sound effects,
+// js/story-sounds.js), with the same rules as every sound here.
+export function playTune(sound) {
+  play(sound);
+}
+
+// Part 44c: claps (the class cheers Sara): short soft bursts of noise.
+export function playClaps(at = 0, count = 6) {
+  if (!getSoundOn()) return;
+  const c = audioContext();
+  if (!c || c.state !== 'running') return;
+  try {
+    for (let i = 0; i < count; i++) noiseBurst(c, c.destination, c.currentTime + at + i * 0.14, 0.07, 0.2, 'bandpass', 1800, 900);
+  } catch {
+    // No sound support.
+  }
+}
+
 export function playSound(name) {
   play(SOUNDS[name]);
 }

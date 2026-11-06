@@ -5,20 +5,32 @@
 // Nothing moves on by itself (Habiba: no timer): the child taps Next or Back,
 // or the arrow keys. The first "Start the story" tap also lets the browser
 // play sound. Words: data/content/story.json; rules: helpers/story.js (tested).
+// Part 44c: each line is read aloud (its own switch, on by default; js/voice.js),
+// the speaker's mouth moves only while the voice speaks, the music goes quieter
+// meanwhile, "Hear this again" repeats a line, and each line has the design's
+// scene sound effects (js/story-sounds.js). With read-aloud off, Pip hoots and
+// Sara chirps instead.
 // The HTML is built from our own content; nothing a child typed goes in here.
 import { pipSVG } from './pip.js';
 import { playSound } from './sounds.js';
-import { startMusic, stopMusic } from './music.js';
-import { getSoundOn, setSoundOn, getMusicOn, setMusicOn } from './storage/save.js';
+import { startMusic, stopMusic, duckMusic } from './music.js';
 import {
-  nextPosition, previousPosition, skipPosition, nextLabel, trailStates, stageScale,
+  getSoundOn, setSoundOn, getMusicOn, setMusicOn, getVoiceOn, setVoiceOn,
+} from './storage/save.js';
+import {
+  nextPosition, previousPosition, skipPosition, nextLabel, trailStates, stageScale, STORY_EFFECTS,
 } from './helpers/story.js';
+import { speak, stopSpeaking } from './voice.js';
+import { playStoryEffects, playStoryStart, playStoryEnd } from './story-sounds.js';
 import { avatarSVG } from './story-characters.js';
 import { sceneHTML, STORY_DEFS } from './story-scenes.js';
 
 const SOUND_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="currentColor"/><path d="M16 9 Q19 12 16 15 M18.5 6.5 Q24 12 18.5 17.5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>';
 // The design's bold tick for a step that is done (a drawing, not a thin ✓).
 const TICK = '<svg width="20" height="20" viewBox="0 0 20 20" aria-label="done"><path d="M4 10 L8.5 14.5 L16 6" stroke="#17324D" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+// The design's read-aloud icon (a speech bubble with lines) and its "hear again" speaker.
+const VOICE_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5 H20 V16 H12 L7 20 V16 H4 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M8 9.5 H16 M8 12.5 H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const AGAIN_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="currentColor"/><path d="M16 8 Q19 12 16 16 M18.5 5.5 Q23 12 18.5 18.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
 const MUSIC_ICON ='<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18 V6 L20 4 V16" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="3" fill="currentColor"/><circle cx="17.5" cy="16" r="3" fill="currentColor"/></svg>';
 
 // The sky behind every scene: drifting clouds (like the rooms), across the
@@ -54,6 +66,7 @@ export function openStory(words, returnTo) {
         <div class="story-switches">
           <button type="button" class="story-switch" id="story-sound" aria-label="Sound effects">${SOUND_ICON}</button>
           <button type="button" class="story-switch" id="story-music" aria-label="Background music">${MUSIC_ICON}</button>
+          <button type="button" class="story-switch" id="story-voice" aria-label="Read aloud">${VOICE_ICON}</button>
         </div>
       </header>
       <div class="story-scene" id="story-scene"></div>
@@ -64,7 +77,10 @@ export function openStory(words, returnTo) {
         </div>
         <div class="story-words">
           <p class="story-meta"><span class="story-chip" id="story-chip"></span><span class="story-count" id="story-count"></span></p>
-          <p class="story-line" id="story-line" aria-live="polite"></p>
+          <div class="story-line-row">
+            <p class="story-line" id="story-line" aria-live="polite"></p>
+            <button type="button" class="story-again" id="story-again" aria-label="${buttons.again}">${AGAIN_ICON}</button>
+          </div>
         </div>
         <div class="story-controls">
           <div class="story-buttons">
@@ -99,6 +115,7 @@ export function openStory(words, returnTo) {
   function showSwitches() {
     get('story-sound').setAttribute('aria-pressed', String(getSoundOn()));
     get('story-music').setAttribute('aria-pressed', String(getMusicOn()));
+    get('story-voice').setAttribute('aria-pressed', String(getVoiceOn()));
   }
   get('story-sound').addEventListener('click', () => {
     setSoundOn(!getSoundOn());
@@ -110,7 +127,39 @@ export function openStory(words, returnTo) {
     if (getMusicOn()) startMusic(); else stopMusic();
     showSwitches();
   });
+  get('story-voice').addEventListener('click', () => {
+    setVoiceOn(!getVoiceOn());
+    showSwitches();
+    if (getVoiceOn()) sayLine(); else quiet();
+  });
   showSwitches();
+
+  // Read-aloud: while a line is said, the speaker's mouth moves (css/story.css)
+  // and the music goes quieter, by about 70 percent.
+  const currentLine = () => scenes[position.scene].lines[position.line];
+  function quiet() {
+    stopSpeaking();
+    dialog.classList.remove('st-talking-pip', 'st-talking-sara', 'st-talking-kids');
+    duckMusic(false);
+  }
+  function sayLine() {
+    const line = currentLine();
+    speak(line.who, line.text, {
+      onStart: () => {
+        dialog.classList.add(`st-talking-${line.who}`);
+        duckMusic(true);
+      },
+      onEnd: () => {
+        dialog.classList.remove(`st-talking-${line.who}`);
+        duckMusic(false);
+      },
+    });
+  }
+  // "Hear this again" works even with read-aloud off: the child asked for it.
+  get('story-again').addEventListener('click', () => {
+    quiet();
+    sayLine();
+  });
 
   function render() {
     const scene = scenes[position.scene];
@@ -153,11 +202,15 @@ export function openStory(words, returnTo) {
     });
   }
 
-  // The sounds of a line: a whoosh when a new scene opens, and a little
-  // sound for who speaks (Pip's rising hoot, Sara's chirp).
+  // The sounds of a line: a whoosh when a new scene opens, the scene's sound
+  // effects, and the line read aloud (or, with read-aloud off, a little sound
+  // for who speaks: Pip's rising hoot, Sara's chirp).
   function soundsFor(line, newScene) {
+    quiet();
     if (newScene) playSound('whoosh');
-    if (line.who === 'pip') playSound('hoot');
+    playStoryEffects(STORY_EFFECTS[`${scenes[position.scene].id}:${position.line}`]);
+    if (getVoiceOn()) sayLine();
+    else if (line.who === 'pip') playSound('hoot');
     else if (line.who === 'sara') playSound('sara');
   }
 
@@ -169,6 +222,7 @@ export function openStory(words, returnTo) {
   }
 
   function close() {
+    quiet();
     stopMusic();
     window.removeEventListener('resize', fit);
     dialog.close();
@@ -179,6 +233,7 @@ export function openStory(words, returnTo) {
   get('story-start').addEventListener('click', () => {
     get('story-cover').hidden = true;
     startMusic(); // the tap lets the browser play sound (only if music is on)
+    playStoryStart();
     render();
     soundsFor(scenes[0].lines[0], true);
     get('story-next').focus();
@@ -186,7 +241,10 @@ export function openStory(words, returnTo) {
   get('story-next').addEventListener('click', () => {
     const next = nextPosition(scenes, position);
     if (next) goTo(next);
-    else close(); // "Start mission": back to the start page, to type the code
+    else {
+      playStoryEnd(); // "Start mission": a fanfare, then back to the start page to type the code
+      close();
+    }
   });
   get('story-back').addEventListener('click', () => goTo(previousPosition(scenes, position)));
   get('story-skip').addEventListener('click', () => goTo(skipPosition(scenes)));

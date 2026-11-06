@@ -98,6 +98,17 @@ export function setMusicOn(on) {
   writeItem(MUSIC_KEY, on ? 'on' : 'off');
 }
 
+// The story's read-aloud has its own switch (Part 44c): ON by default.
+const VOICE_KEY = 'datascope:voice';
+
+export function getVoiceOn() {
+  return readItem(VOICE_KEY) !== 'off';
+}
+
+export function setVoiceOn(on) {
+  writeItem(VOICE_KEY, on ? 'on' : 'off');
+}
+
 // The ids of log entries already sent to the online database (Part 22),
 // so each entry is sent once. Entries that can never be accepted are added too.
 const SENT_KEY = 'datascope:sentIds';

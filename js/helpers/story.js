@@ -55,6 +55,29 @@ export function trailStates(step) {
   });
 }
 
+// The scene sound effects of the approved design, per "scene:line": each is
+// [effect, seconds after the line starts, (for a pop) its note in Hz].
+// js/story-sounds.js plays them. A new scene also gets its whoosh (js/story.js).
+export const STORY_EFFECTS = {
+  'ask:1': [['pop', 0.5, 700]], // the thought bubble pops in
+  'plan:0': [['ticks', 0.4], ['pop', 0.9, 640]], // Sara writes, the guess card pops in
+  'collect:1': [['pop', 0.3, 620], ['pop', 0.9, 740]], // "9 hours", "8 hours"
+  'collect:2': [['pop', 0.3, 860], ['yawn', 0.6]], // "10 hours", and a sleepy yawn
+  'collect:3': [['ding', 0]],
+  'graph:0': [['grow', 0.5]], // the bars grow
+  'graph:1': [['pop', 0.1, 520]],
+  'numbers:0': [['pop', 0.9, 600], ['pop', 1.1, 760]], // the centre number and the mean
+  'numbers:1': [['ding', 0]],
+  'numbers:2': [['rattle', 0], ['ding', 0.95]], // the die rolls
+  'conclude:0': [['ding', 0]],
+  'conclude:1': [['pop', 0.1, 840]],
+  'conclude:2': [['stamp', 0], ['fanfare', 0.1], ['clap', 0.2]], // Checked!, hooray
+  'mission:0': [['chime', 0]],
+  'mission:1': [['pop', 0.2, 700]],
+  'mission:2': [['ding', 0]],
+};
+export const EFFECT_NAMES = ['pop', 'ticks', 'yawn', 'ding', 'grow', 'rattle', 'stamp', 'fanfare', 'clap', 'chime'];
+
 // How much to scale the stage so it fills the window, as big as fits, like the
 // approved design (Habiba, 6 Nov 2026: it must look like the design's screens).
 export function stageScale(availableWidth, availableHeight) {

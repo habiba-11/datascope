@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  nextPosition, previousPosition, skipPosition, nextLabel, trailStates, stageScale, STEPS,
+  nextPosition, previousPosition, skipPosition, nextLabel, trailStates, stageScale, STEPS, STORY_EFFECTS, EFFECT_NAMES,
 } from '../js/helpers/story.js';
 import { allStrings, longestSentence, MAX_SENTENCE_WORDS } from '../js/helpers/readability.js';
 import {
@@ -75,4 +75,16 @@ test('the story opens by itself once per browser (it is remembered as seen)', ()
   assert.equal(hasSeenTutorial(), false);
   markTutorialSeen();
   assert.equal(hasSeenTutorial(), true);
+});
+
+test('every scene sound effect belongs to a real line and is a known effect', () => {
+  for (const [key, effects] of Object.entries(STORY_EFFECTS)) {
+    const [id, line] = key.split(':');
+    const scene = scenes.find((s) => s.id === id);
+    assert.ok(scene && scene.lines[Number(line)], `${key} is not a line`);
+    for (const [name, at] of effects) {
+      assert.ok(EFFECT_NAMES.includes(name), `${key}: ${name}`);
+      assert.ok(at >= 0 && at < 2, `${key}: ${name} at ${at}s`);
+    }
+  }
 });

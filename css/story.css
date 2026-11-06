@@ -443,3 +443,43 @@
   .st-cloud--1 { transform: translateX(55vw); }
   .st-cloud--2 { transform: translateX(18vw); }
 }
+
+/* ---------- Part 44c: read-aloud ---------- */
+.story-line-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.story-line-row .story-line {
+  flex: 1;
+}
+
+/* "Hear this again": a small speaker button next to the line. */
+.story-again {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 14px;
+  background: var(--color-bg);
+  color: var(--color-navy);
+  cursor: pointer;
+}
+
+/* Pip's beak moves only while Pip's line is being said (js/story.js sets the class). */
+.story.st-talking-pip .story-scene .pip-beak {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: st-beak 0.26s ease-in-out infinite;
+}
+
+@keyframes st-beak { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.7); } }
+
+/* The start page behind the story does not scroll (no scrollbar beside it). */
+html:has(dialog.story[open]) {
+  overflow: hidden;
+}
