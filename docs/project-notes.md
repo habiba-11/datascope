@@ -190,6 +190,7 @@ Parts 42 to 51. Claude commits each part; nothing is pushed until Habiba says "p
 | fix | 6 Nov | `7713eda` | Number Lab "Which spreads out more?": a reminder of each class (lowest, highest, mean, range worked out, a ruler on one shared scale). |
 | fix | 6 Nov | `2ac19ea` | Fireworks behind the cards, where they can be seen, with a real firework sound (whistle, bang, crackles); My journey loops them every 1.3 s. |
 | fix | 6 Nov | `a9e792b` | Number Lab Build it: 💡 hint ("write the mean in all 5 boxes", then a chip that fills them). New field `usedHint` on the build-mean `meaning-task` entry; `hint-picked` with suggestionId `fill-mean`. |
+| fix | 6 Nov | `fd7bdee` | **Realistic fireworks** (Habiba: cartoonish, annoying sound): canvas behind the cards, rocket + glowing streaks with gravity and glitter; sound made from noise (launch, hiss, boom with echo, crackles); My journey loop every 2.2 s, far-off and quiet. 60 fps with the CPU slowed 4x. |
 
 **Decisions (Habiba, 6 Nov 2026):** no stickers on the Evidence Card, no mission
 bar, no audience sentence ("tell the principal") anywhere. Pip stands beside the
