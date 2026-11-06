@@ -11,6 +11,7 @@ import { enterPhase, finishPhase } from '../phase-progress.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { wireChoiceCards } from '../choices.js';
+import { showMissionCard } from '../mission.js';
 
 // Question Studio in the 3-zone layout (UI guide). One room, two phases:
 // Ask (pick a question, fix two flawed questions) and Plan (guess first).
@@ -31,6 +32,9 @@ let selectedScenario = null; // { id, recipe, content }
 let fixitScenarioId = null;
 let predictScenarioId = null;
 let guessSaved = false;
+// The scenario whose Mission card was shown on this visit (Part 42a), so it
+// opens again only if the child goes back and picks another one.
+let missionScenarioId = null;
 // Whether each fix-it question is clear right now.
 const clearState = { 'fixit-1': false, 'fixit-2': false };
 // The Hint button of each fix-it (it sits in the action bar while that fix-it is on screen).
@@ -130,7 +134,7 @@ function showStep(n) {
 function refreshPrimary() {
   if (step === 0) {
     bar.setPrimary(selectedScenario
-      ? { label: 'Next: Fix 1 →', ready: true, onClick: () => showStep(1) }
+      ? { label: 'Next: Fix 1 →', ready: true, onClick: startMission }
       : { label: '', enabled: false, whyDisabled: '👆 Pick a question first' });
   } else if (step === 1) {
     bar.setPrimary(clearState['fixit-1']
@@ -149,6 +153,15 @@ function refreshPrimary() {
   } else {
     bar.setPrimary({ label: '', enabled: false, whyDisabled: '👆 Pick your guess' });
   }
+}
+
+// Part 42a: before the first fix-it, Pip shows the mission for the chosen scenario.
+async function startMission() {
+  if (missionScenarioId !== selectedScenario.id) {
+    missionScenarioId = selectedScenario.id;
+    await showMissionCard(selectedScenario.content);
+  }
+  showStep(1);
 }
 
 // Ask is done when a scenario is picked AND both questions are fixed. It is

@@ -25,6 +25,8 @@ export const EVENT_TYPES = [
   'cards-sorted', // Number Lab: the child put Mia's numbers in order (the card sort); centre = the median
   'badge-earned', // a badge patch was earned and shown (badgeId, phase; backfill: found in an older log)
   'build-varied', // Number Lab: after 8, 8, 8, 8, 8 the child also made different numbers with the same mean
+  // Round 4 (pilot feedback, 5 Nov 2026): new events only, no field renamed.
+  'mission-seen', // Part 42a: Pip's Mission card was shown after picking a scenario (scenarioId)
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];

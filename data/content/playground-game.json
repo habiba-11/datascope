@@ -2,6 +2,7 @@
   "scenarioId": "playground-game",
   "emoji": "⚽",
   "cardTitle": "What do we play at recess?",
+  "mission": { "goal": "Find out which recess game our class likes best.", "short": "Which game do we like best?" },
   "wordsNote": "Games are words. We can't add them, so there is no mean, median or range. We use the mode: the game picked the most.",
   "fixIts": [
     { "flawed": "Isn't football the best game?", "fix": "Which game did you play most at recess this week?" },

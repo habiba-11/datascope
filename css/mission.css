@@ -1,0 +1,27 @@
+/* The mission (Part 42, Round 4): Pip's Mission card (js/mission.js).
+   Colours and sizes come from theme.css. */
+
+.mission-hello {
+  margin: 0 0 var(--space-2);
+  font-weight: 700;
+}
+
+/* The goal is the biggest thing on the card: what the child must find out. */
+.mission-goal {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-heading);
+  font-size: 26px;
+  line-height: 1.25;
+  background: var(--color-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+}
+
+.mission-line {
+  margin: var(--space-2) 0;
+}
+
+@media (max-width: 560px) {
+  .mission-goal { font-size: 22px; }
+}
