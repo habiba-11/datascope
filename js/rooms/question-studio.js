@@ -11,7 +11,7 @@ import { enterPhase, finishPhase } from '../phase-progress.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { wireChoiceCards } from '../choices.js';
-import { showMissionCard, fillMissionBar, hideMissionBar } from '../mission.js';
+import { showMissionCard } from '../mission.js';
 
 // Question Studio in the 3-zone layout (UI guide). One room, two phases:
 // Ask (pick a question, fix two flawed questions) and Plan (guess first).
@@ -122,8 +122,6 @@ function showStep(n) {
   document.querySelector('.card-layout').style.setProperty('--accent', `var(--color-${phase})`);
   document.querySelector('.task-card-title').textContent = STRIP[phase];
   setCurrentStep(phase);
-  // Part 42b: the mission bar shows once a question is picked (not while picking).
-  if (n === 0) hideMissionBar(); else fillMissionBar(selectedScenario.content, phase);
   // Ask and Plan share this page, so Plan starts (and its intro opens) on reaching the guess.
   enterPhase(phase);
 

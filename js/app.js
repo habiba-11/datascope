@@ -1,4 +1,4 @@
-import { getExplorerCode, getDonePhases, getPreviewAll, getSelectedScenarioId } from './storage/save.js';
+import { getExplorerCode, getDonePhases, getPreviewAll } from './storage/save.js';
 import { countBadges, counterHTML, backpackLabel, setupCelebrations } from './celebrate.js';
 import { setupAboutTab } from './phase-intro.js';
 import { guardPage, enterPhase } from './phase-progress.js';
@@ -10,8 +10,6 @@ import { watchPressedState } from './pressed-state.js';
 import { startSync, STATUS_TEXT } from './storage/sync.js';
 import { backendReady } from './config.js';
 import { EXIT_BUTTON_HTML, setupExitButton } from './exit-button.js';
-import { MISSION_BAR_HTML, fillMissionBar, setMissionBarStep } from './mission.js';
-import { loadContent } from './helpers/scenarios.js';
 
 // `icon` is a line icon from icons.js (step bar); `emoji` is used in Pip's words.
 const STEPS = [
@@ -60,7 +58,6 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
         <button class="btn icon-btn badge-counter" id="badge-counter" type="button" aria-label="${backpackLabel(countBadges())}">${counterHTML(countBadges())}</button>
       </div>
     </header>
-    ${layout === 'card' ? MISSION_BAR_HTML : ''}
     ${getPreviewAll() ? '<p class="preview-banner">👀 Teacher preview: all rooms are open on this device</p>' : ''}
     ${layout === 'card' ? cardBodyHTML(accent, contentHTML) : `<div class="shell-body">
       <aside class="sidebar">
@@ -114,11 +111,6 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   });
   window.addEventListener('datascope:phase-done', showUnlocked);
   if (phase) enterPhase(phase);
-  // Part 42b: the mission stays in sight. Question Studio fills the bar itself,
-  // once the child has picked a question; My journey has no phase, so no bar.
-  if (phase && phase !== 'ask') {
-    loadContent(getSelectedScenarioId()).then((content) => fillMissionBar(content, step)).catch(() => {});
-  }
 }
 
 // The trail (Part 15 + UI guide). Only the open steps are shown (Prof's
@@ -255,7 +247,6 @@ function codeBadge() {
 // Used by Question Studio, where one room covers two steps (Ask, then Plan).
 export function setCurrentStep(stepId) {
   currentStep = stepId;
-  setMissionBarStep(stepId);
   document.querySelectorAll('.step-bar .step').forEach((link) => {
     const isCurrent = link.dataset.step === stepId;
     link.classList.toggle('current', isCurrent);
