@@ -180,6 +180,7 @@ Parts 42 to 51. Claude commits each part; nothing is pushed until Habiba says "p
 | 42c+ | 6 Nov | `39b4021` | The "Why?" box removed from the About panel (Habiba: "repetitive"); the line next to the tab stays. |
 | 42d | 6 Nov | `512f46d` | **"🎯 For your mission:"** under "I learned" on every end-of-room card, from the child's own work (e.g. "Your graph shows the most common answer: 9 hours."; games: "The mode is Tag"). |
 | 43a | 6 Nov | `0b4d866` | **Living background** on every child page: clouds, sun, birds (flap, then glide), swaying hills and flowers, a butterfly, one touch per room (stars in Chance Lab, bars in Graph Lab, shapes, never digits, in Number Lab). Behind the card; taps go through. Start page birds stay above the title. Reduced motion: a still picture. Below 1100px the room touches are hidden (no side space). |
+| 43a+ | 6 Nov | `edc23a7` | Habiba: **only clouds** move (birds, sun, flowers, butterfly removed; hills still). Room shapes enhanced: 10 per room, 4 pictures of the room topic (Chance: star, die, coin, spinner; Graph: bars, pie, line, dots; Number: circle, triangle, square, diamond), different sizes, float, turn or twinkle. |
 
 **Decisions (Habiba, 6 Nov 2026):** no stickers on the Evidence Card, no mission
 bar, no audience sentence ("tell the principal") anywhere. Pip stands beside the

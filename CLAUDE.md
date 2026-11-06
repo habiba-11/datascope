@@ -163,6 +163,7 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 - **Working mode:** one part at a time; after each part run `npm test`, check Chrome at 1366 and 768, then Claude commits. **Never push until Habiba writes "push".**
 - **Reasoning log:** never rename a field; add new events or fields (so far: `mission-seen`).
 - **Purpose (Part 42):** a Mission card per scenario after picking it, a "🎯 Why?" line per room, and "🎯 For your mission:" on each end-of-room card. **Rejected by Habiba (6 Nov 2026), do not add back:** Evidence Card stickers, a mission bar, an audience sentence ("tell the principal").
+- **Background (6 Nov 2026):** only drifting clouds plus each room's own shapes in the side margins. **Rejected, do not add back:** birds, sun, flowers, butterfly, swaying hills.
 - **Liveliness (Part 43, decided 6 Nov 2026):** Pip beside the card at 1366, bigger inside the card below that; idle help after 10 seconds, at most once per screen; background music on but quiet, with its own switch; one composed loop shared with the story.
 - **Story (Part 44):** build `docs/design/frames/datascope-story-ui.html` exactly; read-aloud in the story only for now, with the clearest English voice available.
 - **Devices:** laptops and PC screens only (1366x768 matters most).
