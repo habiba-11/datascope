@@ -55,7 +55,8 @@ export function trailStates(step) {
   });
 }
 
-// How much to scale the stage so it fits the space it has (never bigger than real size).
+// How much to scale the stage so it fills the window, as big as fits, like the
+// approved design (Habiba, 6 Nov 2026: it must look like the design's screens).
 export function stageScale(availableWidth, availableHeight) {
-  return Math.min(1, availableWidth / STAGE_WIDTH, availableHeight / STAGE_HEIGHT);
+  return Math.min(availableWidth / STAGE_WIDTH, availableHeight / STAGE_HEIGHT);
 }

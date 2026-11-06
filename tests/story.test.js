@@ -59,8 +59,9 @@ test('the trail lights up the step of each scene; the mission has every step don
   assert.deepEqual(STEPS.map((s) => s.name), ['Ask', 'Plan', 'Collect', 'Explore', 'Conclude']);
 });
 
-test('the stage fits the screen and never grows past its real size', () => {
-  assert.equal(stageScale(1920, 1080), 1);
+test('the stage fills the window as big as fits, like the design', () => {
+  assert.equal(stageScale(1920, 1200), 2);
+  assert.equal(stageScale(1366, 768), 1.28);
   assert.equal(stageScale(480, 600), 0.5);
 });
 

@@ -164,27 +164,17 @@
   color: #fff;
 }
 
-/* ---------- the characters in a scene ---------- */
-.st-sara-spot {
-  position: absolute;
-  left: 380px;
-  top: 190px;
-  width: 200px;
-  height: 230px;
-}
+/* ---------- the scenes (js/story-scenes.js, copied from the design) ---------- */
+/* A part that pops in from a certain line: it adds no box of its own. */
+.st-part { display: contents; }
+.st-part[hidden] { display: none; }
+.st-defs { position: absolute; }
 
 .st-small-pip {
   position: absolute;
   left: 20px;
   top: 310px;
   width: 96px;
-}
-
-.st-mission-pip {
-  position: absolute;
-  left: 400px;
-  top: 150px;
-  width: 160px;
 }
 
 .st-sara,
@@ -432,6 +422,21 @@
 @keyframes st-kid-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes st-clap { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(9px); } }
 @keyframes st-zzz { 0% { opacity: 0; transform: translate(0, 6px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(10px, -18px); } }
+
+/* The design's scene animations (its names, with "st-" in front). */
+@keyframes st-popin { 0% { transform: scale(0.4); opacity: 0; } 70% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes st-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes st-rise { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes st-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes st-starfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes st-pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.95; transform: scale(1.14); } }
+@keyframes st-tw { 0%, 100% { opacity: 0.3; transform: scale(0.55) rotate(0deg); } 50% { opacity: 1; transform: scale(1) rotate(24deg); } }
+@keyframes st-roll { 0% { transform: rotate(0deg) translateY(0); } 25% { transform: rotate(120deg) translateY(-24px); } 50% { transform: rotate(240deg) translateY(0); } 75% { transform: rotate(330deg) translateY(-14px); } 100% { transform: rotate(360deg) translateY(0); } }
+@keyframes st-stamp { 0% { transform: scale(2.2) rotate(-20deg); opacity: 0; } 60% { transform: scale(0.92) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(10deg); opacity: 1; } }
+@keyframes st-fall { 0% { transform: translateY(-30px) rotate(0deg); } 100% { transform: translateY(380px) rotate(320deg); } }
+@keyframes st-nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes st-shoot { 0% { transform: translate(0, 0); opacity: 0; } 3% { opacity: 1; } 13% { transform: translate(260px, 110px); opacity: 0; } 100% { transform: translate(260px, 110px); opacity: 0; } }
+@keyframes st-dust { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(-80px) scale(1.1); opacity: 0; } }
 
 /* Reduced motion: the clouds rest in view. */
 @media (prefers-reduced-motion: reduce) {

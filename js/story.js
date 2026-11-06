@@ -14,10 +14,12 @@ import {
   nextPosition, previousPosition, skipPosition, nextLabel, trailStates, stageScale,
 } from './helpers/story.js';
 import { avatarSVG } from './story-characters.js';
-import { sceneHTML } from './story-scenes.js';
+import { sceneHTML, STORY_DEFS } from './story-scenes.js';
 
 const SOUND_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="currentColor"/><path d="M16 9 Q19 12 16 15 M18.5 6.5 Q24 12 18.5 17.5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>';
-const MUSIC_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18 V6 L20 4 V16" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="3" fill="currentColor"/><circle cx="17.5" cy="16" r="3" fill="currentColor"/></svg>';
+// The design's bold tick for a step that is done (a drawing, not a thin ✓).
+const TICK = '<svg width="20" height="20" viewBox="0 0 20 20" aria-label="done"><path d="M4 10 L8.5 14.5 L16 6" stroke="#17324D" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const MUSIC_ICON ='<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18 V6 L20 4 V16" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="3" fill="currentColor"/><circle cx="17.5" cy="16" r="3" fill="currentColor"/></svg>';
 
 // The sky behind every scene: drifting clouds (like the rooms), across the
 // whole window. The hills are part of the stage (so Sara always stands on
@@ -43,6 +45,7 @@ export function openStory(words, returnTo) {
   dialog.className = 'story';
   dialog.setAttribute('aria-labelledby', 'story-title');
   dialog.innerHTML = `
+    ${STORY_DEFS}
     ${SKY}
     <div class="story-stage" id="story-stage">
       ${HILLS}
@@ -85,9 +88,9 @@ export function openStory(words, returnTo) {
   document.body.append(dialog);
   const get = (id) => dialog.querySelector(`#${id}`);
 
-  // The 960 x 600 stage is scaled to fit the window (never bigger than real size).
+  // The 960 x 600 stage is scaled to fill the window, as big as fits (like the design).
   function fit() {
-    get('story-stage').style.setProperty('--scale', stageScale(innerWidth - 16, innerHeight - 16));
+    get('story-stage').style.setProperty('--scale', stageScale(innerWidth, innerHeight));
   }
   fit();
   window.addEventListener('resize', fit);
@@ -115,7 +118,7 @@ export function openStory(words, returnTo) {
 
     get('story-trail').innerHTML = trailStates(scene.step).map((s, i) => `
       <li class="story-step story-step--${s.state}" style="--c: var(--color-${s.colour})">
-        <span class="story-step-dot">${s.state === 'done' ? '✓' : i + 1}</span>
+        <span class="story-step-dot">${s.state === 'done' ? TICK : i + 1}</span>
         <span class="story-step-name">${s.name}</span>
       </li>`).join('');
 
@@ -124,8 +127,11 @@ export function openStory(words, returnTo) {
       shownScene = position.scene;
       get('story-scene').innerHTML = sceneHTML(scene.id);
     }
-    get('story-scene').querySelectorAll('[data-line]').forEach((part) => {
-      part.hidden = Number(part.dataset.line) > position.line;
+    // A part shows from its data-line on, or only before its data-before.
+    get('story-scene').querySelectorAll('.st-part').forEach((part) => {
+      const from = Number(part.dataset.line || 0);
+      const until = part.dataset.before === undefined ? Infinity : Number(part.dataset.before);
+      part.hidden = position.line < from || position.line >= until;
     });
 
     get('story-avatar').innerHTML = avatarSVG(line.who);
