@@ -7,7 +7,7 @@ let audio = null; // one shared AudioContext, made on the first sound
 
 // Each sound is a short list of notes: [frequency in Hz, start in seconds, length in seconds].
 // "wave" changes the feel: 'sine' is soft, 'triangle' is a bit brighter.
-const SOUNDS = {
+export const SOUNDS = {
   correct: { wave: 'triangle', volume: 0.12, notes: [[523, 0, 0.12], [659, 0.1, 0.12], [784, 0.2, 0.25]] },
   tryAgain: { wave: 'sine', volume: 0.1, notes: [[392, 0, 0.15], [330, 0.15, 0.25]] }, // gentle, not a buzzer
   badge: { wave: 'sine', volume: 0.15, notes: [[660, 0, 0.3], [880, 0.12, 0.3]] },
@@ -44,9 +44,15 @@ const SOUNDS = {
   // never silent (Habiba, 4 Nov 2026: "sometimes it has sound, sometimes not").
   confetti: { wave: 'triangle', volume: 0.08, notes: [[1047, 0, 0.12], [1319, 0.07, 0.12], [1568, 0.14, 0.12], [2093, 0.21, 0.3]] },
   // Part 43c: Pip's own sounds with a line (helpers/pip-lines.js PIP_EVENTS).
-  // A soft owl "hoo-hoo" (a room opens) and a quick chirp (a wink for a hint).
-  hoot: { wave: 'sine', volume: 0.1, notes: [[392, 0, 0.2], [330, 0.24, 0.3]] },
-  chirp: { wave: 'triangle', volume: 0.06, notes: [[1319, 0, 0.06], [1568, 0.08, 0.09]] },
+  // A soft owl "hoo-HOO" going UP (a room opens). It used to go down, from the
+  // same note to the same note as tryAgain, so a new room sounded like a
+  // mistake (Habiba, 6 Nov 2026). Now only "try again" goes down (tested).
+  hoot: { wave: 'sine', volume: 0.1, notes: [[440, 0, 0.18], [587, 0.22, 0.3]] },
+  // Pip winks when a hint is used: a quick bright blink of sound.
+  wink: { wave: 'triangle', volume: 0.06, notes: [[1319, 0, 0.06], [1568, 0.08, 0.09]] },
+  // Part 43d: a very soft tap for every button press, and a whoosh when a new room opens.
+  tap: { wave: 'sine', volume: 0.04, notes: [[700, 0, 0.05]] },
+  whoosh: { wave: 'sine', volume: 0.05, notes: [[300, 0, 0.06], [420, 0.04, 0.06], [560, 0.08, 0.06], [740, 0.12, 0.07], [960, 0.16, 0.1]] },
   // Every badge that lands in the backpack: a soft "pop" in.
   badgeLand: { wave: 'sine', volume: 0.15, notes: [[440, 0, 0.08], [880, 0.06, 0.2]] },
 };
@@ -67,6 +73,21 @@ globalThis.document?.addEventListener('pointerdown', () => {
 // played late: the waiting time is taken off every note, and a note whose
 // moment has passed is skipped (so the sound always matches its motion).
 const WAKE_MS = 250;
+
+// The only sounds that may end lower than they start: a gentle "try again",
+// and the chance devices and the stamp landing with a thud. Every other sound
+// means "good" or "here we go", so it goes up or stays (tests/sounds.test.js).
+export const FALLING_SOUNDS = ['tryAgain', 'stamp', 'flip', 'roll'];
+
+// The one shared AudioContext (js/music.js plays the music on it too), or null.
+export function audioContext() {
+  try {
+    audio = audio || new AudioContext();
+    return audio;
+  } catch {
+    return null;
+  }
+}
 
 export function playSound(name) {
   play(SOUNDS[name]);

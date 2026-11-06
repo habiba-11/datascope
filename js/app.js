@@ -12,6 +12,8 @@ import { backendReady } from './config.js';
 import { EXIT_BUTTON_HTML, setupExitButton } from './exit-button.js';
 import { mountSky } from './ambient.js';
 import { mountPipStand } from './pip-stand.js';
+import { setupMusic } from './music.js';
+import { playSound } from './sounds.js';
 
 // `icon` is a line icon from icons.js (step bar); `emoji` is used in Pip's words.
 const STEPS = [
@@ -95,6 +97,14 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   // Part 43a: the living background, with this room's own touch (My journey has no phase).
   mountSky(phase || step);
   mountPipStand(); // Part 43c: big Pip beside the card, alive and talking
+  // Part 43d: a whoosh as the room opens, a soft tap for every button, and the music.
+  playSound('whoosh');
+  document.addEventListener('pointerdown', (e) => {
+    const button = e.target.closest('.btn');
+    if (button && !button.disabled && !button.classList.contains('sound-toggle')) playSound('tap');
+  });
+  const musicButton = document.getElementById('music-toggle');
+  if (musicButton) setupMusic(musicButton);
   setupCelebrations();
   setupAboutTab();
   watchPressedState();
@@ -168,6 +178,7 @@ function cardBodyHTML(accent, contentHTML) {
       </div>
       <div class="status-tools">
         <button class="btn btn-quiet sound-toggle" id="sound-toggle" type="button" aria-pressed="true">🔊 Sound: on</button>
+        <button class="btn btn-quiet sound-toggle" id="music-toggle" type="button" aria-pressed="true">🎵 Music: on</button>
         ${EXIT_BUTTON_HTML}
       </div>
     </footer>`;

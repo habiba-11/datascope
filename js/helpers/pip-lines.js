@@ -13,7 +13,7 @@ export const PIP_EVENTS = {
   tryAgain: { move: 'tilt', sound: null },
   badge: { move: 'cheer', sound: null },
   phaseDone: { move: 'dance', sound: null },
-  hint: { move: 'wink', sound: 'chirp' },
+  hint: { move: 'wink', sound: 'wink' },
 };
 
 // Pip's idle life: one small move every few seconds, never the same twice in a row.

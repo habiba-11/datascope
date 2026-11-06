@@ -86,6 +86,18 @@ export function setSoundOn(on) {
   writeItem(SOUND_KEY, on ? 'on' : 'off');
 }
 
+// The background music has its own switch (Part 43d, Habiba 6 Nov 2026): ON
+// by default (and quiet), until the child turns it off.
+const MUSIC_KEY = 'datascope:music';
+
+export function getMusicOn() {
+  return readItem(MUSIC_KEY) !== 'off';
+}
+
+export function setMusicOn(on) {
+  writeItem(MUSIC_KEY, on ? 'on' : 'off');
+}
+
 // The ids of log entries already sent to the online database (Part 22),
 // so each entry is sent once. Entries that can never be accepted are added too.
 const SENT_KEY = 'datascope:sentIds';
