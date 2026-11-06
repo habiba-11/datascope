@@ -102,8 +102,8 @@ bugs" rule:** deliberate changes based on the pilot children's feedback.
 
 ## 6. Decisions that still hold
 
-- **Rewards are for good reasoning, never speed.** No timers (the tutorial's
-  autoplay is the one exception), no leaderboards, no comparing children. Stars
+- **Rewards are for good reasoning, never speed.** No timers at all (since Part 44 the
+  story moves only on Next), no leaderboards, no comparing children. Stars
   ignore where an answer came from, so a hint never costs a star.
 - **Hints give answers:** the first 💡 tap shows 3 true answers; tap (main) or
   drag (bonus); the child can edit them. The 💡 button sits under the question.
@@ -191,6 +191,7 @@ Parts 42 to 51. Claude commits each part; nothing is pushed until Habiba says "p
 | fix | 6 Nov | `2ac19ea` | Fireworks behind the cards, where they can be seen, with a real firework sound (whistle, bang, crackles); My journey loops them every 1.3 s. |
 | fix | 6 Nov | `a9e792b` | Number Lab Build it: 💡 hint ("write the mean in all 5 boxes", then a chip that fills them). New field `usedHint` on the build-mean `meaning-task` entry; `hint-picked` with suggestionId `fill-mean`. |
 | fix | 6 Nov | `fd7bdee` | **Realistic fireworks** (Habiba: cartoonish, annoying sound): canvas behind the cards, rocket + glowing streaks with gravity and glitter; sound made from noise (launch, hiss, boom with echo, crackles); My journey loop every 2.2 s, far-off and quiet. 60 fps with the CPU slowed 4x. |
+| 44a | 6 Nov | `642194f` | **The story** replaces the film (no timer): Start cover, trail, switches, dialog card, Next/Back/Skip/arrow keys/Esc; 7 scenes in `data/content/story.json`. Habiba: old "6 rooms" and "hints" scenes dropped; scene 7 says "a pretend class" (no size); the story sky is like the rooms (clouds, hills). |
 
 **Decisions (Habiba, 6 Nov 2026):** no stickers on the Evidence Card, no mission
 bar, no audience sentence ("tell the principal") anywhere. Pip stands beside the
