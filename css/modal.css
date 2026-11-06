@@ -494,3 +494,10 @@ body.modal-open {
   font-family: var(--font-heading);
   font-weight: 800;
 }
+
+/* Part 42d: "🎯 For your mission:" under "I learned", with a thin line between. */
+.ps-box .ps-mission {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 2px dashed var(--color-navy);
+}

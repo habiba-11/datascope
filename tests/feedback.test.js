@@ -1,10 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildPhaseFeedback, countWords, FEEDBACK_PHASES, STAR_WORDS, SOURCE_CHIPS, combineSources, yourWork,
+  buildPhaseFeedback, countWords, FEEDBACK_PHASES, STAR_WORDS, SOURCE_CHIPS, combineSources, yourWork, missionLine,
 } from '../js/helpers/feedback.js';
 import { PHASES } from '../js/helpers/progress.js';
 import { makeEntry } from '../js/helpers/log.js';
+import { longestSentence, MAX_SENTENCE_WORDS } from '../js/helpers/readability.js';
 
 test('every phase has feedback rules', () => {
   assert.deepEqual([...FEEDBACK_PHASES].sort(), [...PHASES].sort());
@@ -154,4 +155,38 @@ test('Your work never changes the stars (a hint never costs a star)', () => {
   const own = buildPhaseFeedback('graph', { typesTried: 2, notTellWords: 6, notTellText: 'x', notTellSource: 'own' });
   const hint = buildPhaseFeedback('graph', { typesTried: 2, notTellWords: 6, notTellText: 'x', notTellSource: 'hint' });
   assert.equal(own.stars, hint.stars);
+});
+
+// ---------- Part 42d: "🎯 For your mission:" ----------
+
+test('every phase card has a mission line from the child\'s own work', () => {
+  const facts = {
+    ask: {}, plan: { guessText: '8' }, collect: { mostCommon: '9 hours' }, graph: { top: '9 hours' },
+    number: { mean: '8.4', kind: 'number' }, chance: {}, conclude: {},
+  };
+  for (const [phase, f] of Object.entries(facts)) {
+    const card = buildPhaseFeedback(phase, f);
+    assert.ok(card.mission, phase);
+    assert.ok(longestSentence(card.mission) <= MAX_SENTENCE_WORDS, card.mission);
+  }
+  assert.equal(missionLine('graph', { top: '9 hours' }), 'Your graph shows the most common answer: 9 hours.');
+  assert.equal(missionLine('number', { mean: '8.4', kind: 'number' }), 'In one number: the mean is 8.4.');
+});
+
+test('mission line: two classes and games get their own sentences', () => {
+  assert.equal(missionLine('collect', { mostCommon: null }), 'Now you have answers from both classes.');
+  assert.equal(missionLine('graph', { top: null }), 'Your graphs show how the two classes are different.');
+  assert.match(missionLine('number', { mean: '30', kind: 'compare' }), /same mean: 30/);
+  assert.equal(missionLine('number', {}), 'Now you can say the answer in one number.');
+});
+
+test('mission line for games never talks about numbers', () => {
+  const games = [
+    missionLine('collect', { mostCommon: 'Tag' }),
+    missionLine('graph', { top: 'Tag' }),
+    missionLine('number', { guess: 'Tag', mode: ['Tag', 'Swings'] }),
+    missionLine('plan', { guessText: '"Tag"' }),
+  ];
+  assert.equal(games[2], 'The mode is Tag and Swings: the game picked the most.');
+  for (const text of games) assert.doesNotMatch(text, /\b(number|numbers|mean|median|range|average)\b/i, text);
 });

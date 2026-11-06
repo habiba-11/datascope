@@ -326,6 +326,8 @@ async function init() {
       // For "Your work" on the card (only words; the stars ignore the source).
       notTellText: document.getElementById('not-tell').value.trim(),
       notTellSource: hints['not-tell'].answerFields().answerSource,
+      // Part 42d: "For your mission" names the most common answer (one class only).
+      top: partner ? null : facts.top,
     });
     refreshPrimary();
   }

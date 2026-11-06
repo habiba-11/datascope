@@ -67,6 +67,7 @@ async function init() {
   tasks = TASKS_BY_KIND[kind];
   tasks.forEach((task, i) => { taskComplete[i + 1] = false; });
   numberFacts.teaches = recipe.teaches;
+  numberFacts.kind = kind; // Part 42d: two classes get their own "For your mission" line
 
   const { values } = generateClassData(recipe);
   const valuesB = partner ? generateClassData(partner).values : null;
