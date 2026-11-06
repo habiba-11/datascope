@@ -136,6 +136,7 @@ bugs" rule:** deliberate changes based on the pilot children's feedback.
 ## 7. Known open items
 
 - Not yet tested on a real Chromebook or tablet, or with a real screen reader.
+- Read-aloud voices differ per device. Chrome on Windows offline had only Microsoft George, Hazel and Susan; Google voices need the internet; a Chromebook may have others. Listen on the school laptops; if the voices sound robotic, record the lines as small audio files (Part 44 option).
 - The page fade between rooms sometimes logs "Transition was aborted" in the
   console. Children don't see it.
 - Graph Lab bar colours repeat after 5 values (the labels carry the meaning).
@@ -193,6 +194,7 @@ Parts 42 to 51. Claude commits each part; nothing is pushed until Habiba says "p
 | fix | 6 Nov | `fd7bdee` | **Realistic fireworks** (Habiba: cartoonish, annoying sound): canvas behind the cards, rocket + glowing streaks with gravity and glitter; sound made from noise (launch, hiss, boom with echo, crackles); My journey loop every 2.2 s, far-off and quiet. 60 fps with the CPU slowed 4x. |
 | 44a | 6 Nov | `642194f` | **The story** replaces the film (no timer): Start cover, trail, switches, dialog card, Next/Back/Skip/arrow keys/Esc; 7 scenes in `data/content/story.json`. Habiba: old "6 rooms" and "hints" scenes dropped; scene 7 says "a pretend class" (no size); the story sky is like the rooms (clouds, hills). |
 | 44b | 6 Nov | `9545c37` | The story looks like the approved design: its 7 scenes copied from `datascope-story-ui.html`, parts pop in line by line, the stage fills the window. Not copied (Habiba): sun, birds, flowers; the class size. |
+| 44c | 6 Nov | `4011ad1` | **Read-aloud** (own switch, on): the clearest English browser voice; Pip male, Sara female, the class higher; CAPITAL words said in lowercase; mouths move only while speaking; music 70% quieter meanwhile; "Hear this again". The design's scene sound effects per line. Found: this Windows laptop has only Microsoft George, Hazel and Susan (no Natural or Google voices offline). |
 
 **Decisions (Habiba, 6 Nov 2026):** no stickers on the Evidence Card, no mission
 bar, no audience sentence ("tell the principal") anywhere. Pip stands beside the

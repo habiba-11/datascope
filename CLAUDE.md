@@ -165,5 +165,5 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 - **Purpose (Part 42):** a Mission card per scenario after picking it, a "🎯 Why?" line per room. **Rejected by Habiba (6 Nov 2026), do not add back:** Evidence Card stickers, a mission bar, an audience sentence ("tell the principal"), "🎯 For your mission" on the end-of-room cards.
 - **Background (6 Nov 2026):** only drifting clouds plus each room's own shapes in the side margins. **Rejected, do not add back:** birds, sun, flowers, butterfly, swaying hills.
 - **Liveliness (Part 43, decided 6 Nov 2026):** Pip beside the card at 1366, bigger inside the card below that; idle help after 10 seconds, at most once per screen; background music on but quiet, with its own switch; one composed loop shared with the story.
-- **Story (Part 44):** build `docs/design/frames/datascope-story-ui.html` exactly; read-aloud in the story only for now, with the clearest English voice available.
+- **Story (Part 44, built 6 Nov 2026):** looks like `docs/design/frames/datascope-story-ui.html` (scenes copied from it, stage fills the window), without the sun, birds, flowers and the class size. Read-aloud in the story only (own switch, on by default), the clearest English browser voice. No timer: Next and Back only.
 - **Devices:** laptops and PC screens only (1366x768 matters most).
