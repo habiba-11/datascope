@@ -43,6 +43,10 @@ const SOUNDS = {
   // Every confetti burst plays this sparkle (motion.js confetti), so confetti is
   // never silent (Habiba, 4 Nov 2026: "sometimes it has sound, sometimes not").
   confetti: { wave: 'triangle', volume: 0.08, notes: [[1047, 0, 0.12], [1319, 0.07, 0.12], [1568, 0.14, 0.12], [2093, 0.21, 0.3]] },
+  // Part 43c: Pip's own sounds with a line (helpers/pip-lines.js PIP_EVENTS).
+  // A soft owl "hoo-hoo" (a room opens) and a quick chirp (a wink for a hint).
+  hoot: { wave: 'sine', volume: 0.1, notes: [[392, 0, 0.2], [330, 0.24, 0.3]] },
+  chirp: { wave: 'triangle', volume: 0.06, notes: [[1319, 0, 0.06], [1568, 0.08, 0.09]] },
   // Every badge that lands in the backpack: a soft "pop" in.
   badgeLand: { wave: 'sine', volume: 0.15, notes: [[440, 0, 0.08], [880, 0.06, 0.2]] },
 };

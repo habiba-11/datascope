@@ -36,8 +36,15 @@ export function animate(element, name) {
 
 // Pip reacts: 'hop' (a happy hop, wings up) or 'think' (a head tilt, eyes up, "?").
 export function pipReacts(name) {
-  animate(document.querySelector('.pip-mascot'), name);
+  // Every Pip on the page: the one in the card and (Part 43c) big Pip beside it.
+  document.querySelectorAll('.pip-mascot').forEach((pip) => animate(pip, name));
   pipMoodFor(name === 'think' ? 'think' : 'cheer');
+}
+
+// Part 43c: tells big Pip (js/pip-stand.js) to say a line for this event.
+// An event on the window, so motion.js does not need to know about the stand.
+function pipLine(event) {
+  window.dispatchEvent(new CustomEvent('datascope:pip', { detail: { event } }));
 }
 
 // ---------- GSAP helpers (Part 21a) ----------
@@ -215,6 +222,7 @@ export function cheer(feedback) {
   playSound('correct');
   animate(feedback, 'cheer');
   pipReacts('hop');
+  pipLine('correct');
 }
 
 // A wrong answer: a soft sound, a gentle wobble, and Pip thinks with you.
@@ -223,4 +231,5 @@ export function encourage(feedback) {
   playSound('tryAgain');
   animate(feedback, 'wobble');
   pipReacts('think');
+  pipLine('tryAgain');
 }

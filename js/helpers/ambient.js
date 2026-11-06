@@ -43,14 +43,14 @@ export const ROOM_SHAPES = {
 const SPINNERS = new Set(['circle', 'triangle', 'square', 'diamond', 'spinner', 'coin', 'die']);
 const TWINKLERS = new Set(['star']);
 
-// Where the 10 shapes sit: 5 down each side margin, at different heights and
-// sizes (px), each with its own speed, so they never move in step.
+// Where the shapes sit, at different heights and sizes (px), each with its own
+// speed, so they never move in step. The bottom of the left margin belongs to
+// Pip (Part 43c, js/pip-stand.js), so the left shapes stay above PIP_TOP_VH.
+export const PIP_TOP_VH = 56;
 const SPOTS = [
   { x: 4, y: 24, size: 30, seconds: 4.2, delay: 0 },
-  { x: 10, y: 38, size: 44, seconds: 5.6, delay: -1.2 },
-  { x: 3, y: 54, size: 36, seconds: 4.8, delay: -2.6 },
-  { x: 9, y: 68, size: 26, seconds: 3.8, delay: -0.6 },
-  { x: 5, y: 76, size: 40, seconds: 6.2, delay: -3.1 },
+  { x: 10, y: 36, size: 44, seconds: 5.6, delay: -1.2 },
+  { x: 4, y: 48, size: 34, seconds: 4.8, delay: -2.6 },
   { x: 92, y: 22, size: 38, seconds: 5.2, delay: -0.9 },
   { x: 96, y: 36, size: 28, seconds: 4.0, delay: -2.0 },
   { x: 90, y: 50, size: 46, seconds: 6.0, delay: -3.4 },

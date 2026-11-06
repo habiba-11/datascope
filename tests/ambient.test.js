@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  skyPlan, moverCount, blinkLoops, ROOM_SHAPES, MAX_MOVERS, MIN_BLINK_SECONDS,
+  skyPlan, moverCount, blinkLoops, ROOM_SHAPES, MAX_MOVERS, MIN_BLINK_SECONDS, PIP_TOP_VH,
 } from '../js/helpers/ambient.js';
 
 const ROOMS = [...Object.keys(ROOM_SHAPES), 'welcome'];
@@ -48,5 +48,14 @@ test('only stars twinkle; clouds drift slowly and rest in view with reduced moti
   for (const c of skyPlan('ask').clouds) {
     assert.ok(c.seconds >= 30, `cloud crosses in ${c.seconds}s`);
     assert.equal(typeof c.restX, 'number');
+  }
+});
+
+test('the left shapes stay above Pip, who stands at the bottom of the left margin', () => {
+  for (const room of Object.keys(ROOM_SHAPES)) {
+    for (const t of skyPlan(room).touches.filter((s) => s.x < 50)) {
+      // y is the top of the shape (vh); its size is at most 46px (about 6vh at 768px).
+      assert.ok(t.y + 6 <= PIP_TOP_VH, `${room}: left shape at ${t.y}vh`);
+    }
   }
 });

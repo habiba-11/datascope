@@ -1,0 +1,55 @@
+{
+  "roomOpen": [
+    "Hi again! Let's explore this room.",
+    "Welcome! I'm ready when you are.",
+    "Hoo-hoo! A new room to explore!",
+    "Let's find out something new!",
+    "Ready, detective? Let's go!",
+    "This room has a job for you.",
+    "Here we are! Read the question first."
+  ],
+  "correct": [
+    "Great thinking!",
+    "Yes! You got it!",
+    "Hoo-hoo! Well done!",
+    "Super detective work!",
+    "That's right! Nice work!",
+    "Brilliant! Keep going!",
+    "Wow, sharp thinking!",
+    "Correct! I'm so proud of you!"
+  ],
+  "tryAgain": [
+    "Try again, you can do it!",
+    "Almost! Have another look.",
+    "Good try! Check it once more.",
+    "Mistakes help us learn. Try again!",
+    "Hmm, not yet. You've got this!",
+    "Take your time and try again.",
+    "Look closely. You can fix it!",
+    "Nice effort! One more try."
+  ],
+  "badge": [
+    "You found a badge!",
+    "Congratulations! A new badge!",
+    "A badge for great thinking!",
+    "Look! Your backpack got a badge!",
+    "Hoo-hoo! Badge time!",
+    "You earned it with good reasons!"
+  ],
+  "phaseDone": [
+    "Congratulations! Step finished!",
+    "Hooray! You did it!",
+    "Great work! On to the next step!",
+    "Happy dance time!",
+    "You finished this part. Amazing!",
+    "Hoo-hoo! Another step done!"
+  ],
+  "hint": [
+    "Here's a hint, just for you!",
+    "Psst! Hints help us learn.",
+    "Good idea to ask for help!",
+    "Hints never cost a star!",
+    "Hints are a smart tool!",
+    "Use the hint, then think!"
+  ]
+}

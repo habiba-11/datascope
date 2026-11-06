@@ -426,3 +426,114 @@
     font-size: 16px;
   }
 }
+
+/* ---------- Part 43c (Round 4): big Pip beside the card (js/pip-stand.js) ---------- */
+/* On a laptop screen Pip stands on the hills in the left margin, as wide as the
+   margin allows (148px at 1280, 180px at 1366 and more), with a speech bubble
+   above. Narrower screens have no margin: the small Pip in the card grows instead. */
+.pip-stand {
+  display: none;
+}
+
+@media (min-width: 1240px) {
+  .pip-stand {
+    position: fixed;
+    left: 8px;
+    bottom: 24px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(180px, calc((100vw - 1000px) / 2 + 8px));
+    pointer-events: none; /* never in the way of a tap */
+  }
+
+  .pip-line .pip-mascot--line {
+    display: none; /* big Pip stands beside the card instead */
+  }
+}
+
+@media (max-width: 1239px) {
+  .pip-line .pip-mascot--line {
+    width: 80px;
+  }
+}
+
+.pip-stand-body {
+  width: 82%;
+}
+
+.pip-stand-bubble {
+  position: relative;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* The bubble's tail points down at Pip. */
+.pip-stand-bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  background: var(--color-card-bg);
+  border-right: var(--border-width) solid var(--color-navy);
+  border-bottom: var(--border-width) solid var(--color-navy);
+  transform: rotate(45deg);
+}
+
+.pip-bubble-pop {
+  animation: m-pop var(--duration-medium) var(--ease-spring);
+}
+
+/* Pip's moves (helpers/pip-lines.js), played by js/motion.js animate(). */
+.pip-move-hop { animation: pip-hop 0.6s ease-out; }
+.pip-move-tilt { animation: pip-think 0.9s ease-in-out; }
+.pip-move-jump { animation: pip-jump 0.8s var(--ease-spring); }
+.pip-move-dance { animation: pip-dance 1.4s ease-in-out; }
+.pip-move-cheer { animation: pip-jump 0.8s var(--ease-spring); }
+.pip-move-wave .pip-wing-right { animation: pip-wave 1.2s ease-in-out; }
+.pip-move-look .pip-pupils { animation: pip-look 1.6s ease-in-out; }
+.pip-move-cheer .pip-wing-left { animation: pip-wing-up-left 1s ease-in-out; }
+.pip-move-cheer .pip-wing-right { animation: pip-wing-up-right 1s ease-in-out; }
+
+/* A wink: the left eye stays open, the right eyelid closes once. */
+.pip-move-wink .pip-lids { animation: none; transform: none; }
+.pip-move-wink .pip-lids ellipse { transform-box: fill-box; transform-origin: center; transform: scaleY(0); }
+.pip-move-wink .pip-lids ellipse:last-child { animation: pip-wink 0.8s ease-in-out; }
+
+@keyframes pip-jump {
+  0%, 100% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-30px) scale(1.06); }
+  65% { transform: translateY(0) scale(0.96, 1.04); }
+}
+@keyframes pip-dance {
+  0%, 100% { transform: rotate(0) translateY(0); }
+  20% { transform: rotate(-10deg) translateY(-12px); }
+  40% { transform: rotate(10deg) translateY(0); }
+  60% { transform: rotate(-10deg) translateY(-12px); }
+  80% { transform: rotate(10deg) translateY(0); }
+}
+@keyframes pip-wave {
+  0%, 100% { transform: rotate(0); }
+  25%, 75% { transform: rotate(-75deg); }
+  50% { transform: rotate(-45deg); }
+}
+@keyframes pip-look {
+  0%, 100% { transform: translate(0, 0); }
+  30% { transform: translate(-4px, 0); }
+  70% { transform: translate(4px, 1px); }
+}
+@keyframes pip-wing-up-left { 0%, 100% { transform: rotate(0); } 30%, 70% { transform: rotate(55deg); } }
+@keyframes pip-wing-up-right { 0%, 100% { transform: rotate(0); } 30%, 70% { transform: rotate(-55deg); } }
+@keyframes pip-wink { 0%, 100% { transform: scaleY(0); } 30%, 60% { transform: scaleY(1); } }

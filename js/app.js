@@ -11,6 +11,7 @@ import { startSync, STATUS_TEXT } from './storage/sync.js';
 import { backendReady } from './config.js';
 import { EXIT_BUTTON_HTML, setupExitButton } from './exit-button.js';
 import { mountSky } from './ambient.js';
+import { mountPipStand } from './pip-stand.js';
 
 // `icon` is a line icon from icons.js (step bar); `emoji` is used in Pip's words.
 const STEPS = [
@@ -93,6 +94,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
 
   // Part 43a: the living background, with this room's own touch (My journey has no phase).
   mountSky(phase || step);
+  mountPipStand(); // Part 43c: big Pip beside the card, alive and talking
   setupCelebrations();
   setupAboutTab();
   watchPressedState();
