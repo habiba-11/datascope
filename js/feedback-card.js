@@ -76,22 +76,6 @@ function tipBox(icon, label, text, className, ms) {
   return box;
 }
 
-// "I learned", then (Part 42d) "🎯 For your mission:" from the child's own work,
-// in the same blue box, so the card does not grow by a whole box.
-function learnBox(card) {
-  const box = tipBox('brain', 'I learned:', card.learned, 'ps-learn', 3000);
-  if (card.mission) {
-    const line = el('p', '', 'ps-mission');
-    line.append(el('b', '🎯 For your mission: '), card.mission);
-    // The box puts its icon beside the words, so both lines go in one wrapper.
-    const learned = box.querySelector('p');
-    const words = el('div', '', 'ps-learn-words');
-    learned.replaceWith(words);
-    words.append(learned, line);
-  }
-  return box;
-}
-
 // The 7 stops: done ✓, this one glows, the rest dashed with their number.
 function trailNode(phase) {
   const here = PHASES.indexOf(phase);
@@ -138,7 +122,7 @@ export function showFeedbackCard(phase, card) {
   body.append(
     wins,
     tipBox('bulb', 'Next time:', card.nextTime, 'ps-next', 2800),
-    learnBox(card),
+    tipBox('brain', 'I learned:', card.learned, 'ps-learn', 3000),
     trailNode(phase),
   );
 

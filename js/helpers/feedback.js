@@ -184,32 +184,7 @@ export function yourWork(phase, facts = {}) {
   return YOUR_WORK[phase] ? YOUR_WORK[phase](facts) : null;
 }
 
-// Part 42d (Round 4 pilot feedback): "🎯 For your mission:" one sentence, from
-// the child's own work, that points back to the mission. Games (words) never
-// get a number sentence: their Number Lab line is about the mode.
-const MISSION_LINES = {
-  ask: () => 'Your mission now has a clear question.',
-  plan: (f) => (f.guessText ? `You guessed ${f.guessText}. The data will show if you are right.` : null),
-  // facts.mostCommon is null for two classes (each has its own).
-  collect: (f) => (f.mostCommon ? `The most common answer so far is ${f.mostCommon}.` : 'Now you have answers from both classes.'),
-  // facts.top: the most common answer (Graph Lab), or null for two classes.
-  graph: (f) => (f.top ? `Your graph shows the most common answer: ${f.top}.` : 'Your graphs show how the two classes are different.'),
-  number: (f) => {
-    if (Array.isArray(f.mode) && f.mean === undefined) return `The mode is ${f.mode.join(' and ')}: the game picked the most.`;
-    if (f.mean === undefined || f.mean === null) return 'Now you can say the answer in one number.';
-    return f.kind === 'compare'
-      ? `Both classes have the same mean: ${f.mean}. Their spread is different.`
-      : `In one number: the mean is ${f.mean}.`;
-  },
-  chance: () => 'Now you can say how sure you are about your answer.',
-  conclude: () => 'Your Evidence Card answers your mission!',
-};
-
-export function missionLine(phase, facts = {}) {
-  return MISSION_LINES[phase] ? MISSION_LINES[phase](facts) : null;
-}
-
-// Returns { stars (1 to 3), starWord, wins (at most 3), nextTime, learned, mission, yourWork }.
+// Returns { stars (1 to 3), starWord, wins (at most 3), nextTime, learned, yourWork }.
 export function buildPhaseFeedback(phase, facts = {}) {
   const rule = RULES[phase];
   if (!rule) throw new Error(`No feedback rules for phase "${phase}"`);
@@ -221,7 +196,6 @@ export function buildPhaseFeedback(phase, facts = {}) {
     wins: card.wins.filter(Boolean).slice(0, 3),
     nextTime: card.nextTime,
     learned: card.learned,
-    mission: missionLine(phase, facts),
     yourWork: yourWork(phase, facts),
   };
 }
