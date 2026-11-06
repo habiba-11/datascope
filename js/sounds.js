@@ -110,6 +110,44 @@ export function playClaps(at = 0, count = 6) {
   }
 }
 
+// Part 44c: a real-sounding yawn (Habiba, 6 Nov 2026: "do a yawn voice, not
+// read the word"). A buzzy voice tone through a vowel-shaped filter ("haaa"),
+// rising, holding, then sinking ("mmm"), with a little breath of air.
+export const YAWN_SECONDS = 1.4;
+
+export function playYawn(at = 0) {
+  if (!getSoundOn()) return;
+  const c = audioContext();
+  if (!c || c.state !== 'running') return;
+  try {
+    const t = c.currentTime + at;
+    const end = t + YAWN_SECONDS;
+    const voice = c.createOscillator();
+    voice.type = 'sawtooth';
+    voice.frequency.setValueAtTime(170, t);
+    voice.frequency.linearRampToValueAtTime(290, t + 0.45);
+    voice.frequency.linearRampToValueAtTime(260, t + 0.8);
+    voice.frequency.linearRampToValueAtTime(140, end);
+    const vowel = c.createBiquadFilter(); // the open "aaa" mouth, closing to "mmm"
+    vowel.type = 'lowpass';
+    vowel.Q.value = 6;
+    vowel.frequency.setValueAtTime(700, t);
+    vowel.frequency.linearRampToValueAtTime(1100, t + 0.5);
+    vowel.frequency.linearRampToValueAtTime(380, end);
+    const gain = c.createGain();
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.1, t + 0.3);
+    gain.gain.setValueAtTime(0.1, t + 0.85);
+    gain.gain.exponentialRampToValueAtTime(0.0001, end);
+    voice.connect(vowel).connect(gain).connect(c.destination);
+    voice.start(t);
+    voice.stop(end + 0.05);
+    noiseBurst(c, c.destination, t + 0.05, YAWN_SECONDS - 0.2, 0.025, 'bandpass', 900, 600); // the breath
+  } catch {
+    // No sound support.
+  }
+}
+
 export function playSound(name) {
   play(SOUNDS[name]);
 }

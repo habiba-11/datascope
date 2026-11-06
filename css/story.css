@@ -483,3 +483,30 @@
 html:has(dialog.story[open]) {
   overflow: hidden;
 }
+
+/* The classmates talk too (Habiba, 6 Nov 2026): while the class speaks, the
+   kids marked data-says for this line open and close their mouths. */
+.st-kid-mouth-open { display: none; }
+
+.story.st-talking-kids[data-line='1'] [data-says='1'] .st-kid-mouth-open,
+.story.st-talking-kids[data-line='2'] [data-says='2'] .st-kid-mouth-open {
+  display: inline;
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: st-mouth 0.28s ease-in-out infinite;
+}
+
+.story.st-talking-kids[data-line='1'] [data-says='1'] .st-kid-mouth-closed,
+.story.st-talking-kids[data-line='2'] [data-says='2'] .st-kid-mouth-closed {
+  display: none;
+}
+
+/* The sleepy one mumbles while talking, then yawns with a wide-open mouth. */
+.st-kid-yawn { transform-box: fill-box; transform-origin: 50% 30%; }
+.story.st-talking-kids[data-line='2'] [data-says='2'] .st-kid-yawn { animation: st-mouth 0.32s ease-in-out infinite; }
+.story.st-yawning .st-kid-yawn { animation: st-yawn 1.4s ease-in-out; }
+
+@keyframes st-yawn {
+  0%, 100% { transform: scale(1); }
+  35%, 70% { transform: scale(1.9, 2.4); }
+}

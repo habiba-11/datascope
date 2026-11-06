@@ -2,9 +2,12 @@
 // approved design (docs/design/frames/datascope-story-ui.html) so they look the
 // same. Each scene is built once when it opens. A part marked data-line="n"
 // shows from line n on, and data-before="n" only before line n (js/story.js),
-// so things pop in as the story goes on. The design's animations are in
+// so things pop in as the story goes on. data-says="n" marks the classmates
+// who answer on line n (their mouths move while the class speaks). The design's animations are in
 // css/story.css with an "st-" in front of their names. Changed from the design
-// (Habiba, 6 Nov 2026): the mission card says "Pretend class" with no number.
+// (Habiba, 6 Nov 2026): the mission card says "Pretend class" with no number;
+// the thought bubble's words are centred; in the numbers scene Sara stands
+// further left and a little smaller, so the cards do not cover her.
 // Our own drawings only: no child text ever goes through here.
 import { pipSVG } from './pip.js';
 import { saraSVG, classmateSVG } from './story-characters.js';
@@ -30,8 +33,8 @@ const SCENES = {
 <circle cx="584" cy="124" r="14" fill="#fff" stroke="#17324D" stroke-width="3"></circle>
 <ellipse cx="740" cy="84" rx="190" ry="62" fill="#fff" stroke="#17324D" stroke-width="4"></ellipse>
 <path d="M606 70 a22 22 0 1 0 24 30 a17 17 0 1 1 -24 -30 Z" fill="#FFC531" stroke="#17324D" stroke-width="3"></path>
-<text x="700" y="78" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="26" fill="#17324D">Do my classmates</text>
-<text x="700" y="108" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="26" fill="#17324D">sleep enough?</text>
+<text x="758" y="78" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="26" fill="#17324D">Do my classmates</text>
+<text x="758" y="108" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="26" fill="#17324D">sleep enough?</text>
 <g font-family="'Baloo 2', sans-serif" font-weight="700" font-size="34" fill="#FF7A6B"><text x="880" y="150" style="animation: st-float 1.8s ease-in-out infinite">?</text><text x="620" y="190" style="animation: st-float 2.2s ease-in-out infinite; animation-delay: -0.8s">?</text></g>
 </svg>
 </div>`,
@@ -53,10 +56,10 @@ const SCENES = {
   // Four classmates; their answers pop up over their heads, and one is sleepy.
   collect: () => `
 <div style="position: absolute; left: 150px; top: 190px; width: 200px; height: 230px">${saraSVG('clip')}</div>
-<div style="position: absolute; left: 400px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#38B6FF', skin: '#F2C4A0', hair: '#7A4A21', mood: 'idle', delay: 0 })}</div>
-<div style="position: absolute; left: 520px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#4CC26B', skin: '#8D5A3B', hair: '#1F1712', mood: 'idle', delay: 1 })}</div>
-<div style="position: absolute; left: 640px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#A596FF', skin: '#E8B08A', hair: '#D9822B', mood: 'idle', delay: 2 })}</div>
-<div style="position: absolute; left: 760px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#FFC531', skin: '#C68B59', hair: '#3B2A20', mood: 'sleepy', delay: 0 })}</div>
+<div data-says="1" style="position: absolute; left: 400px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#38B6FF', skin: '#F2C4A0', hair: '#7A4A21', mood: 'idle', delay: 0 })}</div>
+<div data-says="1" style="position: absolute; left: 520px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#4CC26B', skin: '#8D5A3B', hair: '#1F1712', mood: 'idle', delay: 1 })}</div>
+<div data-says="2" style="position: absolute; left: 640px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#A596FF', skin: '#E8B08A', hair: '#D9822B', mood: 'idle', delay: 2 })}</div>
+<div data-says="2" style="position: absolute; left: 760px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#FFC531', skin: '#C68B59', hair: '#3B2A20', mood: 'sleepy', delay: 0 })}</div>
 <div class="st-part" data-line="1">
 <div style="position: absolute; left: 392px; top: 196px; width: 100px; height: 46px; box-sizing: border-box; background: #fff; border: 4px solid #17324D; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 22px; animation: st-popin 0.4s ease-out both">9 hours</div>
 <div style="position: absolute; left: 512px; top: 196px; width: 100px; height: 46px; box-sizing: border-box; background: #fff; border: 4px solid #17324D; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 22px; animation: st-popin 0.4s ease-out 0.5s both">8 hours</div>
@@ -94,7 +97,7 @@ const SCENES = {
   // The numbers in order, the centre number and the mean; then "My guess was 8";
   // then chance: a die rolls, and "should" and "did" bars grow.
   numbers: () => `
-<div style="position: absolute; left: 150px; top: 190px; width: 200px; height: 230px">${saraSVG('point')}</div>
+<div style="position: absolute; left: 116px; top: 224px; width: 170px; height: 196px">${saraSVG('point')}</div>
 <svg style="position: absolute; left: 0; top: 72px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
 <defs><pattern id="stripe" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="#FFF0C2"></rect><rect width="5" height="10" fill="#FFC531"></rect></pattern></defs>
 <g font-family="'Baloo 2', sans-serif" font-weight="700" font-size="40" fill="#17324D" text-anchor="middle">

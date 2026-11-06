@@ -21,7 +21,9 @@ import {
   nextPosition, previousPosition, skipPosition, nextLabel, trailStates, stageScale, STORY_EFFECTS,
 } from './helpers/story.js';
 import { speak, stopSpeaking } from './voice.js';
-import { playStoryEffects, playStoryStart, playStoryEnd } from './story-sounds.js';
+import {
+  playStoryEffects, playStoryStart, playStoryEnd, EFFECT_SECONDS,
+} from './story-sounds.js';
 import { avatarSVG } from './story-characters.js';
 import { sceneHTML, STORY_DEFS } from './story-scenes.js';
 
@@ -142,9 +144,18 @@ export function openStory(words, returnTo) {
     dialog.classList.remove('st-talking-pip', 'st-talking-sara', 'st-talking-kids');
     duckMusic(false);
   }
+  // A line's "after" (e.g. a yawn): played once the words are done. The
+  // sleepy classmate opens their mouth wide while it plays (css/story.css).
+  function playAfter(line, at = 0) {
+    if (!line.after) return;
+    playStoryEffects([[line.after, at]]);
+    setTimeout(() => dialog.classList.add('st-yawning'), at * 1000);
+    setTimeout(() => dialog.classList.remove('st-yawning'), (at + (EFFECT_SECONDS[line.after] || 1)) * 1000);
+  }
+
   function sayLine() {
     const line = currentLine();
-    speak(line.who, line.text, {
+    speak(line.who, line.say || line.text, {
       onStart: () => {
         dialog.classList.add(`st-talking-${line.who}`);
         duckMusic(true);
@@ -152,6 +163,7 @@ export function openStory(words, returnTo) {
       onEnd: () => {
         dialog.classList.remove(`st-talking-${line.who}`);
         duckMusic(false);
+        playAfter(line);
       },
     });
   }
@@ -164,6 +176,7 @@ export function openStory(words, returnTo) {
   function render() {
     const scene = scenes[position.scene];
     const line = scene.lines[position.line];
+    dialog.dataset.line = position.line; // which classmates talk (css/story.css data-says)
 
     get('story-trail').innerHTML = trailStates(scene.step).map((s, i) => `
       <li class="story-step story-step--${s.state}" style="--c: var(--color-${s.colour})">
@@ -210,8 +223,11 @@ export function openStory(words, returnTo) {
     if (newScene) playSound('whoosh');
     playStoryEffects(STORY_EFFECTS[`${scenes[position.scene].id}:${position.line}`]);
     if (getVoiceOn()) sayLine();
-    else if (line.who === 'pip') playSound('hoot');
-    else if (line.who === 'sara') playSound('sara');
+    else {
+      if (line.who === 'pip') playSound('hoot');
+      else if (line.who === 'sara') playSound('sara');
+      playAfter(line, 0.6); // no voice: the yawn comes a moment after the words appear
+    }
   }
 
   function goTo(next) {

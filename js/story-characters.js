@@ -44,10 +44,11 @@ export function saraSVG(mood = 'think') {
 }
 
 // A classmate: shirt, skin and hair colours, and a mood: idle, sleepy or clap.
+// The mouth opens and closes while the class speaks; the sleepy one yawns.
 export function classmateSVG({ shirt = '#38B6FF', skin = '#F2C4A0', hair = '#7A4A21', mood = 'idle', delay = 0 } = {}) {
   const face = mood === 'sleepy'
-    ? `<path d="M-24 2 Q-16 -4 -8 2" stroke="${NAVY}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M8 2 Q16 -4 24 2" stroke="${NAVY}" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="22" rx="7" ry="6" fill="${NAVY}"/><text class="st-zzz" x="30" y="-30" font-family="Baloo 2, sans-serif" font-weight="800" font-size="22" fill="${NAVY}">z</text>`
-    : `<circle cx="-16" cy="0" r="5.5" fill="${NAVY}"/><circle cx="16" cy="0" r="5.5" fill="${NAVY}"/><path d="M-14 14 Q0 28 14 14" stroke="${NAVY}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+    ? `<path d="M-24 2 Q-16 -4 -8 2" stroke="${NAVY}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M8 2 Q16 -4 24 2" stroke="${NAVY}" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse class="st-kid-yawn" cx="0" cy="22" rx="7" ry="6" fill="${NAVY}"/><text class="st-zzz" x="30" y="-30" font-family="Baloo 2, sans-serif" font-weight="800" font-size="22" fill="${NAVY}">z</text>`
+    : `<circle cx="-16" cy="0" r="5.5" fill="${NAVY}"/><circle cx="16" cy="0" r="5.5" fill="${NAVY}"/><path class="st-kid-mouth-closed" d="M-14 14 Q0 28 14 14" stroke="${NAVY}" stroke-width="4" fill="none" stroke-linecap="round"/><g class="st-kid-mouth-open"><path d="M-12 13 Q0 34 12 13 Z" fill="#fff" stroke="${NAVY}" stroke-width="4" stroke-linejoin="round"/></g>`;
   const clap = mood === 'clap'
     ? `<g class="st-clap"><circle cx="-8" cy="78" r="11" fill="${skin}" stroke="${NAVY}" stroke-width="4"/></g><g class="st-clap st-clap--back"><circle cx="8" cy="78" r="11" fill="${skin}" stroke="${NAVY}" stroke-width="4"/></g>`
     : '';

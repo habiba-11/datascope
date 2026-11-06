@@ -3,15 +3,17 @@
 // a ding, Sara writing, a yawn, the bars growing, the die rattling, the stamp,
 // a fanfare, claps and a chime. Which line gets which: STORY_EFFECTS in
 // helpers/story.js (tested). They follow the sound switch like every sound.
-import { playTune, playClaps, playSound } from './sounds.js';
+import {
+  playTune, playClaps, playSound, playYawn, YAWN_SECONDS,
+} from './sounds.js';
 
 const EFFECTS = {
   // A quick bubbly pop, rising (something appears).
   pop: (at, f = 560) => playTune({ wave: 'sine', volume: 0.12, notes: [[f, at, 0.06], [Math.round(f * 1.7), at + 0.05, 0.08]] }),
   // Sara's pencil: three tiny ticks.
   ticks: (at) => playTune({ wave: 'square', volume: 0.03, notes: [[900, at, 0.05], [1000, at + 0.06, 0.05], [900, at + 0.12, 0.05]] }),
-  // A sleepy yawn, sliding down.
-  yawn: (at) => playTune({ wave: 'sine', volume: 0.08, notes: [[520, at, 0.25], [380, at + 0.22, 0.25], [260, at + 0.44, 0.3]] }),
+  // A real-sounding yawn (sounds.js playYawn).
+  yawn: (at) => playYawn(at),
   ding: (at) => playTune({ wave: 'sine', volume: 0.12, notes: [[880, at, 0.4], [1320, at + 0.02, 0.4, 0.06]] }),
   // The bars grow: five notes going up.
   grow: (at) => playTune({ wave: 'sine', volume: 0.09, notes: [262, 330, 392, 523, 660].map((f, i) => [f, at + i * 0.2, 0.18]) }),
@@ -32,6 +34,9 @@ const EFFECTS = {
 export function playStoryEffects(effects = []) {
   for (const [name, at, note] of effects) EFFECTS[name](at, note);
 }
+
+// How long an effect lasts (for the yawning mouth).
+export const EFFECT_SECONDS = { yawn: YAWN_SECONDS };
 
 // The start of the story (a chime) and its happy end (a fanfare).
 export function playStoryStart() {

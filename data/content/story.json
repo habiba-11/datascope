@@ -41,7 +41,7 @@
       "lines": [
         { "who": "sara", "text": "Hi! How many hours did you sleep last night?" },
         { "who": "kids", "text": "Nine! ... Eight!" },
-        { "who": "kids", "text": "Ten! ... Only three... yawn!" },
+        { "who": "kids", "text": "Ten! ... Only three... yawn!", "say": "Ten! ... Only three...", "after": "yawn" },
         { "who": "pip", "text": "Every answer is a piece of DATA. Now Sara can look for a pattern." }
       ]
     },

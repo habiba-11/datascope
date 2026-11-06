@@ -88,3 +88,11 @@ test('every scene sound effect belongs to a real line and is a known effect', ()
     }
   }
 });
+
+test('a line can say other words than it shows, and do a sound after (the yawn is not read aloud)', () => {
+  const yawn = scenes.find((s) => s.id === 'collect').lines[2];
+  assert.doesNotMatch(yawn.say, /yawn/i);
+  assert.equal(yawn.after, 'yawn');
+  assert.ok(EFFECT_NAMES.includes(yawn.after));
+  for (const s of scenes) for (const line of s.lines) if (line.after) assert.ok(EFFECT_NAMES.includes(line.after), line.after);
+});

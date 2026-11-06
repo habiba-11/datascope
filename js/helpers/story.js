@@ -58,11 +58,14 @@ export function trailStates(step) {
 // The scene sound effects of the approved design, per "scene:line": each is
 // [effect, seconds after the line starts, (for a pop) its note in Hz].
 // js/story-sounds.js plays them. A new scene also gets its whoosh (js/story.js).
+// A line in story.json can also have "say" (what the voice says, if not the
+// text) and "after" (an effect once the voice has finished, e.g. a real yawn
+// instead of reading the word "yawn": Habiba, 6 Nov 2026).
 export const STORY_EFFECTS = {
   'ask:1': [['pop', 0.5, 700]], // the thought bubble pops in
   'plan:0': [['ticks', 0.4], ['pop', 0.9, 640]], // Sara writes, the guess card pops in
   'collect:1': [['pop', 0.3, 620], ['pop', 0.9, 740]], // "9 hours", "8 hours"
-  'collect:2': [['pop', 0.3, 860], ['yawn', 0.6]], // "10 hours", and a sleepy yawn
+  'collect:2': [['pop', 0.3, 860]], // "10 hours" (then the yawn: this line's "after")
   'collect:3': [['ding', 0]],
   'graph:0': [['grow', 0.5]], // the bars grow
   'graph:1': [['pop', 0.1, 520]],
