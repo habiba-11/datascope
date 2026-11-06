@@ -478,3 +478,19 @@ body.modal-open {
   .phase-summary .modal-body { padding: 14px 16px 10px; }
 }
 
+
+/* Part 42c: "🎯 Why?" at the top of a phase's pop-up and the About panel,
+   the first thing read: what the room is for. */
+.intro-why {
+  margin: 0 0 var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  font-weight: 700;
+  background: var(--color-bg);
+  border-left: 6px solid var(--color-navy);
+  border-radius: 8px;
+}
+
+.intro-why strong {
+  font-family: var(--font-heading);
+  font-weight: 800;
+}

@@ -10,3 +10,14 @@ export const MISSION_WORDS = {
   end: 'At the end, you make your Evidence Card.',
   button: 'Start my mission →',
 };
+
+// Part 42c: "Why this room?" (data/content/phases.json). Returns the why line
+// and the bullets for this phase. A words scenario (games, kind 'category')
+// uses its own words where a phase has them, so it never talks about numbers.
+export function roomWhy(intro, kind) {
+  const words = kind === 'category';
+  return {
+    why: (words && intro.whyWords) || intro.why,
+    bullets: (words && intro.bulletsWords) || intro.bullets,
+  };
+}

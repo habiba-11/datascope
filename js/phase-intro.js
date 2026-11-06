@@ -2,14 +2,19 @@
 // itself the first time a child reaches a phase; the "📖 About this room" tab on
 // the task card shows the same words, and more, at any time (Prof's comment 6).
 // Texts: data/content/phases.json.
+// Part 42c (Round 4): each phase also says WHY the room exists ("🎯 Why?"), in
+// the pop-up, the tab's panel and next to the tab; games get their own words.
 import { openModal } from './modal.js';
 import { logEvent } from './helpers/log.js';
-import { hasSeenIntro, markIntroSeen } from './storage/save.js';
+import { hasSeenIntro, markIntroSeen, getSelectedScenarioId } from './storage/save.js';
 import { STEP_OF_PHASE } from './helpers/progress.js';
+import { roomWhy } from './helpers/mission.js';
+import { loadContent } from './helpers/scenarios.js';
 
 const STEP_ORDER = ['ask', 'plan', 'collect', 'explore', 'conclude'];
 
 let phasesPromise = null;
+let kindPromise = null;
 let currentPhase = null;
 // Resolves when the intro that opened by itself is closed (or straight away
 // if none opened), so another pop-up can wait its turn (e.g. the maths recap).
@@ -21,11 +26,37 @@ function loadPhases() {
   return phasesPromise;
 }
 
+// The scenario's kind ('number', 'category' or 'compare'), so games get their own words.
+function loadKind() {
+  if (!kindPromise) {
+    kindPromise = loadContent(getSelectedScenarioId()).then((c) => c.numberLab.kind).catch(() => 'number');
+  }
+  return kindPromise;
+}
+
+// One phase's words for this child's scenario: icon, title, accent, doneWhen, why, bullets.
+async function loadIntro(phase) {
+  const [phases, kind] = await Promise.all([loadPhases(), loadKind()]);
+  const intro = phases[phase];
+  return intro ? { ...intro, ...roomWhy(intro, kind) } : null;
+}
+
 function el(tag, text, className) {
   const element = document.createElement(tag);
   element.textContent = text;
   element.className = className;
   return element;
+}
+
+// "🎯 Why? Graphs help us SEE the answer." (a bold "Why?", then the line)
+function whyNodes(why) {
+  return [el('strong', '🎯 Why? ', ''), document.createTextNode(why)];
+}
+
+function whyParagraph(why) {
+  const line = el('p', '', 'intro-why');
+  line.append(...whyNodes(why));
+  return line;
 }
 
 // "Step 3 of 5", then the bullets rise in one after another (UI guide f2).
@@ -41,11 +72,11 @@ function introNodes(phase, intro) {
 }
 
 async function showPhaseIntro(phase) {
-  const intro = (await loadPhases())[phase];
+  const intro = await loadIntro(phase);
   if (!intro) return;
 
   const body = document.createElement('div');
-  body.append(...introNodes(phase, intro), el('p', 'Tap 📖 About this room any time to see this again.', 'intro-again'));
+  body.append(whyParagraph(intro.why), ...introNodes(phase, intro), el('p', 'Tap 📖 About this room any time to see this again.', 'intro-again'));
 
   logEvent('shell', 'popup-seen', { phase, auto: true });
   await openModal({
@@ -59,10 +90,11 @@ async function showPhaseIntro(phase) {
 
 // Fills the tab's panel with the phase the child is in now.
 async function fillAboutPanel(panel, phase) {
-  const intro = (await loadPhases())[phase];
+  const intro = await loadIntro(phase);
   if (!intro) return;
   panel.replaceChildren(
     el('p', `${intro.icon} ${intro.title}`, 'about-title'),
+    whyParagraph(intro.why),
     ...introNodes(phase, intro),
     el('p', `✅ You are done when: ${intro.doneWhen}`, 'about-done'),
   );
@@ -79,10 +111,22 @@ export function setIntroPhase(phase) {
   const panel = document.getElementById('about-panel');
   if (tab) tab.hidden = false;
   if (panel && !panel.hidden) fillAboutPanel(panel, phase);
+  fillWhyLine(phase);
 
   if (hasSeenIntro(phase)) return;
   markIntroSeen(phase);
   autoIntroClosed = showPhaseIntro(phase);
+}
+
+// The "🎯 Why?" line next to the tab (task-card.js). Question Studio moves
+// from Ask to Plan, so it is filled again for the new phase.
+async function fillWhyLine(phase) {
+  const line = document.getElementById('why-line');
+  if (!line) return;
+  const intro = await loadIntro(phase);
+  if (!intro || phase !== currentPhase) return; // the child already moved on
+  line.replaceChildren(...whyNodes(intro.why));
+  line.hidden = false;
 }
 
 export function whenIntroClosed() {

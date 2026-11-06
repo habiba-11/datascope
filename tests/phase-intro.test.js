@@ -19,13 +19,14 @@ test('every phase has an intro with an icon, a title and a room colour', () => {
   }
 });
 
-test('intros are short: 1 to 3 bullets, each under 10 words', () => {
+test('intros are short: 1 to 3 bullets (games words too), each under 10 words', () => {
   for (const id of PHASE_IDS) {
-    const { bullets } = phases[id];
-    assert.ok(bullets.length >= 1 && bullets.length <= 3, `${id} has ${bullets.length} bullets`);
-    for (const bullet of bullets) {
-      const words = bullet.split(/\s+/).length;
-      assert.ok(words < 10, `"${bullet}" has ${words} words`);
+    for (const bullets of [phases[id].bullets, phases[id].bulletsWords].filter(Boolean)) {
+      assert.ok(bullets.length >= 1 && bullets.length <= 3, `${id} has ${bullets.length} bullets`);
+      for (const bullet of bullets) {
+        const words = bullet.split(/\s+/).length;
+        assert.ok(words < 10, `"${bullet}" has ${words} words`);
+      }
     }
   }
 });
@@ -79,4 +80,9 @@ test('popup-seen is a known log event', () => {
   const entry = makeEntry('OWL-07', 'shell', 'popup-seen', { phase: 'ask', auto: true });
   assert.equal(entry.type, 'popup-seen');
   assert.equal(entry.auto, true);
+});
+
+test('Part 42c: every task card has the "Why?" line next to the About tab, hidden until a phase is known', () => {
+  const html = taskCardHTML({ title: 'Collect', bodyHTML: '<p>Task</p>' });
+  assert.match(html, /class="about-row">\s*<p class="why-line" id="why-line" hidden><\/p>/);
 });

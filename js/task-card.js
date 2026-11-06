@@ -10,8 +10,11 @@ import { stepStates } from './helpers/stepper.js';
 // in the same spot on every card (js/phase-intro.js fills it). It hangs under the
 // strip and is yellow, so it can't be mistaken for an Explore room's tab. It stays
 // hidden on a page with no phase (My journey).
+// Part 42c (Round 4): on its left, "🎯 Why?" says what the room is for, in the
+// row's empty space, so it costs no height (js/phase-intro.js fills it).
 const ABOUT_TAB_HTML = `
   <div class="about-row">
+    <p class="why-line" id="why-line" hidden></p>
     <button class="about-tab" id="about-tab" type="button" aria-expanded="false" aria-controls="about-panel" hidden>
       📖 About this room <span class="about-arrow" aria-hidden="true">▼</span>
     </button>

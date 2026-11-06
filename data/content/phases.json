@@ -3,13 +3,15 @@
     "icon": "❓",
     "title": "Ask a question",
     "accent": "ask",
-    "bullets": ["Pick a question to explore.", "Check that it is a good question.", "Fix questions that are not clear."],
+    "why": "A clear question gets clear answers.",
+    "bullets": ["Pick a question to explore.", "Fix questions that are not clear."],
     "doneWhen": "you pick a question and fix both questions."
   },
   "plan": {
     "icon": "🗺️",
     "title": "Make a plan",
     "accent": "plan",
+    "why": "A guess helps you spot surprises in the data.",
     "bullets": ["Guess the answer before you look.", "Scientists guess first, then check."],
     "doneWhen": "you save your guess."
   },
@@ -17,35 +19,42 @@
     "icon": "📋",
     "title": "Collect data",
     "accent": "collect",
-    "bullets": ["Ask our pretend class your question.", "Watch the answers pop in.", "This class is made up, just for learning."],
+    "why": "Answers are your data. You need data to find out.",
+    "bullets": ["Ask our pretend class your question.", "This class is made up, just for learning."],
     "doneWhen": "every pretend classmate has answered."
   },
   "graph": {
     "icon": "📊",
     "title": "Draw graphs",
     "accent": "explore",
-    "bullets": ["Turn answers into pictures.", "Try different graphs.", "Ask: what can it NOT tell us?"],
+    "why": "Graphs help us SEE the answer.",
+    "bullets": ["Turn answers into pictures.", "Ask: what can it NOT tell us?"],
     "doneWhen": "you answer both questions and tap I'm done."
   },
   "number": {
     "icon": "🔢",
     "title": "Find the statistics",
     "accent": "explore",
-    "bullets": ["Statistics are numbers that sum up data.", "Find the mean, median, mode and range.", "Each one tells a different story."],
+    "why": "Statistics say the answer in one number.",
+    "bullets": ["Find the mean, median, mode and range.", "Each one tells a different story."],
+    "whyWords": "The mode tells us the most popular answer.",
+    "bulletsWords": ["Find the game picked the most.", "Find out why words need the mode."],
     "doneWhen": "you finish all the puzzles."
   },
   "chance": {
     "icon": "🎲",
     "title": "Test chance",
     "accent": "explore",
-    "bullets": ["List everything that could happen.", "Guess, then test many times.", "Compare \"should happen\" with \"did happen\"."],
+    "why": "Chance helps us say how sure we can be.",
+    "bullets": ["Guess, then test many times.", "Compare \"should happen\" with \"did happen\"."],
     "doneWhen": "you test it and tap I'm done testing."
   },
   "conclude": {
     "icon": "🚩",
     "title": "Show your evidence",
     "accent": "conclude",
-    "bullets": ["Say what you found.", "Show your proof.", "Say how sure you are."],
+    "why": "Now you prove your answer with your evidence.",
+    "bullets": ["Say what you found, with proof.", "Say how sure you are."],
     "doneWhen": "you make your Evidence Card."
   }
 }
