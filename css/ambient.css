@@ -1,0 +1,173 @@
+/* The living background (Part 43a, Round 4): js/ambient.js draws it,
+   helpers/ambient.js plans it (tested). Only transform and opacity move.
+   The sky sits behind the hills (z-index -2), the flowers and butterfly on
+   the hills (z-index -1), and both stay behind the task card. Taps go through.
+   Reduced motion: base.css stops every animation; the rules at the end put
+   each traveller in a still, visible spot instead (a still picture). */
+
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sky--front {
+  z-index: -1;
+}
+
+.sky > div {
+  position: absolute;
+}
+
+/* ---------- the sun: top left, its rays turn slowly, its glow breathes ---------- */
+.sky-sun {
+  top: 110px;
+  left: 2vw;
+  width: 110px;
+  height: 110px;
+}
+
+/* Three stacked layers, each moved as a whole picture (no redrawing). */
+.sky-sun > * {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.sky-rays { animation: sky-spin var(--rays) linear infinite; }
+
+.sky-glow {
+  inset: 9%;
+  border-radius: 50%;
+  background: radial-gradient(#FFE9A0 0%, rgba(255, 233, 160, 0) 70%);
+  animation: sky-glow var(--glow) ease-in-out infinite;
+}
+
+/* Narrower screens: the card fills the middle, so the sun moves up to the
+   empty corner beside the step bar. */
+@media (max-width: 1100px) {
+  .sky-sun { top: 88px; left: auto; right: 6px; width: 70px; height: 70px; }
+}
+
+/* ---------- travellers: clouds, birds and the far flock cross the screen ---------- */
+.sky-travel {
+  left: 0;
+  top: var(--top);
+  will-change: transform;
+  animation: sky-cross var(--seconds) linear var(--delay) infinite;
+}
+
+.sky-cloud { width: calc(170px * var(--scale)); height: calc(68px * var(--scale)); }
+.sky-flock { width: calc(120px * var(--scale)); height: calc(38px * var(--scale)); }
+.sky-bird { width: calc(96px * var(--scale)); height: calc(60px * var(--scale)); }
+
+/* A bird flies in a gentle wave; its wings flap in short bursts, then glide. */
+.sky-wave { width: 100%; height: 100%; will-change: transform; animation: sky-wave 4s ease-in-out infinite; }
+
+.sky-wing {
+  transform-box: fill-box;
+  transform-origin: 92% 92%;
+  animation: sky-wing 3.4s ease-in-out infinite;
+}
+
+.sky-vflap {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: sky-vflap 0.9s ease-in-out infinite;
+}
+
+/* ---------- on the hills: swaying flowers and a butterfly ---------- */
+.sky-flower {
+  will-change: transform;
+  left: var(--x);
+  bottom: 18px;
+  width: 26px;
+  height: 48px;
+  transform-origin: 50% 100%;
+  animation: sky-sway var(--seconds) ease-in-out infinite;
+}
+
+.sky-butterfly {
+  will-change: transform;
+  left: var(--x);
+  bottom: var(--bottom);
+  width: 34px;
+  height: 28px;
+  animation: sky-butterfly var(--seconds) ease-in-out infinite alternate;
+}
+
+.sky-flutter {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: sky-flutter 0.4s ease-in-out infinite; /* 2.5 flaps a second, a shape not a flash */
+}
+
+/* The hills sway slightly (the whole picture, so it stays cheap to move). */
+.hills svg {
+  will-change: transform;
+  width: calc(100% + 24px);
+  margin-left: -12px;
+  animation: sky-hills 14s ease-in-out infinite;
+}
+
+/* ---------- the room's own touch, in the side margins ---------- */
+.sky-touch {
+  will-change: transform, opacity;
+  left: var(--x);
+  top: var(--y);
+  width: 34px;
+  height: 34px;
+  margin-left: -17px;
+}
+
+.sky-touch--float { animation: sky-float var(--seconds) ease-in-out var(--delay) infinite; }
+.sky-touch--spin { animation: sky-turn var(--seconds) ease-in-out var(--delay) infinite; }
+.sky-touch--twinkle { animation: sky-twinkle var(--seconds) ease-in-out var(--delay) infinite; }
+
+/* Loops rest while the tab is hidden (js/app.js sets the class). */
+.tab-hidden .sky *,
+.tab-hidden .sky,
+.tab-hidden .hills svg {
+  animation-play-state: paused !important;
+}
+
+@keyframes sky-cross { from { transform: translateX(-200px); } to { transform: translateX(calc(100vw + 40px)); } }
+@keyframes sky-spin { to { transform: rotate(360deg); } }
+@keyframes sky-glow { 0%, 100% { opacity: 0.45; transform: scale(1); } 50% { opacity: 0.85; transform: scale(1.12); } }
+@keyframes sky-wave { 0%, 100% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-14px) rotate(-5deg); } 75% { transform: translateY(12px) rotate(5deg); } }
+
+/* 3 flaps, then a long glide with the wing held out. */
+@keyframes sky-wing {
+  0% { transform: rotate(8deg); } 7% { transform: rotate(-80deg); } 14% { transform: rotate(8deg); }
+  21% { transform: rotate(-80deg); } 28% { transform: rotate(8deg); } 35% { transform: rotate(-80deg); }
+  42% { transform: rotate(8deg); } 49% { transform: rotate(-68deg); } 58%, 100% { transform: rotate(-6deg); }
+}
+@keyframes sky-vflap { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(-0.8); } }
+@keyframes sky-sway { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+@keyframes sky-butterfly {
+  0% { transform: translate(0, 0); } 25% { transform: translate(60px, -40px); } 50% { transform: translate(120px, 0); }
+  75% { transform: translate(70px, -60px); } 100% { transform: translate(140px, -20px); }
+}
+@keyframes sky-flutter { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.25); } }
+@keyframes sky-hills { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-10px); } }
+@keyframes sky-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+@keyframes sky-turn { 0%, 100% { transform: rotate(-12deg) translateY(0); } 50% { transform: rotate(12deg) translateY(-10px); } }
+@keyframes sky-twinkle { 0%, 100% { opacity: 0.35; transform: scale(0.7) rotate(0deg); } 50% { opacity: 1; transform: scale(1) rotate(24deg); } }
+
+/* Reduced motion: a still picture. The travellers rest at their own spot. */
+@media (prefers-reduced-motion: reduce) {
+  .sky-travel { transform: translateX(var(--rest-x)); }
+  .sky-touch--twinkle { opacity: 0.8; }
+}
+
+/* Narrow screens: the side margins are too thin for the room's touch, and a
+   resting bird would peek out half-hidden by the card. */
+@media (max-width: 1100px) {
+  .sky-touch { display: none; }
+}
+
+@media (max-width: 1100px) and (prefers-reduced-motion: reduce) {
+  .sky-bird { display: none; }
+}

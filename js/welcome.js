@@ -4,6 +4,10 @@ import { getExplorerCode, setExplorerCode, hasSeenTutorial, markTutorialSeen } f
 import { pipSVG } from './pip.js';
 import { LOGO_SVG } from './icons.js';
 import { openTutorial } from './tutorial.js';
+import { mountSky } from './ambient.js';
+
+// Part 43a: the living background (sun, clouds, birds, flowers), no room touch here.
+mountSky('welcome');
 
 // Pip greets the child on the start page (cheering, wings up).
 document.getElementById('mascot').innerHTML = pipSVG('Pip the owl explorer');

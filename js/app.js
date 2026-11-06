@@ -10,6 +10,7 @@ import { watchPressedState } from './pressed-state.js';
 import { startSync, STATUS_TEXT } from './storage/sync.js';
 import { backendReady } from './config.js';
 import { EXIT_BUTTON_HTML, setupExitButton } from './exit-button.js';
+import { mountSky } from './ambient.js';
 
 // `icon` is a line icon from icons.js (step bar); `emoji` is used in Pip's words.
 const STEPS = [
@@ -90,6 +91,8 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   // child having to look for it. Done here once for every room.
   root.querySelectorAll('.feedback').forEach((el) => el.setAttribute('aria-live', 'polite'));
 
+  // Part 43a: the living background, with this room's own touch (My journey has no phase).
+  mountSky(phase || step);
   setupCelebrations();
   setupAboutTab();
   watchPressedState();
