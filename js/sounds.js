@@ -2,6 +2,7 @@
 // Sounds are made by the browser (Web Audio), so there are no sound files.
 // They play unless the child turned sound off (on by default, CLAUDE.md).
 import { getSoundOn } from './storage/save.js';
+import { RISE_SECONDS, seededRandom } from './helpers/fireworks.js';
 
 let audio = null; // one shared AudioContext, made on the first sound
 
@@ -109,36 +110,76 @@ export function playStars(count) {
   });
 }
 
-// A real firework (Round 4, Habiba 6 Nov 2026: "a real sound of fireworks"):
-// a rising whistle, then a soft bang with a low thump, then crackles. Made by
-// the browser from noise and tones; the crackles are at fixed times, so every
-// firework sounds the same. `at`: seconds from now when the WHISTLE starts
-// (the bang comes FIREWORK_WHISTLE later); `loudness`: 1 = normal, less in a loop.
-export const FIREWORK_WHISTLE = 0.5;
-export const FIREWORK_CRACKLES = [0.06, 0.11, 0.15, 0.22, 0.27, 0.31, 0.38, 0.46, 0.52, 0.61];
-let noiseBuffer = null;
+// A real firework, heard from a little way off (Round 4; changed 6 Nov 2026,
+// Habiba: the first one, a whistle tone and a bang, was "unrealistic and
+// annoying"). Made from noise, not tones: a soft launch thump and an airy hiss
+// as the rocket climbs, then a deep boom with an echo (reverb), then scattered
+// crackles spread left and right. The crackles come from a fixed pattern, so
+// every firework sounds the same (the same moment always sounds the same).
+// `at`: seconds from now when the rocket LAUNCHES (the boom is FIREWORK_RISE
+// later, when the sparks burst). `far`: true for the gentle, far-off finale loop.
+export const FIREWORK_RISE = RISE_SECONDS;
+const crackleRandom = seededRandom(2026);
+export const FIREWORK_CRACKLES = Array.from({ length: 28 }, () => ({
+  time: 0.3 + crackleRandom() * 1.3,
+  pan: crackleRandom() * 1.6 - 0.8,
+})).sort((a, b) => a.time - b.time);
 
-function noise(c, t, seconds, volume, filterType, from, to) {
+let noiseBuffer = null;
+let echo = null; // one reverb for every firework
+
+function noiseSource(c) {
   if (!noiseBuffer) {
-    noiseBuffer = c.createBuffer(1, c.sampleRate, c.sampleRate); // 1 second of noise, made once
+    noiseBuffer = c.createBuffer(1, c.sampleRate * 2, c.sampleRate); // 2 s of noise, made once
     const data = noiseBuffer.getChannelData(0);
     for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
   }
   const source = c.createBufferSource();
   source.buffer = noiseBuffer;
+  return source;
+}
+
+// The echo of an open sky: a short, softly fading reverb.
+function echoInput(c) {
+  if (!echo) {
+    const seconds = 2.2;
+    const impulse = c.createBuffer(2, c.sampleRate * seconds, c.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+      const data = impulse.getChannelData(ch);
+      for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length) ** 3;
+    }
+    echo = c.createConvolver();
+    echo.buffer = impulse;
+    const wet = c.createGain();
+    wet.gain.value = 0.5;
+    echo.connect(wet).connect(c.destination);
+  }
+  return echo;
+}
+
+// A burst of filtered noise from t for `seconds`, fading out, into `out`.
+function noiseBurst(c, out, t, seconds, volume, type, from, to, pan = 0) {
+  const source = noiseSource(c);
   const filter = c.createBiquadFilter();
-  filter.type = filterType;
+  filter.type = type;
   filter.frequency.setValueAtTime(from, t);
   filter.frequency.exponentialRampToValueAtTime(to, t + seconds);
   const gain = c.createGain();
-  gain.gain.setValueAtTime(volume, t);
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(volume, t + 0.008);
   gain.gain.exponentialRampToValueAtTime(0.0001, t + seconds);
-  source.connect(filter).connect(gain).connect(c.destination);
-  source.start(t);
+  let node = source.connect(filter).connect(gain);
+  if (pan && c.createStereoPanner) {
+    const panner = c.createStereoPanner();
+    panner.pan.value = pan;
+    node = node.connect(panner);
+  }
+  node.connect(out);
+  source.start(t, Math.random()); // a different slice of the noise each time
   source.stop(t + seconds + 0.05);
 }
 
-export function playFirework(at = 0, loudness = 1) {
+export function playFirework(at = 0, far = false) {
   if (!getSoundOn()) return;
   const c = audioContext();
   if (!c) return;
@@ -148,32 +189,44 @@ export function playFirework(at = 0, loudness = 1) {
   }
   try {
     const t = c.currentTime + at;
-    // The whistle: a thin tone that rises as the rocket goes up.
-    const whistle = c.createOscillator();
-    const whistleGain = c.createGain();
-    whistle.type = 'sine';
-    whistle.frequency.setValueAtTime(500, t);
-    whistle.frequency.exponentialRampToValueAtTime(1600, t + FIREWORK_WHISTLE);
-    whistleGain.gain.setValueAtTime(0.0001, t);
-    whistleGain.gain.exponentialRampToValueAtTime(0.025 * loudness, t + 0.1);
-    whistleGain.gain.exponentialRampToValueAtTime(0.0001, t + FIREWORK_WHISTLE);
-    whistle.connect(whistleGain).connect(c.destination);
-    whistle.start(t);
-    whistle.stop(t + FIREWORK_WHISTLE + 0.05);
-    // The bang: a burst of soft noise and a low thump.
-    const bang = t + FIREWORK_WHISTLE;
-    noise(c, bang, 0.7, 0.16 * loudness, 'lowpass', 2400, 300);
-    const thump = c.createOscillator();
-    const thumpGain = c.createGain();
-    thump.frequency.setValueAtTime(110, bang);
-    thump.frequency.exponentialRampToValueAtTime(40, bang + 0.3);
-    thumpGain.gain.setValueAtTime(0.18 * loudness, bang);
-    thumpGain.gain.exponentialRampToValueAtTime(0.0001, bang + 0.35);
-    thump.connect(thumpGain).connect(c.destination);
-    thump.start(bang);
-    thump.stop(bang + 0.4);
-    // The crackles: tiny bright pops, as the sparks fall.
-    for (const crackle of FIREWORK_CRACKLES) noise(c, bang + 0.2 + crackle, 0.03, 0.05 * loudness, 'highpass', 4000, 6000);
+    // Everything goes through one soft "distance" filter: far away = duller and quieter.
+    const out = c.createGain();
+    out.gain.value = far ? 0.45 : 0.8;
+    const distance = c.createBiquadFilter();
+    distance.type = 'lowpass';
+    distance.frequency.value = far ? 1800 : 5000;
+    out.connect(distance);
+    distance.connect(c.destination);
+    distance.connect(echoInput(c));
+
+    // Launch: a soft low thump, then an airy hiss while the rocket climbs.
+    const launch = c.createOscillator();
+    const launchGain = c.createGain();
+    launch.frequency.setValueAtTime(140, t);
+    launch.frequency.exponentialRampToValueAtTime(60, t + 0.12);
+    launchGain.gain.setValueAtTime(0.12, t);
+    launchGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+    launch.connect(launchGain).connect(out);
+    launch.start(t);
+    launch.stop(t + 0.2);
+    noiseBurst(c, out, t + 0.02, FIREWORK_RISE, 0.03, 'bandpass', 1200, 3200);
+
+    // The boom: deep noise and a sub-bass drop, with the echo of the open sky.
+    const boom = t + FIREWORK_RISE;
+    noiseBurst(c, out, boom, 1.4, 0.5, 'lowpass', 1400, 120);
+    const sub = c.createOscillator();
+    const subGain = c.createGain();
+    sub.frequency.setValueAtTime(75, boom);
+    sub.frequency.exponentialRampToValueAtTime(35, boom + 0.6);
+    subGain.gain.setValueAtTime(0.0001, boom);
+    subGain.gain.exponentialRampToValueAtTime(0.35, boom + 0.01);
+    subGain.gain.exponentialRampToValueAtTime(0.0001, boom + 0.7);
+    sub.connect(subGain).connect(out);
+    sub.start(boom);
+    sub.stop(boom + 0.75);
+
+    // The crackles: tiny sharp pops as the glitter burns, spread left and right.
+    for (const { time, pan } of FIREWORK_CRACKLES) noiseBurst(c, out, boom + time, 0.025, 0.12, 'highpass', 3000, 5000, pan);
   } catch {
     // No sound support: the fireworks still show.
   }

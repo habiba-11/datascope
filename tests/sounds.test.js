@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { SOUNDS, FALLING_SOUNDS, FIREWORK_WHISTLE, FIREWORK_CRACKLES } from '../js/sounds.js';
+import { SOUNDS, FALLING_SOUNDS, FIREWORK_RISE, FIREWORK_CRACKLES } from '../js/sounds.js';
 import { PIP_EVENTS } from '../js/helpers/pip-lines.js';
 
 const first = (s) => s.notes[0][0];
@@ -33,8 +33,10 @@ test('sounds stay gentle: no sound is louder than the badge stamp', () => {
   for (const [name, sound] of Object.entries(SOUNDS)) assert.ok(sound.volume <= 0.2, name);
 });
 
-test('a firework always sounds the same: whistle, then bang, then fixed crackles within a second', () => {
-  assert.equal(FIREWORK_WHISTLE, 0.5);
-  assert.deepEqual([...FIREWORK_CRACKLES].sort((a, b) => a - b), FIREWORK_CRACKLES);
-  assert.ok(FIREWORK_CRACKLES.every((t) => t > 0 && t < 1));
+test('a firework always sounds the same: launch, boom after the climb, then a fixed crackle pattern', () => {
+  assert.equal(FIREWORK_RISE, 0.6);
+  assert.equal(FIREWORK_CRACKLES.length, 28);
+  const times = FIREWORK_CRACKLES.map((c) => c.time);
+  assert.deepEqual([...times].sort((a, b) => a - b), times, 'in time order');
+  assert.ok(FIREWORK_CRACKLES.every((c) => c.time > 0 && c.time < 2 && Math.abs(c.pan) <= 0.8));
 });
