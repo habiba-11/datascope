@@ -74,6 +74,11 @@ function introNodes(phase, intro) {
 async function showPhaseIntro(phase) {
   const intro = await loadIntro(phase);
   if (!intro) return;
+  // Badges earned by the same tap join the pop-up line one turn later
+  // (js/celebrate.js, setTimeout 0). The intro waits that turn too, so it comes
+  // AFTER them: Ask card, then the Question Fixer badge, then the Plan intro
+  // (bug found by Habiba, 6 Nov 2026: the badge showed after Plan had opened).
+  await new Promise((resolve) => { setTimeout(resolve, 0); });
 
   const body = document.createElement('div');
   body.append(whyParagraph(intro.why), ...introNodes(phase, intro), el('p', 'Tap 📖 About this room any time to see this again.', 'intro-again'));
