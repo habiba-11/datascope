@@ -128,6 +128,121 @@
   border: 2px solid var(--color-btn-main-bg);
 }
 
+/* ---------- Part 45 (Round 4): clearer fix-its ---------- */
+/* Fix 1: two big answer buttons, A and B, each with its letter in a circle. */
+.fixit-choices {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 720px;
+}
+
+.fixit-choice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 10px 18px;
+  text-align: left;
+  font-size: 20px;
+  background: var(--color-card-bg);
+  color: var(--color-navy);
+}
+
+.fixit-letter {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 50%;
+  background: var(--color-ask-light);
+  font-size: 20px;
+}
+
+/* Right: green with a tick; not quite: greyed out (the words say it too). */
+.fixit-choice.correct { background: #E4F7E8; border-color: var(--color-btn-main-bg); }
+.fixit-choice.correct .fixit-letter { background: var(--color-btn-main-bg); color: #fff; }
+.fixit-choice.correct::after { content: '✓'; margin-left: auto; font-size: 26px; color: var(--color-btn-main-bg); }
+.fixit-choice.wrong { opacity: 0.55; }
+.fixit-choice.correct:disabled { opacity: 1; } /* the right answer stays bright */
+
+/* Fix 2: the box, ONE tip and the checklist on the left; a good example on the right. */
+.fixit-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+  gap: var(--space-3);
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .fixit-layout { grid-template-columns: 1fr; }
+}
+
+.fixit-tip {
+  margin: 10px 0 6px;
+  padding: 8px 12px;
+  border: 2px solid var(--color-plan);
+  border-radius: 12px;
+  background: #FFF1D6;
+  font-weight: 800;
+}
+
+.fixit-tip--done {
+  border-color: var(--color-btn-main-bg);
+  background: #E4F7E8;
+}
+
+.fixit-checklist {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fixit-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  color: #4A6580;
+}
+
+.fixit-mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  font-weight: 800;
+}
+
+/* A tick turns green when that check passes (a ✓ and darker words too). */
+.fixit-checklist li.ok { color: var(--color-navy); }
+.fixit-checklist li.ok .fixit-mark {
+  border-color: var(--color-btn-main-bg);
+  background: var(--color-btn-main-bg);
+  color: #fff;
+  animation: m-pop var(--duration-medium) var(--ease-spring);
+}
+
+.fixit-example {
+  padding: var(--space-2) var(--space-3);
+  border: 3px dashed var(--color-btn-main-bg);
+  border-radius: var(--radius-card);
+  background: #E4F7E8;
+}
+
+.fixit-example p { margin: 0; font-weight: 700; }
+
+.fixit-example-q {
+  margin-top: 6px !important;
+  font-family: var(--font-heading);
+  font-size: 20px;
+}
+
 /* The bonus question folds away, so the screen shows one task. */
 .bonus {
   margin-top: var(--space-3);

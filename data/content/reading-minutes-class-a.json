@@ -4,7 +4,7 @@
   "cardTitle": "How long do two classes read?",
   "mission": { "goal": "Find out if Class A and Class B read the same.", "short": "Do two classes read the same?" },
   "fixIts": [
-    { "flawed": "Don't you think reading is great?", "fix": "How many minutes did you read yesterday?" },
+    { "flawed": "Don't you think reading is great?", "fix": "How many minutes did you read yesterday?", "choice": { "goodFirst": true, "why": "A says WHEN, and it does not push people." } },
     { "flawed": "Do you read books?", "fix": "How many books did you read this month?" }
   ],
   "planPrompt": "🤔 Make a guess! How many minutes did most kids read?",

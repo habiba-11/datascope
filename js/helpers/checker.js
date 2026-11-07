@@ -44,43 +44,72 @@ export function hasTimeframe(lower) {
   return TIME_PATTERNS.some((pattern) => pattern.test(lower));
 }
 
-// Returns a list of friendly warnings for a survey question.
-// An empty list means the question looks good.
-export function checkQuestion(question) {
-  const warnings = [];
+// Every rule the question breaks, in this order, each with its tip in plain
+// Grade 5 words (Round 4, Part 45: the same words as the checklist).
+// Each: { id, tip }. An empty list means the question looks good.
+export function questionProblems(question) {
+  const problems = [];
   // Tablets often type a curly apostrophe, and children may type two spaces.
   const text = question.trim().replace(/[‘’]/g, "'").replace(/\s+/g, ' ');
   const lower = text.toLowerCase();
   const words = lower.split(' ').filter(Boolean);
 
   if (words.length < MIN_WORDS) {
-    warnings.push(`✏️ Write a whole question, with at least ${MIN_WORDS} words.`);
+    problems.push({ id: 'words', tip: `✏️ Write a whole question, with at least ${MIN_WORDS} words.` });
   }
 
   if (/\bnot\b/.test(lower) || /n't\b/.test(lower)) {
-    warnings.push("🚫 It has a 'not' in it. Ask it without 'not'.");
+    problems.push({ id: 'not', tip: "🚫 Take out 'not' (like isn't or don't). It pushes people." });
   }
 
   // "right now" is a time, so its "right" does not push people to an answer.
   const withoutRightNow = lower.replace(/\bright now\b/g, '');
   const foundLeadingWord = LEADING_WORDS.find((word) => new RegExp(`\\b${word}\\b`).test(withoutRightNow));
   if (foundLeadingWord) {
-    warnings.push(`👉 The word "${foundLeadingWord}" pushes people to one answer. Use a fairer word.`);
+    problems.push({ id: 'pushy', tip: `👉 Take out "${foundLeadingWord}". It pushes people to one answer.` });
   }
 
   if (!hasTimeframe(lower)) {
-    warnings.push("⏰ When? Add a time, like 'this week' or 'last night'.");
+    problems.push({ id: 'when', tip: "⏰ When? Say a time, like 'this week' or 'last night'." });
   }
 
   const startsYesNo = YES_NO_STARTERS.includes(words[0] || '');
   const hasOpenWord = OPEN_STARTERS.some((word) => words.includes(word));
   if (startsYesNo && !hasOpenWord) {
-    warnings.push("🔁 People can only say yes or no. Start with What, How or Which.");
+    problems.push({ id: 'yesno', tip: '🔁 Not just yes or no. Start with What, How or Which.' });
   }
 
   if (!text.endsWith('?')) {
-    warnings.push('❓ Put a ? at the end.');
+    problems.push({ id: 'mark', tip: '❓ End it with a ?' });
   }
 
-  return warnings;
+  return problems;
+}
+
+// Returns a list of friendly warnings for a survey question (the tips).
+// An empty list means the question looks good.
+export function checkQuestion(question) {
+  return questionProblems(question).map((p) => p.tip);
+}
+
+// The checklist the child sees turning green (Round 4, Part 45, Habiba: 4 ticks;
+// "not" joins the pushy words). A whole question (3 words) is not a tick: its
+// tip still shows first.
+export const CHECKLIST = [
+  { id: 'mark', label: 'It ends with ?', rules: ['mark'] },
+  { id: 'when', label: 'It says WHEN (this week, last night)', rules: ['when'] },
+  { id: 'open', label: 'Not just yes or no', rules: ['yesno'] },
+  { id: 'fair', label: "No pushy words (like 'not' or 'good')", rules: ['not', 'pushy'] },
+];
+
+// Each tick: { id, label, ok }.
+export function questionChecklist(question) {
+  const broken = questionProblems(question).map((p) => p.id);
+  return CHECKLIST.map((item) => ({ id: item.id, label: item.label, ok: !item.rules.some((r) => broken.includes(r)) }));
+}
+
+// ONE tip at a time (the first rule still broken), or null when it is a good question.
+export function firstTip(question) {
+  const problems = questionProblems(question);
+  return problems.length ? problems[0].tip : null;
 }

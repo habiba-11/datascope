@@ -20,7 +20,7 @@ test('catches a negative, leading, yes/no question with no timeframe', () => {
 
 test('a missing question mark is the only warning on an otherwise good question', () => {
   const warnings = checkQuestion('How many hours did you sleep last night');
-  assert.deepEqual(warnings, ['❓ Put a ? at the end.']);
+  assert.deepEqual(warnings, ['❓ End it with a ?']);
 });
 
 test('every scenario question passes our own checker (zero warnings)', () => {
@@ -112,4 +112,26 @@ test('every warning follows the Grade 5 rule (12 words or fewer per sentence)', 
     .concat(checkQuestion('Do you like pizza'));
   assert.ok(all.length >= 5);
   for (const warning of all) assert.ok(longestSentence(warning) <= 12, warning);
+});
+
+// ---------- Round 4, Part 45: the checklist and ONE tip at a time ----------
+import { questionChecklist, firstTip, CHECKLIST } from '../js/helpers/checker.js';
+
+test('the checklist has the 4 ticks from the pilot fix, and "not" counts as a pushy word', () => {
+  assert.deepEqual(CHECKLIST.map((c) => c.id), ['mark', 'when', 'open', 'fair']);
+  const ticks = (q) => Object.fromEntries(questionChecklist(q).map((c) => [c.id, c.ok]));
+  assert.deepEqual(ticks('How many hours did you sleep last night?'), { mark: true, when: true, open: true, fair: true });
+  assert.deepEqual(ticks('Do you sleep a lot?'), { mark: true, when: false, open: false, fair: true });
+  assert.equal(ticks("Isn't football fun this week?").fair, false);
+  assert.equal(ticks('What is the best game this week?').fair, false);
+});
+
+test('ONE tip at a time: the first problem only, and none for a good question', () => {
+  assert.equal(firstTip("Don't you think school is good"), "🚫 Take out 'not' (like isn't or don't). It pushes people.");
+  assert.equal(firstTip('Do you sleep a lot?'), "⏰ When? Say a time, like 'this week' or 'last night'.");
+  assert.equal(firstTip('How many hours did you sleep last night?'), null);
+});
+
+test('the checklist and the tips use Grade 5 words', () => {
+  for (const c of CHECKLIST) assert.ok(longestSentence(c.label) <= 12, c.label);
 });

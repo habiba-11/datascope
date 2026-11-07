@@ -9,5 +9,6 @@
     "Because we only asked {n} pretend kids.",
     "Because another class might give different answers.",
     "Because the graph and the numbers show the same thing."
-  ]
+  ],
+  "goodQuestion": "What fruit did you eat yesterday?"
 }

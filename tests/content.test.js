@@ -90,3 +90,14 @@ test('a suggested answer has no emoji at its start (a child may keep it as their
     }
   }
 });
+
+test('Part 45: the first fix-it is a choice (A or B) with a short "why", and the good one is not always B', () => {
+  const firsts = contents.map(({ content }) => content.fixIts[0].choice);
+  for (const choice of firsts) {
+    assert.equal(typeof choice.goodFirst, 'boolean');
+    assert.ok(longestSentence(choice.why) <= MAX_SENTENCE_WORDS, choice.why);
+  }
+  assert.ok(firsts.some((c) => c.goodFirst) && firsts.some((c) => !c.goodFirst), 'A and B both win sometimes');
+  // The shared example of a good question passes the checker.
+  assert.deepEqual(checkQuestion(read('content/answers.json').goodQuestion), []);
+});

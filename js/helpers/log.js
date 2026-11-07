@@ -29,6 +29,7 @@ export const EVENT_TYPES = [
   'mission-seen', // Part 42a: Pip's Mission card was shown after picking a scenario (scenarioId)
   'idle-help-shown', // Part 43e: no tap for 10 s, Pip offered help (screen, hintButton: a 💡 button was there)
   'idle-help-taken', // Part 43e: the child tapped Pip's "Yes, help me!" (screen)
+  'fixit-choice', // Part 45: Fix 1 "Which question is better?" (scenarioId, picked A or B, correct, tries)
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];

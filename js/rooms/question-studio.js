@@ -1,11 +1,13 @@
 import { mountShell, setCurrentStep } from '../app.js';
-import { checkQuestion } from '../helpers/checker.js';
+import { checkQuestion, firstTip, questionChecklist } from '../helpers/checker.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { createHint } from '../helpers/prompts.js';
-import { PICKABLE_SCENARIOS, loadRecipe, loadContent } from '../helpers/scenarios.js';
+import {
+  PICKABLE_SCENARIOS, loadRecipe, loadContent, loadSharedAnswers,
+} from '../helpers/scenarios.js';
 import { setSelectedScenarioId, getExplorerCode } from '../storage/save.js';
 import { finishedScenarios } from '../helpers/progress.js';
-import { cheer } from '../motion.js';
+import { cheer, encourage } from '../motion.js';
 import { pipSay } from '../pip.js';
 import { enterPhase, finishPhase } from '../phase-progress.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
@@ -18,12 +20,13 @@ import { showMissionCard } from '../mission.js';
 // Each screen is one step of the mini stepper, with ONE primary button.
 const STEPS = [
   { label: 'Pick', phase: 'ask', question: 'What do you want to find out?', pip: 'Pick one. Our pretend class will answer it.' },
-  { label: 'Fix 1', phase: 'ask', question: '🛠️ Fix question 1', pip: 'This question has a problem. Change it until you see ✅.' },
-  { label: 'Fix 2', phase: 'ask', question: '🛠️ Fix question 2', pip: 'One more! Change it until you see ✅.' },
+  // Round 4, Part 45 (Habiba): Fix 1 is a choice (A or B), Fix 2 is typing with
+  // a checklist that turns green and ONE tip at a time.
+  { label: 'Fix 1', phase: 'ask', question: '🤔 Which question is better?', pip: 'Only one is a good survey question. Tap it!' },
+  { label: 'Fix 2', phase: 'ask', question: '🛠️ Make it better!', pip: 'This question is not good yet. Make it better!' },
   { label: 'Guess', phase: 'plan', question: '🤔 Guess first!', pip: 'Scientists guess first, then check.' },
 ];
 const STRIP = { ask: '❓ Ask · Question Studio', plan: '🗺️ Plan · Question Studio' };
-const FIXIT_IDS = ['fixit-1', 'fixit-2'];
 
 let step = 0;
 let bar = null;
@@ -49,6 +52,8 @@ async function init() {
   // Questions this child already finished get a "✓ Done before" label: a
   // nudge to try a new one (they can still pick it again).
   const doneBefore = finishedScenarios(readLog(), getExplorerCode());
+  // Part 45: one good question on another topic, shown beside Fix 2 as a model.
+  const { goodQuestion } = await loadSharedAnswers();
 
   mountShell({
     step: 'ask',
@@ -74,19 +79,32 @@ async function init() {
           </div>
         </section>
 
-        ${FIXIT_IDS.map((id, i) => `
-          <section class="task fixit" data-step="${i + 1}" hidden>
-            <label for="${id}">Question ${i + 1}</label>
-            <textarea id="${id}" class="fixit-input" rows="2"></textarea>
-            <ul class="checker-list" id="checker-list-${i + 1}"></ul>
-            <div class="hint-list-slot" id="hint-slot-${i + 1}"></div>
-            ${i === 1 ? `
-              <details class="bonus">
-                <summary>⭐ Bonus: write your own question!</summary>
-                <textarea id="own-question" class="fixit-input" rows="2" placeholder="Type a question..." aria-label="My own question"></textarea>
-                <ul class="checker-list" id="checker-list-own"></ul>
-              </details>` : ''}
-          </section>`).join('')}
+        <section class="task fixit" data-step="1" hidden>
+          <div class="fixit-choices" id="fixit-choices" role="group" aria-label="Which question is better?"></div>
+          <p class="feedback" id="fixit-choice-feedback" hidden></p>
+        </section>
+
+        <section class="task fixit" data-step="2" hidden>
+          <div class="fixit-layout">
+            <div>
+              <label for="fixit-2">This question:</label>
+              <textarea id="fixit-2" class="fixit-input" rows="2"></textarea>
+              <p class="fixit-tip" id="fixit-tip-2" aria-live="polite"></p>
+              <ul class="fixit-checklist" id="checklist-2" aria-label="Checklist"></ul>
+              <div class="hint-list-slot" id="hint-slot-2"></div>
+            </div>
+            <aside class="fixit-example">
+              <p>👍 A good question looks like this:</p>
+              <p class="fixit-example-q">${goodQuestion}</p>
+            </aside>
+          </div>
+          <details class="bonus">
+            <summary>⭐ Bonus: write your own question!</summary>
+            <textarea id="own-question" class="fixit-input" rows="2" placeholder="Type a question..." aria-label="My own question"></textarea>
+            <p class="fixit-tip" id="fixit-tip-own" aria-live="polite"></p>
+            <ul class="fixit-checklist" id="checklist-own" aria-label="Checklist"></ul>
+          </details>
+        </section>
 
         <section class="task" data-step="3" hidden>
           <p class="plan-prompt" id="predict-question"></p>
@@ -126,7 +144,8 @@ function showStep(n) {
   enterPhase(phase);
 
   bar.setBack(n === 0 ? null : { label: 'Back', onClick: () => showStep(n - 1) });
-  bar.setHint(label.startsWith('Fix') ? hintButtons[FIXIT_IDS[n - 1]] : null);
+  // Only Fix 2 (typing) has a hint; Fix 1 is a choice.
+  bar.setHint(n === 2 ? hintButtons['fixit-2'] : null);
   refreshPrimary();
 }
 
@@ -139,10 +158,10 @@ function refreshPrimary() {
   } else if (step === 1) {
     bar.setPrimary(clearState['fixit-1']
       ? { label: 'Next: Fix 2 →', ready: true, onClick: () => showStep(2) }
-      : { label: '', enabled: false, whyDisabled: '✏️ Fix the question first' });
+      : { label: '', enabled: false, whyDisabled: '👆 Pick A or B first' });
   } else if (step === 2) {
     const bothClear = Object.values(clearState).every(Boolean);
-    const why = clearState['fixit-2'] ? '✏️ Question 1 needs fixing too' : '✏️ Fix the question first';
+    const why = clearState['fixit-2'] ? '👆 Fix 1 needs an answer too' : '✏️ Make the question better first';
     bar.setPrimary(bothClear
       ? { label: 'Next: Make a guess →', ready: true, onClick: () => { finishAsk(); showStep(3); } }
       : { label: '', enabled: false, whyDisabled: why });
@@ -185,21 +204,63 @@ function renderFixIts() {
   if (!selectedScenario || fixitScenarioId === selectedScenario.id) return;
   fixitScenarioId = selectedScenario.id;
 
-  selectedScenario.content.fixIts.forEach(({ flawed, fix }, i) => {
-    const id = FIXIT_IDS[i];
-    const textarea = document.getElementById(id);
-    textarea.value = flawed;
-    clearState[id] = false;
+  const [first, second] = selectedScenario.content.fixIts;
+  renderChoice(first);
 
-    // A new scenario gets new hints: the old hint list goes.
-    const { button, list } = createHint(id, 'question-studio', [
-      'Fix one tip at a time, starting at the top.',
-      { text: 'Here is one idea. Tap it to use it:', answer: fix, box: textarea },
-    ]);
-    hintButtons[id] = button;
-    document.getElementById(`hint-slot-${i + 1}`).replaceChildren(list);
-    renderChecker(textarea, document.getElementById(`checker-list-${i + 1}`), id);
-  });
+  // Fix 2: the flawed question in the box, its tip, checklist and hint.
+  const textarea = document.getElementById('fixit-2');
+  textarea.value = second.flawed;
+  clearState['fixit-2'] = false;
+  // A new scenario gets new hints: the old hint list goes.
+  const { button, list } = createHint('fixit-2', 'question-studio', [
+    'Fix one tip at a time, starting at the top.',
+    { text: 'Here is one idea. Tap it to use it:', answer: second.fix, box: textarea },
+  ]);
+  hintButtons['fixit-2'] = button;
+  document.getElementById('hint-slot-2').replaceChildren(list);
+  renderChecker(textarea, 'fixit-2', '2');
+}
+
+// Fix 1 (Part 45): "Which question is better? A or B?" The better question is
+// the scenario's fix; the content says which letter it gets (A or B), so the
+// answer is not always B. A wrong pick is fine: try again, nothing is lost.
+// Logged as "fixit-choice" (which letter, right or not, which try).
+function renderChoice({ flawed, fix, choice }) {
+  const box = document.getElementById('fixit-choices');
+  const feedback = document.getElementById('fixit-choice-feedback');
+  const options = choice.goodFirst ? [fix, flawed] : [flawed, fix];
+  clearState['fixit-1'] = false;
+  feedback.hidden = true;
+  let tries = 0;
+  box.replaceChildren(...options.map((question, i) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn choice-btn fixit-choice';
+    const letter = Object.assign(document.createElement('span'), { className: 'fixit-letter', textContent: 'AB'[i] });
+    button.append(letter, document.createTextNode(question));
+    button.addEventListener('click', () => {
+      tries += 1;
+      const right = question === fix;
+      logEvent('question-studio', 'fixit-choice', {
+        scenarioId: selectedScenario.id, picked: 'AB'[i], correct: right, tries,
+      });
+      feedback.hidden = false;
+      if (right) {
+        button.classList.add('correct');
+        box.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+        feedback.textContent = `✅ Yes! ${choice.why}`;
+        clearState['fixit-1'] = true;
+        cheer(feedback);
+        refreshPrimary();
+      } else {
+        button.classList.add('wrong');
+        button.disabled = true;
+        feedback.textContent = '🤔 Not quite. Look again: which one says WHEN and does not push?';
+        encourage(feedback);
+      }
+    });
+    return button;
+  }));
 }
 
 // Builds the guess for the selected scenario. If the child went back and
@@ -261,31 +322,37 @@ function savePrediction(guess) {
 
 // Shows the checker's tips under a question (or ✅). Each tip starts with its
 // own emoji, so colour is never the only signal.
-function renderChecker(textarea, list, trackId) {
-  const warnings = checkQuestion(textarea.value);
-  const items = warnings.length
-    ? warnings.map((w) => Object.assign(document.createElement('li'), { className: 'warn', textContent: w }))
-    : [Object.assign(document.createElement('li'), { className: 'ok', textContent: '✅ Clear question!' })];
-  list.replaceChildren(...items);
+// Part 45: ONE tip at a time (the first thing to fix), and the checklist of 4
+// ticks that turn green as the question gets better. Each tick has a word and
+// a mark (✓ or ○), so colour is never the only signal. `suffix` names the tip
+// and the list ('2' for Fix 2, 'own' for the bonus); `trackId` is null for the bonus.
+function renderChecker(textarea, trackId, suffix) {
+  const tip = firstTip(textarea.value);
+  const clear = tip === null;
+  document.getElementById(`fixit-tip-${suffix}`).textContent = clear ? '✅ Great question! It passes every check.' : tip;
+  document.getElementById(`fixit-tip-${suffix}`).classList.toggle('fixit-tip--done', clear);
+  const list = document.getElementById(`checklist-${suffix}`);
+  list.replaceChildren(...questionChecklist(textarea.value).map((item) => {
+    const li = document.createElement('li');
+    li.className = item.ok ? 'ok' : 'todo';
+    li.append(Object.assign(document.createElement('span'), { className: 'fixit-mark', textContent: item.ok ? '✓' : '○' }), item.label);
+    if (!item.ok) li.append(Object.assign(document.createElement('span'), { className: 'sr-only', textContent: ' (not yet)' }));
+    return li;
+  }));
 
   if (trackId) {
-    // Cheer once, at the moment a flawed question becomes clear (not on every key).
-    if (warnings.length === 0 && !clearState[trackId]) cheer(list);
-    clearState[trackId] = warnings.length === 0;
+    // Cheer once, at the moment the flawed question becomes clear (not on every key).
+    if (clear && !clearState[trackId]) cheer(list);
+    clearState[trackId] = clear;
     refreshPrimary();
   }
 }
 
 function setupFixIt() {
-  FIXIT_IDS.forEach((id, i) => {
-    const textarea = document.getElementById(id);
-    const list = document.getElementById(`checker-list-${i + 1}`);
-    textarea.addEventListener('input', () => renderChecker(textarea, list, id));
-  });
-
+  const textarea = document.getElementById('fixit-2');
+  textarea.addEventListener('input', () => renderChecker(textarea, 'fixit-2', '2'));
   const ownTextarea = document.getElementById('own-question');
-  const ownList = document.getElementById('checker-list-own');
-  ownTextarea.addEventListener('input', () => renderChecker(ownTextarea, ownList, null));
+  ownTextarea.addEventListener('input', () => renderChecker(ownTextarea, null, 'own'));
 }
 
 init();
