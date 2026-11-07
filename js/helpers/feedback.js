@@ -27,12 +27,13 @@ const RULES = {
     learned: 'A good question is clear, fair and says when.',
   }),
 
-  // facts: { guessText }. Guessing before looking IS this phase's reasoning.
+  // facts: { guessText }. Predicting before looking IS this phase's reasoning
+  // (Part 50: Plan is a PREDICTION; Number Lab makes an ESTIMATE).
   plan: (f) => ({
     stars: 3,
-    wins: [`You guessed ${f.guessText} before looking.`, 'Guess first, then check. Just like scientists!'],
-    nextTime: 'Remember why you guessed that.',
-    learned: 'A guess helps you notice surprises in the data.',
+    wins: [`You predicted ${f.guessText} before looking.`, 'Predict first, then check. Just like scientists!'],
+    nextTime: 'Remember why you predicted that.',
+    learned: 'A prediction helps you notice surprises in the data.',
   }),
 
   // facts: { classSizes: [20] or [18, 18], mostCommon (text or null), guess (or null) }
@@ -40,8 +41,8 @@ const RULES = {
     const hasGuess = f.guess !== null && f.guess !== undefined;
     const sizes = f.classSizes || [];
     const guessWin = hasGuess && (f.mostCommon
-      ? `Most common answer: ${f.mostCommon}. Your guess: ${f.guess}.`
-      : `Your guess was ${f.guess}. Now compare the classes!`);
+      ? `Most common answer: ${f.mostCommon}. Your prediction: ${f.guess}.`
+      : `Your prediction was ${f.guess}. Now compare the classes!`);
     return {
       stars: 2 + (hasGuess ? 1 : 0),
       wins: [

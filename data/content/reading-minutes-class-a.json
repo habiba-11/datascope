@@ -7,7 +7,7 @@
     { "flawed": "Don't you think reading is great?", "fix": "How many minutes did you read yesterday?", "choice": { "goodFirst": true, "why": "A says WHEN, and it does not push people." } },
     { "flawed": "Do you read books?", "fix": "How many books did you read this month?" }
   ],
-  "planPrompt": "🤔 Make a guess! How many minutes did most kids read?",
+  "planPrompt": "🔮 Predict! How many minutes did most kids read?",
   "graphLab": {
     "tell": "📊 What do the two graphs tell us?",
     "notTell": "🤔 What can't these graphs tell us?",
@@ -45,7 +45,7 @@
       "the data showed me something new"
     ],
     "kind": "compare",
-    "predictPrompt": "🤔 Guess first! If every kid read the same, how many minutes would that be?",
+    "predictPrompt": "📏 Now estimate! If every kid read the same, how many minutes would that be?",
     "build": "📖 5 kids read some minutes. Their mean is {target}. Type 5 numbers that fit.",
     "mistake": { "story": "📖 Mia asked 5 friends how long they read.", "numbers": [9, 3, 20, 5, 7] },
     "compareRange": {

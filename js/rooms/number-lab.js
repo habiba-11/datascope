@@ -6,10 +6,11 @@ import {
   numberLabKind, TASKS_BY_KIND, fillTemplate, buildTarget, buildExample, isAllSame, miaSays, choicesFor, revealMessage, classStats,
   rangeSummary, rulerSpan,
 } from '../helpers/number-tasks.js';
-import { logEvent, trackMeaningTask } from '../helpers/log.js';
+import { logEvent, trackMeaningTask, readLog } from '../helpers/log.js';
+import { planPrediction, guessWord, planReminder } from '../helpers/guesses.js';
 import { createAnswerHint, createHint } from '../helpers/prompts.js';
 import { answerFacts, fillSuggestions } from '../helpers/suggestions.js';
-import { getSelectedScenarioId } from '../storage/save.js';
+import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
 import { cheer, encourage, stagger, countUp } from '../motion.js';
 import { finishPhase } from '../phase-progress.js';
 import { whenIntroClosed } from '../phase-intro.js';
@@ -59,6 +60,13 @@ let recipe = null;
 let content = null; // this scenario's numberLab words (data/content/<scenario>.json)
 // What the child did, for the feedback card at the end (Part 16).
 const numberFacts = { guess: null, changedWithReason: false, teaches: '' };
+// Part 50 (Habiba chose A, 7 Nov 2026): the Plan PREDICTION and the Number Lab
+// ESTIMATE are two different things. `word`: what this room calls the guess.
+// `planGuess`: the child's Plan prediction (or null). `fromPlan`: games check
+// that prediction against the mode instead of asking the same question again.
+let word = 'estimate';
+let planGuess = null;
+let fromPlan = false;
 
 async function init() {
   recipe = await loadRecipe(getSelectedScenarioId());
@@ -69,6 +77,12 @@ async function init() {
   tasks = TASKS_BY_KIND[kind];
   tasks.forEach((task, i) => { taskComplete[i + 1] = false; });
   numberFacts.teaches = recipe.teaches;
+  word = guessWord(kind);
+  planGuess = planPrediction(readLog(), getExplorerCode(), recipe.id);
+  fromPlan = kind === 'category' && planGuess !== null;
+  STEP_LABELS.predict = kind === 'category' ? 'Prediction' : 'Estimate';
+  TASK_TITLES.predict = kind === 'category' ? '🔮 Your prediction' : '📏 Your estimate';
+  TASK_PIP.predict = fromPlan ? 'Was your prediction right? Let us check!' : 'Estimate first, then check the statistics!';
 
   const { values } = generateClassData(recipe);
   const valuesB = partner ? generateClassData(partner).values : null;
@@ -135,8 +149,8 @@ function refreshPrimary() {
   }
   if (task === 'predict') {
     if (stage.predict === 'guess') bar.setPrimary({ label: '🔍 Show statistics', onClick: revealNumbers });
-    else if (stage.predict === 'changing') bar.setPrimary({ label: 'Save my new guess', onClick: saveRevision });
-    else bar.setPrimary({ label: '', enabled: false, whyDisabled: '🤔 Keep or change your guess?' });
+    else if (stage.predict === 'changing') bar.setPrimary({ label: `Save my new ${word}`, onClick: saveRevision });
+    else bar.setPrimary({ label: '', enabled: false, whyDisabled: `🤔 Keep or change your ${word}?` });
   } else if (task === 'build') {
     bar.setPrimary({ label: 'Check my numbers', onClick: checkBuild });
   } else if (task === 'mistake' && stage.mistake === 'sort') {
@@ -162,7 +176,7 @@ function guessControl(prefix, values) {
       .map((v) => `<button class="btn choice-btn ${prefix}-choice" data-value="${v}" type="button">${v}</button>`)
       .join('');
   }
-  return `<input type="number" id="${prefix}-input" aria-label="My guess"> <span class="predict-unit">${recipe.unit || ''}</span>`;
+  return `<input type="number" id="${prefix}-input" aria-label="My ${word}"> <span class="predict-unit">${recipe.unit || ''}</span>`;
 }
 
 // Choice buttons: only one can be picked at a time.
@@ -176,6 +190,7 @@ function wireChoiceGroup(prefix) {
 
 // The child's guess: a number, a word, or null if nothing is chosen yet.
 function readGuess(prefix) {
+  if (prefix === 'predict' && fromPlan) return planGuess;
   if (kind === 'category') {
     const chosen = document.querySelector(`.${prefix}-choice.active`);
     return chosen ? chosen.dataset.value : null;
@@ -286,19 +301,20 @@ function buildExampleHTML(example, target) {
 const TASK_HTML = {
   predict: (n, { values }) => `
     <section class="task" data-task="${n}">
-      <p>${content.predictPrompt}</p>
-      <div class="predict-row">${guessControl('predict', values)}</div>
+      ${planGuess !== null ? `<p class="plan-reminder">${planReminder(planGuess, recipe)}</p>` : ''}
+      <p>${fromPlan ? content.checkPrompt : content.predictPrompt}</p>
+      ${fromPlan ? '' : `<div class="predict-row">${guessControl('predict', values)}</div>`}
       <div id="stats-box" hidden></div>
       <p class="feedback" id="predict-feedback" hidden></p>
 
       <div class="revise-box" id="revise-box" hidden>
         <p><strong>🤔 Has the data changed your mind?</strong></p>
         <div class="choice-row">
-          <button class="btn choice-btn" id="keep-guess-btn" type="button">👍 Keep my guess</button>
-          <button class="btn choice-btn" id="change-guess-btn" type="button">✏️ Change my guess</button>
+          <button class="btn choice-btn" id="keep-guess-btn" type="button">👍 Keep my ${word}</button>
+          <button class="btn choice-btn" id="change-guess-btn" type="button">✏️ Change my ${word}</button>
         </div>
         <div class="revise-form" id="revise-form" hidden>
-          <span>My new guess:</span>
+          <span>My new ${word}:</span>
           ${guessControl('new-guess', values)}
           <label for="revise-reason">because</label>
           <input type="text" id="revise-reason" class="revise-reason" placeholder="...">
@@ -421,7 +437,7 @@ const TASK_SETUP = {
       // Guess first: the numbers stay hidden until the child has made a guess.
       const guess = readGuess('predict');
       if (guess === null) {
-        show(feedback, kind === 'category' ? '👆 Pick your guess first!' : '✏️ Type your guess first!');
+        show(feedback, kind === 'category' ? `👆 Pick your ${word} first!` : `✏️ Type your ${word} first!`);
         return;
       }
       const box = document.getElementById('stats-box');
@@ -437,7 +453,9 @@ const TASK_SETUP = {
       document.querySelectorAll('.predict-row input, .predict-row button').forEach((el) => { el.disabled = true; });
 
       numberFacts.guess = guess;
-      const logged = { about: recipe.question, scenarioId: recipe.id, guess };
+      // Part 50: new fields only. planGuess: the Plan prediction beside the
+      // estimate; fromPlan: games checked the Plan prediction (no second guess).
+      const logged = { about: recipe.question, scenarioId: recipe.id, guess, planGuess, fromPlan };
       if (kind === 'category') {
         numberFacts.mode = stats.mode;
         logged.mode = stats.mode;
@@ -622,7 +640,7 @@ function setupRevision(n, getOldGuess) {
   keepBtn.addEventListener('click', () => {
     keepBtn.classList.add('active');
     logEvent('number-lab', 'revision', { about: recipe.question, scenarioId: recipe.id, changed: false, oldGuess: getOldGuess() });
-    finish(`👍 You kept your guess: ${getOldGuess()}. Which number above backs it up?`);
+    finish(`👍 You kept your ${word}: ${getOldGuess()}. Which number above backs it up?`);
   });
 
   changeBtn.addEventListener('click', () => {
@@ -638,7 +656,7 @@ function setupRevision(n, getOldGuess) {
     const newGuess = readGuess('new-guess');
     const reason = reasonInput.value.trim();
     if (newGuess === null || !reason) {
-      show(feedback, '✏️ Give your new guess AND say why.');
+      show(feedback, `✏️ Give your new ${word} AND say why.`);
       return;
     }
     numberFacts.changedWithReason = true;

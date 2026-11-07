@@ -128,7 +128,7 @@ test('reveal message: same mean, different range (reading)', () => {
   const a = generateClassData(read('scenarios/reading-minutes-class-a.json')).values;
   const b = generateClassData(read('scenarios/reading-minutes-class-b.json')).values;
   const message = revealMessage('compare', 20, classStats('compare', a, b));
-  assert.match(message, /Nice guess/);
+  assert.match(message, /Nice estimate/); // Part 50: Number Lab makes an estimate
   assert.match(message, /look at the range/);
 });
 

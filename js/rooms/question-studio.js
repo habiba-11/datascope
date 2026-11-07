@@ -16,7 +16,8 @@ import { wireChoiceCards } from '../choices.js';
 import { showMissionCard } from '../mission.js';
 
 // Question Studio in the 3-zone layout (UI guide). One room, two phases:
-// Ask (pick a question, fix two flawed questions) and Plan (guess first).
+// Ask (pick a question, fix two flawed questions) and Plan (predict first; Part 50:
+// a PREDICTION here, an ESTIMATE of the mean in Number Lab).
 // Each screen is one step of the mini stepper, with ONE primary button.
 const STEPS = [
   { label: 'Pick', phase: 'ask', question: 'What do you want to find out?', pip: 'Pick one. Our pretend class will answer it.' },
@@ -26,7 +27,7 @@ const STEPS = [
   { label: 'Fix 2', phase: 'ask', question: '🛠️ Make it better!', pip: 'This question is not good yet. Make it better!' },
   // Part 46 (Round 4): the bonus is its own optional step, so children notice it.
   { label: '⭐ Bonus', phase: 'ask', question: '⭐ Bonus: your own question', pip: 'Want a challenge? Write your OWN question!' },
-  { label: 'Guess', phase: 'plan', question: '🤔 Guess first!', pip: 'Scientists guess first, then check.' },
+  { label: 'Predict', phase: 'plan', question: '🔮 Predict first!', pip: 'Scientists predict first, then check.' },
 ];
 const STRIP = { ask: '❓ Ask · Question Studio', plan: '🗺️ Plan · Question Studio' };
 
@@ -182,14 +183,14 @@ function refreshPrimary() {
   } else if (step === 3) {
     // The bonus is optional: once the child tries it, they can go on at any time.
     bar.setPrimary(bonusTaken
-      ? { label: 'Next: Make a guess →', ready: true, onClick: () => { finishAsk(); showStep(4); } }
+      ? { label: 'Next: Make a prediction →', ready: true, onClick: () => { finishAsk(); showStep(4); } }
       : { label: '', enabled: false, whyDisabled: '👆 Try the bonus, or skip it' });
   } else if (guessSaved) {
     bar.setPrimary({ label: '📋 Collect the data →', ready: true, onClick: () => { location.href = 'data-hub.html'; } });
   } else if (selectedScenario.recipe.answerType === 'number') {
-    bar.setPrimary({ label: 'Save my guess', onClick: saveTypedGuess });
+    bar.setPrimary({ label: 'Save my prediction', onClick: saveTypedGuess });
   } else {
-    bar.setPrimary({ label: '', enabled: false, whyDisabled: '👆 Pick your guess' });
+    bar.setPrimary({ label: '', enabled: false, whyDisabled: '👆 Pick your prediction' });
   }
 }
 
@@ -334,7 +335,7 @@ function renderPredictTask() {
 
   const row = document.getElementById('predict-row');
   if (recipe.answerType === 'number') {
-    row.innerHTML = `<input type="number" id="predict-input" aria-label="My guess">
+    row.innerHTML = `<input type="number" id="predict-input" aria-label="My prediction">
       <span class="predict-unit">${recipe.unit || ''}</span>`;
     return;
   }
@@ -368,7 +369,7 @@ function savePrediction(guess) {
   const { recipe } = selectedScenario;
   const shown = recipe.answerType === 'number' ? guess : `"${guess}"`;
   const feedback = document.getElementById('predict-feedback');
-  feedback.textContent = `👍 Your guess: ${shown}. Now let's collect the data!`;
+  feedback.textContent = `👍 Your prediction: ${shown}. Now let's collect the data!`;
   feedback.hidden = false;
   logEvent('question-studio', 'prediction', {
     about: recipe.question, scenarioId: recipe.id, guess: recipe.answerType === 'number' ? Number(guess) : guess,

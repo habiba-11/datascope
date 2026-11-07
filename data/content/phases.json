@@ -11,9 +11,9 @@
     "icon": "🗺️",
     "title": "Make a plan",
     "accent": "plan",
-    "why": "A guess helps you spot surprises in the data.",
-    "bullets": ["Guess the answer before you look.", "Scientists guess first, then check."],
-    "doneWhen": "you save your guess."
+    "why": "A prediction helps you spot surprises in the data.",
+    "bullets": ["Predict the answer before you look.", "Scientists predict first, then check."],
+    "doneWhen": "you save your prediction."
   },
   "collect": {
     "icon": "📋",

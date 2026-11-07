@@ -86,7 +86,7 @@ export function revealMessage(kind, guess, stats) {
 
   const shownMean = formatMean(stats.mean);
   let message = Math.abs(guess - shownMean) <= 1
-    ? `🎯 Nice guess! You said ${guess}. The mean is ${shownMean}.`
+    ? `🎯 Nice estimate! You said ${guess}. The mean is ${shownMean}.`
     : `You said ${guess}. The mean is ${shownMean}.`;
 
   if (kind === 'compare') {

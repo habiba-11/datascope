@@ -8,7 +8,7 @@
     { "flawed": "Isn't football the best game?", "fix": "Which game did you play most at recess this week?", "choice": { "goodFirst": false, "why": "B says WHEN, and it does not push people." } },
     { "flawed": "Do you like games?", "fix": "What is your favourite recess game this week?" }
   ],
-  "planPrompt": "🤔 Make a guess! Which game will most kids pick?",
+  "planPrompt": "🔮 Predict! Which game will most kids pick?",
   "graphLab": {
     "tell": "📊 What does this graph tell us about recess games?",
     "notTell": "🤔 What can't this graph tell us?",
@@ -47,7 +47,8 @@
       "the data showed me something new"
     ],
     "kind": "category",
-    "predictPrompt": "🤔 Guess first! Which game did the most kids pick?",
+    "predictPrompt": "🔮 Predict first! Which game did the most kids pick?",
+    "checkPrompt": "🔍 Tap Show statistics to check it.",
     "whyNoMean": {
       "question": "🤔 Why can't we find the mean of favourite games?",
       "options": [

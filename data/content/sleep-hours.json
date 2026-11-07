@@ -7,7 +7,7 @@
     { "flawed": "Isn't staying up late bad for you?", "fix": "What time did you go to bed last night?", "choice": { "goodFirst": false, "why": "B says WHEN, and it does not push people." } },
     { "flawed": "Do you sleep a lot?", "fix": "How many hours did you sleep last night?" }
   ],
-  "planPrompt": "🤔 Make a guess! How many hours did most kids sleep?",
+  "planPrompt": "🔮 Predict! How many hours did most kids sleep?",
   "graphLab": {
     "tell": "📊 What does this graph tell us about our sleep?",
     "notTell": "🤔 What can't this graph tell us?",
@@ -45,7 +45,7 @@
       "the data showed me something new"
     ],
     "kind": "number",
-    "predictPrompt": "🤔 Guess first! If every kid slept the same, how many hours would that be?",
+    "predictPrompt": "📏 Now estimate! If every kid slept the same, how many hours would that be?",
     "build": "😴 5 friends slept some hours. Their mean is {target}. Type 5 numbers that fit.",
     "mistake": { "story": "😴 Mia asked 5 friends how long they slept.", "numbers": [10, 7, 6, 9, 8] },
     "realLife": {

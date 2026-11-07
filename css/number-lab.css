@@ -365,3 +365,16 @@
   font-size: 16px; /* a short label */
   font-weight: 700;
 }
+
+/* Part 50: the Plan prediction, shown above the estimate (or, for games, the
+   prediction that gets checked). Plan's yellow, so it reads as "from before". */
+.plan-reminder {
+  display: inline-block;
+  margin: 0 0 var(--space-1);
+  padding: 6px 14px;
+  background: var(--color-plan-light);
+  border: 2px solid var(--color-navy);
+  border-radius: 14px;
+  font-weight: 800;
+  color: var(--color-navy);
+}

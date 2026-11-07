@@ -34,7 +34,7 @@ test('Collect: a guess to compare with earns a star; the guess and the data are 
   const withGuess = buildPhaseFeedback('collect', { classSizes: [20], mostCommon: '9', guess: 8 });
   assert.equal(noGuess.stars, 2);
   assert.equal(withGuess.stars, 3);
-  assert.equal(withGuess.wins[1], 'Most common answer: 9. Your guess: 8.');
+  assert.equal(withGuess.wins[1], 'Most common answer: 9. Your prediction: 8.');
   const twoClasses = buildPhaseFeedback('collect', { classSizes: [18, 18], mostCommon: null, guess: 20 });
   assert.match(twoClasses.wins[0], /both classes: 18 \+ 18/);
 });

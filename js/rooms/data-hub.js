@@ -5,6 +5,7 @@ import { loadRecipe, loadPartnerRecipe } from '../helpers/scenarios.js';
 import { tallyKeys, colourFor, seatLabels, countAnswers, tallyWords } from '../helpers/tally.js';
 import { valueText } from '../helpers/charts.js';
 import { logEvent, readLog } from '../helpers/log.js';
+import { planPrediction } from '../helpers/guesses.js';
 import { playSound } from '../sounds.js';
 import { pipReacts, animate } from '../motion.js';
 import { pipSay } from '../pip.js';
@@ -71,7 +72,7 @@ async function init() {
       classSizes: classes.map((c) => c.data.values.length),
       // Two classes have two different "most common" answers, so none is named.
       mostCommon: partner ? null : mode(classes[0].data.values).join(' and ') || null,
-      guess: lastPrediction(recipe.id),
+      guess: planPrediction(readLog(), getExplorerCode(), recipe.id),
     });
   }
 
@@ -121,14 +122,6 @@ async function init() {
     }
   }
   showStep(0);
-}
-
-// This child's Plan guess for this scenario (the newest one), or null.
-// Filtered by code: on a shared device the log also holds other children's work.
-function lastPrediction(scenarioId) {
-  const code = getExplorerCode();
-  const guesses = readLog().filter((e) => e.code === code && e.type === 'prediction' && e.scenarioId === scenarioId);
-  return guesses.length ? guesses[guesses.length - 1].guess : null;
 }
 
 // Two panels for one class: the seats (left) and the tally (right).
