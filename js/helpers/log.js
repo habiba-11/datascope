@@ -32,7 +32,6 @@ export const EVENT_TYPES = [
   'fixit-choice', // Part 45: Fix 1 "Which question is better?" (scenarioId, picked A or B, correct, tries)
   'bonus-seen', // Part 46: the bonus step "Write your OWN question" was shown (scenarioId)
   'bonus-choice', // Part 46: the child tried the bonus or skipped it (scenarioId, taken: true or false)
-  'tray-intro-seen', // Part 47: Pip pointed at the helper tray (room; auto: first time in the room, or the About tab)
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];

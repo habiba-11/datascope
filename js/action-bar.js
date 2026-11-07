@@ -1,11 +1,10 @@
 // Shell layer: the action bar under the task card (UI guide, zone 3). Always in
 // the same place: Back (quiet) on the left, the ONE primary button (green) on
-// the right. The screen's Hint goes to the helper tray (setHint; Part 47).
+// the right. The Hint button sits under the question (setHint).
 // mountShell({ layout: 'card' }) makes the empty bar; each room fills it with setupActionBar().
-import { setTrayHint } from './helper-tray.js';
 
 // back:    { label, href } or { label, onClick }, or null for no Back
-// hint:    a button made by prompts.js (the tray's 💡 uses it, see setHint), or null
+// hint:    a button made by prompts.js (placed under the question, see setHint), or null
 // primary: see setPrimary below
 // Returns { setPrimary, setBack }, so the room can change the buttons as the task goes on.
 export function setupActionBar({ back = null, hint = null, primary }) {
@@ -45,12 +44,19 @@ export function setupActionBar({ back = null, hint = null, primary }) {
     onPrimary = onClick;
   }
 
-  // The Hint of the task on screen (or null for none). Part 47 (Habiba,
-  // 7 Nov 2026): the 💡 in the helper tray gives it, the same place in every
-  // room; the button itself is not on the page. Its ideas still appear under
-  // the question (each room puts its hint list there).
+  // The Hint button of the task on screen (or null for none).
+  let hintBtn = null;
+  // It goes right under the question, at the top of the hint slot of the task
+  // on screen (so the button and its answers are together; Habiba, 4 Nov 2026).
+  // A page without a hint slot keeps it in the bar.
   function setHint(button) {
-    setTrayHint(button);
+    if (hintBtn) hintBtn.remove();
+    hintBtn = button;
+    if (!button) return;
+    button.classList.add('btn-secondary');
+    const slot = [...document.querySelectorAll('.hint-list-slot')].find((s) => s.offsetParent !== null);
+    if (slot) slot.prepend(button);
+    else right.prepend(button);
   }
 
   setBack(back);

@@ -1,5 +1,4 @@
-import { mountShell } from '../app.js';
-import { addTrayTool } from '../helper-tray.js';
+import { mountShell, addTitleButton } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { mean, median, mode, range, formatMean } from '../helpers/stats.js';
 import { loadRecipe, loadPartnerRecipe, loadContent, loadSharedAnswers } from '../helpers/scenarios.js';
@@ -156,8 +155,12 @@ async function init() {
     stats: classStats(kind, values, partnerValues),
     journey: buildJourney(readLog(), getExplorerCode(), recipe.id, recipe.compareWith || null),
   });
-  // Part 47: "🧭 My findings" is in the helper tray.
-  addTrayTool('findings', () => openFindings(findings, { auto: false, wordsNote }), kind);
+  const findingsBtn = document.createElement('button');
+  findingsBtn.type = 'button';
+  findingsBtn.className = 'btn';
+  findingsBtn.textContent = '📋 My findings';
+  findingsBtn.addEventListener('click', () => openFindings(findings, { auto: false, wordsNote }));
+  addTitleButton(findingsBtn);
   if (!isPhaseDone('conclude')) whenIntroClosed().then(() => openFindings(findings, { auto: true, wordsNote }));
 }
 

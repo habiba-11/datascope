@@ -12,7 +12,6 @@ import { backendReady } from './config.js';
 import { EXIT_BUTTON_HTML, setupExitButton } from './exit-button.js';
 import { mountSky } from './ambient.js';
 import { mountPipStand } from './pip-stand.js';
-import { mountHelperTray, introduceTray } from './helper-tray.js';
 import { setupMusic } from './music.js';
 import { playSound } from './sounds.js';
 
@@ -98,11 +97,6 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   // Part 43a: the living background, with this room's own touch (My journey has no phase).
   mountSky(phase || step);
   mountPipStand(); // Part 43c: big Pip beside the card, alive and talking
-  // Part 47: the helper tray in every room (My journey has no task, so no tray).
-  if (phase) {
-    mountHelperTray(phase);
-    introduceTray();
-  }
   // Part 43d: a whoosh as the room opens, a soft tap for every button, and the music.
   playSound('whoosh');
   document.addEventListener('pointerdown', (e) => {
@@ -277,4 +271,26 @@ export function setCurrentStep(stepId) {
     // Screen readers say "current step" for the highlighted one.
     if (isCurrent) link.setAttribute('aria-current', 'step'); else link.removeAttribute('aria-current');
   });
+}
+
+// Puts a room's own tool (e.g. "📘 Maths recap") next to its title, so it
+// never crowds the task text underneath. In the card layout it goes into the
+// top bar instead (UI guide: at most 3 buttons there).
+export function addTitleButton(button) {
+  const tools = document.getElementById('room-tools');
+  if (document.querySelector('.card-layout') && tools) {
+    button.classList.remove('title-btn');
+    button.classList.add('btn-secondary', 'room-tool');
+    tools.append(button);
+    return;
+  }
+  const title = document.querySelector('.room-title');
+  let row = title.parentElement;
+  if (!row.classList.contains('room-title-row')) {
+    row = document.createElement('div');
+    row.className = 'room-title-row';
+    title.before(row);
+    row.append(title);
+  }
+  row.append(button);
 }
