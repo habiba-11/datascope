@@ -100,7 +100,7 @@ async function init() {
         <div class="graph-layout${partner ? ' graph-layout--two' : ''}">
           <div class="graph-look">
             <div class="graph-toolbar" id="graph-toolbar">
-              <p class="graph-toolbar-label" id="graph-toolbar-label"><span aria-hidden="true">📊</span> Pick a graph to draw:</p>
+              <p class="graph-toolbar-label" id="graph-toolbar-label"><span aria-hidden="true">📊</span> Pick a graph to explore:</p>
               <div class="kind-tabs" id="kind-tabs" aria-labelledby="graph-toolbar-label">
                 ${CHART_TYPES.map((t) => `<button class="kind-tab" data-value="${t.value}" type="button" aria-label="${t.name}: ${t.use}">${t.icon}<span>${t.name}</span></button>`).join('')}
               </div>
