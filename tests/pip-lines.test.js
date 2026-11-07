@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
+  isStale,
   PIP_EVENTS, IDLE_MOVES, pickLine, nextIdleMove, idleGap, IDLE_HELP_SECONDS, screenKey, shouldOfferHelp,
 } from '../js/helpers/pip-lines.js';
 import { EVENT_TYPES } from '../js/helpers/log.js';
@@ -58,4 +59,12 @@ test('idle help: after 10 seconds, once per screen, and logged with known events
   assert.equal(shouldOfferHelp(screen, offered), false);
   assert.equal(shouldOfferHelp(screenKey('/rooms/number-lab.html', '3 Real life'), offered), true);
   assert.ok(EVENT_TYPES.includes('idle-help-shown') && EVENT_TYPES.includes('idle-help-taken'));
+});
+
+test('a reaction that waited too long is dropped; room, badge and phase lines always come', () => {
+  assert.equal(isStale('correct', 500), false);
+  assert.equal(isStale('correct', 4000), true);
+  assert.equal(isStale('hint', 3500), true);
+  assert.equal(isStale('badge', 9000), false);
+  assert.equal(isStale('roomOpen', 9000), false);
 });

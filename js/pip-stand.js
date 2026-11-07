@@ -12,7 +12,7 @@ import { pipSVG } from './pip.js';
 import { animate } from './motion.js';
 import { playSound } from './sounds.js';
 import {
-  PIP_EVENTS, pickLine, nextIdleMove, idleGap, IDLE_HELP_SECONDS, screenKey, shouldOfferHelp,
+  PIP_EVENTS, isStale, pickLine, nextIdleMove, idleGap, IDLE_HELP_SECONDS, screenKey, shouldOfferHelp,
 } from './helpers/pip-lines.js';
 import { logEvent } from './helpers/log.js';
 
@@ -54,15 +54,17 @@ let queue = Promise.resolve();
 // `options.help`: a function for a "💡 Yes, help me!" button in the bubble (idle help).
 // `options.ms`: how long the line stays.
 export function pipTalk(event, options = {}) {
-  queue = queue.then(() => talkNow(event, options)).catch(() => {});
+  const asked = Date.now();
+  queue = queue.then(() => talkNow(event, options, asked)).catch(() => {});
   return queue;
 }
 
-async function talkNow(event, options) {
+async function talkNow(event, options, asked = Date.now()) {
   const style = PIP_EVENTS[event];
   const lines = (await loadLines())[event];
   if (!style || !lines || !lines.length) return;
   await whenNoModal();
+  if (isStale(event, Date.now() - asked)) return; // its moment has passed (helpers/pip-lines.js)
   const { index, text } = pickLine(lines, lastLine[event]);
   lastLine[event] = index;
   if (style.sound) playSound(style.sound);

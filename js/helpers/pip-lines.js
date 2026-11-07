@@ -63,3 +63,14 @@ export function screenKey(page, step = "") {
 export function shouldOfferHelp(screen, offered) {
   return !offered.has(screen);
 }
+
+// A reaction to a tap (a right answer, a try again, a hint, the pointer line)
+// only makes sense at that moment. If it waited in Pip's line longer than
+// this, it is dropped, so Pip never cheers seconds after the moment (scan,
+// 7 Nov 2026). Room, badge and phase lines still wait their turn.
+export const REACTIONS = ['correct', 'tryAgain', 'hint', 'tray'];
+export const STALE_MS = 3000;
+
+export function isStale(event, waitedMs) {
+  return REACTIONS.includes(event) && waitedMs > STALE_MS;
+}
