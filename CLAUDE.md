@@ -169,4 +169,5 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 - **Choosing vs answering (Part 48, 7 Nov 2026):** a green ✓ means "right answer". A plain choice (which graph to draw) is a navy, pressed, underlined tab, never a green ✓. Graph Lab: a "Pick a graph to draw" toolbar on top of the chart with "Graphs tried: N of 4".
 - **Main button (Part 49, 7 Nov 2026):** the action bar sticks to the bottom of the window, so the one main button is always on screen; do not put the main action inside the card.
 - **Two guesses (Part 50, Habiba chose A, 7 Nov 2026):** Plan = a PREDICTION before data; Number Lab = an ESTIMATE of the mean, with a reminder of the prediction. Games: Number Lab checks the Plan prediction (no second guess). Metrics and badges unchanged.
+- **Games words (Part 51, 7 Nov 2026):** the games scenario never talks about numbers (use `whyWords` / `bulletsWords` / `titleWords` and kind === 'category' branches); only the "why games have no mean" lesson names mean, median and range.
 - **Devices:** laptops and PC screens only (1366x768 matters most).
