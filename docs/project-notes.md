@@ -199,6 +199,8 @@ Parts 42 to 51. Claude commits each part; nothing is pushed until Habiba says "p
 | 45 | 7 Nov | `0e35db6` | **Fix the question:** Fix 1 = choose A or B (+ why), new event `fixit-choice`; Fix 2 = type, ONE tip at a time, 4 ticks turning green, a good example beside. Checker rules unchanged, tips in plain words. |
 | 46 | 7 Nov | `96e33b7` | **Bonus question** is its own optional step (⭐ Bonus, after Fix 2): Try the bonus / No thanks, continue. New events `bonus-seen`, `bonus-choice` (taken). |
 | 47 | 7 Nov | `ddabaa5` | **Helper tray** in the left margin above Pip (top-bar row below 1240px): 💡 Hint (every room, greyed when none), 📖 Maths recap (Number Lab), 🧭 My findings (Evidence Board), each with a "when to use me" line. Pip points at it the first time in each room; new event `tray-intro-seen`. |
+| 47 undone | 7 Nov | `a11bfcf` | The helper tray removed again (Habiba): the helpers stay in their places. |
+| 47b | 7 Nov | `37da910` | **Pointers:** the first time each helper appears in a room, an arrow points at it where it is (Hint under the question, Maths recap and My findings in the top bar) with its "when to use me" line, and Pip says a line. Event `tray-intro-seen` (phase, helper, auto); the About tab shows them again. |
 
 **Decisions (Habiba, 6 Nov 2026):** no stickers on the Evidence Card, no mission
 bar, no audience sentence ("tell the principal") anywhere. Pip stands beside the
