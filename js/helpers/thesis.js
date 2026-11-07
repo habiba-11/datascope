@@ -30,7 +30,7 @@ export const THESIS_COLUMNS = [
   { key: 'badges', meaning: 'Reasoning badges earned (whole log, all scenarios).' },
   { key: 'level', meaning: 'Explorer level reached (from badges).' },
   { key: 'planGuess', meaning: 'The guess made in Plan, before seeing any data.' },
-  { key: 'numberGuess', meaning: 'Number Lab: the guess before the numbers were revealed (a number, or a word for games).' },
+  { key: 'numberGuess', meaning: 'Number Lab: the estimate of the mean before the numbers were revealed. Games: the word guessed (since 7 Nov 2026 the Plan prediction, checked against the mode; log field fromPlan).' },
   { key: 'mean', meaning: 'Number Lab: the real class mean shown after the guess (empty for games).' },
   { key: 'predictionError', meaning: 'Number Lab: how far the guess was from the mean (|guess - mean|; empty for games).' },
   { key: 'revised', meaning: 'Number Lab: true if the child changed their guess after seeing the data, false if they kept it.' },
