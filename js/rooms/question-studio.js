@@ -24,6 +24,8 @@ const STEPS = [
   // a checklist that turns green and ONE tip at a time.
   { label: 'Fix 1', phase: 'ask', question: '🤔 Which question is better?', pip: 'Only one is a good survey question. Tap it!' },
   { label: 'Fix 2', phase: 'ask', question: '🛠️ Make it better!', pip: 'This question is not good yet. Make it better!' },
+  // Part 46 (Round 4): the bonus is its own optional step, so children notice it.
+  { label: '⭐ Bonus', phase: 'ask', question: '⭐ Bonus: your own question', pip: 'Want a challenge? Write your OWN question!' },
   { label: 'Guess', phase: 'plan', question: '🤔 Guess first!', pip: 'Scientists guess first, then check.' },
 ];
 const STRIP = { ask: '❓ Ask · Question Studio', plan: '🗺️ Plan · Question Studio' };
@@ -98,15 +100,25 @@ async function init() {
               <p class="fixit-example-q">${goodQuestion}</p>
             </aside>
           </div>
-          <details class="bonus">
-            <summary>⭐ Bonus: write your own question!</summary>
-            <textarea id="own-question" class="fixit-input" rows="2" placeholder="Type a question..." aria-label="My own question"></textarea>
-            <p class="fixit-tip" id="fixit-tip-own" aria-live="polite"></p>
-            <ul class="fixit-checklist" id="checklist-own" aria-label="Checklist"></ul>
-          </details>
         </section>
 
-        <section class="task" data-step="3" hidden>
+        <section class="task bonus-step" data-step="3" hidden>
+          <div class="bonus-offer" id="bonus-offer">
+            <p class="bonus-note">⭐ This one is extra. You can try it, or skip it.</p>
+            <div class="bonus-buttons">
+              <button type="button" class="btn btn-main" id="bonus-yes">⭐ Try the bonus</button>
+              <button type="button" class="btn btn-secondary" id="bonus-no">No thanks, continue →</button>
+            </div>
+          </div>
+          <div class="bonus-write" id="bonus-write" hidden>
+            <label for="own-question">My own question:</label>
+            <textarea id="own-question" class="fixit-input" rows="2" placeholder="Type a question..."></textarea>
+            <p class="fixit-tip" id="fixit-tip-own" aria-live="polite"></p>
+            <ul class="fixit-checklist" id="checklist-own" aria-label="Checklist"></ul>
+          </div>
+        </section>
+
+        <section class="task" data-step="4" hidden>
           <p class="plan-prompt" id="predict-question"></p>
           <div class="predict-row" id="predict-row"></div>
           <p class="feedback" id="predict-feedback" hidden></p>
@@ -121,13 +133,15 @@ async function init() {
     refreshPrimary();
   });
   setupFixIt();
+  setupBonus();
   showStep(0);
 }
 
 function showStep(n) {
   step = n;
   if (n === 1 || n === 2) renderFixIts();
-  if (n === 3) renderPredictTask();
+  if (n === 3) offerBonus();
+  if (n === 4) renderPredictTask();
   document.querySelectorAll('.task').forEach((el) => {
     el.hidden = Number(el.dataset.step) !== n;
   });
@@ -163,8 +177,13 @@ function refreshPrimary() {
     const bothClear = Object.values(clearState).every(Boolean);
     const why = clearState['fixit-2'] ? '👆 Fix 1 needs an answer too' : '✏️ Make the question better first';
     bar.setPrimary(bothClear
-      ? { label: 'Next: Make a guess →', ready: true, onClick: () => { finishAsk(); showStep(3); } }
+      ? { label: 'Next: ⭐ Bonus →', ready: true, onClick: () => showStep(3) }
       : { label: '', enabled: false, whyDisabled: why });
+  } else if (step === 3) {
+    // The bonus is optional: once the child tries it, they can go on at any time.
+    bar.setPrimary(bonusTaken
+      ? { label: 'Next: Make a guess →', ready: true, onClick: () => { finishAsk(); showStep(4); } }
+      : { label: '', enabled: false, whyDisabled: '👆 Try the bonus, or skip it' });
   } else if (guessSaved) {
     bar.setPrimary({ label: '📋 Collect the data →', ready: true, onClick: () => { location.href = 'data-hub.html'; } });
   } else if (selectedScenario.recipe.answerType === 'number') {
@@ -181,6 +200,44 @@ async function startMission() {
     await showMissionCard(selectedScenario.content);
   }
   showStep(1);
+}
+
+// Part 46: the bonus offer. Seen once per scenario (logged "bonus-seen"); the
+// child's answer is logged as "bonus-choice" (taken: true or false). Skipping
+// is fine: it costs nothing and goes straight on to the guess.
+let bonusTaken = false;
+let bonusSeenFor = null;
+
+function offerBonus() {
+  if (bonusSeenFor === selectedScenario.id) return;
+  bonusSeenFor = selectedScenario.id;
+  logEvent('question-studio', 'bonus-seen', { scenarioId: selectedScenario.id });
+}
+
+function resetBonus() {
+  bonusTaken = false;
+  bonusSeenFor = null;
+  document.getElementById('bonus-offer').hidden = false;
+  document.getElementById('bonus-write').hidden = true;
+  document.getElementById('own-question').value = '';
+}
+
+function setupBonus() {
+  document.getElementById('bonus-yes').addEventListener('click', () => {
+    logEvent('question-studio', 'bonus-choice', { scenarioId: selectedScenario.id, taken: true });
+    bonusTaken = true;
+    document.getElementById('bonus-offer').hidden = true;
+    document.getElementById('bonus-write').hidden = false;
+    const box = document.getElementById('own-question');
+    renderChecker(box, null, 'own');
+    box.focus();
+    refreshPrimary();
+  });
+  document.getElementById('bonus-no').addEventListener('click', () => {
+    logEvent('question-studio', 'bonus-choice', { scenarioId: selectedScenario.id, taken: false });
+    finishAsk();
+    showStep(4);
+  });
 }
 
 // Ask is done when a scenario is picked AND both questions are fixed. It is
@@ -206,6 +263,7 @@ function renderFixIts() {
 
   const [first, second] = selectedScenario.content.fixIts;
   renderChoice(first);
+  resetBonus(); // a new scenario: the bonus is offered again
 
   // Fix 2: the flawed question in the box, its tip, checklist and hint.
   const textarea = document.getElementById('fixit-2');

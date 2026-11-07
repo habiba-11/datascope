@@ -243,18 +243,30 @@
   font-size: 20px;
 }
 
-/* The bonus question folds away, so the screen shows one task. */
-.bonus {
-  margin-top: var(--space-3);
+/* Part 46: the bonus is its own optional step: a big offer, then the box. */
+.bonus-offer {
+  padding: var(--space-3);
+  border: 3px dashed var(--color-plan);
+  border-radius: var(--radius-card);
+  background: var(--color-plan-light);
+  text-align: center;
 }
 
-.bonus summary {
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-  font-family: var(--font-heading);
+.bonus-note {
+  margin: 0 0 var(--space-2);
   font-weight: 800;
-  cursor: pointer;
+}
+
+.bonus-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.bonus-buttons .btn {
+  min-height: 56px;
+  font-size: 20px;
 }
 
 /* The Plan question ("How many hours...?") above the guess. */

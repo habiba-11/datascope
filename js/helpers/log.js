@@ -30,6 +30,8 @@ export const EVENT_TYPES = [
   'idle-help-shown', // Part 43e: no tap for 10 s, Pip offered help (screen, hintButton: a 💡 button was there)
   'idle-help-taken', // Part 43e: the child tapped Pip's "Yes, help me!" (screen)
   'fixit-choice', // Part 45: Fix 1 "Which question is better?" (scenarioId, picked A or B, correct, tries)
+  'bonus-seen', // Part 46: the bonus step "Write your OWN question" was shown (scenarioId)
+  'bonus-choice', // Part 46: the child tried the bonus or skipped it (scenarioId, taken: true or false)
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];
