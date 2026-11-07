@@ -95,17 +95,19 @@ export function checkQuestion(question) {
 // The checklist the child sees turning green (Round 4, Part 45, Habiba: 4 ticks;
 // "not" joins the pushy words). A whole question (3 words) is not a tick: its
 // tip still shows first.
+// 8 Nov 2026 (Habiba: "more detailed and easier"): each tick has an icon, a
+// short title and one line that explains it with examples.
 export const CHECKLIST = [
-  { id: 'mark', label: 'It ends with ?', rules: ['mark'] },
-  { id: 'when', label: 'It says WHEN (this week, last night)', rules: ['when'] },
-  { id: 'open', label: 'Not just yes or no', rules: ['yesno'] },
-  { id: 'fair', label: "No pushy words (like 'not' or 'good')", rules: ['not', 'pushy'] },
+  { id: 'mark', icon: '❓', label: 'It ends with a question mark (?)', detail: 'Put ? at the very end.', rules: ['mark'] },
+  { id: 'when', icon: '⏰', label: 'It says WHEN', detail: "Add a time, like 'last night' or 'this week'. Then all answers are about the same time.", rules: ['when'] },
+  { id: 'open', icon: '💬', label: 'People can say more than yes or no', detail: 'Start with What, How many or Which.', rules: ['yesno'] },
+  { id: 'fair', icon: '🤝', label: 'It has no pushy words', detail: "Take out words like 'not', 'don't', 'best' or 'bad'. They push people to one answer.", rules: ['not', 'pushy'] },
 ];
 
-// Each tick: { id, label, ok }.
+// Each tick: { id, icon, label, detail, ok }.
 export function questionChecklist(question) {
   const broken = questionProblems(question).map((p) => p.id);
-  return CHECKLIST.map((item) => ({ id: item.id, label: item.label, ok: !item.rules.some((r) => broken.includes(r)) }));
+  return CHECKLIST.map(({ id, icon, label, detail, rules }) => ({ id, icon, label, detail, ok: !rules.some((r) => broken.includes(r)) }));
 }
 
 // ONE tip at a time (the first rule still broken), or null when it is a good question.

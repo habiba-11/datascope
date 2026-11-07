@@ -133,5 +133,10 @@ test('ONE tip at a time: the first problem only, and none for a good question', 
 });
 
 test('the checklist and the tips use Grade 5 words', () => {
-  for (const c of CHECKLIST) assert.ok(longestSentence(c.label) <= 12, c.label);
+  for (const c of CHECKLIST) {
+    assert.ok(longestSentence(c.label) <= 12, c.label);
+    // 8 Nov 2026: every tick has an icon and one line that explains it.
+    assert.ok(c.icon && c.detail, c.id);
+    assert.ok(longestSentence(c.detail) <= 12, c.detail);
+  }
 });

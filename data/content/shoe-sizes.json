@@ -4,7 +4,7 @@
   "cardTitle": "What size are our shoes?",
   "mission": { "goal": "Find out which shoe sizes our class wears.", "short": "What shoe sizes do we wear?" },
   "fixIts": [
-    { "flawed": "Don't you think big shoes are better?", "fix": "What shoe size do you wear this year?", "choice": { "goodFirst": true, "why": "A says WHEN, and it does not push people." } },
+    { "flawed": "Don't you think big shoes are better?", "fix": "What shoe size do you wear this year?", "choice": { "goodFirst": true, "whenWords": "this year", "whenWhy": "Feet grow, so we want the size now.", "pushyWords": "\"Don't\" and \"better\"" } },
     { "flawed": "Are your shoes new?", "fix": "How many pairs of shoes did you get this year?" }
   ],
   "planPrompt": "🔮 Predict! Which shoe size do most kids wear?",

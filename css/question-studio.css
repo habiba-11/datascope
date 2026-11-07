@@ -177,6 +177,7 @@
 
 @media (max-width: 760px) {
   .fixit-layout { grid-template-columns: 1fr; }
+  .fixit-checklist { grid-template-columns: 1fr; }
 }
 
 .fixit-tip {
@@ -193,9 +194,17 @@
   background: #E4F7E8;
 }
 
+/* 8 Nov 2026: a heading, then each check as a small row: ✓/○, a bold title
+   with its icon, and one line that explains it. */
+.fixit-checklist-title {
+  margin: 10px 0 6px;
+  font-weight: 800;
+}
+
 .fixit-checklist {
   display: grid;
-  gap: 4px;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 across: shorter card */
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -203,15 +212,39 @@
 
 .fixit-checklist li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
-  font-weight: 700;
+  padding: 6px 10px;
+  border: 2px solid #C9D6E2;
+  border-radius: 12px;
+  background: var(--color-card-bg);
   color: #4A6580;
 }
+
+.fixit-checklist li > div {
+  display: grid;
+  gap: 2px;
+}
+
+.fixit-check-title { font-weight: 800; }
+.fixit-check-detail { font-weight: 600; line-height: 1.3; }
+
+.fixit-checklist li.ok { border-color: var(--color-btn-main-bg); background: #E4F7E8; }
+
+/* Fix 1, right answer: three rows (the answer, WHEN, pushy). */
+.fixit-why {
+  display: grid;
+  gap: 6px;
+  max-width: 720px;
+}
+
+.fixit-why-line { display: block; }
+.fixit-why-line:first-child { font-weight: 800; }
 
 .fixit-mark {
   display: grid;
   place-items: center;
+  flex-shrink: 0;
   width: 28px;
   height: 28px;
   border: 2px solid currentColor;

@@ -1,5 +1,6 @@
 import { mountShell, setCurrentStep } from '../app.js';
 import { checkQuestion, firstTip, questionChecklist } from '../helpers/checker.js';
+import { choiceExplanation, TRY_AGAIN } from '../helpers/fixit-words.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { createHint } from '../helpers/prompts.js';
 import {
@@ -84,7 +85,7 @@ async function init() {
 
         <section class="task fixit" data-step="1" hidden>
           <div class="fixit-choices" id="fixit-choices" role="group" aria-label="Which question is better?"></div>
-          <p class="feedback" id="fixit-choice-feedback" hidden></p>
+          <div class="feedback" id="fixit-choice-feedback" hidden></div>
         </section>
 
         <section class="task fixit" data-step="2" hidden>
@@ -93,7 +94,6 @@ async function init() {
               <label for="fixit-2">This question:</label>
               <textarea id="fixit-2" class="fixit-input" rows="2"></textarea>
               <p class="fixit-tip" id="fixit-tip-2" aria-live="polite"></p>
-              <ul class="fixit-checklist" id="checklist-2" aria-label="Checklist"></ul>
               <div class="hint-list-slot" id="hint-slot-2"></div>
             </div>
             <aside class="fixit-example">
@@ -101,6 +101,9 @@ async function init() {
               <p class="fixit-example-q">${goodQuestion}</p>
             </aside>
           </div>
+          <!-- 8 Nov 2026: the checklist goes under both columns, 2 across, so the box, tip and hint stay near the top -->
+          <p class="fixit-checklist-title" id="checklist-title-2">📋 Your question is ready when all 4 have a ✓:</p>
+          <ul class="fixit-checklist" id="checklist-2" aria-labelledby="checklist-title-2"></ul>
         </section>
 
         <section class="task bonus-step" data-step="3" hidden>
@@ -115,7 +118,8 @@ async function init() {
             <label for="own-question">My own question:</label>
             <textarea id="own-question" class="fixit-input" rows="2" placeholder="Type a question..."></textarea>
             <p class="fixit-tip" id="fixit-tip-own" aria-live="polite"></p>
-            <ul class="fixit-checklist" id="checklist-own" aria-label="Checklist"></ul>
+            <p class="fixit-checklist-title" id="checklist-title-own">📋 Your question is ready when all 4 have a ✓:</p>
+            <ul class="fixit-checklist" id="checklist-own" aria-labelledby="checklist-title-own"></ul>
           </div>
         </section>
 
@@ -290,6 +294,7 @@ function renderChoice({ flawed, fix, choice }) {
   const options = choice.goodFirst ? [fix, flawed] : [flawed, fix];
   clearState['fixit-1'] = false;
   feedback.hidden = true;
+  feedback.classList.remove('fixit-why');
   let tries = 0;
   box.replaceChildren(...options.map((question, i) => {
     const button = document.createElement('button');
@@ -307,14 +312,16 @@ function renderChoice({ flawed, fix, choice }) {
       if (right) {
         button.classList.add('correct');
         box.querySelectorAll('button').forEach((b) => { b.disabled = true; });
-        feedback.textContent = `✅ Yes! ${choice.why}`;
+        // 3 rows: the answer, what WHEN is, what pushy is (helpers/fixit-words.js).
+        feedback.replaceChildren(...choiceExplanation(choice).map((line) => Object.assign(document.createElement('span'), { className: 'fixit-why-line', textContent: line })));
+        feedback.classList.add('fixit-why');
         clearState['fixit-1'] = true;
         cheer(feedback);
         refreshPrimary();
       } else {
         button.classList.add('wrong');
         button.disabled = true;
-        feedback.textContent = '🤔 Not quite. Look again: which one says WHEN and does not push?';
+        feedback.textContent = TRY_AGAIN;
         encourage(feedback);
       }
     });
@@ -394,7 +401,13 @@ function renderChecker(textarea, trackId, suffix) {
   list.replaceChildren(...questionChecklist(textarea.value).map((item) => {
     const li = document.createElement('li');
     li.className = item.ok ? 'ok' : 'todo';
-    li.append(Object.assign(document.createElement('span'), { className: 'fixit-mark', textContent: item.ok ? '✓' : '○' }), item.label);
+    // ✓ or ○, then the title (with its icon) and one line that explains it.
+    const words = document.createElement('div');
+    words.append(
+      Object.assign(document.createElement('strong'), { className: 'fixit-check-title', textContent: `${item.icon} ${item.label}` }),
+      Object.assign(document.createElement('span'), { className: 'fixit-check-detail', textContent: item.detail }),
+    );
+    li.append(Object.assign(document.createElement('span'), { className: 'fixit-mark', textContent: item.ok ? '✓' : '○' }), words);
     if (!item.ok) li.append(Object.assign(document.createElement('span'), { className: 'sr-only', textContent: ' (not yet)' }));
     return li;
   }));

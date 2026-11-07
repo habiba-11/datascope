@@ -5,7 +5,7 @@
   "mission": { "goal": "Find out which recess game our class likes best.", "short": "Which game do we like best?" },
   "wordsNote": "Games are words. We can't add them, so there is no mean, median or range. We use the mode: the game picked the most.",
   "fixIts": [
-    { "flawed": "Isn't football the best game?", "fix": "Which game did you play most at recess this week?", "choice": { "goodFirst": false, "why": "B says WHEN, and it does not push people." } },
+    { "flawed": "Isn't football the best game?", "fix": "Which game did you play most at recess this week?", "choice": { "goodFirst": false, "whenWords": "this week", "whenWhy": "So all answers are about the same week.", "pushyWords": "\"Isn't\" and \"best\"" } },
     { "flawed": "Do you like games?", "fix": "What is your favourite recess game this week?" }
   ],
   "planPrompt": "🔮 Predict! Which game will most kids pick?",

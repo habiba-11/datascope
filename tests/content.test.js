@@ -91,11 +91,13 @@ test('a suggested answer has no emoji at its start (a child may keep it as their
   }
 });
 
-test('Part 45: the first fix-it is a choice (A or B) with a short "why", and the good one is not always B', () => {
+test('Part 45: the first fix-it is a choice (A or B) with its WHEN and pushy words, and the good one is not always B', () => {
   const firsts = contents.map(({ content }) => content.fixIts[0].choice);
   for (const choice of firsts) {
     assert.equal(typeof choice.goodFirst, 'boolean');
-    assert.ok(longestSentence(choice.why) <= MAX_SENTENCE_WORDS, choice.why);
+    // 8 Nov 2026: the one-line "why" became 3 fields (js/helpers/fixit-words.js).
+    assert.ok(choice.whenWords && choice.pushyWords, 'whenWords and pushyWords');
+    assert.ok(longestSentence(choice.whenWhy) <= MAX_SENTENCE_WORDS, choice.whenWhy);
   }
   assert.ok(firsts.some((c) => c.goodFirst) && firsts.some((c) => !c.goodFirst), 'A and B both win sometimes');
   // The shared example of a good question passes the checker.
