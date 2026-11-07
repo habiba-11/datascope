@@ -70,7 +70,7 @@ export function mountSky(room) {
     ...plan.clouds.map((c) => mover('sky-cloud', {
       top: `${c.top}px`, scale: c.scale, seconds: `${c.seconds}s`, delay: `${c.delay}s`, 'rest-x': `${c.restX}vw`,
     }, CLOUD_SVG)),
-    ...plan.touches.map((t) => mover(`sky-touch sky-touch--${t.motion}`, {
+    ...plan.touches.map((t) => mover(`sky-touch sky-touch--${t.motion}${t.x < 50 ? ' sky-touch--left' : ''}`, {
       x: `${t.x}vw`, y: `${t.y}vh`, size: `${t.size}px`, seconds: `${t.seconds}s`, delay: `${t.delay}s`, turn: t.turn,
     }, shapeSVG(t.shape, t.colour))),
   ].join('');

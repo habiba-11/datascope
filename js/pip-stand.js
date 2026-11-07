@@ -127,8 +127,9 @@ function idleLoop() {
 const offered = new Set();
 let idleTimer = null;
 
+// The 💡 of the helper tray (Part 47), when this screen has a hint.
 function visibleHintButton() {
-  return [...document.querySelectorAll('.hint-btn')].find((b) => b.offsetParent !== null && !b.disabled) || null;
+  return document.querySelector('.helper-tile[data-tool="hint"]:not(:disabled)');
 }
 
 // The screen: the page and the step of the mini stepper (or the question).

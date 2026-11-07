@@ -16,6 +16,8 @@ export const PIP_EVENTS = {
   hint: { move: 'wink', sound: 'wink' },
   // Part 43e: the child has not tapped for a while; Pip wiggles and offers help.
   idle: { move: 'wiggle', sound: 'hoot' },
+  // Part 47: the first time in a room, Pip points up at the helper tray.
+  tray: { move: 'wave', sound: null },
 };
 
 // Pip's idle life: one small move every few seconds, never the same twice in a row.

@@ -3,7 +3,7 @@
 // and a worked example that appears one step at a time ("Next step").
 // Words: data/content/recap.json. Numbers: helpers/recap.js (stats.js).
 import { openModal } from './modal.js';
-import { addTitleButton } from './app.js';
+import { addTrayTool } from './helper-tray.js';
 import { logEvent } from './helpers/log.js';
 import { recapCardIds, exampleLines } from './helpers/recap.js';
 import { hasSeenIntro, markIntroSeen } from './storage/save.js';
@@ -107,10 +107,7 @@ export function autoOpenRecap(kind) {
   openRecap({ kind, auto: true, room: 'number-lab' });
 }
 
-// Adds a "📘 Maths recap" button next to the room title.
+// Adds "📖 Maths recap" to the helper tray (Part 47).
 export function addRecapButton(kind, room) {
-  const button = el('button', '📘 Maths recap', 'btn title-btn');
-  button.type = 'button';
-  button.addEventListener('click', () => openRecap({ kind, auto: false, room }));
-  addTitleButton(button);
+  addTrayTool('recap', () => openRecap({ kind, auto: false, room }), kind);
 }
