@@ -48,7 +48,7 @@
     ],
     "kind": "category",
     "predictPrompt": "🔮 Predict first! Which game did the most kids pick?",
-    "checkPrompt": "🔍 Tap Show statistics to check it.",
+    "checkPrompt": "🔍 Tap Show the mode to check it.",
     "whyNoMean": {
       "question": "🤔 Why can't we find the mean of favourite games?",
       "options": [

@@ -82,6 +82,8 @@ async function init() {
   fromPlan = kind === 'category' && planGuess !== null;
   STEP_LABELS.predict = kind === 'category' ? 'Prediction' : 'Estimate';
   TASK_TITLES.predict = kind === 'category' ? '🔮 Your prediction' : '📏 Your estimate';
+  // Part 51: the games scenario never talks about numbers.
+  if (kind === 'category') TASK_PIP.realLife = 'Data is everywhere in real life!';
   TASK_PIP.predict = fromPlan ? 'Was your prediction right? Let us check!' : 'Estimate first, then check the statistics!';
 
   const { values } = generateClassData(recipe);
@@ -148,7 +150,7 @@ function refreshPrimary() {
     return;
   }
   if (task === 'predict') {
-    if (stage.predict === 'guess') bar.setPrimary({ label: '🔍 Show statistics', onClick: revealNumbers });
+    if (stage.predict === 'guess') bar.setPrimary({ label: kind === 'category' ? '🔍 Show the mode' : '🔍 Show statistics', onClick: revealNumbers });
     else if (stage.predict === 'changing') bar.setPrimary({ label: `Save my new ${word}`, onClick: saveRevision });
     else bar.setPrimary({ label: '', enabled: false, whyDisabled: `🤔 Keep or change your ${word}?` });
   } else if (task === 'build') {
@@ -640,7 +642,9 @@ function setupRevision(n, getOldGuess) {
   keepBtn.addEventListener('click', () => {
     keepBtn.classList.add('active');
     logEvent('number-lab', 'revision', { about: recipe.question, scenarioId: recipe.id, changed: false, oldGuess: getOldGuess() });
-    finish(`👍 You kept your ${word}: ${getOldGuess()}. Which number above backs it up?`);
+    finish(kind === 'category'
+      ? `👍 You kept your ${word}: ${getOldGuess()}. Look at the mode above. Does it back you up?`
+      : `👍 You kept your ${word}: ${getOldGuess()}. Which number above backs it up?`);
   });
 
   changeBtn.addEventListener('click', () => {

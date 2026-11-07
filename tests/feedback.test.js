@@ -105,6 +105,18 @@ test('Number Lab with words (games): a guess that matches the mode earns the thi
   assert.match(wrong.wins[0], /The mode was Football/);
 });
 
+test('Part 51: the games cards never talk about numbers', () => {
+  const NUMBER_WORDS = /\b(numbers?|statistics|mean|median|range|average)\b/i;
+  const cards = [
+    buildPhaseFeedback('number', { guess: 'Tag', mode: ['Football'], changedWithReason: true, teaches: 'The mode fits categories.' }),
+    buildPhaseFeedback('number', { guess: 'Tag', mode: ['Football'], changedWithReason: false }),
+    buildPhaseFeedback('conclude', { evidenceCount: 0, evidenceOptions: 1, certaintyReasonWords: 8 }),
+  ];
+  for (const card of cards) {
+    for (const text of [...card.wins.filter(Boolean), card.nextTime, card.learned || '']) assert.doesNotMatch(text, NUMBER_WORDS, text);
+  }
+});
+
 test('no "next time" line repeats the words the card already shows ("💡 Next time:")', () => {
   for (const phase of ['ask', 'plan', 'collect', 'graph', 'number', 'chance', 'conclude']) {
     for (const facts of [{}, { guess: 8, classSizes: [20] }]) {

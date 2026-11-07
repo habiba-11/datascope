@@ -34,6 +34,7 @@
   "number": {
     "icon": "🔢",
     "title": "Find the statistics",
+    "titleWords": "Find the most popular answer",
     "accent": "explore",
     "why": "Statistics say the answer in one number.",
     "bullets": ["Find the mean, median, mode and range.", "Each one tells a different story."],

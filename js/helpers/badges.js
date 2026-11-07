@@ -48,8 +48,8 @@ export function earnedBadges(entries, code) {
 // `id` is the start of the badge key ("why:Fair coin" -> "why").
 export const BADGE_TYPES = [
   { id: 'why', icon: '🧙', name: 'Why-Wizard', earnedFor: 'You explained WHY something is likely or unlikely.', where: '🎲 Chance Lab: rate a chance and say why.' },
-  { id: 'changed-mind', icon: '🔄', name: 'Mind-Changer', earnedFor: 'You changed your mind because of the evidence.', where: '🔢 Number Lab: after Show statistics, change your guess and say why.' },
-  { id: 'task', icon: '🧮', name: 'Number Cracker', earnedFor: 'You worked out what the numbers really mean.', where: '🔢 Number Lab: solve a puzzle (using a hint is fine!).' },
+  { id: 'changed-mind', icon: '🔄', name: 'Mind-Changer', earnedFor: 'You changed your mind because of the evidence.', where: '🔢 Number Lab: after you check the data, change your guess and say why.' },
+  { id: 'task', icon: '🧮', name: 'Number Cracker', earnedFor: 'You worked out what the data really means.', where: '🔢 Number Lab: solve a puzzle (using a hint is fine!).' },
   { id: 'not-tell', icon: '🔍', name: 'Graph Skeptic', earnedFor: 'You spotted what a graph can NOT tell us.', where: '📊 Graph Lab: say what the graph can NOT tell us.' },
   { id: 'claim', icon: '🏅', name: 'Data Detective', earnedFor: 'You made a claim with evidence and said how sure you are.', where: '🚩 Evidence Board: finish your Evidence Card.' },
 ];
@@ -204,7 +204,7 @@ export const BADGES = [
   },
   {
     id: 'task', name: 'Number Cracker', phase: 'Explore', color: 'collect', icon: 'calculator',
-    why: 'You worked out what the numbers really mean.',
+    why: 'You worked out what the data really means.',
     how: 'Solve a Number Lab puzzle. Using a hint is fine!',
     rule: (entries) => entries.some(solved),
   },

@@ -81,19 +81,21 @@ const RULES = {
   number: (f) => {
     const isWords = Array.isArray(f.mode) && f.mean === undefined;
     const close = isWords ? f.mode.includes(f.guess) : Math.abs(f.guess - f.mean) <= 1;
-    let guessWin = close ? `Your guess ${f.guess} was close to the mean ${f.mean}!` : `You guessed ${f.guess}. The mean was ${f.mean}.`;
-    if (isWords) guessWin = close ? `You guessed ${f.guess}. That is the mode!` : `You guessed ${f.guess}. The mode was ${f.mode.join(' and ')}.`;
+    // Part 50: an ESTIMATE of the mean, or (games) the Plan PREDICTION checked.
+    // Part 51: the games card never talks about numbers.
+    let guessWin = close ? `Your estimate ${f.guess} was close to the mean ${f.mean}!` : `You estimated ${f.guess}. The mean was ${f.mean}.`;
+    if (isWords) guessWin = close ? `You predicted ${f.guess}. That is the mode!` : `You predicted ${f.guess}. The mode was ${f.mode.join(' and ')}.`;
     return {
       stars: 2 + (close || f.changedWithReason ? 1 : 0),
       wins: [
         guessWin,
         f.changedWithReason && 'You changed your mind because of the data.',
-        'You solved all the number puzzles.',
+        isWords ? 'You solved all the puzzles.' : 'You solved all the number puzzles.',
       ],
       nextTime: f.changedWithReason
-        ? 'Which number do you trust most? Say why.'
-        : "If the data surprises you, it's OK to change your guess.",
-      learned: f.teaches || 'Mean, median and mode each tell a different story.',
+        ? (isWords ? 'Why is the mode the best answer for games? Say why.' : 'Which number do you trust most? Say why.')
+        : `If the data surprises you, it's OK to change your ${isWords ? 'prediction' : 'estimate'}.`,
+      learned: f.teaches || (isWords ? 'The mode shows the most popular answer.' : 'Mean, median and mode each tell a different story.'),
     };
   },
 
@@ -121,7 +123,7 @@ const RULES = {
     const enoughProof = onlyMode ? f.evidenceCount >= 1 : f.evidenceCount >= 2;
     const explained = f.certaintyReasonWords >= EXPLAINED;
     let nextTime = 'Now share your claim with your class!';
-    if (!enoughProof) nextTime = 'Use two numbers as proof next time.';
+    if (!enoughProof) nextTime = onlyMode ? 'Use the mode as proof next time.' : 'Use two numbers as proof next time.';
     else if (!explained) nextTime = 'Say more about why you are that sure.';
     let proofWin = enoughProof ? `You used ${f.evidenceCount} numbers as proof.` : 'You used a number as proof.';
     if (onlyMode) proofWin = 'You used the mode as proof.';

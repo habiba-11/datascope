@@ -35,6 +35,8 @@ test('every room says why it exists, in one short Grade 5 line', () => {
 });
 
 test('roomWhy: games get their own words, the number scenarios the normal ones', () => {
+  assert.equal(roomWhy(phases.number, 'category').title, 'Find the most popular answer');
+  assert.equal(roomWhy(phases.number, 'number').title, 'Find the statistics');
   assert.equal(roomWhy(phases.number, 'number').why, phases.number.why);
   assert.equal(roomWhy(phases.number, 'category').why, phases.number.whyWords);
   assert.deepEqual(roomWhy(phases.number, 'category').bullets, phases.number.bulletsWords);
