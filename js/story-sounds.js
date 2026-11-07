@@ -31,8 +31,11 @@ const EFFECTS = {
 };
 
 // Plays a line's effects: a list of [effect, seconds from now, (pop) note].
+// Returns { stop() }: when the child moves on before they are over, the story
+// stops them, so no sound of an old line plays over the new one (scan, 7 Nov 2026).
 export function playStoryEffects(effects = []) {
-  for (const [name, at, note] of effects) EFFECTS[name](at, note);
+  const playing = effects.map(([name, at, note]) => EFFECTS[name](at, note));
+  return { stop: () => playing.forEach((sound) => sound?.stop()) };
 }
 
 // How long an effect lasts (for the yawning mouth).

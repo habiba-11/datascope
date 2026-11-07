@@ -144,13 +144,27 @@ export function openStory(words, returnTo) {
     dialog.classList.remove('st-talking-pip', 'st-talking-sara', 'st-talking-kids');
     duckMusic(false);
   }
+  // The sounds and yawn timers of the line on screen. When the child moves on
+  // (or closes the story) before they are over, they stop, so nothing from an
+  // old line plays over the new one (scan, 7 Nov 2026).
+  let lineSounds = [];
+  let lineTimers = [];
+  function stopLine() {
+    lineSounds.forEach((sound) => sound.stop());
+    lineTimers.forEach(clearTimeout);
+    lineSounds = [];
+    lineTimers = [];
+    dialog.classList.remove('st-yawning');
+  }
   // A line's "after" (e.g. a yawn): played once the words are done. The
   // sleepy classmate opens their mouth wide while it plays (css/story.css).
   function playAfter(line, at = 0) {
     if (!line.after) return;
-    playStoryEffects([[line.after, at]]);
-    setTimeout(() => dialog.classList.add('st-yawning'), at * 1000);
-    setTimeout(() => dialog.classList.remove('st-yawning'), (at + (EFFECT_SECONDS[line.after] || 1)) * 1000);
+    lineSounds.push(playStoryEffects([[line.after, at]]));
+    lineTimers.push(
+      setTimeout(() => dialog.classList.add('st-yawning'), at * 1000),
+      setTimeout(() => dialog.classList.remove('st-yawning'), (at + (EFFECT_SECONDS[line.after] || 1)) * 1000),
+    );
   }
 
   function sayLine() {
@@ -220,8 +234,9 @@ export function openStory(words, returnTo) {
   // for who speaks: Pip's rising hoot, Sara's chirp).
   function soundsFor(line, newScene) {
     quiet();
+    stopLine();
     if (newScene) playSound('whoosh');
-    playStoryEffects(STORY_EFFECTS[`${scenes[position.scene].id}:${position.line}`]);
+    lineSounds.push(playStoryEffects(STORY_EFFECTS[`${scenes[position.scene].id}:${position.line}`]));
     if (getVoiceOn()) sayLine();
     else {
       if (line.who === 'pip') playSound('hoot');
@@ -239,6 +254,7 @@ export function openStory(words, returnTo) {
 
   function close() {
     quiet();
+    stopLine();
     stopMusic();
     window.removeEventListener('resize', fit);
     dialog.close();

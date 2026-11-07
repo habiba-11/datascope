@@ -95,19 +95,21 @@ export function audioContext() {
 // Part 44c: a little tune made on the spot (the story's scene sound effects,
 // js/story-sounds.js), with the same rules as every sound here.
 export function playTune(sound) {
-  play(sound);
+  return play(sound); // { stop() }: the story stops a line's sounds when the child moves on
 }
 
 // Part 44c: claps (the class cheers Sara): short soft bursts of noise.
 export function playClaps(at = 0, count = 6) {
-  if (!getSoundOn()) return;
+  if (!getSoundOn()) return SILENT;
   const c = audioContext();
-  if (!c || c.state !== 'running') return;
+  if (!c || c.state !== 'running') return SILENT;
+  const nodes = [];
   try {
-    for (let i = 0; i < count; i++) noiseBurst(c, c.destination, c.currentTime + at + i * 0.14, 0.07, 0.2, 'bandpass', 1800, 900);
+    for (let i = 0; i < count; i++) nodes.push(noiseBurst(c, c.destination, c.currentTime + at + i * 0.14, 0.07, 0.2, 'bandpass', 1800, 900));
   } catch {
     // No sound support.
   }
+  return stopper(nodes);
 }
 
 // Part 44c: a real-sounding yawn (Habiba, 6 Nov 2026: "do a yawn voice, not
@@ -116,9 +118,10 @@ export function playClaps(at = 0, count = 6) {
 export const YAWN_SECONDS = 1.4;
 
 export function playYawn(at = 0) {
-  if (!getSoundOn()) return;
+  if (!getSoundOn()) return SILENT;
   const c = audioContext();
-  if (!c || c.state !== 'running') return;
+  if (!c || c.state !== 'running') return SILENT;
+  const nodes = [];
   try {
     const t = c.currentTime + at;
     const end = t + YAWN_SECONDS;
@@ -142,14 +145,15 @@ export function playYawn(at = 0) {
     voice.connect(vowel).connect(gain).connect(c.destination);
     voice.start(t);
     voice.stop(end + 0.05);
-    noiseBurst(c, c.destination, t + 0.05, YAWN_SECONDS - 0.2, 0.025, 'bandpass', 900, 600); // the breath
+    nodes.push(voice, noiseBurst(c, c.destination, t + 0.05, YAWN_SECONDS - 0.2, 0.025, 'bandpass', 900, 600)); // the breath
   } catch {
     // No sound support.
   }
+  return stopper(nodes);
 }
 
 export function playSound(name) {
-  play(SOUNDS[name]);
+  return play(SOUNDS[name]);
 }
 
 // The stars on the end-of-phase card (feedback-card.js): all 3 stars pop in,
@@ -160,8 +164,9 @@ export function playSound(name) {
 export const STAR_TIMES = [0.75, 1.05, 1.35];
 const STAR_NOTES = [659, 784, 1047];
 
+// Returns { stop() }: the card stops the notes if it is closed first.
 export function playStars(count) {
-  play({
+  return play({
     wave: 'triangle',
     volume: 0.1,
     notes: STAR_TIMES.map((time, i) => (i < count ? [STAR_NOTES[i], time, i === 2 ? 0.3 : 0.18] : [262, time, 0.12, 0.04])),
@@ -235,6 +240,7 @@ function noiseBurst(c, out, t, seconds, volume, type, from, to, pan = 0) {
   node.connect(out);
   source.start(t, Math.random()); // a different slice of the noise each time
   source.stop(t + seconds + 0.05);
+  return source;
 }
 
 export function playFirework(at = 0, far = false) {
@@ -290,26 +296,54 @@ export function playFirework(at = 0, far = false) {
   }
 }
 
+// Returns { stop() }: a sound whose picture goes away early (the stars of a
+// card closed before they popped in) can be stopped, so no note is heard
+// after its motion is gone (scan of 7 Nov 2026).
+const SILENT = { stop() {} };
+
+// { stop() } for sound nodes made here (the claps, the yawn).
+function stopper(nodes) {
+  return {
+    stop() {
+      for (const node of nodes) {
+        try { node.stop(); } catch { /* already over */ }
+      }
+    },
+  };
+}
+
 function play(sound) {
-  if (!sound || !getSoundOn()) return;
+  if (!sound || !getSoundOn()) return SILENT;
+  const notes = [];
+  let stopped = false;
+  const handle = {
+    stop() {
+      stopped = true;
+      for (const note of notes) {
+        try { note.stop(); } catch { /* already over */ }
+      }
+    },
+  };
   try {
     audio = audio || new AudioContext();
     if (audio.state !== 'running') {
       const asked = performance.now();
       const waking = audio.resume().catch(() => {});
       Promise.race([waking, new Promise((r) => { setTimeout(r, WAKE_MS); })])
-        .then(() => { if (audio.state === 'running') playNotes(sound, (performance.now() - asked) / 1000); });
-      return;
+        .then(() => { if (!stopped && audio.state === 'running') playNotes(sound, (performance.now() - asked) / 1000, notes); });
+      return handle;
     }
-    playNotes(sound, 0);
+    playNotes(sound, 0, notes);
   } catch {
     // No sound support: everything else still works.
   }
+  return handle;
 }
 
 // Each note: [frequency in Hz, start in seconds, length in seconds, volume (optional)].
 // `late`: how many seconds have passed since the sound was asked for.
-function playNotes(sound, late) {
+// `notes`: each note made is added here, so it can be stopped.
+function playNotes(sound, late, notes = []) {
   try {
     for (const [frequency, offset, length, noteVolume] of sound.notes) {
       if (offset < late) continue; // its moment has passed: skipped, never late
@@ -323,6 +357,7 @@ function playNotes(sound, late) {
       note.connect(volume).connect(audio.destination);
       note.start(start);
       note.stop(start + length);
+      notes.push(note);
     }
   } catch {
     // No sound support: everything else still works.

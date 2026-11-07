@@ -57,13 +57,15 @@ function starsNode(count) {
 // stars' CSS delay (css/modal.css) is 600 ms + 300 ms each; each note comes
 // when its star is at its biggest. It runs when the card is really on screen
 // (it may wait in line behind a badge pop-up). Reduced motion: the stars are
-// all there at once, so one "done" tune.
+// all there at once, so one "done" tune. Returns { stop() }: if the card is
+// closed before the stars pop in, their notes are stopped (scan, 7 Nov 2026:
+// a quick tap on "Unlock" left star notes ringing over the next screen).
 function playStarSound(count) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     playSound('done');
-    return;
+    return { stop() {} };
   }
-  playStars(count);
+  return playStars(count);
 }
 
 // A coloured box with an icon and words: "Next time" (yellow), "I learned" (blue).
@@ -143,14 +145,16 @@ export function showFeedbackCard(phase, card) {
 
   pipReacts('hop');
 
+  let stars = { stop() {} }; // the star notes, stopped if the card closes first
   return openModal({
     title: `${PHASE_NAMES[phase]}: done!`,
     accent: STEP_OF_PHASE[phase],
     className: 'phase-summary',
     body,
     buttons: [{ label: next ? `Unlock ${PHASE_NAMES[next]} →` : '🎉 Finish', value: 'next', main: true }],
+    beforeClose: () => stars.stop(),
     onOpen: (dialog) => {
-      playStarSound(card.stars);
+      stars = playStarSound(card.stars);
       // "Step 3 of 5" in the header, and the one button gently pulses when it is ready.
       const step = el('span', `Step ${STEP_ORDER.indexOf(STEP_OF_PHASE[phase]) + 1} of ${STEP_ORDER.length}`, 'ps-step');
       dialog.querySelector('.modal-header').append(step);
