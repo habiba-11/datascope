@@ -231,16 +231,40 @@
   color: var(--color-navy);
 }
 
-/* Zone 3: always in the same place. Back on the left, Hint + ONE primary on the right. */
+/* Zone 3: always in the same place. Back on the left, Hint + ONE primary on the right.
+   Part 49 (Round 4 pilot: "Run survey" and the main buttons were below the
+   screen on the laptops): the bar sticks to the bottom of the window while the
+   card scrolls under it, and sits in its normal place at the end of the card. */
 .action-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
   max-width: 1000px;
-  margin: var(--space-3) auto 0;
-  padding: 0 var(--space-3);
+  margin: var(--space-2) auto 0;
+  padding: 10px var(--space-3);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-2);
+  background: var(--color-bg);
+  border-radius: 22px 22px 0 0;
+}
+
+/* Stuck over the card (js/action-bar.js): a soft shadow above it, so it is
+   clear the card goes on underneath. */
+.action-bar--stuck {
+  box-shadow: 0 -6px 12px -4px rgba(23, 50, 77, 0.25);
+}
+
+/* Tabbing to a box behind the stuck bar scrolls it up above the bar. */
+html:has(.action-bar) {
+  scroll-padding-bottom: 96px;
+}
+
+/* The invisible line under the bar that tells js/action-bar.js when it is stuck. */
+.action-bar-end {
+  height: 1px;
 }
 
 .action-left,
