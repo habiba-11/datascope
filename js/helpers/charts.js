@@ -441,3 +441,10 @@ export function makeChartConfig(type, labels, data, recipe, yMax) {
     },
   };
 }
+
+// Part 48 (Round 4 pilot: the big chart cards looked like answers): the small
+// counter beside the "Pick a graph to draw" toolbar. Trying graphs is
+// exploring, never a race, so it only counts (no timer, no stars).
+export function triedText(tried, total = 4) {
+  return `Graphs tried: ${tried} of ${total}${tried >= total ? " 🎉" : ""}`;
+}

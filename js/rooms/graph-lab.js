@@ -2,7 +2,7 @@ import { mountShell, exploreCardTabsHTML } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { compareValues } from '../helpers/stats.js';
 import {
-  buildFrequencyData, makeChartConfig, directLabelsPlugin, describeChart, pieKeyPosition, lineFits, valueText, countText, tallestIndex,
+  buildFrequencyData, makeChartConfig, directLabelsPlugin, describeChart, pieKeyPosition, lineFits, valueText, countText, tallestIndex, triedText,
 } from '../helpers/charts.js';
 import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import { logEvent } from '../helpers/log.js';
@@ -17,12 +17,15 @@ import { setupActionBar } from '../action-bar.js';
 import { wireChoiceCards } from '../choices.js';
 
 // Graph Lab in the 3-zone layout (UI guide), laid out like the f13 design
-// (4 Nov 2026): 4 big chart tiles, charts in white boxes with WHAT (blue) and
+// (4 Nov 2026): a small "Pick a graph to draw" toolbar on top of the chart
+// (Part 48, Round 4 pilot: 4 big chart tiles under the question looked like
+// answers to it), charts in white boxes with WHAT (blue) and
 // HOW MANY (yellow) axis pills, a tap-to-read helper, and in steps 2 and 3 the
 // question in a panel above the chart (4 Nov 2026). Three steps, ONE primary button.
 const STEP_LABELS = ['Look', 'What it tells', 'What it can NOT tell'];
 
-// Each tile: a tiny drawing of the chart (decorative), its name and what it is good for.
+// Each toolbar tab: a tiny drawing of the chart (decorative), its name, and
+// what it is good for (read out by screen readers).
 const ICON = (inner) => `<svg viewBox="0 0 52 44" aria-hidden="true">${inner}</svg>`;
 const CHART_TYPES = [
   { value: 'bar', name: 'Bar', use: 'compare heights', icon: ICON('<rect x="4" y="22" width="11" height="18" rx="2" fill="#FF7A6B" stroke="#17324D" stroke-width="3"/><rect x="20" y="8" width="11" height="32" rx="2" fill="#FFC531" stroke="#17324D" stroke-width="3"/><rect x="36" y="28" width="11" height="12" rx="2" fill="#38B6FF" stroke="#17324D" stroke-width="3"/>') },
@@ -94,11 +97,15 @@ async function init() {
       bodyHTML: `
         <div id="stepper"></div>
         ${pipLineHTML('', recipe.question)}
-        <div class="kind-tiles" id="kind-tiles" aria-label="Kind of graph">
-          ${CHART_TYPES.map((t) => `<button class="kind-tile" data-value="${t.value}" type="button">${t.icon}<span>${t.name}<small>${t.use}</small></span></button>`).join('')}
-        </div>
         <div class="graph-layout${partner ? ' graph-layout--two' : ''}">
           <div class="graph-look">
+            <div class="graph-toolbar" id="graph-toolbar">
+              <p class="graph-toolbar-label" id="graph-toolbar-label"><span aria-hidden="true">📊</span> Pick a graph to draw:</p>
+              <div class="kind-tabs" id="kind-tabs" aria-labelledby="graph-toolbar-label">
+                ${CHART_TYPES.map((t) => `<button class="kind-tab" data-value="${t.value}" type="button" aria-label="${t.name}: ${t.use}">${t.icon}<span>${t.name}</span></button>`).join('')}
+              </div>
+              <p class="graphs-tried" id="graphs-tried" aria-live="polite"></p>
+            </div>
             <p class="careful-note" id="careful-note" hidden><span aria-hidden="true">⚠️</span><span><strong>Careful!</strong> <span id="careful-text"></span></span></p>
             <div class="chart-row" id="chart-row">${chartBlocks}</div>
             <div class="read-out" id="read-out" aria-live="polite"></div>
@@ -200,6 +207,7 @@ async function init() {
   function renderCharts(type) {
     currentType = type;
     typesTried.add(type);
+    document.getElementById('graphs-tried').textContent = triedText(typesTried.size, CHART_TYPES.length);
     charts.forEach((chart) => chart.destroy());
     // Two classes as dot plots: one ABOVE the other on the same number line, so
     // each is full width (big dots) and the spreads line up (Habiba, 4 Nov 2026).
@@ -237,7 +245,7 @@ async function init() {
   }
 
   let firstChart = true;
-  wireChoiceCards(document.getElementById('kind-tiles'), '.kind-tile', (btn) => {
+  wireChoiceCards(document.getElementById('kind-tabs'), '.kind-tab', (btn) => {
     const type = btn.dataset.value;
     // Trying another kind of graph is logged (Graph Explorer badge, thesis).
     if (!firstChart && type !== currentType) {
@@ -282,7 +290,7 @@ async function init() {
     step = n;
     document.getElementById('stepper').innerHTML = miniStepperHTML(STEP_LABELS, n);
     // Step 1 is for trying the 4 kinds; steps 2 and 3 keep the chart the child chose.
-    document.getElementById('kind-tiles').hidden = n > 0;
+    document.getElementById('graph-toolbar').hidden = n > 0;
     document.getElementById('ask-panel').hidden = n === 0;
     document.querySelectorAll('.reflection').forEach((el) => { el.hidden = Number(el.dataset.step) !== n; });
     document.querySelector('.graph-layout').classList.toggle('graph-layout--asking', n > 0);
@@ -333,7 +341,7 @@ async function init() {
   // A chart is drawn once, on a canvas: wait for the chart font, or the labels
   // stay in a fallback font (Part 36: the fonts are local, so this is quick).
   await document.fonts.load('bold 18px Nunito').catch(() => {});
-  document.querySelector('.kind-tile[data-value="bar"]').click();
+  document.querySelector('.kind-tab[data-value="bar"]').click();
   showStep(0);
 }
 
