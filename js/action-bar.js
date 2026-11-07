@@ -62,21 +62,6 @@ export function setupActionBar({ back = null, hint = null, primary }) {
   setBack(back);
   setHint(hint);
   setPrimary(primary);
-  watchStuck(bar);
   return { setPrimary, setBack, setHint, primaryButton: primaryBtn };
 }
 
-// Part 49 (Round 4 pilot: the main button was below the screen): the bar sticks
-// to the bottom of the window (css/task-card.css). A 1px line right under it
-// shows when it is stuck: if that line is below the window, the card goes on
-// under the bar, so the bar gets a soft shadow.
-function watchStuck(bar) {
-  if (bar.nextElementSibling?.classList.contains('action-bar-end')) return; // already watching
-  const end = document.createElement('div');
-  end.className = 'action-bar-end';
-  end.setAttribute('aria-hidden', 'true');
-  bar.after(end);
-  new IntersectionObserver(([entry]) => {
-    bar.classList.toggle('action-bar--stuck', !entry.isIntersecting && entry.boundingClientRect.top > 0);
-  }).observe(end);
-}

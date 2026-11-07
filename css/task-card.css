@@ -247,24 +247,18 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-2);
-  background: var(--color-bg);
-  border-radius: 22px 22px 0 0;
+  /* See-through (Habiba, 7 Nov 2026: no strip behind it): only the buttons
+     float; they are not see-through themselves. */
+  pointer-events: none;
 }
 
-/* Stuck over the card (js/action-bar.js): a soft shadow above it, so it is
-   clear the card goes on underneath. */
-.action-bar--stuck {
-  box-shadow: 0 -6px 12px -4px rgba(23, 50, 77, 0.25);
+.action-bar > * {
+  pointer-events: auto; /* the gap between the buttons lets taps through to the card */
 }
 
-/* Tabbing to a box behind the stuck bar scrolls it up above the bar. */
+/* Tabbing to a box behind the buttons scrolls it up above them. */
 html:has(.action-bar) {
   scroll-padding-bottom: 96px;
-}
-
-/* The invisible line under the bar that tells js/action-bar.js when it is stuck. */
-.action-bar-end {
-  height: 1px;
 }
 
 .action-left,
