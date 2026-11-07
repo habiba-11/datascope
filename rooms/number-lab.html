@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="../css/badges.css">
   <link rel="stylesheet" href="../css/tasks.css">
   <link rel="stylesheet" href="../css/number-lab.css">
+  <!-- GSAP 3.15.0, a local copy (works without internet). In the head, so the page is read before it is first drawn: the fade from the last room then finishes (scan, 7 Nov 2026). Standard no-charge license: https://gsap.com/standard-license -->
+  <script src="../js/vendor/gsap.min.js"></script>
 </head>
 <body>
   <div id="shell"></div>
@@ -24,8 +26,6 @@
       <ellipse class="hill-front" cx="1040" cy="270" rx="560" ry="170"></ellipse>
     </svg>
   </div>
-  <!-- GSAP 3.15.0, a local copy (works without internet). Standard no-charge license: https://gsap.com/standard-license -->
-  <script src="../js/vendor/gsap.min.js"></script>
   <script type="module" src="../js/rooms/number-lab.js"></script>
 </body>
 </html>
