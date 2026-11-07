@@ -604,8 +604,3 @@
   0%, 100% { box-shadow: var(--shadow-button), 0 0 0 0 rgba(255, 197, 49, 0); }
   50% { box-shadow: var(--shadow-button), 0 0 0 8px rgba(255, 197, 49, 0.75); }
 }
-
-.about-helpers {
-  margin-top: var(--space-2);
-  min-height: 48px;
-}

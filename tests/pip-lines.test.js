@@ -33,6 +33,10 @@ test('Pip never talks about numbers (the games scenario has none) and never abou
   }
 });
 
+test('with no hint on screen, Pip never offers help (8 Nov 2026)', () => {
+  for (const line of bank.idleCalm) assert.doesNotMatch(line, /help|hint|💡|ask/i, line);
+});
+
 test('pickLine never says the same line twice in a row', () => {
   const lines = bank.correct;
   for (let last = 0; last < lines.length; last++) {

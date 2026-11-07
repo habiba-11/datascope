@@ -11,7 +11,6 @@ import { hasSeenIntro, markIntroSeen, getSelectedScenarioId } from './storage/sa
 import { STEP_OF_PHASE } from './helpers/progress.js';
 import { roomWhy } from './helpers/mission.js';
 import { loadContent } from './helpers/scenarios.js';
-import { showHelpersAgain } from './helper-pointer.js';
 
 const STEP_ORDER = ['ask', 'plan', 'collect', 'explore', 'conclude'];
 
@@ -103,16 +102,7 @@ async function fillAboutPanel(panel, phase) {
     el('p', `${intro.icon} ${intro.title}`, 'about-title'),
     ...introNodes(phase, intro),
     el('p', `✅ You are done when: ${intro.doneWhen}`, 'about-done'),
-    helpersButton(),
   );
-}
-
-// Part 47b: Pip points at the helpers on this screen again, whenever the child asks.
-function helpersButton() {
-  const button = el('button', '🧰 Show me the helpers', 'btn btn-secondary about-helpers');
-  button.type = 'button';
-  button.addEventListener('click', showHelpersAgain);
-  return button;
 }
 
 // Tells the shell which phase the child is in now. Shows its intro if this

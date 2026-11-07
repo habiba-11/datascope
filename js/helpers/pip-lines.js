@@ -16,6 +16,9 @@ export const PIP_EVENTS = {
   hint: { move: 'wink', sound: 'wink' },
   // Part 43e: the child has not tapped for a while; Pip wiggles and offers help.
   idle: { move: 'wiggle', sound: 'hoot' },
+  // 8 Nov 2026 (Habiba): no 💡 Hint on this screen, so Pip only encourages and
+  // never says "need help?" (there is no help button to offer).
+  idleCalm: { move: 'wiggle', sound: 'hoot' },
   // Part 47b: the first time a helper appears in a room, Pip points at it.
   tray: { move: 'wave', sound: null },
 };

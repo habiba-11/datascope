@@ -4,8 +4,9 @@
 // question, 📘 Maths recap and 📋 My findings in the top bar. The first time
 // each one appears in a room, a yellow arrow bounces next to it, pointing at
 // it, with its "when to use me" line, and Pip says a line. Once per helper,
-// per room, per child; logged as "tray-intro-seen". The About tab can show the
-// arrows again. Words and the arrow's spot: helpers/pointers.js (tested).
+// per room, per child; logged as "tray-intro-seen". (The About tab's "Show me
+// the helpers" button was removed, Habiba, 8 Nov 2026.) Words and the arrow's
+// spot: helpers/pointers.js (tested).
 import { helperId, whenLine, pointerSpot } from './helpers/pointers.js';
 import { logEvent } from './helpers/log.js';
 import { hasSeenIntro, markIntroSeen, getSelectedScenarioId } from './storage/save.js';
@@ -73,10 +74,4 @@ export function startHelperPointers(roomId) {
   room = roomId;
   loadContent(getSelectedScenarioId()).then((c) => { kind = c.numberLab.kind; }).catch(() => {});
   setTimeout(look, LOOK_EVERY_MS);
-}
-
-// The About tab's "🧰 Show me the helpers": every helper on screen, again.
-export function showHelpersAgain() {
-  const helpers = visibleHelpers();
-  if (helpers.length) point(helpers, false);
 }

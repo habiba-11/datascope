@@ -158,7 +158,8 @@ function offerHelp() {
     logEvent('shell', 'idle-help-taken', { screen });
     hint.click();
   } : null;
-  pipTalk('idle', { help, ms: 9000 });
+  // No 💡 on screen: calm words only, so Pip never offers help it cannot give.
+  pipTalk(hint ? 'idle' : 'idleCalm', { help, ms: 9000 });
 }
 
 // Puts big Pip on the page and lets Pip react. Called once by js/app.js.
