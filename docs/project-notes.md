@@ -196,6 +196,7 @@ Parts 42 to 51. Claude commits each part; nothing is pushed until Habiba says "p
 | 44b | 6 Nov | `9545c37` | The story looks like the approved design: its 7 scenes copied from `datascope-story-ui.html`, parts pop in line by line, the stage fills the window. Not copied (Habiba): sun, birds, flowers; the class size. |
 | 44c | 6 Nov | `4011ad1` | **Read-aloud** (own switch, on): the clearest English browser voice; Pip male, Sara female, the class higher; CAPITAL words said in lowercase; mouths move only while speaking; music 70% quieter meanwhile; "Hear this again". The design's scene sound effects per line. Found: this Windows laptop has only Microsoft George, Hazel and Susan (no Natural or Google voices offline). |
 | fix | 6 Nov | `138ba77` | Story: bubble words centred; Sara clear of the cards in the numbers scene; classmates talk (mouths) on their lines; a real yawn sound instead of reading "yawn" (story.json lines can have `say` and `after`). |
+| 45 | 7 Nov | `0e35db6` | **Fix the question:** Fix 1 = choose A or B (+ why), new event `fixit-choice`; Fix 2 = type, ONE tip at a time, 4 ticks turning green, a good example beside. Checker rules unchanged, tips in plain words. |
 
 **Decisions (Habiba, 6 Nov 2026):** no stickers on the Evidence Card, no mission
 bar, no audience sentence ("tell the principal") anywhere. Pip stands beside the
