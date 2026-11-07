@@ -556,3 +556,56 @@
   15%, 45%, 75% { transform: rotate(-6deg); }
   30%, 60%, 90% { transform: rotate(6deg); }
 }
+
+/* ---------- Part 47b (Round 4): Pip points at a helper (js/helper-pointer.js) ---------- */
+/* A yellow arrow bounces next to the helper, with its "when to use me" line. */
+.helper-pointer {
+  position: fixed;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 220px;
+  margin-left: -110px; /* centred on the button */
+  pointer-events: none; /* never in the way of a tap */
+}
+
+.helper-pointer--up { animation: pointer-up 0.8s ease-in-out 5; }
+
+/* Near the bottom of the screen it sits above the button, pointing down. */
+.helper-pointer--down {
+  flex-direction: column-reverse;
+  transform: translateY(-100%);
+  animation: pointer-down 0.8s ease-in-out 5;
+}
+
+.helper-pointer--down svg { transform: rotate(180deg); }
+
+.helper-pointer-words {
+  margin: 4px 0 0;
+  padding: 6px 10px;
+  background: var(--color-card-bg);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 14px;
+  box-shadow: 0 3px 0 var(--color-navy);
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+@keyframes pointer-up { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pointer-down { 0%, 100% { transform: translateY(-100%); } 50% { transform: translateY(calc(-100% + 10px)); } }
+
+/* The helper itself glows softly while it is pointed at. */
+.helper-glow { animation: helper-glow 1s ease-in-out 4; }
+
+@keyframes helper-glow {
+  0%, 100% { box-shadow: var(--shadow-button), 0 0 0 0 rgba(255, 197, 49, 0); }
+  50% { box-shadow: var(--shadow-button), 0 0 0 8px rgba(255, 197, 49, 0.75); }
+}
+
+.about-helpers {
+  margin-top: var(--space-2);
+  min-height: 48px;
+}

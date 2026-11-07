@@ -59,5 +59,13 @@
     "Read the question again with me.",
     "Thinking hard? Tap 💡 for ideas!",
     "Want a little help? Just ask!"
+  ],
+  "tray": [
+    "Look! This button helps you.",
+    "Stuck? This button can help!",
+    "See the arrow? That helps when stuck.",
+    "Helpers are here when you need them!",
+    "Psst! Tap that button for help.",
+    "Need help? Try the button I show."
   ]
 }

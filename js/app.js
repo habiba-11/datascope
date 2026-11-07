@@ -12,6 +12,7 @@ import { backendReady } from './config.js';
 import { EXIT_BUTTON_HTML, setupExitButton } from './exit-button.js';
 import { mountSky } from './ambient.js';
 import { mountPipStand } from './pip-stand.js';
+import { startHelperPointers } from './helper-pointer.js';
 import { setupMusic } from './music.js';
 import { playSound } from './sounds.js';
 
@@ -97,6 +98,8 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   // Part 43a: the living background, with this room's own touch (My journey has no phase).
   mountSky(phase || step);
   mountPipStand(); // Part 43c: big Pip beside the card, alive and talking
+  // Part 47b: the first time each helper appears in a room, Pip points at it.
+  if (phase) startHelperPointers(phase);
   // Part 43d: a whoosh as the room opens, a soft tap for every button, and the music.
   playSound('whoosh');
   document.addEventListener('pointerdown', (e) => {
