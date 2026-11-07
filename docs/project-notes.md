@@ -202,6 +202,7 @@ Parts 42 to 51. Claude commits each part; nothing is pushed until Habiba says "p
 | 47 undone | 7 Nov | `a11bfcf` | The helper tray removed again (Habiba): the helpers stay in their places. |
 | 47b | 7 Nov | `37da910` | **Pointers:** the first time each helper appears in a room, an arrow points at it where it is (Hint under the question, Maths recap and My findings in the top bar) with its "when to use me" line, and Pip says a line. Event `tray-intro-seen` (phase, helper, auto); the About tab shows them again. |
 | 48 | 7 Nov | `e460571` | **Graph choice:** the 4 big chart cards became a small "📊 Pick a graph to draw" toolbar on top of the chart; the graph drawn now is navy, pressed and underlined (no green ✓); counter "Graphs tried: 2 of 4". `chart-switch` unchanged. Same look found elsewhere (not changed yet, for Habiba): certainty buttons (green + ✓), scenario and device cards (green ✓ badge), Chance Lab 10/50/500 (green), Number Lab picks and quiz answers (green + ✓, also on a wrong answer). |
+| 49 | 7 Nov | `b633492` | **Main button on screen:** the action bar (Back + the one main button) sticks to the bottom of the window while the card scrolls under it (shadow only while stuck). Before: below the screen at 1366x768 in Question Studio, Data Hub, Graph Lab (by 330px) and Evidence Board; at 768 also Chance Lab. After: on screen everywhere, also in a real laptop window (1366x625). |
 
 **Decisions (Habiba, 6 Nov 2026):** no stickers on the Evidence Card, no mission
 bar, no audience sentence ("tell the principal") anywhere. Pip stands beside the

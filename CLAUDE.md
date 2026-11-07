@@ -167,4 +167,5 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 - **Liveliness (Part 43, decided 6 Nov 2026):** Pip beside the card at 1366, bigger inside the card below that; idle help after 10 seconds, at most once per screen; background music on but quiet, with its own switch; one composed loop shared with the story.
 - **Story (Part 44, built 6 Nov 2026):** looks like `docs/design/frames/datascope-story-ui.html` (scenes copied from it, stage fills the window), without the sun, birds, flowers and the class size. Read-aloud in the story only (own switch, on by default), the clearest English browser voice. No timer: Next and Back only.
 - **Choosing vs answering (Part 48, 7 Nov 2026):** a green ✓ means "right answer". A plain choice (which graph to draw) is a navy, pressed, underlined tab, never a green ✓. Graph Lab: a "Pick a graph to draw" toolbar on top of the chart with "Graphs tried: N of 4".
+- **Main button (Part 49, 7 Nov 2026):** the action bar sticks to the bottom of the window, so the one main button is always on screen; do not put the main action inside the card.
 - **Devices:** laptops and PC screens only (1366x768 matters most).
