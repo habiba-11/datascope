@@ -3,6 +3,8 @@
 // All text goes in with textContent, so nothing typed can ever become HTML.
 import { createModalQueue } from './helpers/modal-queue.js';
 import { pipSVG } from './pip.js';
+import { ILLUSTRATIONS } from './illustrations.js';
+import { setIconText } from './icon-text.js';
 
 const queue = createModalQueue();
 let idCounter = 0;
@@ -16,10 +18,11 @@ export function pauseNextModal(ms) {
 
 // Opens a pop-up, or puts it in line if one is already open.
 // Returns a promise with the `value` of the button pressed ('close' for ✕ or Esc).
-//   icon:        emoji next to the title
+//   icon:        the name of an illustration next to the title (js/illustrations.js)
 //   title:       short heading (plain text)
 //   body:        plain text, or a DOM node built by our own code
-//   buttons:     [{ label, value, main }]; `main` makes it the big green button
+//   buttons:     [{ label, value, main, icon }]; `main` makes it the big green button;
+//                `icon`: an illustration name before the label (Part 54b)
 //   accent:      room colour name ('ask', 'plan', 'collect', 'explore', 'conclude')
 //   dismissible: false hides ✕ and ignores Esc, so a button must be pressed
 //   className:   an extra class for a special look (e.g. the badge pop-up)
@@ -58,7 +61,10 @@ function show({ options, resolve }) {
   const heading = document.createElement('h2');
   heading.id = titleId;
   heading.className = 'modal-title';
-  heading.textContent = icon ? `${icon} ${title}` : title;
+  // Part 54b: an illustration name draws our icon; any other text (rooms not
+  // changed yet) stays as it was.
+  if (ILLUSTRATIONS[icon]) setIconText(heading, icon, title);
+  else heading.textContent = icon ? `${icon} ${title}` : title;
   header.append(pip, heading);
 
   if (dismissible) {
@@ -88,7 +94,8 @@ function show({ options, resolve }) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = b.main ? 'btn btn-main' : 'btn';
-    button.textContent = b.label;
+    if (b.icon) setIconText(button, b.icon, b.label);
+    else button.textContent = b.label;
     button.addEventListener('click', () => close(b.value));
     if (b.main) mainButton = button;
     actions.append(button);

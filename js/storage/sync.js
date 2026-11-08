@@ -7,12 +7,13 @@ import { BACKEND, backendReady } from '../config.js';
 import { getLogEntries, setLogEntries, getSentIds, addSentIds } from './save.js';
 import { toRow, withIds, pendingEntries, batches } from '../helpers/outbox.js';
 
-// What the child sees in the sidebar.
+// What the child sees in the status line: an illustration name and the words
+// (Part 54b: icons instead of emoji; js/app.js draws them).
 export const STATUS_TEXT = {
-  saved: '☁️ Saved online',
-  sending: '⏳ Sending...',
-  offline: '📴 Offline: saved here, will send later',
-  error: '⚠️ Not sent yet: will try again',
+  saved: { icon: 'cloud', text: 'Saved online' },
+  sending: { icon: 'clock', text: 'Sending...' },
+  offline: { icon: 'cloud-off', text: 'Offline: saved here, will send later' },
+  error: { icon: 'warning', text: 'Not sent yet: will try again' },
 };
 
 const RETRY_MS = 30 * 1000;

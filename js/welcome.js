@@ -5,9 +5,11 @@ import { pipSVG } from './pip.js';
 import { LOGO_SVG } from './icons.js';
 import { openStory } from './story.js';
 import { mountSky } from './ambient.js';
+import { fillIcons, setIconText } from './icon-text.js';
 
 // Part 43a: the living background (clouds only on the start page).
 mountSky('welcome');
+fillIcons(); // Part 54b: our icons instead of emoji
 
 // Pip greets the child on the start page (cheering, wings up).
 document.getElementById('mascot').innerHTML = pipSVG('Pip the owl explorer');
@@ -39,7 +41,7 @@ form.addEventListener('submit', (event) => {
 
   const code = normalizeCode(input.value);
   if (!isValidCode(code)) {
-    help.textContent = '⚠️ Codes look like OWL-07 (letters, a dash and numbers). Ask your teacher for yours!';
+    setIconText(help, 'warning', 'Codes look like OWL-07 (letters, a dash and numbers). Ask your teacher for yours!');
     help.classList.add('warn');
     input.focus();
     return;

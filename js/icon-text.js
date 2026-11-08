@@ -19,6 +19,15 @@ export function iconNode(name, label = '') {
   return span;
 }
 
+// Plain HTML pages (the start page): every <span data-icon="key"></span>
+// inside `root` gets that illustration (decorative: words sit next to it).
+export function fillIcons(root = document) {
+  root.querySelectorAll('[data-icon]').forEach((span) => {
+    span.classList.add('ds-icon');
+    span.innerHTML = illustration(span.dataset.icon, { size: 24 });
+  });
+}
+
 // Fills `element` with an icon and a text (the text stays plain text).
 export function setIconText(element, name, text) {
   element.replaceChildren(iconNode(name), document.createTextNode(` ${text}`));

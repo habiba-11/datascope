@@ -5,18 +5,19 @@
 // later with textContent, never through here.
 import { pipSVG } from './pip.js';
 import { stepStates } from './helpers/stepper.js';
+import { iconHTML } from './icon-text.js';
 
 // Prof's comment 6: the room's summary is a tab a child can reopen at any time,
 // in the same spot on every card (js/phase-intro.js fills it). It hangs under the
 // strip and is yellow, so it can't be mistaken for an Explore room's tab. It stays
 // hidden on a page with no phase (My journey).
-// Part 42c (Round 4): on its left, "🎯 Why?" says what the room is for, in the
+// Part 42c (Round 4): on its left, "Why?" (a target icon) says what the room is for, in the
 // row's empty space, so it costs no height (js/phase-intro.js fills it).
 const ABOUT_TAB_HTML = `
   <div class="about-row">
     <p class="why-line" id="why-line" hidden></p>
     <button class="about-tab" id="about-tab" type="button" aria-expanded="false" aria-controls="about-panel" hidden>
-      📖 About this room <span class="about-arrow" aria-hidden="true">▼</span>
+      ${iconHTML('book')} About this room <span class="about-arrow" aria-hidden="true">▼</span>
     </button>
   </div>
   <div class="about-panel" id="about-panel" hidden></div>`;
@@ -40,7 +41,7 @@ export function taskCardHTML({ title, pill = '', tabsHTML = '', bodyHTML }) {
 // The "words, not numbers" box for games (Habiba, 4 Nov 2026): an icon and
 // a title as well as the colour. `text` comes from data/content.
 export function wordsNoteHTML(text) {
-  return `<p class="words-note"><span class="words-note-icon" aria-hidden="true">🔤</span>
+  return `<p class="words-note"><span class="words-note-icon">${iconHTML('letters')}</span>
     <span><strong>Words, not numbers!</strong> ${text}</span></p>`;
 }
 

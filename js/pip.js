@@ -2,6 +2,7 @@
 // yellow explorer hat and a magnifying glass. Drawn as SVG, so it is sharp at
 // any size and its parts can move. Moods: 'happy' (default), 'think', 'cheer'.
 // The mood styles and the blink are in base.css; reduced motion stops the movement.
+import { setIconText } from './icon-text.js';
 
 // `label`: '' when Pip is decoration next to text (hidden from screen readers).
 export function pipSVG(label = '') {
@@ -67,8 +68,10 @@ export function pipMoodFor(mood, ms = 1400) {
 
 // Pip says something: in the sidebar bubble (old layout) or in the Pip line
 // of the task card (new layout). Both are marked with data-pip-text.
-export function pipSay(text) {
+// `icon` (Part 54b): the name of an illustration shown before the words.
+export function pipSay(text, icon = '') {
   document.querySelectorAll('[data-pip-text]').forEach((el) => {
-    el.textContent = text;
+    if (icon) setIconText(el, icon, text);
+    else el.textContent = text;
   });
 }

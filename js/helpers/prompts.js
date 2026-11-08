@@ -1,7 +1,8 @@
 // Layer 3: the prompt engine. Gentle hints and sentence starters for the
 // open questions (architecture row 8: guided prompts and "I think ___ because ___").
 import { logEvent } from './log.js';
-import { appendAnswer, answerSource } from './suggestions.js';
+import { appendAnswer, answerSource } from './suggestions.js';
+import { setIconText } from '../icon-text.js';
 
 // Tips, one per tap (Question Studio's fix-its: fixing the question is the skill
 // itself, so those hints stay words to read). The button and its list are kept
@@ -17,7 +18,7 @@ function answerChip(key, room, { answer, box, onPick, id = 'fix' }) {
   const chip = document.createElement('button');
   chip.type = 'button';
   chip.className = 'suggestion-chip hint-answer';
-  chip.textContent = `👆 ${answer}`;
+  setIconText(chip, 'tap', answer);
   chip.addEventListener('click', () => {
     chip.disabled = true;
     logEvent(room, 'hint-picked', { prompt: key, suggestionId: id, how: 'tap' });
@@ -36,7 +37,7 @@ export function createHint(key, room, hints) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'btn hint-btn';
-  button.textContent = '💡 Need a hint?';
+  setIconText(button, 'bulb', 'Need a hint?');
 
   const list = document.createElement('ul');
   list.className = 'hint-list';
@@ -49,13 +50,14 @@ export function createHint(key, room, hints) {
     shown += 1;
 
     const item = document.createElement('li');
-    item.textContent = `🦉 ${hint.text || hint}`;
+    setIconText(item, 'owl', hint.text || hint);
     if (hint.answer) item.append(answerChip(key, room, hint));
     list.append(item);
     logEvent(room, 'hint', { prompt: key, hintNumber: shown });
 
     const more = shown < hints.length;
-    button.textContent = more ? '💡 Another hint' : 'No more hints. You can do it!';
+    if (more) setIconText(button, 'bulb', 'Another hint');
+    else button.textContent = 'No more hints. You can do it!';
     button.disabled = !more;
   });
 
@@ -78,7 +80,7 @@ export function createAnswerHint(key, room, suggestions, box, { line = '' } = {}
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'btn hint-btn';
-  button.textContent = '💡 Need a hint?';
+  setIconText(button, 'bulb', 'Need a hint?');
 
   const list = document.createElement('ul');
   list.className = 'hint-list suggestion-list';
@@ -163,12 +165,12 @@ export function createAnswerHint(key, room, suggestions, box, { line = '' } = {}
     if (chips.length) return; // already open
     const help = document.createElement('li');
     help.className = 'suggestion-help';
-    help.textContent = line
-      ? `👆 These finish your "${line} …" line. Tap one, or drag it into the box.`
-      : '👆 Tap one, or drag it into the box. You can change the words.';
+    setIconText(help, 'tap', line
+      ? `These finish your "${line} …" line. Tap one, or drag it into the box.`
+      : 'Tap one, or drag it into the box. You can change the words.');
     list.replaceChildren(help, ...suggestions.map(chipItem));
     logEvent(room, 'hint', { prompt: key, hintNumber: 1 });
-    button.textContent = '💡 Answers are below';
+    setIconText(button, 'bulb', 'Answers are below');
     button.disabled = true;
     if (focus) chips[0].focus();
   }

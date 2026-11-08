@@ -13,6 +13,7 @@ import { showBadgePopup } from './badge-popup.js';
 import { BACKPACK_SVG } from './icons.js';
 import { currentPhase } from './phase-progress.js';
 import { pipSay } from './pip.js';
+import { setIconText } from './icon-text.js';
 
 // How many patches the child has (the backpack counter and the level use this).
 export function countBadges() {
@@ -104,7 +105,7 @@ function setupSoundToggle() {
   const button = document.getElementById('sound-toggle');
   function show() {
     const on = getSoundOn();
-    button.textContent = on ? '🔊 Sound: on' : '🔇 Sound: off';
+    setIconText(button, on ? 'speaker' : 'speaker-off', on ? 'Sound: on' : 'Sound: off');
     button.setAttribute('aria-pressed', String(on));
   }
   button.addEventListener('click', () => {

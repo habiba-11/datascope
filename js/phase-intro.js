@@ -10,6 +10,7 @@ import { logEvent } from './helpers/log.js';
 import { hasSeenIntro, markIntroSeen, getSelectedScenarioId } from './storage/save.js';
 import { STEP_OF_PHASE } from './helpers/progress.js';
 import { roomWhy } from './helpers/mission.js';
+import { iconNode, setIconText } from './icon-text.js';
 import { loadContent } from './helpers/scenarios.js';
 
 const STEP_ORDER = ['ask', 'plan', 'collect', 'explore', 'conclude'];
@@ -49,9 +50,11 @@ function el(tag, text, className) {
   return element;
 }
 
-// "🎯 Why? Graphs help us SEE the answer." (a bold "Why?", then the line)
+// "Why? Graphs help us SEE the answer." (the target icon, a bold "Why?", then the line)
 function whyNodes(why) {
-  return [el('strong', '🎯 Why? ', ''), document.createTextNode(why)];
+  const label = el('strong', '', '');
+  setIconText(label, 'target', 'Why? ');
+  return [label, document.createTextNode(why)];
 }
 
 function whyParagraph(why) {
@@ -82,7 +85,7 @@ async function showPhaseIntro(phase) {
   await new Promise((resolve) => { setTimeout(resolve, 0); });
 
   const body = document.createElement('div');
-  body.append(whyParagraph(intro.why), ...introNodes(phase, intro), el('p', 'Tap 📖 About this room any time to see this again.', 'intro-again'));
+  body.append(whyParagraph(intro.why), ...introNodes(phase, intro), el('p', 'Tap "About this room" any time to see this again.', 'intro-again'));
 
   logEvent('shell', 'popup-seen', { phase, auto: true });
   await openModal({
@@ -98,11 +101,12 @@ async function showPhaseIntro(phase) {
 async function fillAboutPanel(panel, phase) {
   const intro = await loadIntro(phase);
   if (!intro) return;
-  panel.replaceChildren(
-    el('p', `${intro.icon} ${intro.title}`, 'about-title'),
-    ...introNodes(phase, intro),
-    el('p', `✅ You are done when: ${intro.doneWhen}`, 'about-done'),
-  );
+  // Part 54b: the room's icon (phases.json "icon" is an illustration name).
+  const title = el('p', '', 'about-title');
+  setIconText(title, intro.icon, intro.title);
+  const done = el('p', '', 'about-done');
+  done.append(iconNode('check'), document.createTextNode(` You are done when: ${intro.doneWhen}`));
+  panel.replaceChildren(title, ...introNodes(phase, intro), done);
 }
 
 // Tells the shell which phase the child is in now. Shows its intro if this

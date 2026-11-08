@@ -14,7 +14,8 @@ import { playSound } from './sounds.js';
 import {
   PIP_EVENTS, isStale, pickLine, nextIdleMove, idleGap, IDLE_HELP_SECONDS, screenKey, shouldOfferHelp,
 } from './helpers/pip-lines.js';
-import { logEvent } from './helpers/log.js';
+import { logEvent } from './helpers/log.js';
+import { setIconText } from './icon-text.js';
 
 const WIDE = '(min-width: 1240px)'; // the same width as in css/shell.css (Part 43c)
 const SAY_MS = 4500; // how long a line stays
@@ -84,7 +85,7 @@ function sayInBubble(text, move, { help = null, ms = SAY_MS } = {}) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'btn btn-quiet pip-help-btn';
-    button.textContent = '💡 Yes, help me!';
+    setIconText(button, 'bulb', 'Yes, help me!');
     button.addEventListener('click', () => {
       bubble.hidden = true;
       help();
@@ -104,9 +105,11 @@ function sayInCard(text, move) {
   const line = document.querySelector('.pip-line-text[data-pip-text]');
   animate(document.querySelector('.pip-mascot--line'), `pip-move-${move}`);
   if (!line) return;
-  const instruction = line.textContent;
-  line.textContent = `🦉 ${text}`;
-  setTimeout(() => { if (line.textContent === `🦉 ${text}`) line.textContent = instruction; }, SAY_MS);
+  // The instruction's own parts (words and maybe an icon) come back after.
+  const instruction = [...line.childNodes];
+  setIconText(line, 'owl', text);
+  const said = line.textContent;
+  setTimeout(() => { if (line.textContent === said) line.replaceChildren(...instruction); }, SAY_MS);
 }
 
 // One small idle move every 6 to 10 seconds: look around, hop, wave or tilt.

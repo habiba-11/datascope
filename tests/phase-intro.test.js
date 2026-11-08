@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { ILLUSTRATIONS } from '../js/illustrations.js';
 import { readFileSync } from 'node:fs';
 import { makeEntry } from '../js/helpers/log.js';
 import { longestSentence, MAX_SENTENCE_WORDS } from '../js/helpers/readability.js';
@@ -15,6 +16,8 @@ test('every phase has an intro with an icon, a title and a room colour', () => {
     const intro = phases[id];
     assert.ok(intro, `missing intro for ${id}`);
     assert.ok(intro.icon && intro.title, `${id} needs an icon and a title`);
+    // Part 54b: the icon is the name of one of our illustrations, not an emoji.
+    assert.ok(ILLUSTRATIONS[intro.icon], `${id}: "${intro.icon}" is not an illustration name`);
     assert.ok(ROOM_COLOURS.includes(intro.accent), `${id} has an unknown colour`);
   }
 });
@@ -53,7 +56,7 @@ test('every task card has the About tab, closed until tapped and hidden until a 
 test('the (i) button is gone: the pop-up points to the tab instead', () => {
   const source = (file) => readFileSync(new URL(`../js/${file}`, import.meta.url), 'utf8');
   assert.doesNotMatch(source('phase-intro.js'), /\(i\)/);
-  assert.match(source('phase-intro.js'), /Tap 📖 About this room/);
+  assert.match(source('phase-intro.js'), /Tap "About this room"/);
   assert.doesNotMatch(source('app.js'), /info-btn/);
 });
 

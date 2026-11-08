@@ -6,6 +6,7 @@
 import { audioContext } from './sounds.js';
 import { getMusicOn, setMusicOn } from './storage/save.js';
 import { stepNotes, STEP_SECONDS } from './helpers/music-score.js';
+import { setIconText } from './icon-text.js';
 
 export const MUSIC_VOLUME = 0.3; // quiet: about a third of the sound effects
 const LOOK_AHEAD = 0.35; // seconds of music planned ahead
@@ -109,11 +110,11 @@ export function duckMusic(on) {
   if (c && bus && timer) bus.gain.setTargetAtTime(on ? MUSIC_VOLUME * 0.3 : MUSIC_VOLUME, c.currentTime, 0.15);
 }
 
-// The 🎵 switch in the status line (js/app.js), and starting the music.
+// The Music switch in the status line (js/app.js), and starting the music.
 export function setupMusic(button) {
   function show() {
     const on = getMusicOn();
-    button.textContent = on ? '🎵 Music: on' : '🎵 Music: off';
+    setIconText(button, 'music', on ? 'Music: on' : 'Music: off');
     button.setAttribute('aria-pressed', String(on));
   }
   button.addEventListener('click', () => {

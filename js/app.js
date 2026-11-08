@@ -15,24 +15,26 @@ import { mountPipStand } from './pip-stand.js';
 import { startHelperPointers } from './helper-pointer.js';
 import { setupMusic } from './music.js';
 import { playSound } from './sounds.js';
+import { iconHTML, setIconText } from './icon-text.js';
 
-// `icon` is a line icon from icons.js (step bar); `emoji` is used in Pip's words.
+// `icon` is a line icon from icons.js (step bar).
 const STEPS = [
-  { id: 'ask', label: 'Ask', icon: 'question', emoji: '❓', color: 'ask', href: 'question-studio.html' },
-  { id: 'plan', label: 'Plan', icon: 'map', emoji: '🗺️', color: 'plan', href: 'question-studio.html' },
-  { id: 'collect', label: 'Collect', icon: 'clipboard', emoji: '📋', color: 'collect', href: 'data-hub.html' },
-  { id: 'explore', label: 'Explore', icon: 'bars', emoji: '📊', color: 'explore', href: 'graph-lab.html' },
-  { id: 'conclude', label: 'Conclude', icon: 'flag', emoji: '🚩', color: 'conclude', href: 'evidence-board.html' },
+  { id: 'ask', label: 'Ask', icon: 'question', color: 'ask', href: 'question-studio.html' },
+  { id: 'plan', label: 'Plan', icon: 'map', color: 'plan', href: 'question-studio.html' },
+  { id: 'collect', label: 'Collect', icon: 'clipboard', color: 'collect', href: 'data-hub.html' },
+  { id: 'explore', label: 'Explore', icon: 'bars', color: 'explore', href: 'graph-lab.html' },
+  { id: 'conclude', label: 'Conclude', icon: 'flag', color: 'conclude', href: 'evidence-board.html' },
 ];
 
 // The ids are the same as the phase ids in helpers/progress.js.
 const EXPLORE_ROOMS = [
-  { id: 'graph', label: '📊 Graph Lab', href: 'graph-lab.html' },
-  { id: 'number', label: '🔢 Number Lab', href: 'number-lab.html' },
-  { id: 'chance', label: '🎲 Chance Lab', href: 'chance-lab.html' },
+// `icon`: an illustration (js/illustrations.js) before the name (Part 54b).
+  { id: 'graph', icon: 'chart', label: 'Graph Lab', href: 'graph-lab.html' },
+  { id: 'number', icon: 'numbers', label: 'Number Lab', href: 'number-lab.html' },
+  { id: 'chance', icon: 'die', label: 'Chance Lab', href: 'chance-lab.html' },
 ];
 
-const LOCKED_MESSAGE = "🔒 That room is still locked. Finish this step first, then it opens!";
+const LOCKED_MESSAGE = `${iconHTML('lock')} That room is still locked. Finish this step first, then it opens!`;
 
 let currentStep = null;
 let currentExplorePage = null;
@@ -63,13 +65,13 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
         <button class="btn icon-btn badge-counter" id="badge-counter" type="button" aria-label="${backpackLabel(countBadges())}">${counterHTML(countBadges())}</button>
       </div>
     </header>
-    ${getPreviewAll() ? '<p class="preview-banner">👀 Teacher preview: all rooms are open on this device</p>' : ''}
+    ${getPreviewAll() ? `<p class="preview-banner">${iconHTML('magnifier')} Teacher preview: all rooms are open on this device</p>` : ''}
     ${layout === 'card' ? cardBodyHTML(accent, contentHTML) : `<div class="shell-body">
       <aside class="sidebar">
         <div class="speech-bubble" data-pip-text>${pipMessage}</div>
         <div class="pip-mascot">${pipSVG()}</div>
         ${codeBadge()}
-        <button class="btn sound-toggle" id="sound-toggle" type="button" aria-pressed="true">🔊 Sound: on</button>
+        <button class="btn sound-toggle" id="sound-toggle" type="button" aria-pressed="true">${iconHTML('speaker')} Sound: on</button>
         ${EXIT_BUTTON_HTML}
         ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}
       </aside>
@@ -116,7 +118,7 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   startSync((status) => {
     const label = document.getElementById('sync-status');
     if (!label) return;
-    label.textContent = STATUS_TEXT[status];
+    setIconText(label, STATUS_TEXT[status].icon, STATUS_TEXT[status].text);
     label.dataset.status = status;
   });
   if (layout !== 'card') {
@@ -180,8 +182,8 @@ function cardBodyHTML(accent, contentHTML) {
         ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}
       </div>
       <div class="status-tools">
-        <button class="btn btn-quiet sound-toggle" id="sound-toggle" type="button" aria-pressed="true">🔊 Sound: on</button>
-        <button class="btn btn-quiet sound-toggle" id="music-toggle" type="button" aria-pressed="true">🎵 Music: on</button>
+        <button class="btn btn-quiet sound-toggle" id="sound-toggle" type="button" aria-pressed="true">${iconHTML('speaker')} Sound: on</button>
+        <button class="btn btn-quiet sound-toggle" id="music-toggle" type="button" aria-pressed="true">${iconHTML('music')} Music: on</button>
         ${EXIT_BUTTON_HTML}
       </div>
     </footer>`;
@@ -194,14 +196,14 @@ function exploreTabsHTML(newTab = null) {
     .filter((r) => getPreviewAll() || isUnlocked(r.id, done))
     .map((r) => {
       const isActive = r.id === currentExplorePage;
-      const doneMark = done.includes(r.id) ? ' ✅' : '';
-      return `<a class="explore-tab${isActive ? ' active' : ''}${r.id === newTab ? ' step-new' : ''}"${isActive ? ' aria-current="page"' : ''} href="${r.href}">${r.label}${doneMark}</a>`;
+      const doneMark = done.includes(r.id) ? ` ${iconHTML('check')}<span class="sr-only"> (done)</span>` : '';
+      return `<a class="explore-tab${isActive ? ' active' : ''}${r.id === newTab ? ' step-new' : ''}"${isActive ? ' aria-current="page"' : ''} href="${r.href}">${iconHTML(r.icon)} ${r.label}${doneMark}</a>`;
     })
     .join('');
 }
 
 // The Explore rooms as tabs on the task card's header (card layout, UI guide):
-// done rooms get a ✓, the current room is white, then ONE "🔒 More soon" tab
+// done rooms get a ✓, the current room is white, then ONE "More soon" tab (a lock)
 // while a room is still locked (its name stays hidden, Prof's comment 2).
 export function exploreCardTabsHTML(newTab = null) {
   const done = getDonePhases();
@@ -209,10 +211,10 @@ export function exploreCardTabsHTML(newTab = null) {
   const tabs = open.map((r) => {
     const isActive = r.id === currentExplorePage;
     const isDone = done.includes(r.id);
-    return `<a class="card-tab${isActive ? ' active' : ''}${isDone ? ' done' : ''}${r.id === newTab ? ' step-new' : ''}"${isActive ? ' aria-current="page"' : ''} href="${r.href}">${isDone ? '<span aria-hidden="true">✓</span> ' : ''}${r.label}${isDone ? '<span class="sr-only"> (done)</span>' : ''}</a>`;
+    return `<a class="card-tab${isActive ? ' active' : ''}${isDone ? ' done' : ''}${r.id === newTab ? ' step-new' : ''}"${isActive ? ' aria-current="page"' : ''} href="${r.href}">${isDone ? '<span aria-hidden="true">✓</span> ' : ''}${iconHTML(r.icon)} ${r.label}${isDone ? '<span class="sr-only"> (done)</span>' : ''}</a>`;
   });
   if (open.length < EXPLORE_ROOMS.length) {
-    tabs.push('<span class="card-tab locked">🔒 More soon<span class="sr-only"> (locked)</span></span>');
+    tabs.push(`<span class="card-tab locked">${iconHTML('lock')} More soon<span class="sr-only"> (locked)</span></span>`);
   }
   return `<nav class="card-tab-row" aria-label="Explore rooms">${tabs.join('')}</nav>`;
 }
@@ -247,9 +249,9 @@ function showUnlocked() {
   }
 
   const opened = newStep ? STEPS.find((s) => s.id === newStep) : null;
-  const name = opened ? `${opened.emoji} ${opened.label}` : newTab && newTab.label;
+  const name = opened ? opened.label : newTab && newTab.label;
   if (name) {
-    pipSay(`🔓 Hoo-hoo! You unlocked ${name}!`);
+    pipSay(`Hoo-hoo! You unlocked ${name}!`, 'lock-open');
     pipReacts('hop');
     unlockStep(document.querySelector('.step-bar .step-new, .explore-subnav .step-new, .task-card-tabs .step-new'));
   }
@@ -260,8 +262,8 @@ function showUnlocked() {
 function codeBadge() {
   const code = getExplorerCode();
   return code
-    ? `<div class="code-badge">🔑 ${code}</div>`
-    : '<a class="code-badge missing" href="../index.html">🔑 No code yet: tap here</a>';
+    ? `<div class="code-badge">${iconHTML('key')} ${code}</div>`
+    : `<a class="code-badge missing" href="../index.html">${iconHTML('key')} No code yet: tap here</a>`;
 }
 
 // Moves the step-bar highlight without rebuilding the shell.

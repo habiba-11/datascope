@@ -5,11 +5,19 @@
 import { openModal } from './modal.js';
 import { logEvent } from './helpers/log.js';
 import { MISSION_WORDS } from './helpers/mission.js';
+import { setIconText } from './icon-text.js';
 
 function el(tag, text, className) {
   const element = document.createElement(tag);
   element.textContent = text;
   element.className = className;
+  return element;
+}
+
+// The same, with one of our illustrations before the words (Part 54b).
+function withIcon(tag, icon, text, className) {
+  const element = el(tag, '', className);
+  setIconText(element, icon, text);
   return element;
 }
 
@@ -19,12 +27,12 @@ export function showMissionCard(content) {
   body.className = 'mission-card';
   body.append(
     el('p', MISSION_WORDS.hello, 'mission-hello'),
-    el('p', `🎯 ${content.mission.goal}`, 'mission-goal m-pop'),
-    el('p', `🏁 ${MISSION_WORDS.end}`, 'mission-line'),
+    withIcon('p', 'target', content.mission.goal, 'mission-goal m-pop'),
+    withIcon('p', 'flag', MISSION_WORDS.end, 'mission-line'),
   );
   logEvent('question-studio', 'mission-seen', { scenarioId: content.scenarioId });
   return openModal({
-    icon: '🎯',
+    icon: 'target',
     title: MISSION_WORDS.title,
     accent: 'ask',
     body,

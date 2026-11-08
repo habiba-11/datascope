@@ -1,6 +1,6 @@
 {
   "ask": {
-    "icon": "❓",
+    "icon": "question",
     "title": "Ask a question",
     "accent": "ask",
     "why": "A clear question gets clear answers.",
@@ -8,7 +8,7 @@
     "doneWhen": "you pick a question and fix both questions."
   },
   "plan": {
-    "icon": "🗺️",
+    "icon": "map",
     "title": "Make a plan",
     "accent": "plan",
     "why": "A prediction helps you spot surprises in the data.",
@@ -16,7 +16,7 @@
     "doneWhen": "you save your prediction."
   },
   "collect": {
-    "icon": "📋",
+    "icon": "clipboard",
     "title": "Collect data",
     "accent": "collect",
     "why": "Answers are your data. You need data to find out.",
@@ -24,7 +24,7 @@
     "doneWhen": "every pretend classmate has answered."
   },
   "graph": {
-    "icon": "📊",
+    "icon": "chart",
     "title": "Draw graphs",
     "accent": "explore",
     "why": "Graphs help us SEE the answer.",
@@ -32,7 +32,7 @@
     "doneWhen": "you answer both questions and tap I'm done."
   },
   "number": {
-    "icon": "🔢",
+    "icon": "numbers",
     "title": "Find the statistics",
     "titleWords": "Find the most popular answer",
     "accent": "explore",
@@ -43,7 +43,7 @@
     "doneWhen": "you finish all the puzzles."
   },
   "chance": {
-    "icon": "🎲",
+    "icon": "die",
     "title": "Test chance",
     "accent": "explore",
     "why": "Chance helps us say how sure we can be.",
@@ -51,7 +51,7 @@
     "doneWhen": "you test it and tap I'm done testing."
   },
   "conclude": {
-    "icon": "🚩",
+    "icon": "flag",
     "title": "Show your evidence",
     "accent": "conclude",
     "why": "Now you prove your answer with your evidence.",
