@@ -142,8 +142,6 @@ bugs" rule:** deliberate changes based on the pilot children's feedback.
 - Graph Lab bar colours repeat after 5 values (the labels carry the meaning).
 - The playground guess shows 5 games (more than 3 choices), because the choices
   must match the data.
-- The question checker lets "Do you know what game you like today?" pass (any open
-  word cancels the yes/no warning).
 - Rubric coding of each claim waits for the real levels from Papers 7 and 13.
 - Thesis: declare the AI assistance used (GIU regulations, section 7).
 

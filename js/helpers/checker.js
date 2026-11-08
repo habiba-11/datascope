@@ -1,10 +1,6 @@
 const LEADING_WORDS = ['good', 'best', 'great', 'bad', 'worst', 'better', 'right', 'wrong', 'amazing', 'awful'];
-const YES_NO_STARTERS = [
-  'do', 'does', 'did', 'is', 'are', 'am', 'was', 'were', 'can', 'could', 'will', 'would',
-  'has', 'have', 'had', 'should', 'may', 'might', 'must', 'shall',
-  "isn't", "aren't", "wasn't", "weren't", "don't", "doesn't", "didn't",
-  "can't", "couldn't", "won't", "wouldn't", "shouldn't", "hasn't", "haven't",
-];
+// A survey question begins with one of these (8 Nov 2026: replaces the list
+// of yes/no starters, which a typo could slip past).
 const OPEN_STARTERS = ['what', 'how', 'which', 'when', 'where', 'why', 'who'];
 // 8 Nov 2026 (Habiba: "how this week?" passed): a whole question has at least
 // 5 words and asks the person (you, your, we, our). Fix 2 also stays on its topic.
@@ -86,9 +82,13 @@ export function questionProblems(question, { topicWords = null } = {}) {
     problems.push({ id: 'when', tip: "⏰ When? Say a time, like 'this week' or 'last night'." });
   }
 
-  const startsYesNo = YES_NO_STARTERS.includes(words[0] || '');
-  const hasOpenWord = OPEN_STARTERS.some((word) => words.includes(word));
-  if (startsYesNo && !hasOpenWord) {
+  // 8 Nov 2026 (Habiba: "wdid you read well last night?" passed): the question
+  // must BEGIN with a question word, as the checklist says. Before, only a
+  // yes/no word at the start was caught, so a typo slipped through, and any
+  // question word later on ("Do you know what...") cancelled the warning.
+  // A time phrase may come first: "Last night, how many hours...?"
+  const clauseStarts = lower.split(',').map((part) => part.trim().split(' ')[0]);
+  if (!clauseStarts.some((word) => OPEN_STARTERS.includes(word))) {
     problems.push({ id: 'yesno', tip: '🔁 Not just yes or no. Start with What, How or Which.' });
   }
 

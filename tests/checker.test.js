@@ -175,3 +175,12 @@ test('8 Nov 2026: every Fix 2 example answer passes with its own topic words, an
     assert.notDeepEqual(checkQuestion(flawed, { topicWords }), [], `${id}: ${flawed}`);
   }
 });
+
+test('8 Nov 2026: a question must BEGIN with a question word (typos and yes/no starts fail)', () => {
+  const yesNo = (q) => checkQuestion(q).some((w) => w.includes('yes or no'));
+  assert.ok(yesNo('wdid you read well last night?'), 'a typo slips past no longer (Habiba)');
+  assert.ok(yesNo('Did you read well last night?'));
+  assert.ok(yesNo('Do you know what game you like today?'), 'a question word later on does not count');
+  assert.ok(!yesNo('How well did you read last night?'));
+  assert.ok(!yesNo('Last night, how many hours did you sleep?'), 'a time phrase may come first');
+});
