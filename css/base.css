@@ -548,3 +548,29 @@ h1 {
   width: 100%;
   height: 100%;
 }
+
+/* Part 54g: a gentle shine for big reward pictures (the level on My ID): a
+   soft light band sweeps across about every 5 seconds. The holder is round
+   and clips it. Reduced motion stops it (the rule above). */
+.ds-shine {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  border-radius: 50%;
+  line-height: 0;
+}
+
+.ds-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.65) 50%, transparent 62%);
+  transform: translateX(-110%);
+  animation: ds-shine 5s ease-in-out 1s infinite;
+  pointer-events: none;
+}
+
+@keyframes ds-shine {
+  0% { transform: translateX(-110%); }
+  40%, 100% { transform: translateX(110%); }
+}

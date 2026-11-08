@@ -666,3 +666,12 @@
     right: calc(4px + (100% - 8px) / 14);
   }
 }
+
+/* Part 54g: the level, big (96 px) in a white medallion, with the gentle shine. */
+.j-level-pic {
+  margin-left: auto;
+  padding: 10px;
+  background: #FFFFFF;
+  border: var(--border-width) solid var(--color-navy);
+  box-shadow: var(--shadow-button);
+}

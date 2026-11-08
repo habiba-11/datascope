@@ -8,6 +8,7 @@ import { playSound, playFirework } from './sounds.js';
 import { launchFirework } from './fireworks.js';
 import { blastConfetti } from './confetti.js';
 import { pipMoodFor } from './pip.js';
+import { iconHTML } from './icon-text.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -119,15 +120,15 @@ export function unlockStep(element) {
   const lock = document.createElement('span');
   lock.className = 'unlock-badge';
   lock.setAttribute('aria-hidden', 'true');
-  lock.textContent = '🔒';
+  lock.innerHTML = iconHTML('lock'); // our icons (Part 54g)
   holder.append(lock);
 
   gsap.timeline({ onComplete: () => lock.remove() })
     .from(element, { scale: 0.3, opacity: 0, duration: MOTION.medium, ease: MOTION.spring, clearProps: 'all' })
     .to(lock, { keyframes: { x: [-4, 4, -3, 3, 0] }, duration: 0.4 })
-    .call(() => { lock.textContent = '🔑'; })
+    .call(() => { lock.innerHTML = iconHTML('key'); })
     .to(lock, { rotation: 90, duration: MOTION.fast })
-    .call(() => { lock.textContent = '🔓'; })
+    .call(() => { lock.innerHTML = iconHTML('lock-open'); })
     .to(lock, { rotation: 0, scale: 1.4, duration: 0.2 })
     .to(lock, { y: -24, opacity: 0, duration: 0.35 })
     .fromTo(holder, { scale: 1 }, { scale: 1.25, duration: 0.18, yoyo: true, repeat: 1, clearProps: 'scale' }, '<');

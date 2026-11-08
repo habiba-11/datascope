@@ -79,7 +79,7 @@ function landInBackpack(count) {
   playSound('badgeLand'); // every badge lands with the same pop
 
   if (level.name !== levelBefore) {
-    pipSays(`Level up: you are now a ${level.icon} ${level.name}!`);
+    pipSays(`Level up: you are now a :${level.icon}: ${level.name}!`); // :name: = icon (Part 54g)
     // Only now: the badge pop-up (and its own confetti) is closed. The fanfare
     // comes just after the badge's landing pop, with the confetti.
     setTimeout(() => confetti({ sound: 'levelUp' }), 400);

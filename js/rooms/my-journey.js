@@ -22,13 +22,17 @@ import { pipSVG, pipMoodFor } from '../pip.js';
 import { confetti, fireworksLoop } from '../motion.js';
 import { taskCardHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
+import { setIconLine } from '../icon-text.js';
+import { illustration } from '../illustrations.js';
 
 const MAX_STARS = STOPS.length * 3;
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Part 54g: our texts here name icons as :name: (only real icon names count,
+// and they become our own SVG, so a child's words stay safe as plain text).
 function el(tag, text = '', className = '') {
   const element = document.createElement(tag);
-  element.textContent = text;
+  setIconLine(element, text);
   if (className) element.className = className;
   return element;
 }
@@ -69,8 +73,8 @@ function celebrationNode(journey, code) {
   line.append(
     pipBox('j-slim-pip'),
     el('h2', all ? 'You finished your whole investigation!' : 'Look how far you came!'),
-    el('span', `🔑 ${code || 'No code yet'}`, 'j-pill'),
-    el('span', `⭐ ${journey.totalStars} of ${MAX_STARS}`, 'j-pill'),
+    el('span', `:key: ${code || 'No code yet'}`, 'j-pill'),
+    el('span', `:star: ${journey.totalStars} of ${MAX_STARS}`, 'j-pill'),
   );
   return line;
 }
@@ -86,7 +90,7 @@ function bigIdeaNode(recipe, words) {
 }
 
 function answerNode(claim) {
-  const box = section('🚩 My answer', claim ? 'This is what you found out, in your own words.' : 'You will write your answer in Conclude. It will show here.');
+  const box = section(':flag: My answer', claim ? 'This is what you found out, in your own words.' : 'You will write your answer in Conclude. It will show here.');
   if (!claim) return box;
   const card = el('div', '', 'j-ans');
   const left = el('div');
@@ -115,7 +119,7 @@ function answerNode(claim) {
 }
 
 function skillsNode(journey, words, info) {
-  const box = section('🧩 Skills I practised', 'One skill for each stop: what you learned, and where you showed it.');
+  const box = section(':puzzle: Skills I practised', 'One skill for each stop: what you learned, and where you showed it.');
   const grid = el('div', '', 'j-skills');
   STOPS.forEach(({ phase, icon, name, color }, i) => {
     const p = journey.phases[phase];
@@ -123,8 +127,8 @@ function skillsNode(journey, words, info) {
     card.style.setProperty('--c', `var(--color-${color})`);
     card.style.setProperty('--i', String(2 + i));
     const head = el('div', '', 'j-card-head');
-    head.append(el('span', icon, 'j-icon'), el('h3', p.done ? words.skills[phase].skill : name));
-    head.append(el('span', p.done ? '✓ Done' : '🔒 Not yet', p.done ? 'j-pill ok' : 'j-pill'));
+    head.append(el('span', `:${icon}:`, 'j-icon'), el('h3', p.done ? words.skills[phase].skill : name));
+    head.append(el('span', p.done ? '✓ Done' : ':lock: Not yet', p.done ? 'j-pill ok' : 'j-pill'));
     const body = el('div', '', 'j-card-body');
     if (p.done) {
       const learned = el('p', '', 'j-learned');
@@ -148,7 +152,7 @@ function skillsNode(journey, words, info) {
 
 function nextTimeNode(words) {
   const box = el('section', '', 'j-next m-rise');
-  box.append(el('h2', '🚀 Next time I can…'));
+  box.append(el('h2', ':rocket: Next time I can…'));
   const list = el('ul');
   words.nextTime.forEach((idea, i) => {
     const item = el('li');
@@ -183,7 +187,7 @@ function stripNode(journey) {
     stop.href = `#stop-${phase}`;
     stop.style.setProperty('--c', `var(--color-${color})`);
     stop.setAttribute('aria-label', p.done ? `${name}, ${p.stars || 0} of 3 stars` : `${name}, not done yet`);
-    stop.append(el('span', p.done ? icon : '🔒', 'j-dot-circle'), el('span', name));
+    stop.append(el('span', `:${p.done ? icon : 'lock'}:`, 'j-dot-circle'), el('span', name));
     const stars = el('span', p.done ? '★'.repeat(p.stars || 0) + '☆'.repeat(3 - (p.stars || 0)) : '', 'j-dot-stars');
     stars.setAttribute('aria-hidden', 'true');
     stop.append(stars);
@@ -202,8 +206,8 @@ function stopCardsNode(journey, info) {
     card.id = `stop-${phase}`;
     card.style.setProperty('--c', `var(--color-${color})`);
     const head = el('div', '', 'j-card-head');
-    head.append(el('span', icon, 'j-icon'), el('h3', name));
-    head.append(el('span', p.done ? '✓ Done' : '🔒 Not done yet', p.done ? 'j-pill ok' : 'j-pill'));
+    head.append(el('span', `:${icon}:`, 'j-icon'), el('h3', name));
+    head.append(el('span', p.done ? '✓ Done' : ':lock: Not done yet', p.done ? 'j-pill ok' : 'j-pill'));
     const body = el('div', '', 'j-card-body');
     if (p.done) {
       body.append(starsNode(p.stars || 0));
@@ -268,8 +272,11 @@ function idPanel(journey, code) {
   const card = el('section', '', 'j-id');
   card.setAttribute('aria-label', 'My Detective ID card');
   const words = el('div');
-  words.append(el('p', '🪪 My Detective ID'), el('p', `🔑 ${code || 'No code yet'}`, 'j-id-code'), el('p', `${level.icon} ${level.name}`));
-  card.append(pipBox('j-id-pip'), words);
+  words.append(el('p', ':id-card: My Detective ID'), el('p', `:key: ${code || 'No code yet'}`, 'j-id-code'), el('p', `:${level.icon}: ${level.name}`));
+  // The level, big and with a gentle shine (Habiba's spec, point 4).
+  const levelPic = el('span', '', 'j-level-pic ds-shine');
+  levelPic.innerHTML = illustration(level.icon, { size: 96, label: level.name });
+  card.append(pipBox('j-id-pip'), words, levelPic);
 
   const stars = el('span', String(journey.totalStars), 'j-tile-v');
   stars.append(el('small', ` of ${MAX_STARS}`));
@@ -290,18 +297,18 @@ function idPanel(journey, code) {
     meter.append(fill);
     const extra = el('div');
     extra.append(meter, el('span', `${toGo} more ${toGo === 1 ? 'badge' : 'badges'} to go`, 'j-tile-note'));
-    nextTile = tile('🔼 Next level', el('span', `${level.next.icon} ${level.next.name}`, 'j-tile-v j-tile-v--small'), extra);
+    nextTile = tile(':arrow-up: Next level', el('span', `:${level.next.icon}: ${level.next.name}`, 'j-tile-v j-tile-v--small'), extra);
   } else {
-    nextTile = tile('🏆 Level', el('span', 'Top level!', 'j-tile-v j-tile-v--small'));
+    nextTile = tile(':trophy: Level', el('span', 'Top level!', 'j-tile-v j-tile-v--small'));
   }
 
   const tiles = el('div', '', 'j-tiles');
   tiles.append(
-    tile('⭐ Stars', stars, el('span', 'for great thinking, not speed', 'j-tile-note')),
-    tile('🎒 Badges', badges, el('span', 'Tap 🎒 at the top to see them', 'j-tile-note')),
+    tile(':star: Stars', stars, el('span', 'for great thinking, not speed', 'j-tile-note')),
+    tile(':bag: Badges', badges, el('span', 'Tap :bag: at the top to see them', 'j-tile-note')),
     nextTile,
   );
-  return [card, tiles, el('p', '☁️ Your work goes to your teacher by itself. Nothing to save!', 'j-online')];
+  return [card, tiles, el('p', ':cloud: Your work goes to your teacher by itself. Nothing to save!', 'j-online')];
 }
 
 // ---------- the tabs ----------
@@ -331,9 +338,9 @@ function tabsNode(tabs, onShow) {
     button.id = `j-tab-${i}`;
     button.setAttribute('role', 'tab');
     button.setAttribute('aria-controls', `j-panel-${i}`);
-    const emoji = el('span', icon);
-    emoji.setAttribute('aria-hidden', 'true');
-    button.append(emoji, label);
+    const pic = el('span', `:${icon}:`); // icon: an illustration name
+    pic.setAttribute('aria-hidden', 'true');
+    button.append(pic, label);
     button.addEventListener('click', () => select(i, false));
     button.addEventListener('keydown', (event) => {
       if (event.key === 'ArrowRight') select((i + 1) % tabs.length, true);
@@ -365,7 +372,7 @@ async function init() {
   if (guardJourney()) return; // not finished yet: sent to the furthest open room
 
   const recipe = await loadRecipe(getSelectedScenarioId());
-  const { cardTitle, emoji } = await loadContent(recipe.id);
+  const { cardTitle, icon: scenarioIcon } = await loadContent(recipe.id);
   const words = await fetch('../data/content/journey.json').then((r) => r.json());
   const code = getExplorerCode();
   const journey = buildJourney(readLog(), code, recipe.id, recipe.compareWith || null, getDonePhases(recipe.id));
@@ -376,7 +383,7 @@ async function init() {
     accent: 'conclude',
     layout: 'card',
     contentHTML: taskCardHTML({
-      title: `🗺️ My journey · ${emoji} ${cardTitle}`,
+      title: `:map: My journey · :${scenarioIcon}: ${cardTitle}`,
       bodyHTML: '<div class="j-body" id="journey"></div>',
     }),
   });
@@ -384,14 +391,14 @@ async function init() {
   // ONE primary: start a new investigation.
   setupActionBar({
     back: { label: 'Evidence Board', href: 'evidence-board.html' },
-    primary: { label: '🔁 Start a new investigation →', ready: true, onClick: newInvestigation },
+    primary: { label: ':repeat: Start a new investigation →', ready: true, onClick: newInvestigation },
   });
 
   let walked = false;
   const tabs = tabsNode([
-    { icon: '🧠', label: 'What I learned', nodes: learnedPanel(journey, recipe, words, info) },
-    { icon: '🗺️', label: 'My journey', nodes: [stripNode(journey), stopCardsNode(journey, info)] },
-    { icon: '🪪', label: 'My ID', nodes: idPanel(journey, code) },
+    { icon: 'brain', label: 'What I learned', nodes: learnedPanel(journey, recipe, words, info) },
+    { icon: 'map', label: 'My journey', nodes: [stripNode(journey), stopCardsNode(journey, info)] },
+    { icon: 'id-card', label: 'My ID', nodes: idPanel(journey, code) },
   ], (index) => {
     if (index === 1 && !walked) {
       walked = true;

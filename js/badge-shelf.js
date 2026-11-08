@@ -6,7 +6,8 @@ import { backpack, levelFor, levelProgress } from './helpers/badges.js';
 import { readLog } from './helpers/log.js';
 import { getExplorerCode } from './storage/save.js';
 import { flipIn } from './motion.js';
-import { patchSVG } from './badge-art.js';
+import { patchSVG } from './badge-art.js';
+import { iconHTML } from './icon-text.js';
 
 // Called once by setupCelebrations(), after the backpack button exists.
 export function setupBadgeShelf() {
@@ -42,7 +43,7 @@ function shelfHTML(patches) {
   const slots = patches.map((b) => {
     const ribbon = b.earned
       ? `<span class="patch-ribbon" style="--patch: var(--color-${b.color})"><span class="patch-dot"></span>${b.name}</span>`
-      : '<span class="patch-ribbon locked">🔒 Locked</span>';
+      : `<span class="patch-ribbon locked">${iconHTML('lock')} Locked</span>`;
     return `
       <li class="shelf-slot ${b.earned ? 'earned' : 'locked'}">
         ${patchSVG(b, !b.earned)}
@@ -57,13 +58,13 @@ function shelfHTML(patches) {
   const level = levelFor(total);
   const toGo = level.next ? level.next.min - total : 0;
   const nextText = level.next
-    ? `${toGo} more badge${toGo > 1 ? 's' : ''} to become a ${level.next.icon} ${level.next.name}!`
+    ? `${toGo} more badge${toGo > 1 ? 's' : ''} to become a ${iconHTML(level.next.icon)} ${level.next.name}!`
     : "That's the top level. Amazing thinking!";
 
   return `
-    <h2 id="shelf-title" class="shelf-title">🎒 My Explorer Backpack</h2>
+    <h2 id="shelf-title" class="shelf-title">${iconHTML('bag')} My Explorer Backpack</h2>
     <div class="shelf-inside">
-      <p class="shelf-level">You are a <strong>${level.icon} ${level.name}</strong>. ${nextText}</p>
+      <p class="shelf-level">You are a <strong>${iconHTML(level.icon)} ${level.name}</strong>. ${nextText}</p>
       <span class="level-bar" role="progressbar" aria-label="${level.next ? `Progress to ${level.next.name}` : 'Top level reached'}" aria-valuenow="${levelProgress(total)}" aria-valuemin="0" aria-valuemax="100">
         <span class="level-fill" style="width: ${levelProgress(total)}%"></span>
       </span>

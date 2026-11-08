@@ -47,11 +47,11 @@ export function earnedBadges(entries, code) {
 // where to find it, so the shelf shows children what good reasoning looks like.
 // `id` is the start of the badge key ("why:Fair coin" -> "why").
 export const BADGE_TYPES = [
-  { id: 'why', icon: '🧙', name: 'Why-Wizard', earnedFor: 'You explained WHY something is likely or unlikely.', where: '🎲 Chance Lab: rate a chance and say why.' },
-  { id: 'changed-mind', icon: '🔄', name: 'Mind-Changer', earnedFor: 'You changed your mind because of the evidence.', where: '🔢 Number Lab: after you check the data, change your guess and say why.' },
-  { id: 'task', icon: '🧮', name: 'Number Cracker', earnedFor: 'You worked out what the data really means.', where: '🔢 Number Lab: solve a puzzle (using a hint is fine!).' },
-  { id: 'not-tell', icon: '🔍', name: 'Graph Skeptic', earnedFor: 'You spotted what a graph can NOT tell us.', where: '📊 Graph Lab: say what the graph can NOT tell us.' },
-  { id: 'claim', icon: '🏅', name: 'Data Detective', earnedFor: 'You made a claim with evidence and said how sure you are.', where: '🚩 Evidence Board: finish your Evidence Card.' },
+  { id: 'why', icon: 'wizard-hat', name: 'Why-Wizard', earnedFor: 'You explained WHY something is likely or unlikely.', where: ':die: Chance Lab: rate a chance and say why.' },
+  { id: 'changed-mind', icon: 'repeat', name: 'Mind-Changer', earnedFor: 'You changed your mind because of the evidence.', where: ':numbers: Number Lab: after you check the data, change your guess and say why.' },
+  { id: 'task', icon: 'numbers', name: 'Number Cracker', earnedFor: 'You worked out what the data really means.', where: ':numbers: Number Lab: solve a puzzle (using a hint is fine!).' },
+  { id: 'not-tell', icon: 'magnifier', name: 'Graph Skeptic', earnedFor: 'You spotted what a graph can NOT tell us.', where: ':chart: Graph Lab: say what the graph can NOT tell us.' },
+  { id: 'claim', icon: 'medal', name: 'Data Detective', earnedFor: 'You made a claim with evidence and said how sure you are.', where: ':flag: Evidence Board: finish your Evidence Card.' },
 ];
 
 // Which kind of badge a key belongs to (or undefined).
@@ -75,10 +75,10 @@ export function badgeShelf(keys) {
 // real-life-mode, real-life-median, why-no-mean, compare-range; which ones a
 // child meets depends on the scenario), 4 graphs, 4 claim cards.
 export const LEVELS = [
-  { min: 0, icon: '🐣', name: 'Rookie Explorer' },
-  { min: 2, icon: '🔎', name: 'Junior Detective' },
-  { min: 5, icon: '🕵️', name: 'Super Detective' },
-  { min: 9, icon: '🏆', name: 'Master Detective' },
+  { min: 0, icon: 'chick', name: 'Rookie Explorer' }, // icon: an illustration name (Part 54g)
+  { min: 2, icon: 'magnifier', name: 'Junior Detective' },
+  { min: 5, icon: 'medal', name: 'Super Detective' },
+  { min: 9, icon: 'trophy', name: 'Master Detective' },
 ];
 
 // The child's level for a number of badges, plus the next level (null at the top).
@@ -91,19 +91,19 @@ export function levelFor(count) {
 export function badgeMessage(entry) {
   switch (entry.type) {
     case 'certainty':
-      return 'Great reasoning! You explained WHY. ⭐';
+      return 'Great reasoning! You explained WHY. :star:';
     case 'revision':
-      return 'You changed your mind because of the evidence. That\'s what scientists do! ⭐';
+      return 'You changed your mind because of the evidence. That\'s what scientists do! :star:';
     case 'meaning-task':
       return entry.result === 'after-hint'
-        ? 'You used the hint and worked it out! ⭐'
-        : 'You worked it out! ⭐';
+        ? 'You used the hint and worked it out! :star:'
+        : 'You worked it out! :star:';
     case 'reflection':
-      return 'Smart thinking! You spotted what the graph can\'t tell us. ⭐';
+      return 'Smart thinking! You spotted what the graph can\'t tell us. :star:';
     case 'claim':
-      return 'Claim + evidence + how sure: a real data detective! ⭐';
+      return 'Claim + evidence + how sure: a real data detective! :star:';
     default:
-      return 'Great thinking! ⭐';
+      return 'Great thinking! :star:';
   }
 }
 
@@ -170,7 +170,7 @@ export const BADGES = [
     rule: (entries) => phaseDone(entries, 'ask'),
   },
   {
-    id: 'brave-guesser', name: 'Brave Guesser', phase: 'Plan', color: 'plan', icon: 'compass',
+    id: 'brave-guesser', name: 'Brave Guesser', phase: 'Plan', color: 'plan', icon: 'crystal-ball',
     why: 'You made a guess before looking. Scientists guess first, then check!',
     how: 'Make a guess before you see the data.',
     rule: (entries) => entries.some((e) => e.type === 'prediction'),
@@ -183,7 +183,7 @@ export const BADGES = [
     rule: (entries) => phaseDone(entries, 'collect'),
   },
   {
-    id: 'graph-explorer', name: 'Graph Explorer', phase: 'Explore', color: 'explore', icon: 'bars',
+    id: 'graph-explorer', name: 'Graph Explorer', phase: 'Explore', color: 'explore', icon: 'chart',
     why: 'You tried two kinds of graphs. Each one shows something new!',
     how: 'Try 2 different graphs.',
     rule: (entries) => entries.some((e) => e.type === 'chart-switch' && e.chartType !== e.from),
@@ -195,7 +195,7 @@ export const BADGES = [
     rule: (entries) => hasMoment(entries, 'not-tell:'),
   },
   {
-    id: 'middle-finder', name: 'Centre Finder', phase: 'Explore', color: 'collect', icon: 'median',
+    id: 'middle-finder', name: 'Centre Finder', phase: 'Explore', color: 'collect', icon: 'pin',
     why: 'You put the numbers in order to find the centre. That is the median!',
     how: 'Sort the numbers to find the median.',
     // Earned when the cards are really in order (Part 21c card sort), not
@@ -203,37 +203,37 @@ export const BADGES = [
     rule: (entries) => entries.some((e) => e.type === 'cards-sorted'),
   },
   {
-    id: 'task', name: 'Number Cracker', phase: 'Explore', color: 'collect', icon: 'calculator',
+    id: 'task', name: 'Number Cracker', phase: 'Explore', color: 'collect', icon: 'numbers',
     why: 'You worked out what the data really means.',
     how: 'Solve a Number Lab puzzle. Using a hint is fine!',
     rule: (entries) => entries.some(solved),
   },
   {
-    id: 'chance-tester', name: 'Chance Tester', phase: 'Explore', color: 'conclude', icon: 'dice',
+    id: 'chance-tester', name: 'Chance Tester', phase: 'Explore', color: 'conclude', icon: 'die',
     why: 'You saw that more tries get closer to the real chance!',
     how: 'Run 10 tries, then 500 tries.',
     rule: testedSmallAndBig,
   },
   {
-    id: 'why', name: 'Why-Wizard', phase: 'Explore', color: 'conclude', icon: 'wand',
+    id: 'why', name: 'Why-Wizard', phase: 'Explore', color: 'conclude', icon: 'wizard-hat',
     why: 'You explained WHY something is likely or unlikely.',
     how: 'Rate a chance and say why.',
     rule: (entries) => hasMoment(entries, 'why:'),
   },
   {
-    id: 'changed-mind', name: 'Mind Changer', phase: 'Any', color: 'conclude', icon: 'refresh', super: true,
+    id: 'changed-mind', name: 'Mind Changer', phase: 'Any', color: 'conclude', icon: 'repeat', super: true,
     why: 'You changed your mind because of the data. Real scientists do that!',
     how: 'Change your guess after you see the data.',
     rule: (entries) => hasMoment(entries, 'changed-mind'),
   },
   {
-    id: 'because-builder', name: 'Because Builder', phase: 'Any', color: 'plan', icon: 'bubble', super: true,
+    id: 'because-builder', name: 'Because Builder', phase: 'Any', color: 'plan', icon: 'speech', super: true,
     why: 'You explained your thinking with "because" three times. Great reasoning!',
     how: 'Explain 3 answers using "because".',
     rule: (entries) => becauseAnswers(entries) >= 3,
   },
   {
-    id: 'claim', name: 'Evidence Expert', phase: 'Conclude', color: 'ask', icon: 'flag', super: true,
+    id: 'claim', name: 'Evidence Expert', phase: 'Conclude', color: 'ask', icon: 'medal', super: true,
     why: 'You made a claim, showed proof and said how sure you are!',
     how: 'Finish your Evidence Card.',
     rule: (entries) => entries.some((e) => (badgeKey(e) || '').startsWith('claim:') && e.evidence && e.evidence.length >= 1),

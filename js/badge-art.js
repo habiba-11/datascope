@@ -1,8 +1,9 @@
 // Shell layer: how a badge patch looks (Part 21b, docs/design/badges-spec.md).
 // A round explorer patch: an outer circle in the badge colour, a white dashed
-// "stitch" ring, a light centre and a navy icon. Super badges get a gold ring.
+// "stitch" ring, a light centre and our colourful illustration (Part 54g; was a
+// navy line icon), with a gentle shine sweeping across. Super badges get a gold ring.
 // Colours come from css/theme.css through CSS variables (css/badges.css).
-import { ICONS } from './icons.js';
+import { ILLUSTRATIONS } from './illustrations.js';
 
 // `badge` is one entry of BADGES (helpers/badges.js).
 // `locked`: grey patch with a lock (the words under it say how to earn it).
@@ -16,12 +17,14 @@ export function patchSVG(badge, locked = false) {
     ? '<circle class="patch-gold" cx="60" cy="60" r="57" stroke-width="3"/><circle class="patch-outer" cx="60" cy="60" r="49" stroke-width="3"/>'
     : '<circle class="patch-outer" cx="60" cy="60" r="55" stroke-width="4"/>';
   const stitch = isSuper ? 41 : 46;
+  const illo = isSuper ? 50 : 58; // the illustration fills the light centre
 
   return `<svg class="patch${isSuper ? ' patch--super' : ''}${locked ? ' patch--locked' : ''}" style="${colour}" viewBox="0 0 120 120" role="img" aria-label="${label}">
     ${rings}
     <circle class="patch-stitch" cx="60" cy="60" r="${stitch}" stroke-width="3" stroke-dasharray="6 6"/>
     <circle class="patch-inner" cx="60" cy="60" r="${stitch - 8}" stroke-width="3"/>
-    <g class="patch-icon" transform="translate(36 36) scale(2)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${ICONS[locked ? 'lock' : badge.icon]}</g>
+    <svg class="patch-illo" x="${60 - illo / 2}" y="${60 - illo / 2}" width="${illo}" height="${illo}" viewBox="0 0 64 64">${ILLUSTRATIONS[locked ? 'lock' : badge.icon] || ''}</svg>
+    ${locked ? '' : '<g transform="rotate(20 60 60)"><rect class="patch-shine" x="-40" y="-20" width="18" height="160"/></g>'}
   </svg>`;
 }
 

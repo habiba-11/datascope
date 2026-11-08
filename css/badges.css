@@ -339,3 +339,20 @@
   .bp-rays,
   .bp-burst { display: none; }
 }
+
+/* ---------- Part 54g: our illustration in the patch, and a gentle shine ----------
+   The patch is round, so it is clipped to its circle; a soft white band sweeps
+   across about every 5 seconds. Reduced motion stops it (css/base.css). */
+.patch { clip-path: circle(50%); }
+.patch--locked .patch-illo { filter: grayscale(1); opacity: 0.75; }
+
+.patch-shine {
+  fill: #FFFFFF;
+  opacity: 0.45;
+  animation: patch-shine 5s ease-in-out 1.2s infinite;
+}
+
+@keyframes patch-shine {
+  0% { transform: translateX(0); }
+  40%, 100% { transform: translateX(200px); }
+}

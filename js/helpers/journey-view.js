@@ -6,13 +6,13 @@ import { CERTAINTY } from './certainty.js';
 import { shownTheory } from './chance.js';
 
 export const STOPS = [
-  { phase: 'ask', icon: '❓', name: 'Ask', color: 'ask' },
-  { phase: 'plan', icon: '🗺️', name: 'Plan', color: 'plan' },
-  { phase: 'collect', icon: '📋', name: 'Collect', color: 'collect' },
-  { phase: 'graph', icon: '📊', name: 'Graph Lab', color: 'explore' },
-  { phase: 'number', icon: '🔢', name: 'Number Lab', color: 'explore' },
-  { phase: 'chance', icon: '🎲', name: 'Chance Lab', color: 'explore' },
-  { phase: 'conclude', icon: '🚩', name: 'Conclude', color: 'conclude' },
+  { phase: 'ask', icon: 'question', name: 'Ask', color: 'ask' },
+  { phase: 'plan', icon: 'map', name: 'Plan', color: 'plan' },
+  { phase: 'collect', icon: 'clipboard', name: 'Collect', color: 'collect' },
+  { phase: 'graph', icon: 'chart', name: 'Graph Lab', color: 'explore' },
+  { phase: 'number', icon: 'numbers', name: 'Number Lab', color: 'explore' },
+  { phase: 'chance', icon: 'die', name: 'Chance Lab', color: 'explore' },
+  { phase: 'conclude', icon: 'flag', name: 'Conclude', color: 'conclude' },
 ];
 
 export const claimSentence = (c) => `I think ${c.claim} because ${c.because}.`;
@@ -43,7 +43,7 @@ export function stopLines(phase, p, { cardTitle, kind }) {
       if (p.revision && p.revision.changed) lines.push(`You changed to ${p.revision.newGuess} because "${p.revision.reason}".`);
       if (p.tasks.length) {
         const solved = p.firstTry + p.afterHint;
-        lines.push(`🧩 Puzzles solved: ${solved}${p.afterHint ? ` (${p.afterHint} after trying again 💪)` : ''}`);
+        lines.push(`:puzzle: Puzzles solved: ${solved}${p.afterHint ? ` (${p.afterHint} after trying again)` : ''}`);
       }
       break;
     case 'chance':
