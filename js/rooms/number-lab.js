@@ -19,7 +19,7 @@ import { mountCardSort } from '../card-sort.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML, wordsNoteHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { pipSay } from '../pip.js';
-import { iconLineHTML } from '../icon-text.js';
+import { iconHTML, iconLineHTML, setIconLine, withoutIcons } from '../icon-text.js';
 
 // The 3-zone layout (UI guide): the Explore rooms are tabs on the card, the
 // tasks are a mini stepper, and the ONE primary button in the action bar says
@@ -29,8 +29,8 @@ const STEP_LABELS = {
   whyNoMean: 'Mean of games?', compareRange: 'Spread',
 };
 const TASK_TITLES = {
-  predict: 'Your guess', build: '🧱 Build it!', mistake: '🕵️ Find the mistake', realLife: '🛒 Real life',
-  whyNoMean: '🤔 Mean of games?', compareRange: '📏 Which spreads out more?',
+  predict: 'Your guess', build: ':bricks: Build it!', mistake: ':magnifier: Find the mistake', realLife: ':cart: Real life',
+  whyNoMean: ':question: Mean of games?', compareRange: ':ruler: Which spreads out more?',
 };
 // Pip's one line for each task.
 const TASK_PIP = {
@@ -82,7 +82,7 @@ async function init() {
   planGuess = planPrediction(readLog(), getExplorerCode(), recipe.id);
   fromPlan = kind === 'category' && planGuess !== null;
   STEP_LABELS.predict = kind === 'category' ? 'Prediction' : 'Estimate';
-  TASK_TITLES.predict = kind === 'category' ? '🔮 Your prediction' : '📏 Your estimate';
+  TASK_TITLES.predict = kind === 'category' ? ':crystal-ball: Your prediction' : ':ruler: Your estimate';
   // Part 51: the games scenario never talks about numbers.
   if (kind === 'category') TASK_PIP.realLife = 'Data is everywhere in real life!';
   TASK_PIP.predict = fromPlan ? 'Was your prediction right? Let us check!' : 'Estimate first, then check the statistics!';
@@ -127,7 +127,7 @@ function showTask(n) {
   currentTask = n;
   const task = tasks[n - 1];
   document.getElementById('stepper').innerHTML = miniStepperHTML(tasks.map((t) => STEP_LABELS[t]), n - 1);
-  document.querySelector('.task-question').textContent = TASK_TITLES[task];
+  setIconLine(document.querySelector('.task-question'), TASK_TITLES[task]);
   pipSay(TASK_PIP[task]);
   // The Hint button is there while the child is giving a reason, and in Build it.
   let hint = null;
@@ -146,20 +146,20 @@ function refreshPrimary() {
   const task = tasks[n - 1];
   if (taskComplete[n]) {
     bar.setPrimary(n === tasks.length
-      ? { label: '🎲 Next: Chance Lab →', ready: true, onClick: () => { location.href = 'chance-lab.html'; } }
+      ? { label: ':die: Next: Chance Lab →', ready: true, onClick: () => { location.href = 'chance-lab.html'; } }
       : { label: `Next: ${STEP_LABELS[tasks[n]]} →`, ready: true, onClick: () => showTask(n + 1) });
     return;
   }
   if (task === 'predict') {
-    if (stage.predict === 'guess') bar.setPrimary({ label: kind === 'category' ? '🔍 Show the mode' : '🔍 Show statistics', onClick: revealNumbers });
+    if (stage.predict === 'guess') bar.setPrimary({ label: kind === 'category' ? ':magnifier: Show the mode' : ':magnifier: Show statistics', onClick: revealNumbers });
     else if (stage.predict === 'changing') bar.setPrimary({ label: `Save my new ${word}`, onClick: saveRevision });
-    else bar.setPrimary({ label: '', enabled: false, whyDisabled: `🤔 Keep or change your ${word}?` });
+    else bar.setPrimary({ label: '', enabled: false, whyDisabled: `:question: Keep or change your ${word}?` });
   } else if (task === 'build') {
     bar.setPrimary({ label: 'Check my numbers', onClick: checkBuild });
   } else if (task === 'mistake' && stage.mistake === 'sort') {
-    bar.setPrimary({ label: '', enabled: false, whyDisabled: '🃏 Put the cards in order first' });
+    bar.setPrimary({ label: '', enabled: false, whyDisabled: ':cards: Put the cards in order first' });
   } else {
-    bar.setPrimary({ label: '', enabled: false, whyDisabled: '👆 Pick an answer first' });
+    bar.setPrimary({ label: '', enabled: false, whyDisabled: ':tap: Pick an answer first' });
   }
 }
 
@@ -206,8 +206,9 @@ function choiceButtons(values) {
   return values.map((v) => `<button class="btn choice-btn" data-answer="${v}" type="button">${v}</button>`).join('');
 }
 
+// Our texts may name icons as :name: (Part 54e).
 const show = (feedback, text) => {
-  feedback.textContent = text;
+  setIconLine(feedback, text);
   feedback.hidden = false;
 };
 
@@ -265,7 +266,7 @@ function statsHTML(stats) {
   if (kind === 'category') {
     return `<div class="stats-grid">
       ${statCard('Mode', modeText(stats.mode))}
-      ${statCard('Mean, median, range', '✖ not for words')}
+      ${statCard('Mean, median, range', `${iconHTML('cross')} not for words`)}
     </div>`;
   }
   const grid = (m, md, mo, r) => `<div class="stats-grid">
@@ -300,14 +301,14 @@ function buildExampleHTML(example, target) {
     </li>`;
   return `
     <aside class="build-example" aria-label="A worked example">
-      <p class="build-example-title">${example.title}</p>
+      <p class="build-example-title">${iconLineHTML(example.title)}</p>
       <ol class="example-steps">
         ${step(1, example.startText, chips(example.start, example.start), example.startSum)}
         ${step(2, example.movedText, chips(example.moved, example.start), example.movedSum)}
         ${step(3, example.checkText, '', example.checkSum)}
       </ol>
-      <p class="build-example-end">${example.endText}</p>
-      <p class="build-example-turn">✏️ Your turn: make a mean of ${target}!</p>
+      <p class="build-example-end">${iconLineHTML(example.endText)}</p>
+      <p class="build-example-turn">${iconHTML('pencil')} Your turn: make a mean of ${target}!</p>
     </aside>`;
 }
 
@@ -321,10 +322,10 @@ const TASK_HTML = {
       <p class="feedback" id="predict-feedback" hidden></p>
 
       <div class="revise-box" id="revise-box" hidden>
-        <p><strong>🤔 Has the data changed your mind?</strong></p>
+        <p><strong>${iconHTML('question')} Has the data changed your mind?</strong></p>
         <div class="choice-row">
-          <button class="btn choice-btn" id="keep-guess-btn" type="button">👍 Keep my ${word}</button>
-          <button class="btn choice-btn" id="change-guess-btn" type="button">✏️ Change my ${word}</button>
+          <button class="btn choice-btn" id="keep-guess-btn" type="button">${iconHTML('thumbsup')} Keep my ${word}</button>
+          <button class="btn choice-btn" id="change-guess-btn" type="button">${iconHTML('pencil')} Change my ${word}</button>
         </div>
         <div class="revise-form" id="revise-form" hidden>
           <span>My new ${word}:</span>
@@ -344,7 +345,7 @@ const TASK_HTML = {
           <!-- 8 Nov 2026 (Habiba: clearer): what to do, the goal, and what the mean is -->
           <p>${iconLineHTML(content.build)}</p>
           <p class="build-goal">${iconLineHTML(fillTemplate(content.buildGoal, { target: buildTarget(values) }))}</p>
-          <p class="build-reminder">🔎 Mean = add all 5, then divide by 5.</p>
+          <p class="build-reminder">${iconHTML('magnifier')} Mean = add all 5, then divide by 5.</p>
           <div class="build-row">
             ${[1, 2, 3, 4, 5].map((i) => `<label class="build-box">Friend ${i}<input type="number" class="build-input"></label>`).join('')}
           </div>
@@ -361,12 +362,12 @@ const TASK_HTML = {
       <p class="number-list">${content.mistake.numbers.join(', ')}</p>
       <p>She says: <strong>"The median is ${miaSays(content.mistake.numbers)}."</strong> Is she right?</p>
       <div class="choice-row" id="mistake-choices">
-        <button class="btn choice-btn" data-answer="yes" type="button">✅ Mia is right</button>
-        <button class="btn choice-btn" data-answer="no" type="button">❌ Mia is wrong</button>
+        <button class="btn choice-btn" data-answer="yes" type="button">${iconHTML('check')} Mia is right</button>
+        <button class="btn choice-btn" data-answer="no" type="button">${iconHTML('cross')} Mia is wrong</button>
       </div>
       <p class="feedback" id="mistake-feedback" hidden></p>
       <div class="sort-box" id="sort-box" hidden>
-        <p><strong>🃏 Now you fix it! Put Mia's numbers in order.</strong></p>
+        <p><strong>${iconHTML('cards')} Now you fix it! Put Mia's numbers in order.</strong></p>
       </div>
       <p class="feedback" id="sort-feedback" hidden></p>
     </section>`,
@@ -386,7 +387,7 @@ const TASK_HTML = {
           <!-- 8 Nov 2026 (Habiba): the child can put the numbers in order first -->
           <div class="order-tool">
             <ol class="order-row" id="order-row" aria-label="The numbers">${orderChipsHTML(list, false)}</ol>
-            <button class="btn btn-secondary" id="order-btn" type="button">🔢 Put them in order</button>
+            <button class="btn btn-secondary" id="order-btn" type="button">${iconHTML('numbers')} Put them in order</button>
           </div>
           <div class="choice-row" id="median-choices">${choiceButtons(choicesFor(list))}</div>
           <p class="feedback" id="median-feedback" hidden></p>
@@ -421,21 +422,21 @@ const TASK_HTML = {
 function rangeReminderHTML({ values, valuesB }) {
   const unit = recipe.unit || '';
   const classes = [
-    { name: '📗 Class A', css: 'a', ...rangeSummary(values) },
-    { name: '📘 Class B', css: 'b', ...rangeSummary(valuesB) },
+    { name: ':book-green: Class A', css: 'a', ...rangeSummary(values) },
+    { name: ':book: Class B', css: 'b', ...rangeSummary(valuesB) },
   ];
   const scaleMax = Math.max(classes[0].high, classes[1].high);
   const cards = classes.map((c) => {
     const span = rulerSpan(c, scaleMax);
     return `
       <div class="range-card range-card--${c.css}">
-        <p class="range-name">${c.name}</p>
+        <p class="range-name">${iconLineHTML(c.name)}</p>
         <ul class="range-facts">
           <li>Lowest: <b>${c.low}</b> · Highest: <b>${c.high}</b></li>
           <li>Mean: <b>${c.mean}</b> ${unit}</li>
           <li>Range: ${c.high} − ${c.low} = <b>${c.range}</b> ${unit}</li>
         </ul>
-        <div class="range-ruler" role="img" aria-label="${c.name.slice(3)}: answers from ${c.low} to ${c.high} ${unit}">
+        <div class="range-ruler" role="img" aria-label="${withoutIcons(c.name)}: answers from ${c.low} to ${c.high} ${unit}">
           <span class="range-span" style="left: ${span.left}%; width: ${span.width}%"></span>
         </div>
         <p class="range-ends"><span>0</span><span>${scaleMax} ${unit}</span></p>
@@ -458,7 +459,7 @@ const TASK_SETUP = {
       // Guess first: the numbers stay hidden until the child has made a guess.
       const guess = readGuess('predict');
       if (guess === null) {
-        show(feedback, kind === 'category' ? `👆 Pick your ${word} first!` : `✏️ Type your ${word} first!`);
+        show(feedback, kind === 'category' ? `:tap: Pick your ${word} first!` : `:pencil: Type your ${word} first!`);
         return;
       }
       const box = document.getElementById('stats-box');
@@ -528,14 +529,14 @@ const TASK_SETUP = {
       const numbers = inputs.map((box) => Number(box.value));
       if (isAllSame(numbers) || mean(numbers) !== target) return;
       allSameSolved = false;
-      show(feedback, `✅ Well done! They are different now, and the mean is still ${target}. 🎉`);
+      show(feedback, `:check: Well done! They are different now, and the mean is still ${target}. :party:`);
       logEvent('number-lab', 'build-varied', { scenarioId: recipe.id, target });
       cheer(feedback);
     }));
 
     checkBuild = () => {
       if (inputs.some((input) => input.value === '')) {
-        show(feedback, '✏️ Fill in all 5 numbers first!');
+        show(feedback, ':pencil: Fill in all 5 numbers first!');
         return;
       }
       const numbers = inputs.map((input) => Number(input.value));
@@ -544,15 +545,15 @@ const TASK_SETUP = {
         // All the same is correct, so it never blocks; Pip just asks for more.
         allSameSolved = isAllSame(numbers);
         show(feedback, allSameSolved
-          ? `✅ Yes! The mean is exactly ${target}. 🤔 Can you make them different? Try one down, one up.`
-          : `✅ Yes! The mean of your numbers is exactly ${target}. 🎉`);
+          ? `:check: Yes! The mean is exactly ${target}. :question: Can you make them different? Try one down, one up.`
+          : `:check: Yes! The mean of your numbers is exactly ${target}. :party:`);
         tracker.solved({ allSame: allSameSolved, usedHint: filledByHint });
         cheer(feedback);
         bar.setHint(null);
         markComplete(n);
       } else {
         // The hint shows the idea behind the mean: the total, shared fairly.
-        show(feedback, `Your numbers have a mean of ${Math.round(theirMean * 100) / 100}. 💡 Tip: 5 × ${target} = ${5 * target}. Your 5 numbers must add up to ${5 * target}.`);
+        show(feedback, `Your numbers have a mean of ${Math.round(theirMean * 100) / 100}. :bulb: Tip: 5 × ${target} = ${5 * target}. Your 5 numbers must add up to ${5 * target}.`);
         tracker.wrong();
         encourage(feedback);
       }
@@ -564,8 +565,8 @@ const TASK_SETUP = {
     wireRetryChoices(document.getElementById('mistake-choices'), document.getElementById('mistake-feedback'), {
       task: 'find-mias-mistake',
       isCorrect: (answer) => answer === (miaSays(numbers) === median(numbers) ? 'yes' : 'no'),
-      correctText: '✅ Right! Mia forgot to put the numbers in order first.',
-      hintText: '🤔 Not quite. What must we do first to find the median?',
+      correctText: ':check: Right! Mia forgot to put the numbers in order first.',
+      hintText: ':question: Not quite. What must we do first to find the median?',
       // Then the child sorts the cards themselves; the task is done once sorted.
       onCorrect: () => {
         stage.mistake = 'sort';
@@ -574,7 +575,7 @@ const TASK_SETUP = {
         box.hidden = false;
         mountCardSort(box, numbers, (centre) => {
           const feedback = document.getElementById('sort-feedback');
-          feedback.textContent = `✅ In order! The one in the centre is ${centre.join(' and ')}. That is the median, not ${miaSays(numbers)}.`;
+          setIconLine(feedback, `:check: In order! The one in the centre is ${centre.join(' and ')}. That is the median, not ${miaSays(numbers)}.`);
           feedback.hidden = false;
           cheer(feedback);
           // Logged apart from Mia's yes/no answer (that one is logged when it is right).
@@ -594,8 +595,8 @@ const TASK_SETUP = {
     wireRetryChoices(document.getElementById('mode-choices'), document.getElementById('mode-feedback'), {
       task: 'real-life-mode',
       isCorrect: (answer) => asAnswer(answer) === theMode,
-      correctText: `✅ Yes! ${theMode} comes up ${timesIn(list, theMode)} times. That's more than any other. It is the mode.`,
-      hintText: '🤔 Not quite. Count how many times each one comes up.',
+      correctText: `:check: Yes! ${theMode} comes up ${timesIn(list, theMode)} times. That's more than any other. It is the mode.`,
+      hintText: ':question: Not quite. Count how many times each one comes up.',
       onCorrect: () => {
         if (realLife.medianQuestion) document.getElementById('median-question').hidden = false;
         else markComplete(n);
@@ -612,16 +613,16 @@ const TASK_SETUP = {
       sorted = true;
       document.getElementById('order-row').innerHTML = orderChipsHTML([...list].sort(compareValues), true);
       orderButton.disabled = true;
-      orderButton.textContent = '✅ In order, smallest to biggest';
+      setIconLine(orderButton, ':check: In order, smallest to biggest');
       logEvent('number-lab', 'reallife-sorted', { scenarioId: recipe.id });
     });
     wireRetryChoices(document.getElementById('median-choices'), document.getElementById('median-feedback'), {
       task: 'real-life-median',
       isCorrect: (answer) => Number(answer) === theMedian,
-      correctText: `✅ Yes! In order: ${inOrder(list)}. The one in the centre is ${theMedian}. It is the median.`,
+      correctText: `:check: Yes! In order: ${inOrder(list)}. The one in the centre is ${theMedian}. It is the median.`,
       hintText: () => (sorted
-        ? '🤔 Not quite. The centre has the same number of boxes on each side.'
-        : '🤔 Not quite. Tap "Put them in order" first.'),
+        ? ':question: Not quite. The centre has the same number of boxes on each side.'
+        : ':question: Not quite. Tap "Put them in order" first.'),
       onCorrect: () => markComplete(n),
     });
   },
@@ -631,8 +632,8 @@ const TASK_SETUP = {
     wireRetryChoices(document.getElementById('why-choices'), document.getElementById('why-feedback'), {
       task: 'why-no-mean',
       isCorrect: (answer) => options[Number(answer)].correct,
-      correctText: '✅ Yes! We can only add up numbers. For words, we use the mode.',
-      hintText: "🤔 Not quite. Can you add 'Football' + 'Tag'?",
+      correctText: ':check: Yes! We can only add up numbers. For words, we use the mode.',
+      hintText: ":question: Not quite. Can you add 'Football' + 'Tag'?",
       onCorrect: () => markComplete(n),
     });
   },
@@ -644,8 +645,8 @@ const TASK_SETUP = {
     wireRetryChoices(document.getElementById('range-choices'), document.getElementById('range-feedback'), {
       task: 'compare-range',
       isCorrect: (answer) => answer === wider,
-      correctText: `✅ Yes! ${wider}'s range is ${big}. ${narrower}'s range is only ${small}. The mean alone hides this!`,
-      hintText: '🤔 Not quite. Look at the range of each class.',
+      correctText: `:check: Yes! ${wider}'s range is ${big}. ${narrower}'s range is only ${small}. The mean alone hides this!`,
+      hintText: ':question: Not quite. Look at the range of each class.',
       onCorrect: () => markComplete(n),
     });
   },
@@ -675,8 +676,8 @@ function setupRevision(n, getOldGuess) {
     keepBtn.classList.add('active');
     logEvent('number-lab', 'revision', { about: recipe.question, scenarioId: recipe.id, changed: false, oldGuess: getOldGuess() });
     finish(kind === 'category'
-      ? `👍 You kept your ${word}: ${getOldGuess()}. Look at the mode above. Does it back you up?`
-      : `👍 You kept your ${word}: ${getOldGuess()}. Which number above backs it up?`);
+      ? `:thumbsup: You kept your ${word}: ${getOldGuess()}. Look at the mode above. Does it back you up?`
+      : `:thumbsup: You kept your ${word}: ${getOldGuess()}. Which number above backs it up?`);
   });
 
   changeBtn.addEventListener('click', () => {
@@ -692,7 +693,7 @@ function setupRevision(n, getOldGuess) {
     const newGuess = readGuess('new-guess');
     const reason = reasonInput.value.trim();
     if (newGuess === null || !reason) {
-      show(feedback, `✏️ Give your new ${word} AND say why.`);
+      show(feedback, `:pencil: Give your new ${word} AND say why.`);
       return;
     }
     numberFacts.changedWithReason = true;
@@ -700,7 +701,7 @@ function setupRevision(n, getOldGuess) {
     logEvent('number-lab', 'revision', {
       about: recipe.question, scenarioId: recipe.id, changed: true, oldGuess: getOldGuess(), newGuess, reason, ...reasonHint.answerFields(),
     });
-    finish(`✏️ You changed from ${getOldGuess()} to ${newGuess} because ${reason}. Changing your mind with evidence is what data detectives do! 🔎`);
+    finish(`:pencil: You changed from ${getOldGuess()} to ${newGuess} because ${reason}. Changing your mind with evidence is what data detectives do! :magnifier:`);
   };
 }
 

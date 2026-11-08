@@ -5,6 +5,7 @@
 // The rules are in helpers/sort-cards.js.
 import { moveItem, isSorted, centreIndexes, dropIndex } from './helpers/sort-cards.js';
 import { pulse } from './motion.js';
+import { setIconText } from './icon-text.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -67,8 +68,9 @@ export function mountCardSort(container, numbers, onSorted) {
   function cardNode({ id, value }, index) {
     const card = el('li', '', 'sort-card');
     card.dataset.id = String(id);
-    const left = el('button', '◀', 'btn sort-left');
-    const right = el('button', '▶', 'btn sort-right');
+    // Text arrows (kept as text, Part 54e); the aria-labels say what they do.
+    const left = el('button', '←', 'btn sort-left');
+    const right = el('button', '→', 'btn sort-right');
     left.type = 'button';
     right.type = 'button';
     left.setAttribute('aria-label', `Move ${value} left`);
@@ -116,6 +118,6 @@ export function mountCardSort(container, numbers, onSorted) {
     if (!done && isSorted(cards.map((c) => c.value))) finish();
   }
 
-  status.textContent = '👆 Drag the cards, or use ◀ ▶, from smallest to biggest.';
+  setIconText(status, 'tap', 'Drag the cards, or use ← →, from smallest to biggest.');
   render();
 }

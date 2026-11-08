@@ -3,7 +3,7 @@
   "cards": [
     {
       "id": "mean",
-      "icon": "⚖️",
+      "icon": "scales",
       "title": "Mean",
       "what": "The fair share: what each one gets if we share equally.",
       "steps": ["Add up all the numbers.", "Count how many numbers there are.", "Share the total fairly: divide."],
@@ -11,7 +11,7 @@
     },
     {
       "id": "median",
-      "icon": "📍",
+      "icon": "pin",
       "title": "Median",
       "what": "The one in the centre, when the numbers are in order.",
       "steps": ["Put the numbers in order.", "Find the one in the centre.", "Two in the centre? Take halfway between them."],
@@ -19,7 +19,7 @@
     },
     {
       "id": "mode",
-      "icon": "🏆",
+      "icon": "trophy",
       "title": "Mode",
       "what": "The answer that comes up the most.",
       "steps": ["Count how often each answer comes up.", "Find the one that comes up the most.", "That is the mode. It can even be a word!"],
@@ -28,12 +28,12 @@
     },
     {
       "id": "range",
-      "icon": "📏",
+      "icon": "ruler",
       "title": "Range",
       "what": "How spread out the answers are.",
       "steps": ["Find the biggest number.", "Find the smallest number.", "Take away: biggest minus smallest."],
       "example": [3, 12, 5, 6]
     }
   ],
-  "wordsNote": "🤔 Mean, median and range need numbers. Games are words, so we use the mode."
+  "wordsNote": ":question: Mean, median and range need numbers. Games are words, so we use the mode."
 }

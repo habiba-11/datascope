@@ -6,7 +6,8 @@ import { openModal } from './modal.js';
 import { addTitleButton } from './app.js';
 import { logEvent } from './helpers/log.js';
 import { recapCardIds, exampleLines } from './helpers/recap.js';
-import { hasSeenIntro, markIntroSeen } from './storage/save.js';
+import { hasSeenIntro, markIntroSeen } from './storage/save.js';
+import { setIconText } from './icon-text.js';
 
 let recapPromise = null;
 
@@ -27,7 +28,9 @@ function el(tag, text = '', className = '') {
 function cardNode(card, useWords) {
   const example = useWords && card.wordExample ? card.wordExample : card.example;
   const box = el('div', '', 'recap-card');
-  box.append(el('h3', `${card.icon} ${card.title}`), el('p', card.what, 'recap-what'));
+  const heading = el('h3');
+  setIconText(heading, card.icon, card.title); // recap.json "icon" is an illustration name (Part 54e)
+  box.append(heading, el('p', card.what, 'recap-what'));
 
   const list = el('ol', '', 'recap-steps');
   const lines = exampleLines(card.id, example);
@@ -38,7 +41,8 @@ function cardNode(card, useWords) {
     list.append(item);
   });
 
-  const next = el('button', '▶ Next step', 'btn recap-next');
+  const next = el('button', '', 'btn recap-next');
+  setIconText(next, 'play', 'Next step');
   next.type = 'button';
   next.addEventListener('click', () => {
     const hiddenStep = list.querySelector('li[hidden]');
@@ -47,7 +51,7 @@ function cardNode(card, useWords) {
       hiddenStep.classList.add('recap-pop');
     }
     if (!list.querySelector('li[hidden]')) {
-      next.textContent = '✅ All steps shown';
+      setIconText(next, 'check', 'All steps shown');
       next.disabled = true;
     }
   });
@@ -68,7 +72,8 @@ export async function openRecap({ kind, auto, room }) {
     // One tab per card (at most 4 choices), with aria-pressed for screen readers.
     const tabs = el('div', '', 'recap-tabs');
     cards.forEach((card, i) => {
-      const tab = el('button', `${card.icon} ${card.title}`, 'btn choice-btn recap-tab');
+      const tab = el('button', '', 'btn choice-btn recap-tab');
+      setIconText(tab, card.icon, card.title);
       tab.type = 'button';
       tab.setAttribute('aria-pressed', String(i === 0));
       if (i === 0) tab.classList.add('active');
@@ -90,7 +95,7 @@ export async function openRecap({ kind, auto, room }) {
   body.append(area);
 
   await openModal({
-    icon: '📘',
+    icon: 'book',
     title: 'Maths recap',
     accent: 'explore',
     body,
@@ -107,9 +112,10 @@ export function autoOpenRecap(kind) {
   openRecap({ kind, auto: true, room: 'number-lab' });
 }
 
-// Adds a "📘 Maths recap" button next to the room title.
+// Adds a "Maths recap" button (book icon) next to the room title.
 export function addRecapButton(kind, room) {
-  const button = el('button', '📘 Maths recap', 'btn title-btn');
+  const button = el('button', '', 'btn title-btn');
+  setIconText(button, 'book', 'Maths recap');
   button.type = 'button';
   button.addEventListener('click', () => openRecap({ kind, auto: false, room }));
   addTitleButton(button);

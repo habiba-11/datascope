@@ -44,14 +44,14 @@ export function buildExample(target) {
     start,
     moved,
     total,
-    title: `👀 Example: make a mean of ${exampleMean}`,
+    title: `:magnifier: Example: make a mean of ${exampleMean}`,
     startText: `Write ${exampleMean} five times.`,
     startSum: `${start.join(' + ')} = ${total}`,
     movedText: 'Take 1 from one number. Give it to another.',
     movedSum: `${moved.join(' + ')} = ${total}`,
     checkText: 'Check: share the total fairly.',
     checkSum: `${total} ÷ ${moved.length} = ${shownMean}`,
-    endText: `✅ The mean is still ${exampleMean}!`,
+    endText: `:check: The mean is still ${exampleMean}!`,
   };
 }
 
@@ -80,24 +80,24 @@ export function revealMessage(kind, guess, stats) {
   if (kind === 'category') {
     const top = stats.mode.join(' and ');
     return stats.mode.includes(guess)
-      ? `🎯 Yes! Most kids picked ${top}. That is the mode.`
+      ? `:target: Yes! Most kids picked ${top}. That is the mode.`
       : `Most kids picked ${top}, not ${guess}. That is the mode.`;
   }
 
   const shownMean = formatMean(stats.mean);
   let message = Math.abs(guess - shownMean) <= 1
-    ? `🎯 Nice estimate! You said ${guess}. The mean is ${shownMean}.`
+    ? `:target: Nice estimate! You said ${guess}. The mean is ${shownMean}.`
     : `You said ${guess}. The mean is ${shownMean}.`;
 
   if (kind === 'compare') {
     if (formatMean(stats.meanB) === shownMean && stats.rangeB !== stats.range) {
-      message += ' 👀 Both classes have this mean. But look at the range!';
+      message += ' :magnifier: Both classes have this mean. But look at the range!';
     }
     return message;
   }
-  if (shownMean <= stats.median - PULL_GAP) message += ' 👀 The mean is lower than the median. A very small answer pulls it down.';
-  else if (shownMean >= stats.median + PULL_GAP) message += ' 👀 The mean is higher than the median. A very big answer pulls it up.';
-  if (stats.mode.length > 1) message += ` 👀 Look: there are ${stats.mode.length} modes!`;
+  if (shownMean <= stats.median - PULL_GAP) message += ' :magnifier: The mean is lower than the median. A very small answer pulls it down.';
+  else if (shownMean >= stats.median + PULL_GAP) message += ' :magnifier: The mean is higher than the median. A very big answer pulls it up.';
+  if (stats.mode.length > 1) message += ` :magnifier: Look: there are ${stats.mode.length} modes!`;
   return message;
 }
 
