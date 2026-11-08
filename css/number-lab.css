@@ -47,13 +47,33 @@
   color: var(--color-text); /* green text on light blue was too faint (2:1) */
 }
 
-/* "Build it": the question and boxes, with the worked example beside them. */
+/* "Build it" (Part 55, Habiba: less crowded): one column. The goal, the boxes,
+   the live total, then "See an example" (it opens the worked example in place). */
 .build-layout {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
-  gap: var(--space-3);
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 720px;
 }
+
+.build-layout .build-row { margin: 0; }
+
+.build-total {
+  margin: 0;
+  padding: 6px 12px;
+  border: 2px solid #C9D6E2;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+/* All 5 add up to the right total: green, with a ✓ icon AND the words. */
+.build-total--done {
+  border-color: var(--color-btn-main-bg);
+  background: #E4F7E8;
+}
+
+.build-example-btn { min-height: 48px; }
 
 .build-example {
   padding: var(--space-2);

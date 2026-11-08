@@ -19,7 +19,7 @@ import { mountCardSort } from '../card-sort.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML, wordsNoteHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { pipSay } from '../pip.js';
-import { iconHTML, iconLineHTML, setIconLine, withoutIcons } from '../icon-text.js';
+import { iconHTML, iconLineHTML, setIconLine, setIconText, withoutIcons } from '../icon-text.js';
 
 // The 3-zone layout (UI guide): the Explore rooms are tabs on the card, the
 // tasks are a mini stepper, and the ONE primary button in the action bar says
@@ -340,18 +340,17 @@ const TASK_HTML = {
 
   build: (n, { values }) => `
     <section class="task" data-task="${n}" hidden>
+      <!-- Part 55 (Habiba, 8 Nov 2026: "confusing and crowded"): ONE goal
+           sentence, the boxes, a live total, and the example behind a button. -->
       <div class="build-layout">
-        <div>
-          <!-- 8 Nov 2026 (Habiba: clearer): what to do, the goal, and what the mean is -->
-          <p>${iconLineHTML(content.build)}</p>
-          <p class="build-goal">${iconLineHTML(fillTemplate(content.buildGoal, { target: buildTarget(values) }))}</p>
-          <p class="build-reminder">${iconHTML('magnifier')} Mean = add all 5, then divide by 5.</p>
-          <div class="build-row">
-            ${[1, 2, 3, 4, 5].map((i) => `<label class="build-box">Friend ${i}<input type="number" class="build-input"></label>`).join('')}
-          </div>
-          <div class="hint-list-slot" id="build-hint-slot"></div>
+        <p class="build-goal">${iconLineHTML(fillTemplate(content.build, { target: buildTarget(values) }))}</p>
+        <div class="build-row">
+          ${[1, 2, 3, 4, 5].map((i) => `<label class="build-box">Friend ${i}<input type="number" class="build-input"></label>`).join('')}
         </div>
-        ${buildExampleHTML(buildExample(buildTarget(values)), buildTarget(values))}
+        <p class="build-total" id="build-total" aria-live="polite"></p>
+        <button class="btn btn-secondary build-example-btn" id="build-example-btn" type="button" aria-expanded="false" aria-controls="build-example-box">${iconHTML('magnifier')} See an example</button>
+        <div id="build-example-box" hidden>${buildExampleHTML(buildExample(buildTarget(values)), buildTarget(values))}</div>
+        <div class="hint-list-slot" id="build-hint-slot"></div>
       </div>
       <p class="feedback" id="build-feedback" hidden></p>
     </section>`,
@@ -513,6 +512,7 @@ const TASK_SETUP = {
         onPick: () => {
           inputs.forEach((box) => { box.value = target; });
           filledByHint = true;
+          showTotal();
           inputs[0].focus();
         },
       },
@@ -521,6 +521,38 @@ const TASK_SETUP = {
     if (tasks[currentTask - 1] === 'build') bar.setHint(buildHint.button);
     // Typing again means the child's own numbers again.
     inputs.forEach((input) => input.addEventListener('input', () => { filledByHint = false; }));
+
+    // Part 55 (Habiba chose the live total, 8 Nov 2026): the fair-share idea
+    // in one line. A mean of 8 for 5 friends means a total of 5 x 8 = 40.
+    // It never shows the mean itself; the child still checks.
+    const totalLine = document.getElementById('build-total');
+    const need = 5 * target;
+    function showTotal() {
+      const filled = inputs.filter((box) => box.value !== '');
+      const sum = filled.reduce((s, box) => s + Number(box.value), 0);
+      const done = filled.length === 5 && sum === need;
+      totalLine.classList.toggle('build-total--done', done);
+      if (!filled.length) setIconLine(totalLine, `:scales: Your 5 numbers must add up to ${need} (5 × ${target}).`);
+      else if (done) setIconLine(totalLine, `:check: Your 5 numbers add up to ${need}. Now tap Check my numbers!`);
+      else if (filled.length < 5) setIconLine(totalLine, `:scales: So far: ${sum}. All 5 must add up to ${need}.`);
+      else setIconLine(totalLine, `:scales: Your 5 numbers add up to ${sum}. You need ${need}.`);
+      // An old "Not yet" or "Fill in all 5" would contradict the line above: it goes.
+      if (feedback.dataset.kind === 'retry') {
+        feedback.hidden = true;
+        feedback.dataset.kind = '';
+      }
+    }
+    inputs.forEach((input) => input.addEventListener('input', showTotal));
+    showTotal();
+
+    // The worked example opens and closes in place.
+    const exampleBtn = document.getElementById('build-example-btn');
+    const exampleBox = document.getElementById('build-example-box');
+    exampleBtn.addEventListener('click', () => {
+      exampleBox.hidden = !exampleBox.hidden;
+      exampleBtn.setAttribute('aria-expanded', String(!exampleBox.hidden));
+      setIconText(exampleBtn, 'magnifier', exampleBox.hidden ? 'See an example' : 'Hide the example');
+    });
 
     // After all-the-same numbers, the child may take up Pip's challenge. No
     // button needed: Pip notices as soon as the numbers differ and still fit.
@@ -537,6 +569,7 @@ const TASK_SETUP = {
     checkBuild = () => {
       if (inputs.some((input) => input.value === '')) {
         show(feedback, ':pencil: Fill in all 5 numbers first!');
+        feedback.dataset.kind = 'retry';
         return;
       }
       const numbers = inputs.map((input) => Number(input.value));
@@ -553,7 +586,9 @@ const TASK_SETUP = {
         markComplete(n);
       } else {
         // The hint shows the idea behind the mean: the total, shared fairly.
-        show(feedback, `Your numbers have a mean of ${Math.round(theirMean * 100) / 100}. :bulb: Tip: 5 × ${target} = ${5 * target}. Your 5 numbers must add up to ${5 * target}.`);
+        // Part 55: short; the live total line shows what to change.
+        show(feedback, `:question: Not yet: their mean is ${Math.round(theirMean * 100) / 100}. Look at the total.`);
+        feedback.dataset.kind = 'retry';
         tracker.wrong();
         encourage(feedback);
       }

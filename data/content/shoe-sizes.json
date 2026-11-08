@@ -46,8 +46,7 @@
     ],
     "kind": "number",
     "predictPrompt": ":ruler: Now estimate! If all feet were one size, what size would it be?",
-    "build": ":shoe: Make up shoe sizes for 5 friends. Type one size in each box.",
-    "buildGoal": ":target: Goal: their mean must be {target}.",
+    "build": ":target: Type 5 shoe sizes. Their mean must be {target}.",
     "mistake": { "story": ":shoe: Mia wrote down 5 friends' shoe sizes.", "numbers": [36, 34, 38, 33, 35] },
     "realLife": {
       "story": ":shop: A shoe shop sold these sizes this week:",

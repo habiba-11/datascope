@@ -117,12 +117,13 @@ test('Part 45: the first fix-it is a choice (A or B) with its WHEN and pushy wor
   assert.deepEqual(checkQuestion(read('content/answers.json').goodQuestion), []);
 });
 
-test('8 Nov 2026: Build it says what to do and the goal (with the target) in Grade 5 sentences', () => {
+test('Build it: ONE goal sentence with the target (Part 55), in Grade 5 sentences', () => {
   for (const { id, content } of contents) {
     if (content.numberLab.kind === 'category') continue; // games have no Build it
-    const { build, buildGoal, realLife } = content.numberLab;
-    assert.ok(build && buildGoal.includes('{target}'), id);
-    for (const text of [build, buildGoal, realLife?.medianQuestion].filter(Boolean)) {
+    const { build, realLife } = content.numberLab;
+    assert.ok(build.includes('{target}'), id);
+    assert.equal(content.numberLab.buildGoal, undefined, `${id}: buildGoal was merged into build`);
+    for (const text of [build, realLife?.medianQuestion].filter(Boolean)) {
       assert.ok(longestSentence(text) <= MAX_SENTENCE_WORDS, `${id}: ${text}`);
     }
   }

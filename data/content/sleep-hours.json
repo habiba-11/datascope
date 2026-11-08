@@ -46,8 +46,7 @@
     ],
     "kind": "number",
     "predictPrompt": ":ruler: Now estimate! If every kid slept the same, how many hours would that be?",
-    "build": ":moon: Make up sleep times for 5 friends. Type the hours in each box.",
-    "buildGoal": ":target: Goal: their mean must be {target} hours.",
+    "build": ":target: Type 5 sleep times. Their mean must be {target} hours.",
     "mistake": { "story": ":moon: Mia asked 5 friends how long they slept.", "numbers": [10, 7, 6, 9, 8] },
     "realLife": {
       "story": ":tent: At a camp, 7 kids slept these hours:",
