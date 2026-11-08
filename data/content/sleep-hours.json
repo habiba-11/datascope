@@ -46,7 +46,8 @@
     ],
     "kind": "number",
     "predictPrompt": "📏 Now estimate! If every kid slept the same, how many hours would that be?",
-    "build": "😴 5 friends slept some hours. Their mean is {target}. Type 5 numbers that fit.",
+    "build": "😴 Make up sleep times for 5 friends. Type the hours in each box.",
+    "buildGoal": "🎯 Goal: their mean must be {target} hours.",
     "mistake": { "story": "😴 Mia asked 5 friends how long they slept.", "numbers": [10, 7, 6, 9, 8] },
     "realLife": {
       "story": "⛺ At a camp, 7 kids slept these hours:",

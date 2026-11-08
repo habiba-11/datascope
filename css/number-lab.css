@@ -169,8 +169,30 @@
   margin: 12px 0;
 }
 
+/* 8 Nov 2026: the goal stands out; each box has its "Friend N" label above it. */
+.build-goal {
+  display: inline-block;
+  margin: 6px 0;
+  padding: 6px 12px;
+  border: 2px solid var(--color-plan);
+  border-radius: 12px;
+  background: #FFF1D6;
+  font-weight: 800;
+}
+
+.build-reminder { margin: 4px 0; font-weight: 700; }
+
+.build-box {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
 .build-input {
-  width: 64px;
+  width: 72px;
+  min-height: 48px;
   font-size: 18px;
   font-family: var(--font-body);
   border: var(--border-width) solid var(--color-navy);

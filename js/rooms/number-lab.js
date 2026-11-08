@@ -330,9 +330,12 @@ const TASK_HTML = {
     <section class="task" data-task="${n}" hidden>
       <div class="build-layout">
         <div>
-          <p>${fillTemplate(content.build, { target: buildTarget(values) })}</p>
+          <!-- 8 Nov 2026 (Habiba: clearer): what to do, the goal, and what the mean is -->
+          <p>${content.build}</p>
+          <p class="build-goal">${fillTemplate(content.buildGoal, { target: buildTarget(values) })}</p>
+          <p class="build-reminder">🔎 Mean = add all 5, then divide by 5.</p>
           <div class="build-row">
-            ${[1, 2, 3, 4, 5].map((i) => `<input type="number" class="build-input" aria-label="Number ${i}">`).join('')}
+            ${[1, 2, 3, 4, 5].map((i) => `<label class="build-box">Friend ${i}<input type="number" class="build-input"></label>`).join('')}
           </div>
           <div class="hint-list-slot" id="build-hint-slot"></div>
         </div>

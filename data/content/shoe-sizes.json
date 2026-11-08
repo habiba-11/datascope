@@ -46,13 +46,14 @@
     ],
     "kind": "number",
     "predictPrompt": "📏 Now estimate! If all feet were one size, what size would it be?",
-    "build": "👟 5 friends have a mean shoe size of {target}. Type 5 sizes that fit.",
+    "build": "👟 Make up shoe sizes for 5 friends. Type one size in each box.",
+    "buildGoal": "🎯 Goal: their mean must be {target}.",
     "mistake": { "story": "👟 Mia wrote down 5 friends' shoe sizes.", "numbers": [36, 34, 38, 33, 35] },
     "realLife": {
       "story": "🏪 A shoe shop sold these sizes this week:",
       "numbers": [36, 34, 35, 34, 37, 36, 34],
       "modeQuestion": "Which size should the shop order the most?",
-      "medianQuestion": "Put the sizes in order. Which one is in the centre?"
+      "medianQuestion": "The shop puts the 7 boxes in a row, smallest to biggest. Which size is the box in the centre?"
     }
   }
 }
