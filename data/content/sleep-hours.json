@@ -52,7 +52,7 @@
       "story": ":tent: At a camp, 7 kids slept these hours:",
       "numbers": [8, 10, 8, 11, 9, 8, 12],
       "modeQuestion": "Which sleep time came up the most?",
-      "medianQuestion": "Put the hours in order. Which one is in the centre?"
+      "medianQuestion": "Put the hours in order, smallest to biggest. Then tap the one in the centre."
     }
   }
 }

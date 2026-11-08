@@ -52,7 +52,7 @@
       "story": ":shop: A shoe shop sold these sizes this week:",
       "numbers": [36, 34, 35, 34, 37, 36, 34],
       "modeQuestion": "Which size should the shop order the most?",
-      "medianQuestion": "The shop puts the 7 boxes in a row, smallest to biggest. Which size is the box in the centre?"
+      "medianQuestion": "The shop lines up the boxes, smallest to biggest. Put the sizes in order. Then tap the one in the centre."
     }
   }
 }

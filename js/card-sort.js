@@ -1,7 +1,9 @@
 // Shell layer: "sort the cards" (Part 21c). The child puts number cards in
 // order, smallest to biggest, by dragging them (mouse or touch) OR with the
-// ◀ ▶ buttons on each card (keyboard and tap). When the cards are in order, the
-// card(s) in the centre light up: that is the median.
+// ← → buttons on each card (keyboard and tap). When the cards are in order, the
+// card(s) in the centre light up: that is the median. With `pickCentre`
+// (Part 56, Habiba: "he finds the centre by himself"), the child taps the
+// centre card instead; a wrong tap shows each card's place (1, 2, 3...).
 // The rules are in helpers/sort-cards.js.
 import { moveItem, isSorted, centreIndexes, dropIndex } from './helpers/sort-cards.js';
 import { pulse } from './motion.js';
@@ -17,7 +19,9 @@ function el(tag, text = '', className = '') {
 }
 
 // Builds the puzzle inside `container`. `onSorted()` runs once, when sorted.
-export function mountCardSort(container, numbers, onSorted) {
+// `pickCentre(index, value, isCentre)`: optional; when sorted, the child taps
+// a card and this decides what to say; it returns true when the tap was right.
+export function mountCardSort(container, numbers, onSorted, { pickCentre = null } = {}) {
   // Each card keeps its id, so it can glide from its old place to its new one.
   let cards = numbers.map((value, id) => ({ id, value }));
   let done = false;
@@ -57,12 +61,50 @@ export function mountCardSort(container, numbers, onSorted) {
   function finish() {
     done = true;
     const centre = centreIndexes(cards.length);
+    if (pickCentre) {
+      row.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+      askForCentre(centre);
+      onSorted();
+      return;
+    }
     centre.forEach((i) => {
       row.children[i].classList.add('centre');
       pulse(row.children[i]);
     });
     row.querySelectorAll('button').forEach((b) => { b.disabled = true; });
     onSorted(centre.map((i) => cards[i].value));
+  }
+
+  // Part 56: every card becomes one big tap target; the child picks the centre.
+  function askForCentre(centre) {
+    setIconText(status, 'tap', 'In order! Now tap the card in the centre.');
+    [...row.children].forEach((card, i) => {
+      card.classList.add('pickable');
+      const pick = el('button', '', 'sort-pick');
+      pick.type = 'button';
+      pick.setAttribute('aria-label', `Card ${i + 1}: ${cards[i].value}`);
+      pick.addEventListener('click', () => {
+        if (pickCentre(i, cards[i].value, centre.includes(i))) {
+          row.querySelectorAll('.sort-pick').forEach((b) => { b.disabled = true; });
+          centre.forEach((c) => {
+            row.children[c].classList.add('centre');
+            pulse(row.children[c]);
+          });
+          status.textContent = '';
+        } else {
+          card.classList.add('wrong-pick');
+          showPlaces();
+        }
+      });
+      card.append(pick);
+    });
+  }
+
+  // After a wrong tap: each card's place under it, so the child can count.
+  function showPlaces() {
+    [...row.children].forEach((card, i) => {
+      if (!card.querySelector('.sort-place')) card.append(el('span', String(i + 1), 'sort-place'));
+    });
   }
 
   function cardNode({ id, value }, index) {
