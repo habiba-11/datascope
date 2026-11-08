@@ -238,5 +238,5 @@ test('every recipe names its axis and its value label', () => {
 test("the toolbar counter counts the graphs tried, and cheers at all 4", () => {
   assert.equal(triedText(1), "Graphs tried: 1 of 4");
   assert.equal(triedText(2), "Graphs tried: 2 of 4");
-  assert.equal(triedText(4), "Graphs tried: 4 of 4 🎉");
+  assert.equal(triedText(4), 'Graphs tried: 4 of 4 :party:');
 });

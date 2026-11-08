@@ -29,7 +29,7 @@ const ABOUT_TAB_HTML = `
 export function taskCardHTML({ title, pill = '', tabsHTML = '', bodyHTML }) {
   const strip = tabsHTML
     ? `<div class="task-card-tabs">${tabsHTML}</div>`
-    : `<p class="task-card-title">${title}</p>${pill ? `<span class="task-card-pill">${pill}</span>` : ''}`;
+    : `<p class="task-card-title">${iconLineHTML(title)}</p>${pill ? `<span class="task-card-pill">${iconLineHTML(pill)}</span>` : ''}`;
   return `
     <section class="task-card m-rise">
       <header class="task-card-strip">${strip}</header>

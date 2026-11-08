@@ -13,6 +13,7 @@ import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
 import { finishPhase } from '../phase-progress.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
+import { iconHTML, setIconText } from '../icon-text.js';
 
 // Data Hub in the 3-zone layout (UI guide): ONE task card with the pretend
 // class (seats) and the tally side by side, and ONE primary button that says
@@ -20,7 +21,7 @@ import { setupActionBar } from '../action-bar.js';
 // Class A, Class B, then both tallies side by side.
 
 // CLAUDE.md: the data is synthetic, and the app says so where the data appears.
-const PRETEND_PILL = '🎭 Pretend class · made-up answers';
+const PRETEND_PILL = ':masks: Pretend class · made-up answers'; // :name: = icon (Part 54d)
 const REVEAL_MS = 400; // the pace of answers (no sound or motion with reduced motion)
 const BAR_HEIGHT = 160; // px: the tallest bar
 
@@ -53,7 +54,7 @@ async function init() {
     accent: 'collect',
     layout: 'card',
     contentHTML: taskCardHTML({
-      title: '📋 Collect · Data Hub',
+      title: ':clipboard: Collect · Data Hub',
       pill: PRETEND_PILL,
       bodyHTML: `
         ${steps ? '<div id="stepper"></div>' : ''}
@@ -76,7 +77,7 @@ async function init() {
     });
   }
 
-  const goToGraphs = { label: '📊 Let\'s draw a graph! →', ready: true, onClick: () => { location.href = 'graph-lab.html'; } };
+  const goToGraphs = { label: ':chart: Let\'s draw a graph! →', ready: true, onClick: () => { location.href = 'graph-lab.html'; } };
 
   // One class's survey: the primary runs it, then says what comes next.
   function surveyStep(c, afterDone) {
@@ -84,12 +85,12 @@ async function init() {
       bar.setPrimary(afterDone);
       return;
     }
-    const label = partner ? `▶ Survey ${shortName(c.recipe)}` : '▶ Run survey';
+    const label = partner ? `:play: Survey ${shortName(c.recipe)}` : ':play: Run survey';
     bar.setPrimary({
       label,
       ready: true, // the one thing to do here: the button invites a tap
       onClick: () => runSurvey(c, allKeys, {
-        onProgress: (n) => bar.setPrimary({ label, enabled: false, whyDisabled: `⏳ Asking... ${n} of ${c.data.values.length}` }),
+        onProgress: (n) => bar.setPrimary({ label, enabled: false, whyDisabled: `:clock: Asking... ${n} of ${c.data.values.length}` }),
         onDone: () => {
           c.done = true;
           classes.forEach((other) => renderTally(other, allKeys, scaleMax()));
@@ -153,7 +154,7 @@ function comparePanelsHTML(classes) {
     <div class="card-panels compare-panels" id="compare-panels" hidden>
       ${classes.map((c, i) => `
         <section class="compare-class compare-class--${i === 0 ? 'a' : 'b'}">
-          <h2 class="panel-title compare-name">${i === 0 ? '📗' : '📘'} ${shortName(c.recipe)}</h2>
+          <h2 class="panel-title compare-name">${iconHTML(i === 0 ? 'book-green' : 'book')} ${shortName(c.recipe)}</h2>
           <div class="tally" id="${c.p}-tally-compare"></div>
           <p class="tally-unit">${c.recipe.chartAxis}</p>
         </section>`).join('')}
@@ -219,7 +220,7 @@ function runSurvey(c, allKeys, { onProgress, onDone }) {
       setTimeout(revealNext, reduceMotion() ? 0 : REVEAL_MS);
       return;
     }
-    said.textContent = `✅ All ${values.length} classmates answered!`;
+    setIconText(said, 'check', `All ${values.length} classmates answered!`);
     playSound('done');
     pipReacts('hop');
     // Scenario + seed recreate exactly the data this child saw (architecture section 5).

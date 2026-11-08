@@ -148,11 +148,11 @@ export const STAR_WORDS = { 3: 'Great thinking!', 2: 'Good thinking!', 1: 'Nice 
 
 // Where "Your work" came from, as the small chip on the card says it.
 export const SOURCE_CHIPS = {
-  own: '🧑 your own words',
-  choice: '🧑 your own choice',
-  hint: '💡 a hint',
-  'hint-edited': '💡 a hint you changed',
-  mixed: '🧑💡 your words and a hint',
+  own: ':pencil: your own words', // :name: = icon (Part 54d)
+  choice: ':tap: your own choice',
+  hint: ':bulb: a hint',
+  'hint-edited': ':bulb: a hint you changed',
+  mixed: ':pencil::bulb: your words and a hint',
 };
 
 // One source for an answer made of several boxes (the claim: "I think" + "because").

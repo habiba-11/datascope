@@ -8,7 +8,8 @@ import { openModal } from './modal.js';
 import { STEP_OF_PHASE, PHASES } from './helpers/progress.js';
 import { SOURCE_CHIPS } from './helpers/feedback.js';
 import { playSound, playStars } from './sounds.js';
-import { pipReacts } from './motion.js';
+import { pipReacts } from './motion.js';
+import { setIconLine } from './icon-text.js';
 
 const PHASE_NAMES = {
   ask: 'Ask', plan: 'Plan', collect: 'Collect', graph: 'Graph Lab',
@@ -107,7 +108,11 @@ export function showFeedbackCard(phase, card) {
   if (card.yourWork) {
     const work = at(el('div', '', 'ps-box ps-you'), 1800);
     work.append(el('h3', `✏️ ${card.yourWork.label}`), el('p', `"${card.yourWork.text}"`, 'ps-quote'));
-    if (SOURCE_CHIPS[card.yourWork.source]) work.append(el('span', SOURCE_CHIPS[card.yourWork.source], 'ps-source'));
+    if (SOURCE_CHIPS[card.yourWork.source]) {
+      const chip = el('span', '', 'ps-source');
+      setIconLine(chip, SOURCE_CHIPS[card.yourWork.source]);
+      work.append(chip);
+    }
     body.append(work);
   }
 

@@ -15,7 +15,7 @@ import { pipSay } from '../pip.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { wireChoiceCards } from '../choices.js';
-import { iconHTML } from '../icon-text.js';
+import { iconHTML, setIconText, setIconLine } from '../icon-text.js';
 
 // Graph Lab in the 3-zone layout (UI guide), laid out like the f13 design
 // (4 Nov 2026): a small "Pick a graph to draw" toolbar on top of the chart
@@ -71,7 +71,7 @@ async function init() {
   // The axis titles as coloured pills (f13): WHAT we asked (blue), HOW MANY kids (yellow).
   const chartBlocks = classes.map((c) => `
     <div class="chart-box">
-      ${partner ? `<h2 class="chart-title">📖 ${c.recipe.title}</h2>` : ''}
+      ${partner ? `<h2 class="chart-title">${iconHTML(c.index === 0 ? 'book-green' : 'book')} ${c.recipe.title}</h2>` : ''}
       <div class="chart-frame">
         <span class="axis-pill axis-pill--many" aria-hidden="true">HOW MANY: kids</span>
         <div class="chart-wrap" tabindex="0" data-class="${c.index}"><canvas id="${c.canvasId}" role="img"></canvas></div>
@@ -101,13 +101,13 @@ async function init() {
         <div class="graph-layout${partner ? ' graph-layout--two' : ''}">
           <div class="graph-look">
             <div class="graph-toolbar" id="graph-toolbar">
-              <p class="graph-toolbar-label" id="graph-toolbar-label"><span aria-hidden="true">📊</span> Pick a graph to explore:</p>
+              <p class="graph-toolbar-label" id="graph-toolbar-label">${iconHTML('chart')} Pick a graph to explore:</p>
               <div class="kind-tabs" id="kind-tabs" aria-labelledby="graph-toolbar-label">
                 ${CHART_TYPES.map((t) => `<button class="kind-tab" data-value="${t.value}" type="button" aria-label="${t.name}: ${t.use}">${t.icon}<span>${t.name}</span></button>`).join('')}
               </div>
               <p class="graphs-tried" id="graphs-tried" aria-live="polite"></p>
             </div>
-            <p class="careful-note" id="careful-note" hidden><span aria-hidden="true">⚠️</span><span><strong>Careful!</strong> <span id="careful-text"></span></span></p>
+            <p class="careful-note" id="careful-note" hidden>${iconHTML('warning')}<span><strong>Careful!</strong> <span id="careful-text"></span></span></p>
             <div class="chart-row" id="chart-row">${chartBlocks}</div>
             <div class="read-out" id="read-out" aria-live="polite"></div>
           </div>
@@ -160,7 +160,7 @@ async function init() {
     const sentence = document.createElement('span');
     sentence.className = 'read-sentence';
     const who = partner ? `${c.recipe.title}: ` : '';
-    sentence.textContent = `${who}${countText(count)} said ${valueText(value, c.recipe)}.${tallest ? ' That is the tallest! 🏆' : ''}`;
+    setIconLine(sentence, `${who}${countText(count)} said ${valueText(value, c.recipe)}.${tallest ? ' That is the tallest! :trophy:' : ''}`);
     readOut.append(chip('what', 'What', valueText(value, c.recipe)), arrow, chip('many', 'How many kids', countText(count)), sentence);
     // The chosen one is drawn with a thick border (Chart.js "active" style).
     charts.forEach((chart, i) => {
@@ -173,7 +173,7 @@ async function init() {
 
   function showTapHint() {
     selected = null;
-    readOut.innerHTML = `<span class="read-hand" aria-hidden="true">👆</span>
+    readOut.innerHTML = `<span class="read-hand">${iconHTML('tap')}</span>
       <span class="read-hint">Tap a ${TAP_WORD[currentType]} to read it.</span>
       <span class="read-legend"><span><i class="key-what"></i>WHAT we asked</span><span><i class="key-many"></i>HOW MANY kids</span></span>`;
   }
@@ -208,7 +208,7 @@ async function init() {
   function renderCharts(type) {
     currentType = type;
     typesTried.add(type);
-    document.getElementById('graphs-tried').textContent = triedText(typesTried.size, CHART_TYPES.length);
+    setIconLine(document.getElementById('graphs-tried'), triedText(typesTried.size, CHART_TYPES.length));
     charts.forEach((chart) => chart.destroy());
     // Two classes as dot plots: one ABOVE the other on the same number line, so
     // each is full width (big dots) and the spreads line up (Habiba, 4 Nov 2026).
@@ -306,28 +306,28 @@ async function init() {
   // The ONE primary button. Graph Lab is done when both answers are real and
   // the child taps "I'm done" (so the feedback card never pops up mid-sentence).
   function refreshPrimary() {
-    const toNumberLab = { label: '🔢 Next: Number Lab →', ready: true, onClick: () => { location.href = 'number-lab.html'; } };
+    const toNumberLab = { label: ':numbers: Next: Number Lab →', ready: true, onClick: () => { location.href = 'number-lab.html'; } };
     if (step === 0) {
       bar.setPrimary(isPhaseDone('graph') ? toNumberLab : { label: 'Next: What it tells →', ready: true, onClick: () => showStep(1) });
     } else if (step === 1) {
       bar.setPrimary(wrote('tell')
         ? { label: 'Next: What it can NOT tell →', ready: true, onClick: () => showStep(2) }
-        : { label: '', enabled: false, whyDisabled: '✏️ Write your idea first' });
+        : { label: '', enabled: false, whyDisabled: ':pencil: Write your idea first' });
     } else if (isPhaseDone('graph')) {
       bar.setPrimary(toNumberLab);
     } else if (!wrote('tell')) {
-      bar.setPrimary({ label: '', enabled: false, whyDisabled: '✏️ Answer the first question too' });
+      bar.setPrimary({ label: '', enabled: false, whyDisabled: ':pencil: Answer the first question too' });
     } else {
       bar.setPrimary(wrote('not-tell')
-        ? { label: "✅ I'm done", ready: true, onClick: finish }
-        : { label: '', enabled: false, whyDisabled: '✏️ Write your idea first' });
+        ? { label: ":check: I'm done", ready: true, onClick: finish }
+        : { label: '', enabled: false, whyDisabled: ':pencil: Write your idea first' });
     }
   }
   ['tell', 'not-tell'].forEach((id) => document.getElementById(id).addEventListener('input', refreshPrimary));
 
   function finish() {
     const feedback = document.getElementById('graph-feedback');
-    feedback.textContent = '✅ Great thinking! Number Lab is open.';
+    setIconText(feedback, 'check', 'Great thinking! Number Lab is open.');
     feedback.hidden = false;
     finishPhase('graph', {
       typesTried: typesTried.size,
