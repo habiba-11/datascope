@@ -115,7 +115,7 @@ test('every warning follows the Grade 5 rule (12 words or fewer per sentence)', 
 });
 
 // ---------- Round 4, Part 45: the checklist and ONE tip at a time ----------
-import { questionChecklist, firstTip, CHECKLIST } from '../js/helpers/checker.js';
+import { questionChecklist, firstTip, CHECKLIST, nextCheck } from '../js/helpers/checker.js';
 
 test('the checklist has the 4 ticks from the pilot fix, and "not" counts as a pushy word', () => {
   assert.deepEqual(CHECKLIST.map((c) => c.id), ['mark', 'when', 'open', 'fair']);
@@ -139,4 +139,13 @@ test('the checklist and the tips use Grade 5 words', () => {
     assert.ok(c.icon && c.detail, c.id);
     assert.ok(longestSentence(c.detail) <= 12, c.detail);
   }
+});
+
+test('8 Nov 2026: the checklist marks ONE check to fix next, in the same order as the tips', () => {
+  assert.equal(nextCheck('Do you like games?'), 'when'); // the tip asks "When?" first
+  assert.equal(nextCheck('Do you like games this week?'), 'open');
+  assert.equal(nextCheck("Isn't football the best game?"), 'fair');
+  assert.equal(nextCheck('How many hours did you sleep last night'), 'mark');
+  assert.equal(nextCheck('How many hours did you sleep last night?'), null); // a good question
+  assert.equal(nextCheck('Games?'), null); // too few words: no check, its tip shows instead
 });

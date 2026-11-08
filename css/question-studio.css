@@ -177,7 +177,6 @@
 
 @media (max-width: 760px) {
   .fixit-layout { grid-template-columns: 1fr; }
-  .fixit-checklist { grid-template-columns: 1fr; }
 }
 
 .fixit-tip {
@@ -201,10 +200,12 @@
   font-weight: 800;
 }
 
+/* 8 Nov 2026, less crowded: one column of short rows with no boxes; only the
+   check to fix next is a yellow box, with its explaining line. */
 .fixit-checklist {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 across: shorter card */
-  gap: 6px;
+  gap: 4px;
+  max-width: 720px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -214,10 +215,9 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 6px 10px;
-  border: 2px solid #C9D6E2;
+  padding: 4px 10px;
+  border: 2px solid transparent;
   border-radius: 12px;
-  background: var(--color-card-bg);
   color: #4A6580;
 }
 
@@ -229,7 +229,16 @@
 .fixit-check-title { font-weight: 800; }
 .fixit-check-detail { font-weight: 600; line-height: 1.3; }
 
-.fixit-checklist li.ok { border-color: var(--color-btn-main-bg); background: #E4F7E8; }
+.fixit-checklist li.next {
+  border-color: var(--color-plan);
+  background: #FFF1D6;
+  color: var(--color-navy);
+}
+
+.fixit-next-tag {
+  font-weight: 800;
+  color: #8A5A00; /* dark gold: readable on the yellow */
+}
 
 /* Fix 1, right answer: three rows (the answer, WHEN, pushy). */
 .fixit-why {

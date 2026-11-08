@@ -1,5 +1,5 @@
 import { mountShell, setCurrentStep } from '../app.js';
-import { checkQuestion, firstTip, questionChecklist } from '../helpers/checker.js';
+import { checkQuestion, firstTip, questionChecklist, nextCheck } from '../helpers/checker.js';
 import { choiceExplanation, TRY_AGAIN } from '../helpers/fixit-words.js';
 import { logEvent, readLog } from '../helpers/log.js';
 import { createHint } from '../helpers/prompts.js';
@@ -276,7 +276,7 @@ function renderFixIts() {
   clearState['fixit-2'] = false;
   // A new scenario gets new hints: the old hint list goes.
   const { button, list } = createHint('fixit-2', 'question-studio', [
-    'Fix one tip at a time, starting at the top.',
+    'Look at the 👉 line. Fix that one first.',
     { text: 'Here is one idea. Tap it to use it:', answer: second.fix, box: textarea },
   ]);
   hintButtons['fixit-2'] = button;
@@ -395,18 +395,29 @@ function savePrediction(guess) {
 function renderChecker(textarea, trackId, suffix) {
   const tip = firstTip(textarea.value);
   const clear = tip === null;
-  document.getElementById(`fixit-tip-${suffix}`).textContent = clear ? '✅ Great question! It passes every check.' : tip;
-  document.getElementById(`fixit-tip-${suffix}`).classList.toggle('fixit-tip--done', clear);
+  const next = nextCheck(textarea.value);
+  // 8 Nov 2026 (Habiba: "crowded, explained twice"): the tip box shows only
+  // what the checklist cannot say: "Great question!", or "write a whole
+  // question" (no check for that). Otherwise the checklist's 👉 line says it.
+  const tipBox = document.getElementById(`fixit-tip-${suffix}`);
+  tipBox.textContent = clear ? '✅ Great question! It passes every check.' : tip;
+  tipBox.hidden = !clear && next !== null;
+  tipBox.classList.toggle('fixit-tip--done', clear);
   const list = document.getElementById(`checklist-${suffix}`);
   list.replaceChildren(...questionChecklist(textarea.value).map((item) => {
     const li = document.createElement('li');
-    li.className = item.ok ? 'ok' : 'todo';
-    // ✓ or ○, then the title (with its icon) and one line that explains it.
+    const isNext = item.id === next;
+    li.className = item.ok ? 'ok' : `todo${isNext ? ' next' : ''}`;
+    // ✓ or ○, then the title (with its icon). Only the check to fix next
+    // also shows its explaining line, so each explanation shows once.
     const words = document.createElement('div');
-    words.append(
-      Object.assign(document.createElement('strong'), { className: 'fixit-check-title', textContent: `${item.icon} ${item.label}` }),
-      Object.assign(document.createElement('span'), { className: 'fixit-check-detail', textContent: item.detail }),
-    );
+    words.append(Object.assign(document.createElement('strong'), { className: 'fixit-check-title', textContent: `${item.icon} ${item.label}` }));
+    if (isNext) {
+      words.append(
+        Object.assign(document.createElement('span'), { className: 'fixit-next-tag', textContent: '👉 Fix this next' }),
+        Object.assign(document.createElement('span'), { className: 'fixit-check-detail', textContent: item.detail }),
+      );
+    }
     li.append(Object.assign(document.createElement('span'), { className: 'fixit-mark', textContent: item.ok ? '✓' : '○' }), words);
     if (!item.ok) li.append(Object.assign(document.createElement('span'), { className: 'sr-only', textContent: ' (not yet)' }));
     return li;

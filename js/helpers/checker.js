@@ -110,6 +110,17 @@ export function questionChecklist(question) {
   return CHECKLIST.map(({ id, icon, label, detail, rules }) => ({ id, icon, label, detail, ok: !rules.some((r) => broken.includes(r)) }));
 }
 
+// The check to fix next (8 Nov 2026: the checklist marks it "👉 Fix this
+// next"): the check of the first rule still broken, in the same order as the
+// tips. null when the question passes, or when the first problem has no check
+// (too few words: its tip is shown instead).
+export function nextCheck(question) {
+  const first = questionProblems(question)[0];
+  if (!first) return null;
+  const item = CHECKLIST.find((c) => c.rules.includes(first.id));
+  return item ? item.id : null;
+}
+
 // ONE tip at a time (the first rule still broken), or null when it is a good question.
 export function firstTip(question) {
   const problems = questionProblems(question);
