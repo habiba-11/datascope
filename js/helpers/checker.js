@@ -6,7 +6,10 @@ const YES_NO_STARTERS = [
   "can't", "couldn't", "won't", "wouldn't", "shouldn't", "hasn't", "haven't",
 ];
 const OPEN_STARTERS = ['what', 'how', 'which', 'when', 'where', 'why', 'who'];
-const MIN_WORDS = 3;
+// 8 Nov 2026 (Habiba: "how this week?" passed): a whole question has at least
+// 5 words and asks the person (you, your, we, our). Fix 2 also stays on its topic.
+const MIN_WORDS = 5;
+const PERSON_WORDS = ['you', 'your', 'yours', 'we', 'our', 'us'];
 
 // The pieces of a time phrase. A vague word like "lately" or "these days" is
 // left out on purpose: a survey needs a set timeframe (Paper 28).
@@ -47,7 +50,9 @@ export function hasTimeframe(lower) {
 // Every rule the question breaks, in this order, each with its tip in plain
 // Grade 5 words (Round 4, Part 45: the same words as the checklist).
 // Each: { id, tip }. An empty list means the question looks good.
-export function questionProblems(question) {
+// `options.topicWords`: words about the scenario's topic (Fix 2 only); a word
+// counts if the question has it or a longer form of it ("sleep" in "sleeping").
+export function questionProblems(question, { topicWords = null } = {}) {
   const problems = [];
   // Tablets often type a curly apostrophe, and children may type two spaces.
   const text = question.trim().replace(/[‘’]/g, "'").replace(/\s+/g, ' ');
@@ -56,6 +61,14 @@ export function questionProblems(question) {
 
   if (words.length < MIN_WORDS) {
     problems.push({ id: 'words', tip: `✏️ Write a whole question, with at least ${MIN_WORDS} words.` });
+  }
+
+  if (!PERSON_WORDS.some((word) => new RegExp(`\\b${word}\\b`).test(lower))) {
+    problems.push({ id: 'person', tip: "🙋 Ask the person. Use 'you' or 'your'." });
+  }
+
+  if (topicWords && !topicWords.some((word) => new RegExp(`\\b${word}`).test(lower))) {
+    problems.push({ id: 'topic', tip: `🎯 Stay on the topic. Use a word like '${topicWords[0]}'.` });
   }
 
   if (/\bnot\b/.test(lower) || /n't\b/.test(lower)) {
@@ -88,8 +101,8 @@ export function questionProblems(question) {
 
 // Returns a list of friendly warnings for a survey question (the tips).
 // An empty list means the question looks good.
-export function checkQuestion(question) {
-  return questionProblems(question).map((p) => p.tip);
+export function checkQuestion(question, options) {
+  return questionProblems(question, options).map((p) => p.tip);
 }
 
 // The checklist the child sees turning green (Round 4, Part 45, Habiba: 4 ticks;
@@ -98,31 +111,42 @@ export function checkQuestion(question) {
 // 8 Nov 2026 (Habiba: "more detailed and easier"): each tick has an icon, a
 // short title and one line that explains it with examples.
 export const CHECKLIST = [
+  // 8 Nov 2026: first, does it make sense? Its line says what is missing.
+  {
+    id: 'sense', icon: '🧠', label: 'It makes sense', rules: ['words', 'person', 'topic'],
+    details: { words: 'Write a whole question, with at least 5 words.', person: "Ask the person: use 'you' or 'your'.", topic: "Stay on the topic, with a word like '{topic}'." },
+  },
   { id: 'mark', icon: '❓', label: 'It ends with a question mark (?)', detail: 'Put ? at the very end.', rules: ['mark'] },
   { id: 'when', icon: '⏰', label: 'It says WHEN', detail: "Add a time, like 'last night' or 'this week'.", rules: ['when'] },
   { id: 'open', icon: '💬', label: 'People can say more than yes or no', detail: 'Begin your question with What, Which or How.', rules: ['yesno'] },
   { id: 'fair', icon: '🤝', label: 'It has no pushy words', detail: "Take out pushy words, like 'best' or 'isn't'.", rules: ['not', 'pushy'] },
 ];
 
-// Each tick: { id, icon, label, detail, ok }.
-export function questionChecklist(question) {
-  const broken = questionProblems(question).map((p) => p.id);
-  return CHECKLIST.map(({ id, icon, label, detail, rules }) => ({ id, icon, label, detail, ok: !rules.some((r) => broken.includes(r)) }));
+// Each tick: { id, icon, label, detail, ok }. A check with several rules
+// (makes sense) explains the first one still broken.
+export function questionChecklist(question, options = {}) {
+  const broken = questionProblems(question, options).map((p) => p.id);
+  return CHECKLIST.map(({ id, icon, label, detail, details, rules }) => {
+    const firstBroken = rules.find((r) => broken.includes(r));
+    const words = details ? details[firstBroken || rules[0]] : detail;
+    const topic = (options.topicWords || [''])[0];
+    return { id, icon, label, detail: words.replace('{topic}', topic), ok: !firstBroken };
+  });
 }
 
 // The check to fix next (8 Nov 2026: the checklist marks it "👉 Fix this
 // next"): the check of the first rule still broken, in the same order as the
 // tips. null when the question passes, or when the first problem has no check
 // (too few words: its tip is shown instead).
-export function nextCheck(question) {
-  const first = questionProblems(question)[0];
+export function nextCheck(question, options) {
+  const first = questionProblems(question, options)[0];
   if (!first) return null;
   const item = CHECKLIST.find((c) => c.rules.includes(first.id));
   return item ? item.id : null;
 }
 
 // ONE tip at a time (the first rule still broken), or null when it is a good question.
-export function firstTip(question) {
-  const problems = questionProblems(question);
+export function firstTip(question, options) {
+  const problems = questionProblems(question, options);
   return problems.length ? problems[0].tip : null;
 }

@@ -102,7 +102,7 @@ async function init() {
             </aside>
           </div>
           <!-- 8 Nov 2026: the checklist goes under both columns, 2 across, so the box, tip and hint stay near the top -->
-          <p class="fixit-checklist-title" id="checklist-title-2">📋 Your question is ready when all 4 have a ✓:</p>
+          <p class="fixit-checklist-title" id="checklist-title-2">📋 Your question is ready when all 5 have a ✓:</p>
           <ul class="fixit-checklist" id="checklist-2" aria-labelledby="checklist-title-2"></ul>
         </section>
 
@@ -118,7 +118,7 @@ async function init() {
             <label for="own-question">My own question:</label>
             <textarea id="own-question" class="fixit-input" rows="2" placeholder="Type a question..."></textarea>
             <p class="fixit-tip" id="fixit-tip-own" aria-live="polite"></p>
-            <p class="fixit-checklist-title" id="checklist-title-own">📋 Your question is ready when all 4 have a ✓:</p>
+            <p class="fixit-checklist-title" id="checklist-title-own">📋 Your question is ready when all 5 have a ✓:</p>
             <ul class="fixit-checklist" id="checklist-own" aria-labelledby="checklist-title-own"></ul>
           </div>
         </section>
@@ -393,23 +393,30 @@ function savePrediction(guess) {
 
 // Shows the checker's tips under a question (or ✅). Each tip starts with its
 // own emoji, so colour is never the only signal.
-// Part 45: ONE tip at a time (the first thing to fix), and the checklist of 4
+// Part 45: ONE tip at a time (the first thing to fix), and the checklist of 5
 // ticks that turn green as the question gets better. Each tick has a word and
 // a mark (✓ or ○), so colour is never the only signal. `suffix` names the tip
 // and the list ('2' for Fix 2, 'own' for the bonus); `trackId` is null for the bonus.
 function renderChecker(textarea, trackId, suffix) {
-  const tip = firstTip(textarea.value);
+  // Fix 2 must also stay on the scenario's topic (8 Nov 2026); the bonus can be about anything.
+  const options = suffix === '2' ? { topicWords: selectedScenario.content.fixIts[1].topicWords } : {};
+  const tip = firstTip(textarea.value, options);
   const clear = tip === null;
-  const next = nextCheck(textarea.value);
+  const next = nextCheck(textarea.value, options);
   // 8 Nov 2026 (Habiba: "crowded, explained twice"): the tip box shows only
-  // what the checklist cannot say: "Great question!", or "write a whole
-  // question" (no check for that). Otherwise the checklist's 👉 line says it.
+  // "it passes", with a reminder that the child is the last judge of sense.
+  // While something is wrong, the checklist's "Fix this next" line says it.
   const tipBox = document.getElementById(`fixit-tip-${suffix}`);
-  tipBox.textContent = clear ? '✅ Great question! It passes every check.' : tip;
+  tipBox.textContent = clear ? '✅ It passes every check! Read it out loud. Does it make sense?' : tip;
   tipBox.hidden = !clear && next !== null;
   tipBox.classList.toggle('fixit-tip--done', clear);
+  // Done: the Fix 2 hint ("Find Fix this next...") has nothing left to say.
+  if (suffix === '2') {
+    document.getElementById('hint-slot-2').hidden = clear;
+    if (hintButtons['fixit-2']) hintButtons['fixit-2'].hidden = clear;
+  }
   const list = document.getElementById(`checklist-${suffix}`);
-  list.replaceChildren(...questionChecklist(textarea.value).map((item) => {
+  list.replaceChildren(...questionChecklist(textarea.value, options).map((item) => {
     const li = document.createElement('li');
     const isNext = item.id === next;
     li.className = item.ok ? 'ok' : `todo${isNext ? ' next' : ''}`;

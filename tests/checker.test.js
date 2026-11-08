@@ -9,8 +9,9 @@ test('a clear, well-formed question has no warnings', () => {
 });
 
 test('catches a yes/no-only question with no timeframe', () => {
+  // 3 since 8 Nov 2026: 4 words is also too short to be a whole question.
   const warnings = checkQuestion('Do you like pizza?');
-  assert.equal(warnings.length, 2);
+  assert.equal(warnings.length, 3);
 });
 
 test('catches a negative, leading, yes/no question with no timeframe', () => {
@@ -117,11 +118,11 @@ test('every warning follows the Grade 5 rule (12 words or fewer per sentence)', 
 // ---------- Round 4, Part 45: the checklist and ONE tip at a time ----------
 import { questionChecklist, firstTip, CHECKLIST, nextCheck } from '../js/helpers/checker.js';
 
-test('the checklist has the 4 ticks from the pilot fix, and "not" counts as a pushy word', () => {
-  assert.deepEqual(CHECKLIST.map((c) => c.id), ['mark', 'when', 'open', 'fair']);
+test('the checklist: "makes sense" (8 Nov 2026), then the 4 ticks from the pilot fix; "not" counts as a pushy word', () => {
+  assert.deepEqual(CHECKLIST.map((c) => c.id), ['sense', 'mark', 'when', 'open', 'fair']);
   const ticks = (q) => Object.fromEntries(questionChecklist(q).map((c) => [c.id, c.ok]));
-  assert.deepEqual(ticks('How many hours did you sleep last night?'), { mark: true, when: true, open: true, fair: true });
-  assert.deepEqual(ticks('Do you sleep a lot?'), { mark: true, when: false, open: false, fair: true });
+  assert.deepEqual(ticks('How many hours did you sleep last night?'), { sense: true, mark: true, when: true, open: true, fair: true });
+  assert.deepEqual(ticks('Do you sleep a lot?'), { sense: true, mark: true, when: false, open: false, fair: true });
   assert.equal(ticks("Isn't football fun this week?").fair, false);
   assert.equal(ticks('What is the best game this week?').fair, false);
 });
@@ -136,16 +137,41 @@ test('the checklist and the tips use Grade 5 words', () => {
   for (const c of CHECKLIST) {
     assert.ok(longestSentence(c.label) <= 12, c.label);
     // 8 Nov 2026: every tick has an icon and one line that explains it.
-    assert.ok(c.icon && c.detail, c.id);
-    assert.ok(longestSentence(c.detail) <= 12, c.detail);
+    const details = c.details ? Object.values(c.details) : [c.detail];
+    assert.ok(c.icon && details.every(Boolean), c.id);
+    for (const d of details) assert.ok(longestSentence(d) <= 12, d);
   }
 });
 
 test('8 Nov 2026: the checklist marks ONE check to fix next, in the same order as the tips', () => {
-  assert.equal(nextCheck('Do you like games?'), 'when'); // the tip asks "When?" first
+  assert.equal(nextCheck('Do you sleep a lot?'), 'when'); // the tip asks "When?" first
   assert.equal(nextCheck('Do you like games this week?'), 'open');
-  assert.equal(nextCheck("Isn't football the best game?"), 'fair');
+  assert.equal(nextCheck("Don't you think football is the best game?"), 'fair');
   assert.equal(nextCheck('How many hours did you sleep last night'), 'mark');
   assert.equal(nextCheck('How many hours did you sleep last night?'), null); // a good question
-  assert.equal(nextCheck('Games?'), null); // too few words: no check, its tip shows instead
+  assert.equal(nextCheck('Games?'), 'sense'); // too few words: it does not make sense yet
+});
+
+test('8 Nov 2026: "how this week?" does not make sense (Habiba), and the line says what is missing', () => {
+  const sense = (q, options) => questionChecklist(q, options).find((c) => c.id === 'sense');
+  assert.equal(sense('how this week?').ok, false);
+  assert.equal(sense('how this week?').detail, 'Write a whole question, with at least 5 words.');
+  // Long enough, but it does not ask anyone.
+  assert.equal(sense('How many hours of sleep last night?').detail, "Ask the person: use 'you' or 'your'.");
+  assert.equal(sense('Which game do we play most this week?').ok, true); // "we" asks the class
+  // Fix 2 stays on its topic; "sleeping" counts for "sleep".
+  const sleep = { topicWords: ['sleep', 'slept', 'bed'] };
+  assert.equal(sense('What did you eat for lunch today?', sleep).detail, "Stay on the topic, with a word like 'sleep'.");
+  assert.equal(sense('How long were you sleeping last night?', sleep).ok, true);
+  assert.equal(nextCheck('What did you eat for lunch today?', sleep), 'sense');
+  assert.deepEqual(checkQuestion('How many hours did you sleep last night?', sleep), []);
+});
+
+test('8 Nov 2026: every Fix 2 example answer passes with its own topic words, and the flawed one does not', () => {
+  for (const id of ['sleep-hours', 'shoe-sizes', 'playground-game', 'reading-minutes-class-a']) {
+    const { fixIts } = JSON.parse(readFileSync(new URL(`../data/content/${id}.json`, import.meta.url), 'utf8'));
+    const { flawed, fix, topicWords } = fixIts[1];
+    assert.deepEqual(checkQuestion(fix, { topicWords }), [], `${id}: ${fix}`);
+    assert.notDeepEqual(checkQuestion(flawed, { topicWords }), [], `${id}: ${flawed}`);
+  }
 });

@@ -5,7 +5,7 @@
   "mission": { "goal": "Find out how long Grade 5 kids sleep at night.", "short": "How long do kids sleep?" },
   "fixIts": [
     { "flawed": "Isn't staying up late bad for you?", "fix": "What time did you go to bed last night?", "choice": { "goodFirst": false, "whenWords": "last night", "whenWhy": "everyone answers about the same night.", "pushyWords": "\"Isn't\" and \"bad\"" } },
-    { "flawed": "Do you sleep a lot?", "fix": "How many hours did you sleep last night?" }
+    { "flawed": "Do you sleep a lot?", "fix": "How many hours did you sleep last night?", "topicWords": ["sleep", "slept", "bed", "asleep", "nap"] }
   ],
   "planPrompt": "🔮 Predict! How many hours did most kids sleep?",
   "graphLab": {
