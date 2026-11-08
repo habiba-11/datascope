@@ -420,8 +420,7 @@ function renderChecker(textarea, trackId, suffix) {
     const li = document.createElement('li');
     const isNext = item.id === next;
     li.className = item.ok ? 'ok' : `todo${isNext ? ' next' : ''}`;
-    // ✓ or ○, then the title (with its icon). Only the check to fix next
-    // also shows its explaining line, so each explanation shows once.
+    // ✓ or ○, then the title (with its icon) and the line that explains it.
     const words = document.createElement('div');
     // The check to fix next: a small "Fix this next" label at the end of its
     // title row (Habiba, 8 Nov 2026: no emoji, not between title and line).
@@ -429,7 +428,8 @@ function renderChecker(textarea, trackId, suffix) {
     titleRow.append(Object.assign(document.createElement('strong'), { className: 'fixit-check-title', textContent: `${item.icon} ${item.label}` }));
     if (isNext) titleRow.append(Object.assign(document.createElement('span'), { className: 'fixit-next-tag', textContent: 'Fix this next' }));
     words.append(titleRow);
-    if (isNext) words.append(Object.assign(document.createElement('span'), { className: 'fixit-check-detail', textContent: item.detail }));
+    // Every check shows its line, always (Habiba, 8 Nov 2026).
+    words.append(Object.assign(document.createElement('span'), { className: 'fixit-check-detail', textContent: item.detail }));
     li.append(Object.assign(document.createElement('span'), { className: 'fixit-mark', textContent: item.ok ? '✓' : '○' }), words);
     if (!item.ok) li.append(Object.assign(document.createElement('span'), { className: 'sr-only', textContent: ' (not yet)' }));
     return li;

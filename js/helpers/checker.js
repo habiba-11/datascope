@@ -114,6 +114,7 @@ export const CHECKLIST = [
   // 8 Nov 2026: first, does it make sense? Its line says what is missing.
   {
     id: 'sense', icon: '🧠', label: 'It makes sense', rules: ['words', 'person', 'topic'],
+    detail: "A whole question of 5 words or more, that asks 'you'.", // shown when it passes
     details: { words: 'Write a whole question, with at least 5 words.', person: "Ask the person: use 'you' or 'your'.", topic: "Stay on the topic, with a word like '{topic}'." },
   },
   { id: 'mark', icon: '❓', label: 'It ends with a question mark (?)', detail: 'Put ? at the very end.', rules: ['mark'] },
@@ -128,7 +129,7 @@ export function questionChecklist(question, options = {}) {
   const broken = questionProblems(question, options).map((p) => p.id);
   return CHECKLIST.map(({ id, icon, label, detail, details, rules }) => {
     const firstBroken = rules.find((r) => broken.includes(r));
-    const words = details ? details[firstBroken || rules[0]] : detail;
+    const words = details && firstBroken ? details[firstBroken] : detail;
     const topic = (options.topicWords || [''])[0];
     return { id, icon, label, detail: words.replace('{topic}', topic), ok: !firstBroken };
   });
