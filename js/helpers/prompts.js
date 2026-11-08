@@ -71,7 +71,10 @@ const DRAG_START = 8;
 // All text goes in with textContent. Returns { button, list, open, answerFields }:
 // open() shows the answers (a room with one button for two boxes calls it), and
 // answerFields() is what to log with the answer (where it came from).
-export function createAnswerHint(key, room, suggestions, box) {
+// `options.line` (8 Nov 2026, Habiba: "not clear this hint is for the second
+// line"): the words that start the box's line, e.g. "because". The help line
+// names it, and each answer starts with it, faded (it is not put in the box).
+export function createAnswerHint(key, room, suggestions, box, { line = '' } = {}) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'btn hint-btn';
@@ -141,7 +144,8 @@ export function createAnswerHint(key, room, suggestions, box) {
     const chip = document.createElement('button');
     chip.type = 'button';
     chip.className = 'suggestion-chip';
-    chip.textContent = suggestion.text;
+    if (line) chip.append(Object.assign(document.createElement('span'), { className: 'suggestion-line', textContent: `${line} … ` }));
+    chip.append(suggestion.text);
     chip.addEventListener('click', () => {
       if (chip.dataset.dragged) {
         delete chip.dataset.dragged;
@@ -159,7 +163,9 @@ export function createAnswerHint(key, room, suggestions, box) {
     if (chips.length) return; // already open
     const help = document.createElement('li');
     help.className = 'suggestion-help';
-    help.textContent = '👆 Tap one, or drag it into the box. You can change the words.';
+    help.textContent = line
+      ? `👆 These finish your "${line} …" line. Tap one, or drag it into the box.`
+      : '👆 Tap one, or drag it into the box. You can change the words.';
     list.replaceChildren(help, ...suggestions.map(chipItem));
     logEvent(room, 'hint', { prompt: key, hintNumber: 1 });
     button.textContent = '💡 Answers are below';

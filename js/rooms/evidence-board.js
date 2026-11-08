@@ -130,11 +130,12 @@ async function init() {
   // The hints give answers built from the class's real numbers.
   const facts = answerFacts(recipe, values, partner, partnerValues);
   const { certaintyWhy } = await loadSharedAnswers();
-  const answerHint = (key, boxId, templates) => createAnswerHint(
-    key, 'evidence-board', fillSuggestions(templates, facts), document.getElementById(boxId),
+  const answerHint = (key, boxId, templates, line) => createAnswerHint(
+    key, 'evidence-board', fillSuggestions(templates, facts), document.getElementById(boxId), { line },
   );
-  claimHint = answerHint('claim', 'claim-subject', evidenceBoard.claimAnswers);
-  becauseHint = answerHint('claim-because', 'claim-reason', evidenceBoard.becauseAnswers);
+  // "I think" and "because": each list says which line its answers finish.
+  claimHint = answerHint('claim', 'claim-subject', evidenceBoard.claimAnswers, 'I think');
+  becauseHint = answerHint('claim-because', 'claim-reason', evidenceBoard.becauseAnswers, 'because');
   hints[1] = claimHint;
   hints[3] = answerHint('certainty-why', 'certainty-reason', certaintyWhy);
   document.getElementById('claim-hints').append(claimHint.list, becauseHint.list);
@@ -249,9 +250,13 @@ function setupClaim() {
     if (hintOpen && subjectDone) becauseHint.open({ focus: false });
     claimHint.list.hidden = hintOpen && subjectDone;
     becauseHint.list.hidden = !(hintOpen && subjectDone);
+    // The box the answers on screen go into glows (8 Nov 2026).
+    subject.classList.toggle('hint-target', hintOpen && !subjectDone);
+    reason.classList.toggle('hint-target', hintOpen && subjectDone && reason.value.trim() === '');
   };
   claimHint.button.addEventListener('click', showRightAnswers);
   subject.addEventListener('change', showRightAnswers);
+  reason.addEventListener('input', showRightAnswers);
   subject.addEventListener('input', () => { if (subject.value.trim() === '') showRightAnswers(); });
   showRightAnswers();
 }

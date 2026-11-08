@@ -510,3 +510,17 @@ h1 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* 8 Nov 2026: answer hints say which line they finish. Each answer starts with
+   the line's first word, faded (it is not put in the box), and the box the
+   answers go into glows yellow while they are on screen. */
+.suggestion-line {
+  font-weight: 600;
+  opacity: 0.6;
+}
+
+.hint-target {
+  outline: 4px solid var(--color-plan);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
