@@ -1,16 +1,16 @@
 {
   "scenarioId": "shoe-sizes",
-  "emoji": "👟",
+  "icon": "shoe",
   "cardTitle": "What size are our shoes?",
   "mission": { "goal": "Find out which shoe sizes our class wears.", "short": "What shoe sizes do we wear?" },
   "fixIts": [
     { "flawed": "Don't you think big shoes are better?", "fix": "What shoe size do you wear this year?", "choice": { "goodFirst": true, "whenWords": "this year", "whenWhy": "feet grow, and we want the size now.", "pushyWords": "\"Don't\" and \"better\"" } },
     { "flawed": "Are your shoes new?", "fix": "How many pairs of shoes did you get this year?", "topicWords": ["shoe", "size", "feet", "foot", "sneaker", "trainer"] }
   ],
-  "planPrompt": "🔮 Predict! Which shoe size do most kids wear?",
+  "planPrompt": ":crystal-ball: Predict! Which shoe size do most kids wear?",
   "graphLab": {
-    "tell": "📊 What does this graph tell us about our shoe sizes?",
-    "notTell": "🤔 What can't this graph tell us?",
+    "tell": ":chart: What does this graph tell us about our shoe sizes?",
+    "notTell": ":question: What can't this graph tell us?",
     "tellAnswers": [
       "{top} are most common, with {topCount} each.",
       "Fewer kids wear {low}, only {lowCount} each.",
@@ -23,10 +23,10 @@
     ]
   },
   "chanceLab": {
-    "story": "👟 The shoe shop gives a prize. Chance picks the winner!"
+    "story": ":shoe: The shoe shop gives a prize. Chance picks the winner!"
   },
   "evidenceBoard": {
-    "claimPrompt": "👀 Look at your findings. Which shoe sizes are most common?",
+    "claimPrompt": ":magnifier: Look at your findings. Which shoe sizes are most common?",
     "claimAnswers": [
       "{top} are the most common sizes",
       "the sizes go from {min} to {max}",
@@ -45,12 +45,12 @@
       "the data showed me something new"
     ],
     "kind": "number",
-    "predictPrompt": "📏 Now estimate! If all feet were one size, what size would it be?",
-    "build": "👟 Make up shoe sizes for 5 friends. Type one size in each box.",
-    "buildGoal": "🎯 Goal: their mean must be {target}.",
-    "mistake": { "story": "👟 Mia wrote down 5 friends' shoe sizes.", "numbers": [36, 34, 38, 33, 35] },
+    "predictPrompt": ":ruler: Now estimate! If all feet were one size, what size would it be?",
+    "build": ":shoe: Make up shoe sizes for 5 friends. Type one size in each box.",
+    "buildGoal": ":target: Goal: their mean must be {target}.",
+    "mistake": { "story": ":shoe: Mia wrote down 5 friends' shoe sizes.", "numbers": [36, 34, 38, 33, 35] },
     "realLife": {
-      "story": "🏪 A shoe shop sold these sizes this week:",
+      "story": ":shop: A shoe shop sold these sizes this week:",
       "numbers": [36, 34, 35, 34, 37, 36, 34],
       "modeQuestion": "Which size should the shop order the most?",
       "medianQuestion": "The shop puts the 7 boxes in a row, smallest to biggest. Which size is the box in the centre?"

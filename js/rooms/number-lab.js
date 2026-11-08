@@ -19,6 +19,7 @@ import { mountCardSort } from '../card-sort.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML, wordsNoteHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { pipSay } from '../pip.js';
+import { iconLineHTML } from '../icon-text.js';
 
 // The 3-zone layout (UI guide): the Explore rooms are tabs on the card, the
 // tasks are a mini stepper, and the ONE primary button in the action bar says
@@ -313,8 +314,8 @@ function buildExampleHTML(example, target) {
 const TASK_HTML = {
   predict: (n, { values }) => `
     <section class="task" data-task="${n}">
-      ${planGuess !== null ? `<p class="plan-reminder">${planReminder(planGuess, recipe)}</p>` : ''}
-      <p>${fromPlan ? content.checkPrompt : content.predictPrompt}</p>
+      ${planGuess !== null ? `<p class="plan-reminder">${iconLineHTML(planReminder(planGuess, recipe))}</p>` : ''}
+      <p>${iconLineHTML(fromPlan ? content.checkPrompt : content.predictPrompt)}</p>
       ${fromPlan ? '' : `<div class="predict-row">${guessControl('predict', values)}</div>`}
       <div id="stats-box" hidden></div>
       <p class="feedback" id="predict-feedback" hidden></p>
@@ -341,8 +342,8 @@ const TASK_HTML = {
       <div class="build-layout">
         <div>
           <!-- 8 Nov 2026 (Habiba: clearer): what to do, the goal, and what the mean is -->
-          <p>${content.build}</p>
-          <p class="build-goal">${fillTemplate(content.buildGoal, { target: buildTarget(values) })}</p>
+          <p>${iconLineHTML(content.build)}</p>
+          <p class="build-goal">${iconLineHTML(fillTemplate(content.buildGoal, { target: buildTarget(values) }))}</p>
           <p class="build-reminder">🔎 Mean = add all 5, then divide by 5.</p>
           <div class="build-row">
             ${[1, 2, 3, 4, 5].map((i) => `<label class="build-box">Friend ${i}<input type="number" class="build-input"></label>`).join('')}
@@ -356,7 +357,7 @@ const TASK_HTML = {
 
   mistake: (n) => `
     <section class="task" data-task="${n}" hidden>
-      <p>${content.mistake.story}</p>
+      <p>${iconLineHTML(content.mistake.story)}</p>
       <p class="number-list">${content.mistake.numbers.join(', ')}</p>
       <p>She says: <strong>"The median is ${miaSays(content.mistake.numbers)}."</strong> Is she right?</p>
       <div class="choice-row" id="mistake-choices">
@@ -374,7 +375,7 @@ const TASK_HTML = {
     const list = content.realLife.numbers || content.realLife.items;
     return `
     <section class="task" data-task="${n}" hidden>
-      <p>${content.realLife.story}</p>
+      <p>${iconLineHTML(content.realLife.story)}</p>
       <p class="number-list">${list.join(', ')}</p>
       <p><strong>1.</strong> ${content.realLife.modeQuestion}</p>
       <div class="choice-row" id="mode-choices">${choiceButtons(choicesFor(list))}</div>
@@ -395,7 +396,7 @@ const TASK_HTML = {
 
   whyNoMean: (n) => `
     <section class="task" data-task="${n}" hidden>
-      <p>${content.whyNoMean.question}</p>
+      <p>${iconLineHTML(content.whyNoMean.question)}</p>
       <div class="choice-row choice-column" id="why-choices">
         ${content.whyNoMean.options.map((o, i) => `<button class="btn choice-btn" data-answer="${i}" type="button">${o.text}</button>`).join('')}
       </div>
@@ -404,7 +405,7 @@ const TASK_HTML = {
 
   compareRange: (n, data) => `
     <section class="task" data-task="${n}" hidden>
-      <p>${content.compareRange.story}</p>
+      <p>${iconLineHTML(content.compareRange.story)}</p>
       ${rangeReminderHTML(data)}
       <p><strong>${content.compareRange.question}</strong></p>
       <div class="choice-row" id="range-choices">${choiceButtons(['Class A', 'Class B'])}</div>

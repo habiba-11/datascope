@@ -21,7 +21,7 @@ test('catches a negative, leading, yes/no question with no timeframe', () => {
 
 test('a missing question mark is the only warning on an otherwise good question', () => {
   const warnings = checkQuestion('How many hours did you sleep last night');
-  assert.deepEqual(warnings, ['❓ End it with a ?']);
+  assert.deepEqual(warnings, [':question: End it with a ?']);
 });
 
 test('every scenario question passes our own checker (zero warnings)', () => {
@@ -128,8 +128,8 @@ test('the checklist: "makes sense" (8 Nov 2026), then the 4 ticks from the pilot
 });
 
 test('ONE tip at a time: the first problem only, and none for a good question', () => {
-  assert.equal(firstTip("Don't you think school is good"), "🚫 Take out 'not' (like isn't or don't). It pushes people.");
-  assert.equal(firstTip('Do you sleep a lot?'), "⏰ When? Say a time, like 'this week' or 'last night'.");
+  assert.equal(firstTip("Don't you think school is good"), ":cross: Take out 'not' (like isn't or don't). It pushes people.");
+  assert.equal(firstTip('Do you sleep a lot?'), ":clock: When? Say a time, like 'this week' or 'last night'.");
   assert.equal(firstTip('How many hours did you sleep last night?'), null);
 });
 

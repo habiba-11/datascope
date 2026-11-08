@@ -5,7 +5,7 @@
 // later with textContent, never through here.
 import { pipSVG } from './pip.js';
 import { stepStates } from './helpers/stepper.js';
-import { iconHTML } from './icon-text.js';
+import { iconHTML, iconLineHTML } from './icon-text.js';
 
 // Prof's comment 6: the room's summary is a tab a child can reopen at any time,
 // in the same spot on every card (js/phase-intro.js fills it). It hangs under the
@@ -52,8 +52,8 @@ export function pipLineHTML(text, question = '') {
     <div class="pip-line">
       <span class="pip-mascot pip-mascot--line">${pipSVG()}</span>
       <div class="pip-line-words">
-        ${question ? `<h1 class="task-question">${question}</h1>` : ''}
-        <p class="pip-line-text" data-pip-text aria-live="polite">${text}</p>
+        ${question ? `<h1 class="task-question">${iconLineHTML(question)}</h1>` : ''}
+        <p class="pip-line-text" data-pip-text aria-live="polite">${iconLineHTML(text)}</p>
       </div>
     </div>`;
 }
@@ -63,7 +63,7 @@ export function miniStepperHTML(labels, current) {
   const chips = stepStates(labels, current).map((s) => `
     <li class="stepper-chip stepper-chip--${s.state}"${s.state === 'now' ? ' aria-current="step"' : ''}>
       <span class="stepper-mark" aria-hidden="true">${s.state === 'done' ? '✓' : s.number}</span>
-      ${s.label}<span class="sr-only"> (${s.word})</span>
+      ${iconLineHTML(s.label)}<span class="sr-only"> (${s.word})</span>
     </li>`).join('');
   return `<ol class="mini-stepper" aria-label="Steps">${chips}</ol>`;
 }

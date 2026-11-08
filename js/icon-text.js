@@ -3,7 +3,41 @@
 // The icon is our own SVG; the text always goes in as plain text, so a
 // child's own words can never be read as code. Sized by css/base.css (.ds-icon):
 // 1.25 times the text, on the text line, like the emoji it replaces.
-import { illustration } from './illustrations.js';
+import { illustration, ILLUSTRATIONS } from './illustrations.js';
+
+// Part 54c: OUR texts (code and data/content, never a child's words) may name
+// an icon anywhere as :name:, e.g. ":crystal-ball: Predict!" or "Next: :star: Bonus".
+// Only a real icon name counts; anything else stays as it is.
+const TOKEN = /:([a-z]+(?:-[a-z]+)*):/g;
+
+// Splits a text into parts: { icon } or { text }. No DOM here, so it is tested.
+export function iconParts(text) {
+  const parts = [];
+  let last = 0;
+  for (const m of String(text).matchAll(TOKEN)) {
+    if (!ILLUSTRATIONS[m[1]]) continue;
+    if (m.index > last) parts.push({ text: text.slice(last, m.index) });
+    parts.push({ icon: m[1] });
+    last = m.index + m[0].length;
+  }
+  if (last < String(text).length) parts.push({ text: String(text).slice(last) });
+  return parts;
+}
+
+// The same text with its :name: shown as icons, as HTML (for our HTML templates).
+export function iconLineHTML(text) {
+  return iconParts(text).map((p) => (p.icon ? iconHTML(p.icon) : p.text)).join('');
+}
+
+// The same, into an element (the words go in as plain text).
+export function setIconLine(element, text) {
+  element.replaceChildren(...iconParts(text).map((p) => (p.icon ? iconNode(p.icon) : document.createTextNode(p.text))));
+}
+
+// The words alone, without the :name: (e.g. for a log or an aria-label).
+export function withoutIcons(text) {
+  return iconParts(text).filter((p) => p.text).map((p) => p.text).join('').replace(/\s+/g, ' ').trim();
+}
 
 // The icon as HTML, for templates that are already HTML (our own words only).
 // `label`: say what the icon means, only when no words next to it say it.

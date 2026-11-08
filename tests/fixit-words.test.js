@@ -3,17 +3,21 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { choiceExplanation, TRY_AGAIN } from '../js/helpers/fixit-words.js';
 import { longestSentence, MAX_SENTENCE_WORDS } from '../js/helpers/readability.js';
+import { withoutIcons } from '../js/icon-text.js';
 
 const SCENARIOS = ['sleep-hours', 'shoe-sizes', 'playground-game', 'reading-minutes-class-a'];
 const fixIts = SCENARIOS.map((id) => JSON.parse(readFileSync(new URL(`../data/content/${id}.json`, import.meta.url), 'utf8')).fixIts[0]);
-const sentence = ({ label, text }) => `${label} ${text}`.trim();
+// The words a child reads (the :name: icons are pictures, not words; Part 54c).
+const sentence = ({ label, text }) => withoutIcons(`${label} ${text}`);
 
 test('Fix 1: 3 short rows that name the right letter, the WHEN words and the pushy words', () => {
-  const rows = choiceExplanation({ goodFirst: false, whenWords: 'last night', whenWhy: 'everyone answers about the same night.', pushyWords: '"Isn\'t" and "bad"' });
+  const rows = choiceExplanation({ goodFirst: false, whenWhy: 'everyone answers about the same night.', whenWords: 'last night', pushyWords: '"Isn\'t" and "bad"' });
   assert.equal(rows.length, 3);
-  assert.equal(rows[0].label, '✅ Yes! B is better.');
-  assert.equal(sentence(rows[1]), '⏰ WHEN: "last night", so everyone answers about the same night.');
-  assert.equal(sentence(rows[2]), '🤝 Not pushy: A uses "Isn\'t" and "bad". They push you to one answer.');
+  assert.equal(rows[0].label, ':check: Yes! B is better.');
+  assert.equal(sentence(rows[1]), 'WHEN: "last night", so everyone answers about the same night.');
+  assert.equal(sentence(rows[2]), 'Not pushy: A uses "Isn\'t" and "bad". They push you to one answer.');
+  assert.match(rows[1].label, /^:clock:/);
+  assert.match(rows[2].label, /^:scales:/);
 });
 
 test('Fix 1: every scenario\'s WHEN words are in the good question, and its pushy words in the other one', () => {

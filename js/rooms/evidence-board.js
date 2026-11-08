@@ -18,7 +18,8 @@ import { whenIntroClosed } from '../phase-intro.js';
 import { countWords } from '../helpers/feedback.js';
 import { pipSay } from '../pip.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML, wordsNoteHTML } from '../task-card.js';
-import { setupActionBar } from '../action-bar.js';
+import { setupActionBar } from '../action-bar.js';
+import { iconLineHTML } from '../icon-text.js';
 
 // Claim -> Evidence -> How sure (Paper 17's three parts). The audience/form task
 // was removed on 26 Oct 2026 (Habiba's decision: it had no purpose for the child).
@@ -89,7 +90,7 @@ async function init() {
             ${pipLineHTML(STEPS[0].pip, STEPS[0].question)}
 
             <section class="task" data-task="1">
-              <p>${evidenceBoard.claimPrompt}</p>
+              <p>${iconLineHTML(evidenceBoard.claimPrompt)}</p>
               <p class="sentence-starter">
                 <label for="claim-subject">I think</label> <input type="text" id="claim-subject" class="inline-input" placeholder="...">
                 <label for="claim-reason">because</label> <input type="text" id="claim-reason" class="inline-input" placeholder="...">

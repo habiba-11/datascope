@@ -15,6 +15,7 @@ import { pipSay } from '../pip.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { wireChoiceCards } from '../choices.js';
+import { iconHTML } from '../icon-text.js';
 
 // Graph Lab in the 3-zone layout (UI guide), laid out like the f13 design
 // (4 Nov 2026): a small "Pick a graph to draw" toolbar on top of the chart
@@ -81,7 +82,7 @@ async function init() {
 
   const reflectionHTML = (id, icon, question) => `
     <section class="reflection" data-step="${id === 'tell' ? 1 : 2}" hidden>
-      <label for="${id}">${icon} ${question.replace(/^\S+\s/, '')}</label>
+      <label for="${id}">${iconHTML(icon)} ${question.replace(/^\S+\s/, '')}</label>
       <textarea id="${id}" rows="3" placeholder="Write your idea here..."></textarea>
       <div class="hint-list-slot" id="${id}-hints"></div>
     </section>`;
@@ -111,8 +112,8 @@ async function init() {
             <div class="read-out" id="read-out" aria-live="polite"></div>
           </div>
           <div class="ask-panel" id="ask-panel" hidden>
-            ${reflectionHTML('tell', '📊', graphLab.tell)}
-            ${reflectionHTML('not-tell', '🔍', graphLab.notTell)}
+            ${reflectionHTML('tell', 'chart', graphLab.tell)}
+            ${reflectionHTML('not-tell', 'magnifier', graphLab.notTell)}
           </div>
         </div>
         <p class="feedback" id="graph-feedback" hidden></p>`,

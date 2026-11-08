@@ -24,7 +24,7 @@ test('Number Lab estimates a mean, but checks the prediction for games', () => {
 });
 
 test('the reminder shows the prediction in the scenario\'s words, or nothing', () => {
-  assert.equal(planReminder(9, SLEEP), '🔮 Before the survey, you predicted: 9 hours.');
-  assert.equal(planReminder('Football', GAMES), '🔮 Before the survey, you predicted: Football.');
+  assert.equal(planReminder(9, SLEEP), ':crystal-ball: Before the survey, you predicted: 9 hours.');
+  assert.equal(planReminder('Football', GAMES), ':crystal-ball: Before the survey, you predicted: Football.');
   assert.equal(planReminder(null, SLEEP), '');
 });

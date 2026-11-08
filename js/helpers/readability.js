@@ -8,9 +8,10 @@ export function sentences(text) {
   return text.split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter(Boolean);
 }
 
-// A word has at least one letter or digit, so emoji and dashes don't count.
+// A word has at least one letter or digit, so emoji and dashes don't count,
+// and neither does an icon named as :name: (Part 54c, js/icon-text.js).
 export function wordCount(sentence) {
-  return sentence.split(/\s+/).filter((token) => /[\p{L}\p{N}]/u.test(token)).length;
+  return sentence.split(/\s+/).filter((token) => /[\p{L}\p{N}]/u.test(token) && !/^:[a-z]+(-[a-z]+)*:$/.test(token)).length;
 }
 
 // The number of words in the longest sentence.

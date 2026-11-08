@@ -58,3 +58,15 @@ test('iconHTML wraps the icon for text lines (sized by .ds-icon in base.css)', (
   assert.match(html, /^<span class="ds-icon"><svg [^>]*aria-hidden="true"/);
   assert.match(iconHTML('bulb', 'Hint'), /aria-label="Hint"/);
 });
+
+// ---------- Part 54c: :name: in our own texts ----------
+import { iconParts, iconLineHTML, withoutIcons } from '../js/icon-text.js';
+
+test(':name: anywhere in our texts becomes an icon; anything else stays text', () => {
+  assert.deepEqual(iconParts(':crystal-ball: Predict!'), [{ icon: 'crystal-ball' }, { text: ' Predict!' }]);
+  assert.deepEqual(iconParts('Next: :star: Bonus →'), [{ text: 'Next: ' }, { icon: 'star' }, { text: ' Bonus →' }]);
+  assert.deepEqual(iconParts('Meet at 10:30: :nothing: here'), [{ text: 'Meet at 10:30: :nothing: here' }]);
+  assert.deepEqual(iconParts('No icons'), [{ text: 'No icons' }]);
+  assert.match(iconLineHTML(':star: Bonus'), /^<span class="ds-icon"><svg .*<\/svg><\/span> Bonus$/);
+  assert.equal(withoutIcons(':crystal-ball: Predict! :star:'), 'Predict!');
+});

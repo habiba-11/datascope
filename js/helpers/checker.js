@@ -56,30 +56,30 @@ export function questionProblems(question, { topicWords = null } = {}) {
   const words = lower.split(' ').filter(Boolean);
 
   if (words.length < MIN_WORDS) {
-    problems.push({ id: 'words', tip: `✏️ Write a whole question, with at least ${MIN_WORDS} words.` });
+    problems.push({ id: 'words', tip: `:pencil: Write a whole question, with at least ${MIN_WORDS} words.` });
   }
 
   if (!PERSON_WORDS.some((word) => new RegExp(`\\b${word}\\b`).test(lower))) {
-    problems.push({ id: 'person', tip: "🙋 Ask the person. Use 'you' or 'your'." });
+    problems.push({ id: 'person', tip: ":speech: Ask the person. Use 'you' or 'your'." });
   }
 
   if (topicWords && !topicWords.some((word) => new RegExp(`\\b${word}`).test(lower))) {
-    problems.push({ id: 'topic', tip: `🎯 Stay on the topic. Use a word like '${topicWords[0]}'.` });
+    problems.push({ id: 'topic', tip: `:target: Stay on the topic. Use a word like '${topicWords[0]}'.` });
   }
 
   if (/\bnot\b/.test(lower) || /n't\b/.test(lower)) {
-    problems.push({ id: 'not', tip: "🚫 Take out 'not' (like isn't or don't). It pushes people." });
+    problems.push({ id: 'not', tip: ":cross: Take out 'not' (like isn't or don't). It pushes people." });
   }
 
   // "right now" is a time, so its "right" does not push people to an answer.
   const withoutRightNow = lower.replace(/\bright now\b/g, '');
   const foundLeadingWord = LEADING_WORDS.find((word) => new RegExp(`\\b${word}\\b`).test(withoutRightNow));
   if (foundLeadingWord) {
-    problems.push({ id: 'pushy', tip: `👉 Take out "${foundLeadingWord}". It pushes people to one answer.` });
+    problems.push({ id: 'pushy', tip: `:scales: Take out "${foundLeadingWord}". It pushes people to one answer.` });
   }
 
   if (!hasTimeframe(lower)) {
-    problems.push({ id: 'when', tip: "⏰ When? Say a time, like 'this week' or 'last night'." });
+    problems.push({ id: 'when', tip: ":clock: When? Say a time, like 'this week' or 'last night'." });
   }
 
   // 8 Nov 2026 (Habiba: "wdid you read well last night?" passed): the question
@@ -89,11 +89,11 @@ export function questionProblems(question, { topicWords = null } = {}) {
   // A time phrase may come first: "Last night, how many hours...?"
   const clauseStarts = lower.split(',').map((part) => part.trim().split(' ')[0]);
   if (!clauseStarts.some((word) => OPEN_STARTERS.includes(word))) {
-    problems.push({ id: 'yesno', tip: '🔁 Not just yes or no. Start with What, How or Which.' });
+    problems.push({ id: 'yesno', tip: ':speech: Not just yes or no. Start with What, How or Which.' });
   }
 
   if (!text.endsWith('?')) {
-    problems.push({ id: 'mark', tip: '❓ End it with a ?' });
+    problems.push({ id: 'mark', tip: ':question: End it with a ?' });
   }
 
   return problems;
@@ -113,14 +113,14 @@ export function checkQuestion(question, options) {
 export const CHECKLIST = [
   // 8 Nov 2026: first, does it make sense? Its line says what is missing.
   {
-    id: 'sense', icon: '🧠', label: 'It makes sense', rules: ['words', 'person', 'topic'],
+    id: 'sense', icon: 'brain', label: 'It makes sense', rules: ['words', 'person', 'topic'],
     detail: "A whole question of 5 words or more, that asks 'you'.", // shown when it passes
     details: { words: 'Write a whole question, with at least 5 words.', person: "Ask the person: use 'you' or 'your'.", topic: "Stay on the topic, with a word like '{topic}'." },
   },
-  { id: 'mark', icon: '❓', label: 'It ends with a question mark (?)', detail: 'Put ? at the very end.', rules: ['mark'] },
-  { id: 'when', icon: '⏰', label: 'It says WHEN', detail: "Add a time, like 'last night' or 'this week'.", rules: ['when'] },
-  { id: 'open', icon: '💬', label: 'People can say more than yes or no', detail: 'Begin your question with What, Which or How.', rules: ['yesno'] },
-  { id: 'fair', icon: '🤝', label: 'It has no pushy words', detail: "Take out pushy words, like 'best' or 'isn't'.", rules: ['not', 'pushy'] },
+  { id: 'mark', icon: 'question', label: 'It ends with a question mark (?)', detail: 'Put ? at the very end.', rules: ['mark'] },
+  { id: 'when', icon: 'clock', label: 'It says WHEN', detail: "Add a time, like 'last night' or 'this week'.", rules: ['when'] },
+  { id: 'open', icon: 'speech', label: 'People can say more than yes or no', detail: 'Begin your question with What, Which or How.', rules: ['yesno'] },
+  { id: 'fair', icon: 'scales', label: 'It has no pushy words', detail: "Take out pushy words, like 'best' or 'isn't'.", rules: ['not', 'pushy'] },
 ];
 
 // Each tick: { id, icon, label, detail, ok }. A check with several rules

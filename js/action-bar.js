@@ -2,6 +2,7 @@
 // the same place: Back (quiet) on the left, the ONE primary button (green) on
 // the right. The Hint button sits under the question (setHint).
 // mountShell({ layout: 'card' }) makes the empty bar; each room fills it with setupActionBar().
+import { setIconLine } from './icon-text.js';
 
 // back:    { label, href } or { label, onClick }, or null for no Back
 // hint:    a button made by prompts.js (placed under the question, see setHint), or null
@@ -38,7 +39,8 @@ export function setupActionBar({ back = null, hint = null, primary }) {
   // ready:       true gives it the "press me" nudge: a small hop and a ring
   //              (only once the task is ready; Habiba, 4 Nov 2026)
   function setPrimary({ label, enabled = true, whyDisabled = '', onClick = null, ready = false }) {
-    primaryBtn.textContent = enabled || !whyDisabled ? label : whyDisabled;
+    // Part 54c: our labels may name an icon as :name: (js/icon-text.js).
+    setIconLine(primaryBtn, enabled || !whyDisabled ? label : whyDisabled);
     primaryBtn.disabled = !enabled;
     primaryBtn.classList.toggle('m-nudge', enabled && ready);
     onPrimary = onClick;

@@ -15,6 +15,8 @@ import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { wireChoiceCards } from '../choices.js';
 import { showMissionCard } from '../mission.js';
+import { iconHTML, setIconText, setIconLine } from '../icon-text.js';
+import { illustration } from '../illustrations.js';
 
 // Question Studio in the 3-zone layout (UI guide). One room, two phases:
 // Ask (pick a question, fix two flawed questions) and Plan (predict first; Part 50:
@@ -24,13 +26,14 @@ const STEPS = [
   { label: 'Pick', phase: 'ask', question: 'What do you want to find out?', pip: 'Pick one. Our pretend class will answer it.' },
   // Round 4, Part 45 (Habiba): Fix 1 is a choice (A or B), Fix 2 is typing with
   // a checklist that turns green and ONE tip at a time.
-  { label: 'Fix 1', phase: 'ask', question: '🤔 Which question is better?', pip: 'Only one is a good survey question. Tap it!' },
-  { label: 'Fix 2', phase: 'ask', question: '🛠️ Make it better!', pip: 'This question is not good yet. Make it better!' },
+  { label: 'Fix 1', phase: 'ask', question: ':question: Which question is better?', pip: 'Only one is a good survey question. Tap it!' },
+  { label: 'Fix 2', phase: 'ask', question: ':tools: Make it better!', pip: 'This question is not good yet. Make it better!' },
   // Part 46 (Round 4): the bonus is its own optional step, so children notice it.
-  { label: '⭐ Bonus', phase: 'ask', question: '⭐ Bonus: your own question', pip: 'Want a challenge? Write your OWN question!' },
-  { label: 'Predict', phase: 'plan', question: '🔮 Predict first!', pip: 'Scientists predict first, then check.' },
+  { label: ':star: Bonus', phase: 'ask', question: ':star: Bonus: your own question', pip: 'Want a challenge? Write your OWN question!' },
+  { label: 'Predict', phase: 'plan', question: ':crystal-ball: Predict first!', pip: 'Scientists predict first, then check.' },
 ];
-const STRIP = { ask: '❓ Ask · Question Studio', plan: '🗺️ Plan · Question Studio' };
+// Part 54c: our texts name their icons as :name: (js/icon-text.js).
+const STRIP = { ask: ':question: Ask · Question Studio', plan: ':map: Plan · Question Studio' };
 
 let step = 0;
 let bar = null;
@@ -74,7 +77,7 @@ async function init() {
           <div class="scenario-grid" id="scenario-grid">
             ${scenarios.map((s, i) => `
               <button class="scenario-card m-pop" style="--i: ${i}" data-id="${s.id}" type="button">
-                <span class="scenario-emoji" aria-hidden="true">${s.content.emoji}</span>
+                <span class="scenario-emoji" aria-hidden="true">${illustration(s.content.icon, { size: 56 })}</span>
                 <span class="scenario-title">${s.content.cardTitle}</span>
                 <span class="scenario-question">${s.recipe.question}</span>
                 ${doneBefore.has(s.id) ? '<span class="scenario-done">✓ Done before</span>' : ''}
@@ -97,20 +100,20 @@ async function init() {
               <div class="hint-list-slot" id="hint-slot-2"></div>
             </div>
             <aside class="fixit-example">
-              <p>👍 A good question looks like this:</p>
+              <p>${iconHTML('thumbsup')} A good question looks like this:</p>
               <p class="fixit-example-q">${goodQuestion}</p>
             </aside>
           </div>
           <!-- 8 Nov 2026: the checklist goes under both columns, 2 across, so the box, tip and hint stay near the top -->
-          <p class="fixit-checklist-title" id="checklist-title-2">📋 Your question is ready when all 5 have a ✓:</p>
+          <p class="fixit-checklist-title" id="checklist-title-2">${iconHTML('clipboard')} Your question is ready when all 5 have a ✓:</p>
           <ul class="fixit-checklist" id="checklist-2" aria-labelledby="checklist-title-2"></ul>
         </section>
 
         <section class="task bonus-step" data-step="3" hidden>
           <div class="bonus-offer" id="bonus-offer">
-            <p class="bonus-note">⭐ This one is extra. You can try it, or skip it.</p>
+            <p class="bonus-note">${iconHTML('star')} This one is extra. You can try it, or skip it.</p>
             <div class="bonus-buttons">
-              <button type="button" class="btn btn-main" id="bonus-yes">⭐ Try the bonus</button>
+              <button type="button" class="btn btn-main" id="bonus-yes">${iconHTML('star')} Try the bonus</button>
               <button type="button" class="btn btn-secondary" id="bonus-no">No thanks, continue →</button>
             </div>
           </div>
@@ -118,7 +121,7 @@ async function init() {
             <label for="own-question">My own question:</label>
             <textarea id="own-question" class="fixit-input" rows="2" placeholder="Type a question..."></textarea>
             <p class="fixit-tip" id="fixit-tip-own" aria-live="polite"></p>
-            <p class="fixit-checklist-title" id="checklist-title-own">📋 Your question is ready when all 5 have a ✓:</p>
+            <p class="fixit-checklist-title" id="checklist-title-own">${iconHTML('clipboard')} Your question is ready when all 5 have a ✓:</p>
             <ul class="fixit-checklist" id="checklist-own" aria-labelledby="checklist-title-own"></ul>
           </div>
         </section>
@@ -153,11 +156,11 @@ function showStep(n) {
 
   const { phase, question, pip, label } = STEPS[n];
   document.getElementById('stepper').innerHTML = miniStepperHTML(STEPS.map((s) => s.label), n);
-  document.querySelector('.task-question').textContent = question;
+  setIconLine(document.querySelector('.task-question'), question);
   pipSay(pip);
   // The card's colour and name follow the phase (Ask coral, Plan yellow).
   document.querySelector('.card-layout').style.setProperty('--accent', `var(--color-${phase})`);
-  document.querySelector('.task-card-title').textContent = STRIP[phase];
+  setIconLine(document.querySelector('.task-card-title'), STRIP[phase]);
   setCurrentStep(phase);
   // Ask and Plan share this page, so Plan starts (and its intro opens) on reaching the guess.
   enterPhase(phase);
@@ -173,28 +176,28 @@ function refreshPrimary() {
   if (step === 0) {
     bar.setPrimary(selectedScenario
       ? { label: 'Next: Fix 1 →', ready: true, onClick: startMission }
-      : { label: '', enabled: false, whyDisabled: '👆 Pick a question first' });
+      : { label: '', enabled: false, whyDisabled: ':tap: Pick a question first' });
   } else if (step === 1) {
     bar.setPrimary(clearState['fixit-1']
       ? { label: 'Next: Fix 2 →', ready: true, onClick: () => showStep(2) }
-      : { label: '', enabled: false, whyDisabled: '👆 Pick A or B first' });
+      : { label: '', enabled: false, whyDisabled: ':tap: Pick A or B first' });
   } else if (step === 2) {
     const bothClear = Object.values(clearState).every(Boolean);
-    const why = clearState['fixit-2'] ? '👆 Fix 1 needs an answer too' : '✏️ Make the question better first';
+    const why = clearState['fixit-2'] ? ':tap: Fix 1 needs an answer too' : ':pencil: Make the question better first';
     bar.setPrimary(bothClear
-      ? { label: 'Next: ⭐ Bonus →', ready: true, onClick: () => showStep(3) }
+      ? { label: 'Next: :star: Bonus →', ready: true, onClick: () => showStep(3) }
       : { label: '', enabled: false, whyDisabled: why });
   } else if (step === 3) {
     // The bonus is optional: once the child tries it, they can go on at any time.
     bar.setPrimary(bonusTaken
       ? { label: 'Next: Make a prediction →', ready: true, onClick: () => { finishAsk(); showStep(4); } }
-      : { label: '', enabled: false, whyDisabled: '👆 Try the bonus, or skip it' });
+      : { label: '', enabled: false, whyDisabled: ':tap: Try the bonus, or skip it' });
   } else if (guessSaved) {
-    bar.setPrimary({ label: '📋 Collect the data →', ready: true, onClick: () => { location.href = 'data-hub.html'; } });
+    bar.setPrimary({ label: ':clipboard: Collect the data →', ready: true, onClick: () => { location.href = 'data-hub.html'; } });
   } else if (selectedScenario.recipe.answerType === 'number') {
     bar.setPrimary({ label: 'Save my prediction', onClick: saveTypedGuess });
   } else {
-    bar.setPrimary({ label: '', enabled: false, whyDisabled: '👆 Pick your prediction' });
+    bar.setPrimary({ label: '', enabled: false, whyDisabled: ':tap: Pick your prediction' });
   }
 }
 
@@ -315,7 +318,9 @@ function renderChoice({ flawed, fix, choice }) {
         // 3 rows: the answer, what WHEN is, what pushy is (helpers/fixit-words.js).
         feedback.replaceChildren(...choiceExplanation(choice).map(({ label, text }) => {
           const row = Object.assign(document.createElement('span'), { className: 'fixit-why-line' });
-          row.append(Object.assign(document.createElement('strong'), { textContent: label }));
+          const strong = document.createElement('strong');
+          setIconLine(strong, label);
+          row.append(strong);
           if (text) row.append(` ${text}`);
           return row;
         }));
@@ -326,7 +331,7 @@ function renderChoice({ flawed, fix, choice }) {
       } else {
         button.classList.add('wrong');
         button.disabled = true;
-        feedback.textContent = TRY_AGAIN;
+        setIconLine(feedback, TRY_AGAIN);
         encourage(feedback);
       }
     });
@@ -343,7 +348,7 @@ function renderPredictTask() {
   document.getElementById('predict-feedback').hidden = true;
 
   const { recipe, content } = selectedScenario;
-  document.getElementById('predict-question').textContent = content.planPrompt;
+  setIconLine(document.getElementById('predict-question'), content.planPrompt);
 
   const row = document.getElementById('predict-row');
   if (recipe.answerType === 'number') {
@@ -369,7 +374,7 @@ function saveTypedGuess() {
   const input = document.getElementById('predict-input');
   if (input.value === '') {
     const feedback = document.getElementById('predict-feedback');
-    feedback.textContent = '✏️ Type a number first!';
+    setIconText(feedback, 'pencil', 'Type a number first!');
     feedback.hidden = false;
     return;
   }
@@ -381,7 +386,7 @@ function savePrediction(guess) {
   const { recipe } = selectedScenario;
   const shown = recipe.answerType === 'number' ? guess : `"${guess}"`;
   const feedback = document.getElementById('predict-feedback');
-  feedback.textContent = `👍 Your prediction: ${shown}. Now let's collect the data!`;
+  setIconText(feedback, 'thumbsup', `Your prediction: ${shown}. Now let's collect the data!`);
   feedback.hidden = false;
   logEvent('question-studio', 'prediction', {
     about: recipe.question, scenarioId: recipe.id, guess: recipe.answerType === 'number' ? Number(guess) : guess,
@@ -407,7 +412,7 @@ function renderChecker(textarea, trackId, suffix) {
   // "it passes", with a reminder that the child is the last judge of sense.
   // While something is wrong, the checklist's "Fix this next" line says it.
   const tipBox = document.getElementById(`fixit-tip-${suffix}`);
-  tipBox.textContent = clear ? '✅ It passes every check! Read it out loud. Does it make sense?' : tip;
+  setIconLine(tipBox, clear ? ':check: It passes every check! Read it out loud. Does it make sense?' : tip);
   tipBox.hidden = !clear && next !== null;
   tipBox.classList.toggle('fixit-tip--done', clear);
   // Done: the Fix 2 hint ("Find Fix this next...") has nothing left to say.
@@ -425,7 +430,9 @@ function renderChecker(textarea, trackId, suffix) {
     // The check to fix next: a small "Fix this next" label at the end of its
     // title row (Habiba, 8 Nov 2026: no emoji, not between title and line).
     const titleRow = Object.assign(document.createElement('div'), { className: 'fixit-check-row' });
-    titleRow.append(Object.assign(document.createElement('strong'), { className: 'fixit-check-title', textContent: `${item.icon} ${item.label}` }));
+    const checkTitle = Object.assign(document.createElement('strong'), { className: 'fixit-check-title' });
+    setIconText(checkTitle, item.icon, item.label);
+    titleRow.append(checkTitle);
     if (isNext) titleRow.append(Object.assign(document.createElement('span'), { className: 'fixit-next-tag', textContent: 'Fix this next' }));
     words.append(titleRow);
     // Every check shows its line, always (Habiba, 8 Nov 2026).

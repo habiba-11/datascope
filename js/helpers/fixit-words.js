@@ -10,11 +10,11 @@ export function choiceExplanation(choice) {
   const good = choice.goodFirst ? 'A' : 'B';
   const pushy = choice.goodFirst ? 'B' : 'A';
   return [
-    { label: `✅ Yes! ${good} is better.`, text: '' },
-    { label: '⏰ WHEN:', text: `"${choice.whenWords}", so ${choice.whenWhy}` },
-    { label: '🤝 Not pushy:', text: `${pushy} uses ${choice.pushyWords}. They push you to one answer.` },
+    { label: `:check: Yes! ${good} is better.`, text: '' },
+    { label: ':clock: WHEN:', text: `"${choice.whenWords}", so ${choice.whenWhy}` },
+    { label: ':scales: Not pushy:', text: `${pushy} uses ${choice.pushyWords}. They push you to one answer.` },
   ];
 }
 
 // A wrong pick: a nudge to look for the two things, never the answer.
-export const TRY_AGAIN = '🤔 Not quite. Look again: which one says a time, and has no pushy words?';
+export const TRY_AGAIN = ':question: Not quite. Look again: which one says a time, and has no pushy words?';

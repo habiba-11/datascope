@@ -27,5 +27,5 @@ export function guessWord(kind) {
 // The reminder above Number Lab's question, or '' when there is no prediction.
 export function planReminder(guess, recipe) {
   if (guess === null || guess === undefined || guess === '') return '';
-  return `🔮 Before the survey, you predicted: ${valueText(guess, recipe)}.`;
+  return `:crystal-ball: Before the survey, you predicted: ${valueText(guess, recipe)}.`; // :name: = icon (Part 54c)
 }

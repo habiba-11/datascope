@@ -1,16 +1,16 @@
 {
   "scenarioId": "reading-minutes-class-a",
-  "emoji": "📖",
+  "icon": "book",
   "cardTitle": "How long do two classes read?",
   "mission": { "goal": "Find out if Class A and Class B read the same.", "short": "Do two classes read the same?" },
   "fixIts": [
     { "flawed": "Don't you think reading is great?", "fix": "How many minutes did you read yesterday?", "choice": { "goodFirst": true, "whenWords": "yesterday", "whenWhy": "everyone answers about the same day.", "pushyWords": "\"Don't\" and \"great\"" } },
     { "flawed": "Do you read books?", "fix": "How many books did you read this month?", "topicWords": ["read", "book", "stor", "page", "minute"] }
   ],
-  "planPrompt": "🔮 Predict! How many minutes did most kids read?",
+  "planPrompt": ":crystal-ball: Predict! How many minutes did most kids read?",
   "graphLab": {
-    "tell": "📊 What do the two graphs tell us?",
-    "notTell": "🤔 What can't these graphs tell us?",
+    "tell": ":chart: What do the two graphs tell us?",
+    "notTell": ":question: What can't these graphs tell us?",
     "tellAnswers": [
       "Class A's answers are close together, from {min} to {max}.",
       "Class B's answers are spread out, from {minB} to {maxB}.",
@@ -23,10 +23,10 @@
     ]
   },
   "chanceLab": {
-    "story": "📖 Pip uses chance to pick the next class book!"
+    "story": ":book: Pip uses chance to pick the next class book!"
   },
   "evidenceBoard": {
-    "claimPrompt": "👀 Look at your findings. How are Class A and Class B different?",
+    "claimPrompt": ":magnifier: Look at your findings. How are Class A and Class B different?",
     "claimAnswers": [
       "Class B's answers are more spread out",
       "Class A's answers are closer together",
@@ -45,12 +45,12 @@
       "the data showed me something new"
     ],
     "kind": "compare",
-    "predictPrompt": "📏 Now estimate! If every kid read the same, how many minutes would that be?",
-    "build": "📖 Make up reading times for 5 friends. Type the minutes in each box.",
-    "buildGoal": "🎯 Goal: their mean must be {target} minutes.",
-    "mistake": { "story": "📖 Mia asked 5 friends how long they read.", "numbers": [9, 3, 20, 5, 7] },
+    "predictPrompt": ":ruler: Now estimate! If every kid read the same, how many minutes would that be?",
+    "build": ":book: Make up reading times for 5 friends. Type the minutes in each box.",
+    "buildGoal": ":target: Goal: their mean must be {target} minutes.",
+    "mistake": { "story": ":book: Mia asked 5 friends how long they read.", "numbers": [9, 3, 20, 5, 7] },
     "compareRange": {
-      "story": "📖 Both classes have the same mean. Now look at the range.",
+      "story": ":book: Both classes have the same mean. Now look at the range.",
       "question": "Which class's answers are more spread out?"
     }
   }

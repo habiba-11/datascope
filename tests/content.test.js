@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { ILLUSTRATIONS } from '../js/illustrations.js';
 import { readFileSync } from 'node:fs';
 import { checkQuestion } from '../js/helpers/checker.js';
 import { PICKABLE_SCENARIOS } from '../js/helpers/scenarios.js';
@@ -11,11 +12,13 @@ const read = (path) => JSON.parse(readFileSync(new URL(`../data/${path}`, import
 const contents = PICKABLE_SCENARIOS.map((id) => ({ id, content: read(`content/${id}.json`) }));
 
 // Keys every content file must have. Parts 17b-d add more.
-const REQUIRED_KEYS = ['scenarioId', 'emoji', 'cardTitle', 'fixIts', 'planPrompt', 'numberLab', 'graphLab', 'chanceLab', 'evidenceBoard'];
+// Part 54c: "icon" (an illustration name) replaced "emoji".
+const REQUIRED_KEYS = ['scenarioId', 'icon', 'cardTitle', 'fixIts', 'planPrompt', 'numberLab', 'graphLab', 'chanceLab', 'evidenceBoard'];
 
 test('readability helper: sentences and words', () => {
   assert.deepEqual(sentences('Make a guess! How many? Go.'), ['Make a guess!', 'How many?', 'Go.']);
   assert.equal(wordCount('🤔 Make a guess!'), 3); // the emoji is not a word
+  assert.equal(wordCount(':question: Make a guess!'), 3); // nor is an icon named as :name:
   assert.equal(longestSentence('One two. One two three four.'), 4);
 });
 
@@ -23,6 +26,16 @@ test('every pickable scenario has a content file with every key', () => {
   for (const { id, content } of contents) {
     assert.equal(content.scenarioId, id);
     for (const key of REQUIRED_KEYS) assert.ok(content[key] !== undefined, `${id} is missing "${key}"`);
+  }
+});
+
+test('Part 54c: scenario pictures and every :name: in the content are real icons, and no emoji is left', () => {
+  for (const { id, content } of contents) {
+    assert.ok(ILLUSTRATIONS[content.icon], `${id}: icon "${content.icon}"`);
+    for (const text of allStrings(content)) {
+      for (const [, name] of text.matchAll(/:([a-z]+(?:-[a-z]+)*):/g)) assert.ok(ILLUSTRATIONS[name], `${id}: ":${name}:" in "${text}"`);
+      assert.doesNotMatch(text, /\p{Extended_Pictographic}/u, `${id}: emoji in "${text}"`);
+    }
   }
 });
 
