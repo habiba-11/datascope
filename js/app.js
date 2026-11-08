@@ -217,9 +217,12 @@ export function exploreCardTabsHTML(newTab = null) {
   return `<nav class="card-tab-row" aria-label="Explore rooms">${tabs.join('')}</nav>`;
 }
 
-// A phase was just finished: redraw the bar so the new step (or Explore
-// room) slides in, and Pip announces it.
+// A phase was just finished (the child closed its end-of-room card): confetti,
+// every time (8 Nov 2026, Habiba: "after completing each room", also when
+// nothing new opens); then redraw the bar so the new step (or Explore room)
+// slides in, and Pip announces it.
 function showUnlocked() {
+  confetti(); // a room is finished: a big moment (fireworks only on My journey)
   const bar = document.querySelector('.step-bar');
   const before = [...bar.querySelectorAll('.step')].map((link) => link.dataset.step);
   const newStep = visibleSteps(getDonePhases()).find((id) => !before.includes(id)) || null;
@@ -249,7 +252,6 @@ function showUnlocked() {
     pipSay(`🔓 Hoo-hoo! You unlocked ${name}!`);
     pipReacts('hop');
     unlockStep(document.querySelector('.step-bar .step-new, .explore-subnav .step-new, .task-card-tabs .step-new'));
-    confetti(); // a phase is finished: a big moment (fireworks only on My journey, 8 Nov 2026)
   }
 }
 
