@@ -38,3 +38,9 @@ test('Pip has lines for pointing, and the moment is a known log event', () => {
   assert.ok(PIP_EVENTS.tray);
   assert.ok(EVENT_TYPES.includes('tray-intro-seen'));
 });
+
+test('8 Nov 2026: with room on the right, the arrow sits beside the button, pointing left', () => {
+  assert.deepEqual(pointerSpot({ left: 100, top: 50, width: 80, bottom: 98 }, 768, 120, 1366), { x: 186, y: 74, dir: 'left' });
+  // No room on the right (a button near the right edge): under or above, as before.
+  assert.equal(pointerSpot({ left: 1200, top: 50, width: 120, bottom: 98 }, 768, 120, 1366).dir, 'up');
+});

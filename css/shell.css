@@ -604,3 +604,19 @@
   0%, 100% { box-shadow: var(--shadow-button), 0 0 0 0 rgba(255, 197, 49, 0); }
   50% { box-shadow: var(--shadow-button), 0 0 0 8px rgba(255, 197, 49, 0.75); }
 }
+
+/* 8 Nov 2026: beside the button, pointing left at it (never covering what is
+   under the button). The arrow turns to point left; the words sit after it. */
+.helper-pointer--left {
+  flex-direction: row;
+  width: auto;
+  max-width: 280px;
+  margin-left: 0;
+  transform: translateY(-50%);
+  animation: pointer-left 0.8s ease-in-out 5;
+}
+
+.helper-pointer--left svg { transform: rotate(-90deg); flex-shrink: 0; }
+.helper-pointer--left .helper-pointer-words { margin: 0 0 0 2px; }
+
+@keyframes pointer-left { 0%, 100% { transform: translate(0, -50%); } 50% { transform: translate(10px, -50%); } }

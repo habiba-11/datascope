@@ -31,7 +31,15 @@ export function whenLine(id, kind = 'number') {
 // Where the arrow goes for a button at `rect` ({ left, top, width, bottom }) on
 // a screen `height` px tall: under it pointing up, or (near the bottom of the
 // screen) above it pointing down. `room`: the space the arrow and its line need.
-export function pointerSpot(rect, height, room = 120) {
+// 8 Nov 2026 (Habiba: "not well placed"): with the screen `width` given and
+// room on the right, it sits beside the button pointing left, so its words
+// never cover what is under the button.
+export const SIDE_ROOM = 300;
+
+export function pointerSpot(rect, height, room = 120, width = 0) {
+  if (width && rect.left + rect.width + SIDE_ROOM <= width) {
+    return { x: rect.left + rect.width + 6, y: rect.top + (rect.bottom - rect.top) / 2, dir: 'left' };
+  }
   const x = rect.left + rect.width / 2;
   if (rect.bottom + room <= height) return { x, y: rect.bottom + 6, dir: 'up' };
   return { x, y: rect.top - 6, dir: 'down' };

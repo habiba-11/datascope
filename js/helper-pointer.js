@@ -3,8 +3,9 @@
 // The helpers stay where they are (Habiba, 7 Nov 2026): the 💡 Hint under the
 // question, 📘 Maths recap and 📋 My findings in the top bar. The first time
 // each one appears in a room, a yellow arrow bounces next to it, pointing at
-// it, with its "when to use me" line, and Pip says a line. Once per helper,
-// per room, per child; logged as "tray-intro-seen". (The About tab's "Show me
+// it, with its "when to use me" line, and Pip says a line. Maths recap and My
+// findings: once per room, per child. Every 💡 Hint button: the first time it
+// is on screen (8 Nov 2026). Logged as "tray-intro-seen". (The About tab's "Show me
 // the helpers" button was removed, Habiba, 8 Nov 2026.) Words and the arrow's
 // spot: helpers/pointers.js (tested).
 import { helperId, whenLine, pointerSpot } from './helpers/pointers.js';
@@ -29,13 +30,19 @@ function visibleHelpers() {
 }
 
 // One arrow, pointing at `button`, with the helper's line in a little bubble.
-function pointAt({ id, button }) {
-  const spot = pointerSpot(button.getBoundingClientRect(), innerHeight);
-  const pointer = document.createElement('div');
+// 8 Nov 2026 (Habiba: "not well placed when scrolling"): it follows its
+// button on every frame while it shows, so it scrolls with the page.
+function place(pointer, button) {
+  const spot = pointerSpot(button.getBoundingClientRect(), innerHeight, 120, innerWidth);
   pointer.className = `helper-pointer helper-pointer--${spot.dir}`;
-  pointer.setAttribute('aria-hidden', 'true'); // the button says what it is; Pip's line is extra
   pointer.style.left = `${spot.x}px`;
   pointer.style.top = `${spot.y}px`;
+}
+
+function pointAt({ id, button }) {
+  const pointer = document.createElement('div');
+  pointer.setAttribute('aria-hidden', 'true'); // the button says what it is; Pip's line is extra
+  place(pointer, button);
   pointer.innerHTML = '<svg viewBox="0 0 40 60" width="34" height="50"><path d="M20 4 L36 26 H26 V56 H14 V26 H4 Z" fill="#FFC531" stroke="#17324D" stroke-width="4" stroke-linejoin="round"/></svg>';
   const words = document.createElement('p');
   words.className = 'helper-pointer-words';
@@ -43,6 +50,13 @@ function pointAt({ id, button }) {
   pointer.append(words);
   document.body.append(pointer);
   button.classList.add('helper-glow');
+  const follow = () => {
+    if (!pointer.isConnected) return;
+    if (button.offsetParent === null) pointer.remove(); // its button left the screen's page
+    else place(pointer, button);
+    requestAnimationFrame(follow);
+  };
+  requestAnimationFrame(follow);
   setTimeout(() => {
     pointer.remove();
     button.classList.remove('helper-glow');
@@ -57,12 +71,26 @@ function point(helpers, auto) {
   pipTalk('tray');
 }
 
-// Looks now and then for a helper this child has not been shown in this room yet.
+// Every 💡 Hint button gets its arrow the first time it is on screen (8 Nov
+// 2026, Habiba: "on all hint buttons"); Maths recap and My findings once per room.
+const pointedHints = new WeakSet();
+
+function isFresh({ id, button }) {
+  if (id === 'hint') return !pointedHints.has(button);
+  return !hasSeenIntro(`pointer:${room}:${id}`);
+}
+
+function markPointed({ id, button }) {
+  if (id === 'hint') pointedHints.add(button);
+  else markIntroSeen(`pointer:${room}:${id}`);
+}
+
+// Looks now and then for a helper this child has not been shown yet.
 function look() {
   if (!document.hidden && !document.querySelector('dialog[open]')) {
-    const fresh = visibleHelpers().filter(({ id }) => !hasSeenIntro(`pointer:${room}:${id}`));
+    const fresh = visibleHelpers().filter(isFresh);
     if (fresh.length) {
-      fresh.forEach(({ id }) => markIntroSeen(`pointer:${room}:${id}`));
+      fresh.forEach(markPointed);
       point(fresh, true);
     }
   }
