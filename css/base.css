@@ -85,21 +85,14 @@ h1 {
   75% { transform: translateX(6px); }
 }
 
-/* Confetti pieces (js/motion.js), falling from the top of the screen. */
-.confetti {
+/* Realistic confetti (js/confetti.js, 8 Nov 2026): one canvas over the page. */
+.confetti-canvas {
   position: fixed;
-  top: -16px;
-  width: 10px;
-  height: 14px;
-  border: 1px solid var(--color-navy);
-  border-radius: 3px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none; /* never blocks a tap */
   z-index: 1000;
-  animation: confetti-fall 1.8s ease-in forwards;
-}
-
-@keyframes confetti-fall {
-  to { transform: translateY(105vh) rotate(var(--spin)); }
 }
 
 /* Part 21a: moving to another room fades the pages into each other, in

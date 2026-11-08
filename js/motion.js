@@ -6,6 +6,7 @@
 // The sounds still follow the sound toggle.
 import { playSound, playFirework } from './sounds.js';
 import { launchFirework } from './fireworks.js';
+import { blastConfetti } from './confetti.js';
 import { pipMoodFor } from './pip.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -162,35 +163,24 @@ export function stamp(element) {
 
 // ---------- big moments ----------
 
-// Confetti in the five room colours falls over the page (big moments only:
-// a finished phase, or leveling up). Skipped with reduced motion.
+// Confetti in the five room colours (big moments only: a finished phase, a
+// level up, the stamped Evidence Card, My journey). Realistic since 8 Nov 2026
+// (Habiba): two party-popper blasts on a canvas (js/confetti.js). Skipped with
+// reduced motion.
 // It ALWAYS plays a sound with it (the sparkle, or e.g. 'levelUp'), even with
 // reduced motion, so the same moment always sounds the same (4 Nov 2026).
-const CONFETTI_COLOURS = ['ask', 'plan', 'collect', 'explore', 'conclude'];
-
 export function confetti({ sound = 'confetti' } = {}) {
   playSound(sound);
   if (reduceMotion()) return;
-  for (let i = 0; i < 40; i++) {
-    const piece = document.createElement('span');
-    piece.className = 'confetti';
-    piece.setAttribute('aria-hidden', 'true');
-    piece.style.left = `${Math.random() * 95}vw`; // 95, so no piece pokes out sideways
-    piece.style.background = `var(--color-${CONFETTI_COLOURS[i % CONFETTI_COLOURS.length]})`;
-    piece.style.animationDelay = `${Math.random() * 0.5}s`;
-    piece.style.setProperty('--spin', `${Math.random() * 720 - 360}deg`);
-    document.body.append(piece);
-    // Removed after 2.5 s (1.8 s fall + up to 0.5 s delay), even if the animation never ran.
-    setTimeout(() => piece.remove(), 2500);
-  }
+  blastConfetti();
 }
 
 // Fireworks (Part 43b; changed 6 Nov 2026, Habiba: in the background, and
 // realistic): rockets rise and burst on a canvas BEHIND the cards (js/fireworks.js),
 // each with a firework sound (sounds.js playFirework). They burst where they can
 // be seen: the side margins and the band above the card, in turn.
-// A finished phase or the stamped Evidence Card: 3 fireworks. My journey: a
-// gentle, far-off loop (fireworksLoop). Reduced motion: only the sound, once.
+// Since 8 Nov 2026 (Habiba) only My journey has fireworks: a gentle, far-off
+// loop (fireworksLoop). The rooms have confetti only. Reduced motion: only the sound, once.
 export const BURST_GAP = 0.45; // seconds between two rockets
 
 const BURST_ZONES = [

@@ -3,7 +3,7 @@ import { countBadges, counterHTML, backpackLabel, setupCelebrations } from './ce
 import { setupAboutTab } from './phase-intro.js';
 import { guardPage, enterPhase } from './phase-progress.js';
 import { visibleSteps, isStepDone, isUnlocked, hasMoreSteps } from './helpers/progress.js';
-import { pipReacts, enterRoom, float, unlockStep, confetti, fireworks } from './motion.js';
+import { pipReacts, enterRoom, float, unlockStep, confetti } from './motion.js';
 import { pipSVG, pipSay } from './pip.js';
 import { lineIcon, LOGO_SVG } from './icons.js';
 import { watchPressedState } from './pressed-state.js';
@@ -249,8 +249,7 @@ function showUnlocked() {
     pipSay(`🔓 Hoo-hoo! You unlocked ${name}!`);
     pipReacts('hop');
     unlockStep(document.querySelector('.step-bar .step-new, .explore-subnav .step-new, .task-card-tabs .step-new'));
-    confetti(); // a phase is finished: a big moment
-    fireworks(); // Part 43b: and 3 bursts of fireworks
+    confetti(); // a phase is finished: a big moment (fireworks only on My journey, 8 Nov 2026)
   }
 }
 
