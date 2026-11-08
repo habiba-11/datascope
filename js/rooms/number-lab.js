@@ -343,14 +343,17 @@ const TASK_HTML = {
       <!-- Part 55 (Habiba, 8 Nov 2026: "confusing and crowded"): ONE goal
            sentence, the boxes, a live total, and the example behind a button. -->
       <div class="build-layout">
-        <p class="build-goal">${iconLineHTML(fillTemplate(content.build, { target: buildTarget(values) }))}</p>
-        <div class="build-row">
-          ${[1, 2, 3, 4, 5].map((i) => `<label class="build-box">Friend ${i}<input type="number" class="build-input"></label>`).join('')}
+        <div class="build-main">
+          <p class="build-goal">${iconLineHTML(fillTemplate(content.build, { target: buildTarget(values) }))}</p>
+          <div class="build-row">
+            ${[1, 2, 3, 4, 5].map((i) => `<label class="build-box">Friend ${i}<input type="number" class="build-input"></label>`).join('')}
+          </div>
+          <p class="build-total" id="build-total" aria-live="polite"></p>
+          <button class="btn btn-secondary build-example-btn" id="build-example-btn" type="button" aria-expanded="false" aria-controls="build-example-box">${iconHTML('magnifier')} See an example</button>
+          <div class="hint-list-slot" id="build-hint-slot"></div>
         </div>
-        <p class="build-total" id="build-total" aria-live="polite"></p>
-        <button class="btn btn-secondary build-example-btn" id="build-example-btn" type="button" aria-expanded="false" aria-controls="build-example-box">${iconHTML('magnifier')} See an example</button>
-        <div id="build-example-box" hidden>${buildExampleHTML(buildExample(buildTarget(values)), buildTarget(values))}</div>
-        <div class="hint-list-slot" id="build-hint-slot"></div>
+        <!-- Opened, the example sits on the right (Habiba, 8 Nov 2026); below on narrow screens. -->
+        <div class="build-example-box" id="build-example-box" hidden>${buildExampleHTML(buildExample(buildTarget(values)), buildTarget(values))}</div>
       </div>
       <p class="feedback" id="build-feedback" hidden></p>
     </section>`,
