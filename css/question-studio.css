@@ -235,9 +235,21 @@
   color: var(--color-navy);
 }
 
+/* The title, and at its end a small "Fix this next" label. */
+.fixit-check-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+
 .fixit-next-tag {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--color-navy);
+  color: #fff;
+  font-size: 16px; /* a short label */
   font-weight: 800;
-  color: #8A5A00; /* dark gold: readable on the yellow */
 }
 
 /* Fix 1, right answer: three rows (the answer, WHEN, pushy). */
@@ -247,8 +259,7 @@
   max-width: 720px;
 }
 
-.fixit-why-line { display: block; }
-.fixit-why-line:first-child { font-weight: 800; }
+.fixit-why-line { display: block; font-weight: 600; }
 
 .fixit-mark {
   display: grid;

@@ -6,14 +6,14 @@ import { longestSentence, MAX_SENTENCE_WORDS } from '../js/helpers/readability.j
 
 const SCENARIOS = ['sleep-hours', 'shoe-sizes', 'playground-game', 'reading-minutes-class-a'];
 const fixIts = SCENARIOS.map((id) => JSON.parse(readFileSync(new URL(`../data/content/${id}.json`, import.meta.url), 'utf8')).fixIts[0]);
+const sentence = ({ label, text }) => `${label} ${text}`.trim();
 
-test('Fix 1: the explanation names the right letter, the WHEN words and the pushy words', () => {
-  const lines = choiceExplanation({ goodFirst: false, whenWords: 'last night', whenWhy: 'So all answers are about the same night.', pushyWords: '"Isn\'t" and "bad"' });
-  assert.equal(lines.length, 3);
-  assert.match(lines[0], /B is the better question/);
-  assert.match(lines[1], /"last night"/);
-  assert.match(lines[2], /A says "Isn't" and "bad"/);
-  assert.match(lines[2], /B lets everyone answer freely/);
+test('Fix 1: 3 short rows that name the right letter, the WHEN words and the pushy words', () => {
+  const rows = choiceExplanation({ goodFirst: false, whenWords: 'last night', whenWhy: 'everyone answers about the same night.', pushyWords: '"Isn\'t" and "bad"' });
+  assert.equal(rows.length, 3);
+  assert.equal(rows[0].label, '✅ Yes! B is better.');
+  assert.equal(sentence(rows[1]), '⏰ WHEN: "last night", so everyone answers about the same night.');
+  assert.equal(sentence(rows[2]), '🤝 Not pushy: A uses "Isn\'t" and "bad". They push you to one answer.');
 });
 
 test('Fix 1: every scenario\'s WHEN words are in the good question, and its pushy words in the other one', () => {
@@ -25,9 +25,13 @@ test('Fix 1: every scenario\'s WHEN words are in the good question, and its push
   }
 });
 
-test('Fix 1: the explanation uses Grade 5 sentences', () => {
+test('Fix 1: short, not a paragraph (each row at most 14 words)', () => {
   for (const { choice } of fixIts) {
-    for (const line of choiceExplanation(choice)) assert.ok(longestSentence(line) <= MAX_SENTENCE_WORDS, line);
+    for (const row of choiceExplanation(choice)) {
+      const text = sentence(row);
+      assert.ok(longestSentence(text) <= MAX_SENTENCE_WORDS, text);
+      assert.ok(text.split(/\s+/).length <= 14, `too long: ${text}`);
+    }
   }
   assert.ok(longestSentence(TRY_AGAIN) <= MAX_SENTENCE_WORDS);
 });

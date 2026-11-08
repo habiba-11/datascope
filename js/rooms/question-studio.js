@@ -276,7 +276,7 @@ function renderFixIts() {
   clearState['fixit-2'] = false;
   // A new scenario gets new hints: the old hint list goes.
   const { button, list } = createHint('fixit-2', 'question-studio', [
-    'Look at the 👉 line. Fix that one first.',
+    'Find "Fix this next" in the list. Fix that one first.',
     { text: 'Here is one idea. Tap it to use it:', answer: second.fix, box: textarea },
   ]);
   hintButtons['fixit-2'] = button;
@@ -313,7 +313,12 @@ function renderChoice({ flawed, fix, choice }) {
         button.classList.add('correct');
         box.querySelectorAll('button').forEach((b) => { b.disabled = true; });
         // 3 rows: the answer, what WHEN is, what pushy is (helpers/fixit-words.js).
-        feedback.replaceChildren(...choiceExplanation(choice).map((line) => Object.assign(document.createElement('span'), { className: 'fixit-why-line', textContent: line })));
+        feedback.replaceChildren(...choiceExplanation(choice).map(({ label, text }) => {
+          const row = Object.assign(document.createElement('span'), { className: 'fixit-why-line' });
+          row.append(Object.assign(document.createElement('strong'), { textContent: label }));
+          if (text) row.append(` ${text}`);
+          return row;
+        }));
         feedback.classList.add('fixit-why');
         clearState['fixit-1'] = true;
         cheer(feedback);
@@ -411,13 +416,13 @@ function renderChecker(textarea, trackId, suffix) {
     // ✓ or ○, then the title (with its icon). Only the check to fix next
     // also shows its explaining line, so each explanation shows once.
     const words = document.createElement('div');
-    words.append(Object.assign(document.createElement('strong'), { className: 'fixit-check-title', textContent: `${item.icon} ${item.label}` }));
-    if (isNext) {
-      words.append(
-        Object.assign(document.createElement('span'), { className: 'fixit-next-tag', textContent: '👉 Fix this next' }),
-        Object.assign(document.createElement('span'), { className: 'fixit-check-detail', textContent: item.detail }),
-      );
-    }
+    // The check to fix next: a small "Fix this next" label at the end of its
+    // title row (Habiba, 8 Nov 2026: no emoji, not between title and line).
+    const titleRow = Object.assign(document.createElement('div'), { className: 'fixit-check-row' });
+    titleRow.append(Object.assign(document.createElement('strong'), { className: 'fixit-check-title', textContent: `${item.icon} ${item.label}` }));
+    if (isNext) titleRow.append(Object.assign(document.createElement('span'), { className: 'fixit-next-tag', textContent: 'Fix this next' }));
+    words.append(titleRow);
+    if (isNext) words.append(Object.assign(document.createElement('span'), { className: 'fixit-check-detail', textContent: item.detail }));
     li.append(Object.assign(document.createElement('span'), { className: 'fixit-mark', textContent: item.ok ? '✓' : '○' }), words);
     if (!item.ok) li.append(Object.assign(document.createElement('span'), { className: 'sr-only', textContent: ' (not yet)' }));
     return li;

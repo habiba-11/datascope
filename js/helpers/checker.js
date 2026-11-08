@@ -99,9 +99,9 @@ export function checkQuestion(question) {
 // short title and one line that explains it with examples.
 export const CHECKLIST = [
   { id: 'mark', icon: '❓', label: 'It ends with a question mark (?)', detail: 'Put ? at the very end.', rules: ['mark'] },
-  { id: 'when', icon: '⏰', label: 'It says WHEN', detail: "Add a time, like 'last night' or 'this week'. Then all answers are about the same time.", rules: ['when'] },
-  { id: 'open', icon: '💬', label: 'People can say more than yes or no', detail: 'Start with What, How many or Which.', rules: ['yesno'] },
-  { id: 'fair', icon: '🤝', label: 'It has no pushy words', detail: "Take out words like 'not', 'don't', 'best' or 'bad'. They push people to one answer.", rules: ['not', 'pushy'] },
+  { id: 'when', icon: '⏰', label: 'It says WHEN', detail: "Add a time, like 'last night' or 'this week'.", rules: ['when'] },
+  { id: 'open', icon: '💬', label: 'People can say more than yes or no', detail: 'Begin your question with What, Which or How.', rules: ['yesno'] },
+  { id: 'fair', icon: '🤝', label: 'It has no pushy words', detail: "Take out pushy words, like 'best' or 'isn't'.", rules: ['not', 'pushy'] },
 ];
 
 // Each tick: { id, icon, label, detail, ok }.
