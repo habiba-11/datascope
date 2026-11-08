@@ -234,7 +234,7 @@ function wireRetryChoices(container, feedback, { task, isCorrect, correctText, h
         cheer(feedback);
         onCorrect();
       } else {
-        show(feedback, hintText);
+        show(feedback, typeof hintText === 'function' ? hintText() : hintText);
         tracker.wrong();
         encourage(feedback);
       }
@@ -243,6 +243,16 @@ function wireRetryChoices(container, feedback, { task, isCorrect, correctText, h
 }
 
 // ---------- each task: its HTML, then its setup ----------
+
+// Real life (8 Nov 2026): the numbers as chips. In order, each chip also shows
+// its place (1st, 2nd...) under it. Numbers only, so this HTML is safe.
+function orderChipsHTML(numbers, inPlaces) {
+  return numbers.map((value, i) => `
+    <li class="order-chip${inPlaces ? ' order-chip--sorted' : ''}" style="--i: ${i}">
+      <span class="order-value">${value}</span>
+      ${inPlaces ? `<span class="order-place">${i + 1}</span>` : ''}
+    </li>`).join('');
+}
 
 function statCard(label, value) {
   return `<div class="stat-card"><span class="stat-label">${label}</span><span class="stat-value">${value}</span></div>`;
@@ -372,6 +382,11 @@ const TASK_HTML = {
       ${content.realLife.medianQuestion ? `
         <div id="median-question" hidden>
           <p><strong>2.</strong> ${content.realLife.medianQuestion}</p>
+          <!-- 8 Nov 2026 (Habiba): the child can put the numbers in order first -->
+          <div class="order-tool">
+            <ol class="order-row" id="order-row" aria-label="The numbers">${orderChipsHTML(list, false)}</ol>
+            <button class="btn btn-secondary" id="order-btn" type="button">🔢 Put them in order</button>
+          </div>
           <div class="choice-row" id="median-choices">${choiceButtons(choicesFor(list))}</div>
           <p class="feedback" id="median-feedback" hidden></p>
         </div>` : ''}
@@ -588,11 +603,24 @@ const TASK_SETUP = {
 
     if (!realLife.medianQuestion) return;
     const theMedian = median(list);
+    // "Put them in order": the chips line up smallest to biggest, each with
+    // its place (1 to 7) under it. The child still finds the centre.
+    let sorted = false;
+    const orderButton = document.getElementById('order-btn');
+    orderButton.addEventListener('click', () => {
+      sorted = true;
+      document.getElementById('order-row').innerHTML = orderChipsHTML([...list].sort(compareValues), true);
+      orderButton.disabled = true;
+      orderButton.textContent = '✅ In order, smallest to biggest';
+      logEvent('number-lab', 'reallife-sorted', { scenarioId: recipe.id });
+    });
     wireRetryChoices(document.getElementById('median-choices'), document.getElementById('median-feedback'), {
       task: 'real-life-median',
       isCorrect: (answer) => Number(answer) === theMedian,
       correctText: `✅ Yes! In order: ${inOrder(list)}. The one in the centre is ${theMedian}. It is the median.`,
-      hintText: '🤔 Not quite. First put them in order, from smallest to biggest.',
+      hintText: () => (sorted
+        ? '🤔 Not quite. The centre has the same number of boxes on each side.'
+        : '🤔 Not quite. Tap "Put them in order" first.'),
       onCorrect: () => markComplete(n),
     });
   },

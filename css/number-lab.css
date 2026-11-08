@@ -400,3 +400,54 @@
   font-weight: 800;
   color: var(--color-navy);
 }
+
+/* ---------- Real life: "Put them in order" (8 Nov 2026) ---------- */
+/* The numbers as chips; in order, each pops into place, with its place under it. */
+.order-tool {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin: 8px 0 14px;
+}
+
+.order-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-chip {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.order-value {
+  display: grid;
+  place-items: center;
+  min-width: 52px;
+  min-height: 48px;
+  padding: 0 8px;
+  border: 2px solid var(--color-navy);
+  border-radius: 12px;
+  background: var(--color-card-bg);
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.order-chip--sorted .order-value {
+  background: #E8F4FF;
+  animation: m-pop var(--duration-medium) var(--ease-spring) both;
+  animation-delay: calc(var(--i) * 80ms);
+}
+
+.order-place {
+  font-size: 16px; /* a short label: the place, 1 to 7 */
+  font-weight: 800;
+  color: #4A6580;
+}
