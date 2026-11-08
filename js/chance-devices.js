@@ -6,6 +6,7 @@
 // playDevice() moves a device to the real result, with its sound at the same time.
 import { needleAngle } from './helpers/chance.js';
 import { playSound } from './sounds.js';
+import { iconHTML } from './icon-text.js';
 
 export const SPINNER_COLOURS = { Red: '#FF7A6B', Blue: '#38B6FF', Green: '#4CC26B', Yellow: '#FFC531' };
 export const isSpinner = (device) => device.outcomes.every((o) => SPINNER_COLOURS[o]);
@@ -82,13 +83,13 @@ export function deviceHTML(device, { labels = false } = {}) {
   return spinnerHTML(device, labels);
 }
 
-// A small round token for one outcome: its colour (spinner), 🦉 / 🪶 (coin),
+// A small round token for one outcome: its colour (spinner), owl / feather icons (coin),
 // or its number (dice). The name is always written next to it.
 export function tokenHTML(outcome) {
   const colour = SPINNER_COLOURS[outcome];
   let inside = '';
-  if (outcome === 'Heads') inside = '🦉';
-  if (outcome === 'Tails') inside = '🪶';
+  if (outcome === 'Heads') inside = iconHTML('owl'); // Part 54f: our icons
+  if (outcome === 'Tails') inside = iconHTML('feather');
   if (/^[1-6]$/.test(outcome)) inside = outcome;
   return `<span class="cl-token" style="--c: ${colour || '#FFFFFF'}" aria-hidden="true">${inside}</span>`;
 }

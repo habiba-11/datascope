@@ -38,7 +38,8 @@ export function referencesIn(file) {
     for (const [, raw] of text.matchAll(/fetch\(\s*'([^']+)'/g)) add(raw, raw.startsWith('../') ? 'rooms' : '.');
   }
   if (file.endsWith('.css')) {
-    for (const [, raw] of text.matchAll(/url\(\s*'?([^')]+)'?\s*\)/g)) add(raw, here);
+    // Single, double or no quotes (Part 54f: a built-in data: icon uses double quotes).
+    for (const [, raw] of text.matchAll(/url\(\s*['"]?([^'")]+)['"]?\s*\)/g)) add(raw, here);
   }
   return found;
 }

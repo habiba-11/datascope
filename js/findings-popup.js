@@ -7,6 +7,7 @@
 import { openModal } from './modal.js';
 import { logEvent } from './helpers/log.js';
 import { pipSVG } from './pip.js';
+import { iconNode, setIconText, setIconLine } from './icon-text.js';
 
 function el(tag, text = '', className = '') {
   const element = document.createElement(tag);
@@ -20,9 +21,7 @@ function section(icon, title, colour, extraClass = '') {
   const box = el('section', '', `fd-sec ${extraClass} m-rise`);
   box.style.setProperty('--c', `var(--color-${colour})`);
   const head = el('h3', '', 'fd-head');
-  const emoji = el('span', icon);
-  emoji.setAttribute('aria-hidden', 'true');
-  head.append(emoji, title);
+  head.append(iconNode(icon), ` ${title}`); // `icon`: an illustration name (Part 54f)
   const body = el('div', '', 'fd-body');
   box.append(head, body);
   return { box, body };
@@ -53,7 +52,9 @@ function votesNode(data) {
     list.append(row);
   });
   const mode = el('p', '', 'fd-mode');
-  mode.append(el('span', '🏆 Most common (mode): '), el('b', data.mode));
+  const modeLabel = el('span');
+  setIconText(modeLabel, 'trophy', 'Most common (mode): ');
+  mode.append(modeLabel, el('b', data.mode));
   return [list, mode];
 }
 
@@ -79,8 +80,9 @@ function compareNode(rows) {
   const corner = el('th');
   corner.setAttribute('scope', 'col');
   head.append(corner);
-  [['📖 Class A', 'fd-col-a'], ['📖 Class B', 'fd-col-b'], ['', '']].forEach(([name, className]) => {
-    const th = el('th', name, className);
+  [['book-green', 'Class A', 'fd-col-a'], ['book', 'Class B', 'fd-col-b'], ['', '', '']].forEach(([icon, name, className]) => {
+    const th = el('th', '', className);
+    if (icon) setIconText(th, icon, name);
     th.setAttribute('scope', 'col');
     head.append(th);
   });
@@ -108,13 +110,21 @@ function compareNode(rows) {
 function dataNode(data, wordsNote) {
   let title = 'The data · two classes';
   if (data.kind !== 'compare') title = `The data · ${data.classSize} kids answered`;
-  const { box, body } = section('🔢', title, 'collect-light');
+  const { box, body } = section('numbers', title, 'collect-light');
   if (data.kind === 'category') {
     body.append(...votesNode(data));
-    if (wordsNote) body.append(el('p', `🔤 ${wordsNote}`, 'fd-words'));
+    if (wordsNote) {
+      const note = el('p', '', 'fd-words');
+      setIconText(note, 'letters', wordsNote);
+      body.append(note);
+    }
   } else if (data.kind === 'compare') {
     body.append(compareNode(data.rows));
-    if (data.note) body.append(el('p', data.note, 'fd-note'));
+    if (data.note) {
+      const note = el('p', '', 'fd-note');
+      setIconLine(note, data.note);
+      body.append(note);
+    }
   } else {
     body.append(tilesNode(data.tiles), lineNode(data.line));
   }
@@ -122,12 +132,13 @@ function dataNode(data, wordsNote) {
 }
 
 function thinkingNode(rows, noGuess) {
-  const { box, body } = section('🧠', 'My thinking', 'plan-light');
+  const { box, body } = section('brain', 'My thinking', 'plan-light');
   const list = el('ol', '', 'fd-timeline');
   rows.forEach((row, i) => {
     const item = el('li', '', 'm-rise');
     item.style.setProperty('--i', String(4 + i));
-    const icon = el('span', row.icon, 'fd-ic');
+    const icon = el('span', '', 'fd-ic');
+    icon.append(iconNode(row.icon));
     icon.setAttribute('aria-hidden', 'true');
     icon.style.setProperty('--c', `var(--color-${row.color})`);
     const bubble = el('div', '', 'fd-bubble');
@@ -145,7 +156,7 @@ function thinkingNode(rows, noGuess) {
 // Opens the pop-up. `auto` = it opened by itself (it is logged either way).
 export function openFindings(findings, { auto, wordsNote }) {
   const body = el('div', '', 'fd');
-  const question = section('❓', 'Our question', 'ask-light', 'fd-q');
+  const question = section('question', 'Our question', 'ask-light', 'fd-q');
   question.body.textContent = findings.question;
   const tip = el('p', '', 'fd-tip');
   const pip = el('span', '', 'fd-tip-pip');
@@ -156,12 +167,12 @@ export function openFindings(findings, { auto, wordsNote }) {
 
   logEvent('evidence-board', 'findings-viewed', { auto });
   return openModal({
-    icon: '📋',
+    icon: 'clipboard',
     title: 'My findings',
     accent: 'conclude',
     className: 'findings-modal',
     body,
-    buttons: [{ label: auto ? "✍️ Let's write my claim" : '↩ Back to my claim', value: 'go', main: true }],
+    buttons: [{ label: auto ? "Let's write my claim" : 'Back to my claim', icon: auto ? 'pencil' : '', value: 'go', main: true }],
     // The bars grow once the pop-up is really on screen (reduced motion: no growing).
     onOpen: (dialog) => requestAnimationFrame(() => requestAnimationFrame(() => {
       dialog.querySelectorAll('.fd-track i').forEach((fill) => { fill.style.width = fill.dataset.width; });

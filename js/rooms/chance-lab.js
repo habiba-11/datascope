@@ -11,6 +11,7 @@ import { pipSay } from '../pip.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { wireChoiceCards } from '../choices.js';
+import { iconHTML, setIconLine } from '../icon-text.js';
 import {
   deviceHTML, tokenHTML, playDevice, resetDevice, isSpinner, SPINNER_COLOURS,
 } from '../chance-devices.js';
@@ -62,7 +63,7 @@ async function init() {
       tabsHTML: exploreCardTabsHTML(),
       bodyHTML: `
         <div id="stepper"></div>
-        ${pipLineHTML(story, '🎲 Pick a chance game')}
+        ${pipLineHTML(story, ':die: Pick a chance game')}
 
         <section class="task" data-task="1">
           <div class="device-grid" id="device-grid" aria-label="Chance games">
@@ -91,7 +92,7 @@ async function init() {
               <div class="certainty-scale likely-scale" id="certainty-scale" role="group" aria-label="How likely">
                 ${certaintyButtonsHTML()}
               </div>
-              <label for="predict-reason" class="reason-label">✏️ Why do you think so?</label>
+              <label for="predict-reason" class="reason-label">${iconHTML('pencil')} Why do you think so?</label>
               <textarea id="predict-reason" class="reason-input" rows="2" placeholder="Because..."></textarea>
               <div class="hint-list-slot" id="why-hints"></div>
               <p class="feedback" id="predict-feedback" hidden></p>
@@ -133,7 +134,7 @@ async function init() {
   showTask(1);
 }
 
-const TASK_QUESTIONS = ['🎲 Pick a chance game', '', '🔁 Test it many times'];
+const TASK_QUESTIONS = [':die: Pick a chance game', '', ':repeat: Test it many times'];
 
 function showTask(n) {
   document.querySelectorAll('.task').forEach((el) => {
@@ -149,7 +150,7 @@ function showTask(n) {
     document.getElementById('predict-art').innerHTML = deviceHTML(selectedDevice, { labels: true });
     question = `How likely is it that the ${selectedDevice.label.toLowerCase()} lands on ${selectedDevice.target}?`;
   }
-  document.querySelector('.task-question').textContent = question;
+  setIconLine(document.querySelector('.task-question'), question);
   pipSay([story, 'Guess first. Then test it many times!', 'Compare what should happen with what did happen.'][n - 1]);
   bar.setBack(n === 1 ? { label: 'Number Lab', href: 'number-lab.html' } : { label: 'Back', onClick: () => showTask(n - 1) });
   bar.setHint(n === 2 ? hint.button : null);
@@ -165,7 +166,7 @@ function refreshRunButton() {
   const button = document.getElementById('run-btn');
   if (!selectedDevice) return;
   const tested = chanceFacts.runSizes.length > 0;
-  button.textContent = running ? `⏳ ${selectedDevice.ing}...` : `▶ ${runWord(selectedDevice)} ${runSize} times`;
+  setIconLine(button, running ? `:clock: ${selectedDevice.ing}...` : `:play: ${runWord(selectedDevice)} ${runSize} times`);
   button.disabled = running;
   button.classList.toggle('m-nudge', !running && !tested);
 }
@@ -179,17 +180,17 @@ function refreshPrimary() {
   if (currentTask === 1) {
     bar.setPrimary(selectedDevice
       ? { label: 'Next: How likely? →', ready: true, onClick: () => showTask(2) }
-      : { label: '', enabled: false, whyDisabled: '👆 Pick a game first' });
+      : { label: '', enabled: false, whyDisabled: ':tap: Pick a game first' });
   } else if (currentTask === 2) {
-    if (!rating) bar.setPrimary({ label: '', enabled: false, whyDisabled: '👆 Pick how likely' });
-    else if (!reasonGiven) bar.setPrimary({ label: '', enabled: false, whyDisabled: '✏️ Say why first' });
+    if (!rating) bar.setPrimary({ label: '', enabled: false, whyDisabled: ':tap: Pick how likely' });
+    else if (!reasonGiven) bar.setPrimary({ label: '', enabled: false, whyDisabled: ':pencil: Say why first' });
     else bar.setPrimary({ label: 'Next: Test it →', ready: true, onClick: () => showTask(3) });
   } else if (running || !tested) {
-    bar.setPrimary({ label: '', enabled: false, whyDisabled: running ? `⏳ ${selectedDevice.ing}...` : '👆 Test it first' });
+    bar.setPrimary({ label: '', enabled: false, whyDisabled: running ? `:clock: ${selectedDevice.ing}...` : ':tap: Test it first' });
   } else if (isPhaseDone('chance') && taskComplete[3]) {
-    bar.setPrimary({ label: '🚩 Next: Evidence Board →', ready: true, onClick: () => { location.href = 'evidence-board.html'; } });
+    bar.setPrimary({ label: ':flag: Next: Evidence Board →', ready: true, onClick: () => { location.href = 'evidence-board.html'; } });
   } else {
-    bar.setPrimary({ label: "✅ I'm done testing", ready: true, onClick: () => finishPhase('chance', withYourWork()).then(refreshPrimary) });
+    bar.setPrimary({ label: ":check: I'm done testing", ready: true, onClick: () => finishPhase('chance', withYourWork()).then(refreshPrimary) });
   }
 }
 
@@ -270,11 +271,11 @@ function setupPredict() {
   function checkComplete() {
     if (!chosen) return;
     if (!reasonInput.value.trim()) {
-      feedback.textContent = '✏️ Now say why you think so!';
+      setIconLine(feedback, ':pencil: Now say why you think so!');
       feedback.hidden = false;
       return;
     }
-    feedback.textContent = `👍 You think ${selectedDevice.target} is "${chosen.toLowerCase()}". Let's test it!`;
+    setIconLine(feedback, `:thumbsup: You think ${selectedDevice.target} is "${chosen.toLowerCase()}". Let's test it!`);
     feedback.hidden = false;
     markComplete(2);
   }
@@ -322,7 +323,7 @@ function runTrial(device) {
 function outcomeCardHTML(device, row, tested) {
   const name = /^[1-6]$/.test(row.name) ? `Rolling a ${row.name}` : row.name;
   const goal = row.name === device.target;
-  const tracked = goal ? '<span class="tracked">⭐ we track this</span>' : '';
+  const tracked = goal ? `<span class="tracked">${iconHTML('star')} we track this</span>` : '';
   const line = (word, pct, big, small, fillClass) => `
     <div class="bar-line">
       <div class="bar-head"><span class="bar-word">${word}</span><span class="bar-value">${big}</span></div>
@@ -397,10 +398,10 @@ function setupTrials() {
       const experimentPct = toPct(timesHit, count);
       const gap = Math.abs(timesHit / count - device.weights[targetIndex] / totalWeight);
 
-      feedback.textContent = trialMessage({
+      setIconLine(feedback, trialMessage({
         count, verb: device.verb, target: device.target, timesHit,
         pct: experimentPct, theory: theoryWords(device.weights[targetIndex], totalWeight), previous: previousRun, gap,
-      });
+      }));
       feedback.hidden = false;
       logEvent('chance-lab', 'trials', {
         device: device.label, outcome: device.target, trials: count, timesHit,

@@ -61,7 +61,7 @@ function dataPart(kind, values, stats) {
       })),
       // "Same mean, different spread" is the lesson, so it is said in words.
       note: sameMean && stats.range !== b.range
-        ? `⚖️ Same mean (${formatMean(stats.mean)}), but the range is ${stats.range} vs ${b.range}.`
+        ? `:scales: Same mean (${formatMean(stats.mean)}), but the range is ${stats.range} vs ${b.range}.`
         : null,
     };
   }
@@ -82,18 +82,18 @@ function thinkingPart(kind, stats, journey) {
   const rows = [];
   if (plan.guess !== null) {
     rows.push({
-      icon: '🤔', color: 'plan', label: 'Your first guess', text: String(plan.guess),
+      icon: 'question', color: 'plan', label: 'Your first guess', text: String(plan.guess),
       matched: kind === 'category' && stats.mode.includes(plan.guess),
     });
   }
   if (number.revision && number.revision.changed) {
     rows.push({
-      icon: '✏️', color: 'ask-light', label: 'You changed your mind',
+      icon: 'pencil', color: 'ask-light', label: 'You changed your mind',
       text: `From ${number.guess} to ${number.revision.newGuess}`, because: number.revision.reason,
     });
   }
-  if (graph.tell) rows.push({ icon: '📊', color: 'explore', label: 'You said the graph shows', text: `"${graph.tell}"` });
-  if (graph.notTell) rows.push({ icon: '🔍', color: 'conclude', label: "And what it can't show", text: `"${graph.notTell}"` });
+  if (graph.tell) rows.push({ icon: 'chart', color: 'explore', label: 'You said the graph shows', text: `"${graph.tell}"` });
+  if (graph.notTell) rows.push({ icon: 'magnifier', color: 'conclude', label: "And what it can't show", text: `"${graph.notTell}"` });
   return rows;
 }
 

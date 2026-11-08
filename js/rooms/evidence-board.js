@@ -19,7 +19,7 @@ import { countWords } from '../helpers/feedback.js';
 import { pipSay } from '../pip.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML, wordsNoteHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
-import { iconLineHTML } from '../icon-text.js';
+import { iconHTML, iconLineHTML, setIconText, setIconLine } from '../icon-text.js';
 
 // Claim -> Evidence -> How sure (Paper 17's three parts). The audience/form task
 // was removed on 26 Oct 2026 (Habiba's decision: it had no purpose for the child).
@@ -39,9 +39,9 @@ let becauseHint = null; // the answers for "...because..."
 // The 3-zone layout (UI guide): each step on the left, and the child's
 // Evidence Card on the right, filling up slot by slot as they go (f8).
 const STEPS = [
-  { label: 'Say it', question: '💬 Say what you found', pip: 'Share what you found. What do you think, and why?' },
-  { label: 'Proof', question: '🔢 Pick your proof', pip: 'Pick the numbers that prove your idea.' },
-  { label: 'How sure', question: '🤔 How sure are you?', pip: 'Real scientists say how sure they are.' },
+  { label: 'Say it', question: ':speech: Say what you found', pip: 'Share what you found. What do you think, and why?' },
+  { label: 'Proof', question: ':numbers: Pick your proof', pip: 'Pick the numbers that prove your idea.' },
+  { label: 'How sure', question: ':question: How sure are you?', pip: 'Real scientists say how sure they are.' },
 ];
 
 async function init() {
@@ -82,7 +82,7 @@ async function init() {
     accent: 'conclude',
     layout: 'card',
     contentHTML: taskCardHTML({
-      title: '🚩 Conclude · Evidence Board',
+      title: ':flag: Conclude · Evidence Board',
       bodyHTML: `
         <div id="stepper"></div>
         <div class="card-panels evidence-panels">
@@ -111,14 +111,14 @@ async function init() {
               <div class="certainty-scale likely-scale" id="certainty-scale" role="group" aria-label="How sure">
                 ${certaintyButtonsHTML('choice-btn')}
               </div>
-              <label for="certainty-reason" class="reason-label">✏️ Why are you that sure?</label>
+              <label for="certainty-reason" class="reason-label">${iconHTML('pencil')} Why are you that sure?</label>
               <textarea id="certainty-reason" rows="2" placeholder="Because..."></textarea>
               <div class="hint-list-slot" id="sure-hints"></div>
             </section>
           </div>
 
           <section class="evidence-card" id="evidence-card" aria-labelledby="card-title">
-            <h2 class="evidence-card-title" id="card-title">🏅 My Evidence Card</h2>
+            <h2 class="evidence-card-title" id="card-title">${iconHTML('medal')} My Evidence Card</h2>
             <div class="card-slot" data-slot="1"><span class="slot-number" aria-hidden="true">1</span><div><strong>I think...</strong><p class="slot-text" id="slot-claim">Not yet</p></div></div>
             <div class="card-slot" data-slot="2"><span class="slot-number" aria-hidden="true">2</span><div><strong>My proof</strong><p class="slot-text" id="slot-proof">Not yet</p></div></div>
             <div class="card-slot" data-slot="3"><span class="slot-number" aria-hidden="true">3</span><div><strong>How sure am I?</strong><p class="slot-text" id="slot-sure">Not yet</p></div></div>
@@ -160,7 +160,7 @@ async function init() {
   const findingsBtn = document.createElement('button');
   findingsBtn.type = 'button';
   findingsBtn.className = 'btn';
-  findingsBtn.textContent = '📋 My findings';
+  setIconText(findingsBtn, 'clipboard', 'My findings');
   findingsBtn.addEventListener('click', () => openFindings(findings, { auto: false, wordsNote }));
   addTitleButton(findingsBtn);
   if (!isPhaseDone('conclude')) whenIntroClosed().then(() => openFindings(findings, { auto: true, wordsNote }));
@@ -173,7 +173,7 @@ function showTask(n) {
   currentTask = n;
   const step = STEPS[n - 1];
   document.getElementById('stepper').innerHTML = miniStepperHTML(STEPS.map((x) => x.label), n - 1);
-  document.querySelector('.task-question').textContent = step.question;
+  setIconLine(document.querySelector('.task-question'), step.question);
   pipSay(step.pip);
   // The slot being filled now is outlined on the card.
   document.querySelectorAll('.card-slot').forEach((slot) => slot.classList.toggle('now', Number(slot.dataset.slot) === n));
@@ -188,19 +188,19 @@ function refreshPrimary() {
   if (currentTask === 1) {
     bar.setPrimary(filled('claim-subject') && filled('claim-reason')
       ? { label: 'Next: Pick your proof →', ready: true, onClick: () => { markComplete(1); showTask(2); } }
-      : { label: '', enabled: false, whyDisabled: '✏️ Fill in both gaps' });
+      : { label: '', enabled: false, whyDisabled: ':pencil: Fill in both gaps' });
   } else if (currentTask === 2) {
     bar.setPrimary(selectedEvidence.size > 0
       ? { label: 'Next: How sure? →', ready: true, onClick: () => showTask(3) }
-      : { label: '', enabled: false, whyDisabled: '👆 Pick your proof' });
+      : { label: '', enabled: false, whyDisabled: ':tap: Pick your proof' });
   } else if (cardMade) {
-    bar.setPrimary({ label: '🗺️ See my journey →', ready: true, onClick: () => { location.href = 'my-journey.html'; } });
+    bar.setPrimary({ label: ':map: See my journey →', ready: true, onClick: () => { location.href = 'my-journey.html'; } });
   } else if (!selectedCertainty) {
-    bar.setPrimary({ label: '', enabled: false, whyDisabled: '👆 Pick how sure' });
+    bar.setPrimary({ label: '', enabled: false, whyDisabled: ':tap: Pick how sure' });
   } else if (!filled('certainty-reason')) {
-    bar.setPrimary({ label: '', enabled: false, whyDisabled: '✏️ Say why first' });
+    bar.setPrimary({ label: '', enabled: false, whyDisabled: ':pencil: Say why first' });
   } else {
-    bar.setPrimary({ label: '🏅 Make my Evidence Card', ready: true, onClick: makeCard });
+    bar.setPrimary({ label: ':medal: Make my Evidence Card', ready: true, onClick: makeCard });
   }
 }
 
@@ -317,7 +317,7 @@ function makeCard() {
   card.querySelector('.card-stamp')?.remove();
   const mark = document.createElement('span');
   mark.className = 'card-stamp';
-  mark.textContent = '✅ Checked!';
+  setIconText(mark, 'check', 'Checked!');
   card.append(mark);
   stamp(mark);
   // The thud and the confetti come when the stamp lands (stamp() takes MOTION.medium).
