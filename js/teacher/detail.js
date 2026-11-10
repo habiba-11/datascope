@@ -5,16 +5,17 @@
 import { PHASES } from '../helpers/progress.js';
 import { sourceLabel } from '../helpers/thesis.js';
 import { twoTapButton } from './two-tap.js';
+import { setIconLine } from '../icon-text.js';
 
 const PHASE_NAMES = {
-  ask: '❓ Ask', plan: '🗺️ Plan', collect: '📋 Collect', graph: '📊 Graph Lab',
-  number: '🔢 Number Lab', chance: '🎲 Chance Lab', conclude: '🚩 Conclude',
+  ask: ':question: Ask', plan: ':map: Plan', collect: ':clipboard: Collect', graph: ':chart: Graph Lab',
+  number: ':numbers: Number Lab', chance: ':die: Chance Lab', conclude: ':flag: Conclude',
 };
 const BASIC_FIELDS = ['id', 'code', 'time', 'room', 'type'];
 
 function el(tag, text = '', className = '') {
   const element = document.createElement(tag);
-  element.textContent = text;
+  setIconLine(element, text); // our texts name icons as :name: (Part 54h)
   if (className) element.className = className;
   return element;
 }
@@ -70,18 +71,18 @@ export function renderDetail(container, row, entries, scenarioTitle, { tagsNode 
 
   const heading = el('h2', `${row.code} · ${scenarioTitle}`);
   const badges = el('p', '', 'detail-badges');
-  badges.textContent = [
-    row.demo ? '🧪 DEMO' : '',
-    row.preview ? '👀 preview run' : '',
-    `${row.finished ? '✅ finished' : `${row.phasesDone} of 7 phases`}`,
-    `⭐ ${row.totalStars} stars`,
-    `💡 ${row.hintsUsed} hints`,
-    `👆 answers tapped in: ${row.suggestionsUsed}`,
-  ].filter(Boolean).join(' · ');
+  setIconLine(badges, [
+    row.demo ? ':masks: DEMO' : '',
+    row.preview ? ':magnifier: preview run' : '',
+    `${row.finished ? ':check: finished' : `${row.phasesDone} of 7 phases`}`,
+    `:star: ${row.totalStars} stars`,
+    `:bulb: ${row.hintsUsed} hints`,
+    `:tap: answers tapped in: ${row.suggestionsUsed}`,
+  ].filter(Boolean).join(' · '));
 
   const phases = table(['Phase', 'Done', 'Stars', 'Minutes'], PHASES.map((phase) => [
     [PHASE_NAMES[phase]],
-    [row[`${phase}Done`] ? '✅ yes' : '– not yet'],
+    [row[`${phase}Done`] ? ':check: yes' : '– not yet'],
     [show(row[`${phase}Stars`])],
     [show(row[`${phase}Minutes`])],
   ]), 'phase-table');
@@ -98,7 +99,7 @@ export function renderDetail(container, row, entries, scenarioTitle, { tagsNode 
   const words = definitionList([
     ['Plan guess', row.planGuess],
     ['Number Lab guess → mean', row.numberGuess === null ? null : `${row.numberGuess} → ${show(row.mean)} (off by ${show(row.predictionError)})`],
-    ['Number Lab puzzles', `✅ ${row.tasksFirstTry} first try · 💡 ${row.tasksAfterHint} after another try · ❌ ${row.tasksUnsolved} unsolved`],
+    ['Number Lab puzzles', `:check: ${row.tasksFirstTry} first try · :bulb: ${row.tasksAfterHint} after another try · :cross: ${row.tasksUnsolved} unsolved`],
     ['Changed mind after the data', row.revised === null ? null : `${row.revised ? 'yes' : 'no'}${row.revisionReason ? `, because ${withSource(`"${row.revisionReason}"`, row.revisionReasonSource)}` : ''}`],
     ['Graph: what it shows', withSource(row.graphTell, row.graphTellSource)],
     ['Graph: what it can NOT show', withSource(row.graphNotTell, row.graphNotTellSource)],
@@ -125,18 +126,18 @@ export function renderDetail(container, row, entries, scenarioTitle, { tagsNode 
     back,
     heading,
     badges,
-    section('📈 Phases', phases),
-    section('💬 Their answers and words', words),
+    section(':chart: Phases', phases),
+    section(':speech: Their answers and words', words),
   );
-  if (tagsNode) container.append(section('🏷️ Misconception tags', tagsNode));
-  container.append(section('🕒 Timeline', timeline));
+  if (tagsNode) container.append(section(':pin: Misconception tags', tagsNode));
+  container.append(section(':clock: Timeline', timeline));
 
   // Privacy: the teacher can delete one child's data (two taps, never by accident).
   if (onDelete) {
-    const remove = el('button', `🗑️ Delete all of ${row.code}'s data`, 'btn btn-secondary');
+    const remove = el('button', `:cross: Delete all of ${row.code}'s data`, 'btn btn-secondary');
     remove.type = 'button';
-    twoTapButton(remove, `⚠️ Tap again to delete ${row.code} for good`, () => onDelete(row.code));
-    container.append(section('🔒 Privacy', remove));
+    twoTapButton(remove, `:warning: Tap again to delete ${row.code} for good`, () => onDelete(row.code));
+    container.append(section(':lock: Privacy', remove));
   }
   container.hidden = false;
   back.focus();

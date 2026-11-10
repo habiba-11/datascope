@@ -65,7 +65,7 @@ const KEYS = THESIS_COLUMNS.map((c) => c.key);
 
 // Where an answer came from, in words for the teacher's page ('' = not recorded).
 export function sourceLabel(source) {
-  const labels = { own: '✍️ own words', hint: '💡 from a hint, unchanged', 'hint-edited': '✏️ from a hint, changed' };
+  const labels = { own: ':pencil: own words', hint: ':bulb: from a hint, unchanged', 'hint-edited': ':pencil: from a hint, changed' }; // :name: = icon
   return labels[source] || '';
 }
 

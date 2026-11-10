@@ -21,9 +21,9 @@
 
     <!-- ---------- Getting in (one of these two is shown) ---------- -->
     <section class="gate" id="pin-gate">
-      <h1>🧑‍🏫 Teacher dashboard</h1>
+      <h1><span data-icon="chart"></span> Teacher dashboard</h1>
       <form id="pin-form" class="gate-form">
-        <label for="pin-input">🔒 Teacher PIN</label>
+        <label for="pin-input"><span data-icon="lock"></span> Teacher PIN</label>
         <input type="password" id="pin-input" autocomplete="off">
         <button class="btn btn-main" type="submit">Open the dashboard</button>
       </form>
@@ -31,11 +31,11 @@
     </section>
 
     <section class="gate" id="login-gate" hidden>
-      <h1>🧑‍🏫 Teacher dashboard</h1>
+      <h1><span data-icon="chart"></span> Teacher dashboard</h1>
       <form id="login-form" class="gate-form">
-        <label for="login-email">📧 Email</label>
+        <label for="login-email"><span data-icon="email"></span> Email</label>
         <input type="email" id="login-email" autocomplete="username" required>
-        <label for="login-password">🔒 Password</label>
+        <label for="login-password"><span data-icon="lock"></span> Password</label>
         <input type="password" id="login-password" autocomplete="current-password" required>
         <button class="btn btn-main" type="submit">Log in</button>
       </form>
@@ -46,23 +46,23 @@
     <div id="dashboard" hidden>
       <header class="dash-top">
         <div>
-          <h1>🧑‍🏫 Teacher dashboard</h1>
+          <h1><span data-icon="chart"></span> Teacher dashboard</h1>
           <p class="dash-who" id="dash-who"></p>
         </div>
         <div class="dash-top-actions">
-          <button class="btn btn-secondary" id="refresh-btn" type="button" hidden>🔄 Refresh</button>
-          <button class="btn btn-secondary" id="logout-btn" type="button" hidden>🚪 Log out</button>
+          <button class="btn btn-secondary" id="refresh-btn" type="button" hidden><span data-icon="repeat"></span> Refresh</button>
+          <button class="btn btn-secondary" id="logout-btn" type="button" hidden><span data-icon="door"></span> Log out</button>
         </div>
       </header>
 
       <p class="feedback" id="teacher-feedback" aria-live="polite" hidden></p>
-      <p class="demo-banner" id="demo-banner" hidden>🧪 DEMO is on: DEMO-01 to DEMO-04 are made-up children, only to try the dashboard. Never saved, never exported.</p>
+      <p class="demo-banner" id="demo-banner" hidden><span data-icon="masks"></span> DEMO is on: DEMO-01 to DEMO-04 are made-up children, only to try the dashboard. Never saved, never exported.</p>
 
       <div class="dash-tabs" role="tablist" aria-label="Dashboard sections">
-        <button class="dash-tab" role="tab" type="button" id="tab-class" aria-controls="panel-class">📊 Class</button>
-        <button class="dash-tab" role="tab" type="button" id="tab-children" aria-controls="panel-children">👧 Children</button>
-        <button class="dash-tab" role="tab" type="button" id="tab-thesis" aria-controls="panel-thesis">📥 Thesis data</button>
-        <button class="dash-tab" role="tab" type="button" id="tab-settings" aria-controls="panel-settings">⚙️ Settings</button>
+        <button class="dash-tab" role="tab" type="button" id="tab-class" aria-controls="panel-class"><span data-icon="chart"></span> Class</button>
+        <button class="dash-tab" role="tab" type="button" id="tab-children" aria-controls="panel-children"><span data-icon="id-card"></span> Children</button>
+        <button class="dash-tab" role="tab" type="button" id="tab-thesis" aria-controls="panel-thesis"><span data-icon="download"></span> Thesis data</button>
+        <button class="dash-tab" role="tab" type="button" id="tab-settings" aria-controls="panel-settings"><span data-icon="gear"></span> Settings</button>
       </div>
 
       <div class="filter-row" id="filter-row">
@@ -72,7 +72,7 @@
         </select>
       </div>
 
-      <!-- 📊 Class: the big picture -->
+      <!-- Class: the big picture -->
       <section class="dash-panel" role="tabpanel" id="panel-class" aria-labelledby="tab-class" tabindex="0">
         <div class="overview" id="overview"></div>
         <p class="overview-more" id="overview-more"></p>
@@ -92,7 +92,7 @@
         </details>
       </section>
 
-      <!-- 👧 Children: a short list; "Open" shows one child's page -->
+      <!-- Children: a short list; "Open" shows one child's page -->
       <section class="dash-panel" role="tabpanel" id="panel-children" aria-labelledby="tab-children" tabindex="0" hidden>
         <div id="children-list">
           <div class="table-wrap">
@@ -115,45 +115,45 @@
         <section class="detail" id="detail" hidden></section>
       </section>
 
-      <!-- 📥 Thesis data: downloads (optional) and DEMO -->
+      <!-- Thesis data: downloads (optional) and DEMO -->
       <section class="dash-panel" role="tabpanel" id="panel-thesis" aria-labelledby="tab-thesis" tabindex="0" hidden>
         <p>Optional downloads for the Results chapter. Real children only: DEMO children are never exported.</p>
         <ul class="action-list">
           <li>
-            <button class="btn btn-main" id="export-thesis-btn" type="button">📑 thesis-metrics.csv</button>
+            <button class="btn btn-main" id="export-thesis-btn" type="button"><span data-icon="download"></span> thesis-metrics.csv</button>
             <span>One row per child per scenario, ready for Excel or SPSS.</span>
           </li>
           <li>
-            <button class="btn btn-secondary" id="export-dictionary-btn" type="button">📘 Data dictionary</button>
+            <button class="btn btn-secondary" id="export-dictionary-btn" type="button"><span data-icon="book"></span> Data dictionary</button>
             <span>What every column in thesis-metrics.csv means.</span>
           </li>
           <li>
-            <button class="btn btn-secondary" id="export-class-btn" type="button">📊 Every log moment</button>
+            <button class="btn btn-secondary" id="export-class-btn" type="button"><span data-icon="chart"></span> Every log moment</button>
             <span>The full reasoning log of every child, plus your tags.</span>
           </li>
         </ul>
 
-        <h2>🧪 DEMO data</h2>
+        <h2><span data-icon="masks"></span> DEMO data</h2>
         <ul class="action-list">
           <li>
-            <button class="btn btn-secondary" id="demo-btn" type="button" aria-pressed="false">🧪 Show DEMO data</button>
+            <button class="btn btn-secondary" id="demo-btn" type="button" aria-pressed="false"><span data-icon="masks"></span> Show DEMO data</button>
             <span>Adds 4 made-up children, to try the dashboard or show Prof.</span>
           </li>
         </ul>
 
       </section>
 
-      <!-- ⚙️ Settings: this device -->
+      <!-- Settings: this device -->
       <section class="dash-panel" role="tabpanel" id="panel-settings" aria-labelledby="tab-settings" tabindex="0" hidden>
-        <h2>🧹 Shared device</h2>
+        <h2><span data-icon="broom"></span> Shared device</h2>
         <ul class="action-list">
           <li>
-            <button class="btn btn-secondary" id="clear-device-btn" type="button">🧹 Clear this device</button>
-            <span id="clear-note">When a child's work shows ☁️ Saved online, removes their code from this device, so the next child starts fresh. (Their work stays safe in the database.)</span>
+            <button class="btn btn-secondary" id="clear-device-btn" type="button"><span data-icon="broom"></span> Clear this device</button>
+            <span id="clear-note">When a child's work shows <span data-icon="cloud"></span> Saved online, removes their code from this device, so the next child starts fresh. (Their work stays safe in the database.)</span>
           </li>
         </ul>
 
-        <h2>👀 Preview the rooms</h2>
+        <h2><span data-icon="magnifier"></span> Preview the rooms</h2>
         <ul class="action-list">
           <li>
             <button class="btn btn-secondary" id="preview-btn" type="button" aria-pressed="false"></button>

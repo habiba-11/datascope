@@ -7,6 +7,9 @@
 import { checkPin } from '../helpers/pin.js';
 import { backendReady } from '../config.js';
 import { isLoggedIn, logIn } from './cloud.js';
+import { setIconLine, fillIcons } from '../icon-text.js';
+
+fillIcons(); // the page's <span data-icon> icons (Part 54h)
 
 const UNLOCK_KEY = 'datascope:teacherUnlocked';
 
@@ -35,7 +38,7 @@ async function openDashboard() {
 
 function showMessage(id, text) {
   const message = document.getElementById(id);
-  message.textContent = text;
+  setIconLine(message, text); // :name: = icon (Part 54h)
   message.hidden = false;
 }
 
@@ -53,8 +56,8 @@ function setupLogin() {
     } catch (error) {
       const offline = !navigator.onLine || error instanceof TypeError; // fetch fails without internet
       showMessage('login-message', offline
-        ? '📴 No internet connection. Connect and try again.'
-        : `🔒 ${error.message}. Check the email and password.`);
+        ? ':cloud-off: No internet connection. Connect and try again.'
+        : `:lock: ${error.message}. Check the email and password.`);
     } finally {
       button.disabled = false;
     }
@@ -72,7 +75,7 @@ function setupPin() {
       rememberUnlock();
       openDashboard();
     } else {
-      showMessage('pin-message', '🔒 That PIN is not right. Try again.');
+      showMessage('pin-message', ':lock: That PIN is not right. Try again.');
       input.select();
     }
   });

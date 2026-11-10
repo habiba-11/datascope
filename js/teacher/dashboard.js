@@ -25,6 +25,7 @@ import { renderDetail } from './detail.js';
 import { twoTapButton } from './two-tap.js';
 import { setupTabs } from './tabs.js';
 import { backendReady } from '../config.js';
+import { setIconLine } from '../icon-text.js';
 import {
   fetchChildren, fetchTags, addTag, removeTag, deleteChild, logOut, teacherEmail,
 } from './cloud.js';
@@ -43,22 +44,23 @@ let charts = [];
 Chart.register(directLabelsPlugin);
 
 const PHASE_NAMES = {
-  ask: '❓ Ask', plan: '🗺️ Plan', collect: '📋 Collect', graph: '📊 Graph Lab',
-  number: '🔢 Number Lab', chance: '🎲 Chance Lab', conclude: '🚩 Conclude',
+  ask: ':question: Ask', plan: ':map: Plan', collect: ':clipboard: Collect', graph: ':chart: Graph Lab',
+  number: ':numbers: Number Lab', chance: ':die: Chance Lab', conclude: ':flag: Conclude',
 };
 
 const feedback = document.getElementById('teacher-feedback');
 const filter = document.getElementById('scenario-filter');
 
+// Our texts name icons as :name: (Part 54h, js/icon-text.js).
 function say(message) {
-  feedback.textContent = message;
+  setIconLine(feedback, message);
   feedback.hidden = false;
 }
 
 // Small helper: makes an element with plain text inside.
 function el(tag, text = '', className = '') {
   const element = document.createElement(tag);
-  element.textContent = text;
+  setIconLine(element, text);
   if (className) element.className = className;
   return element;
 }
@@ -83,18 +85,18 @@ function renderClass(rows) {
   const o = classOverview(rows);
   // The 4 numbers that matter most; the rest in one quiet line underneath.
   const tiles = [
-    ['👧 Children', o.children],
-    ['🏁 Finished', `${o.finished} of ${o.investigations}`],
-    ['🧩 Puzzles right first time', o.firstTryRate === null ? null : `${o.firstTryRate}%`],
-    ['🔄 Changed mind after data', o.revisedRate === null ? null : `${o.revisedRate}%`],
+    [':id-card: Children', o.children],
+    [':flag: Finished', `${o.finished} of ${o.investigations}`],
+    [':puzzle: Puzzles right first time', o.firstTryRate === null ? null : `${o.firstTryRate}%`],
+    [':repeat: Changed mind after data', o.revisedRate === null ? null : `${o.revisedRate}%`],
   ];
   document.getElementById('overview').replaceChildren(...tiles.map(([label, value]) => {
     const tile = el('div', '', 'tile');
     tile.append(el('span', show(value), 'tile-value'), el('span', label, 'tile-label'));
     return tile;
   }));
-  document.getElementById('overview-more').textContent =
-    `🎯 Average guess error: ${show(o.avgPredictionError)} · 💡 Hints used: ${o.hintsUsed}`;
+  setIconLine(document.getElementById('overview-more'),
+    `:target: Average guess error: ${show(o.avgPredictionError)} · :bulb: Hints used: ${o.hintsUsed}`);
 
   document.getElementById('funnel-rows').replaceChildren(...PHASES.map((phase) => {
     const tr = el('tr');
@@ -141,7 +143,7 @@ function renderChildren(rows) {
     const emptyRow = el('tr');
     const emptyCell = el('td', cloud
       ? 'No children yet. Their work appears here by itself when they use DataScope.'
-      : 'The online database is switched off. Tap "🧪 Show DEMO data" in Thesis data to try the dashboard.');
+      : 'The online database is switched off. Tap ":masks: Show DEMO data" in Thesis data to try the dashboard.');
     emptyCell.colSpan = 6;
     emptyRow.append(emptyCell);
     body.append(emptyRow);
@@ -149,7 +151,7 @@ function renderChildren(rows) {
 
   for (const row of rows) {
     const tr = el('tr');
-    const label = row.demo ? ' 🧪 DEMO' : (row.preview ? ' 👀 preview' : '');
+    const label = row.demo ? ' :masks: DEMO' : (row.preview ? ' :magnifier: preview' : '');
     const codeCell = el('th', `${row.code}${label}`, 'no-wrap');
     codeCell.scope = 'row';
 
@@ -159,9 +161,9 @@ function renderChildren(rows) {
     const fill = el('span', '', 'progress-fill');
     fill.style.width = `${(row.phasesDone / 7) * 100}%`;
     bar.append(fill);
-    progress.append(el('span', `${row.finished ? '✅ ' : ''}${row.phasesDone} of 7`), bar);
+    progress.append(el('span', `${row.finished ? ':check: ' : ''}${row.phasesDone} of 7`), bar);
 
-    const open = el('button', '🔍 Open', 'btn no-wrap');
+    const open = el('button', ':magnifier: Open', 'btn no-wrap');
     open.type = 'button';
     open.setAttribute('aria-label', `Open ${row.code}`);
     open.addEventListener('click', () => openChild(row));
@@ -175,7 +177,7 @@ function renderChildren(rows) {
       codeCell,
       el('td', titles[row.scenarioId] || row.scenarioId),
       progress,
-      el('td', `⭐ ${row.totalStars}`, 'no-wrap'),
+      el('td', `:star: ${row.totalStars}`, 'no-wrap'),
       claim,
       openCell,
     );
@@ -226,7 +228,7 @@ function tagBoxes(code) {
         input.checked = !input.checked;
         if (input.checked) now.add(tag.id); else now.delete(tag.id);
         tags[code] = [...now];
-        say(`⚠️ The tag was not saved: ${error.message}`);
+        say(`:warning: The tag was not saved: ${error.message}`);
       }
     });
     const papersWord = tag.papers.includes(',') ? 'Papers' : 'Paper';
@@ -290,7 +292,7 @@ document.getElementById('export-class-btn').addEventListener('click', () => {
 const demoBtn = document.getElementById('demo-btn');
 demoBtn.addEventListener('click', () => {
   showDemo = !showDemo;
-  demoBtn.textContent = showDemo ? '🧪 Hide DEMO data' : '🧪 Show DEMO data';
+  setIconLine(demoBtn, showDemo ? ':masks: Hide DEMO data' : ':masks: Show DEMO data');
   demoBtn.setAttribute('aria-pressed', String(showDemo));
   document.getElementById('demo-banner').hidden = !showDemo;
   closeChild();
@@ -299,7 +301,7 @@ demoBtn.addEventListener('click', () => {
 
 // ---------- ⚙️ Settings ----------
 
-twoTapButton(document.getElementById('clear-device-btn'), '⚠️ Tap again to clear this device', () => {
+twoTapButton(document.getElementById('clear-device-btn'), ':warning: Tap again to clear this device', () => {
   clearChildData();
   say("The child's code and work were cleared from this device. The next child can start fresh.");
 });
@@ -308,7 +310,7 @@ const previewBtn = document.getElementById('preview-btn');
 
 function showPreviewState() {
   const on = getPreviewAll();
-  previewBtn.textContent = on ? '👀 Preview is ON (tap to turn off)' : '🔒 Preview is OFF (tap to turn on)';
+  setIconLine(previewBtn, on ? ':magnifier: Preview is ON (tap to turn off)' : ':lock: Preview is OFF (tap to turn on)');
   previewBtn.setAttribute('aria-pressed', String(on));
 }
 
@@ -321,20 +323,20 @@ previewBtn.addEventListener('click', () => {
 
 // Loads every child's work and the tags from the database.
 async function loadFromCloud() {
-  say('⏳ Loading the children\'s work...');
+  say(':clock: Loading the children\'s work...');
   try {
     const files = await fetchChildren();
     imports = Object.fromEntries(files.map((file) => [file.code, file]));
     tags = await fetchTags();
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    say(`☁️ ${files.length} child${files.length === 1 ? '' : 'ren'} loaded at ${time}.`);
+    say(`:cloud: ${files.length} child${files.length === 1 ? '' : 'ren'} loaded at ${time}.`);
   } catch (error) {
     if (error.message === 'Please log in again.') {
       location.reload(); // the login ran out: back to the login form
       return;
     }
     const offline = !navigator.onLine || error instanceof TypeError;
-    say(offline ? '📴 No internet connection. Connect and tap Refresh.' : `⚠️ Could not load: ${error.message}`);
+    say(offline ? ':cloud-off: No internet connection. Connect and tap Refresh.' : `:warning: Could not load: ${error.message}`);
   }
   closeChild();
   render();
@@ -345,9 +347,9 @@ async function removeChild(code) {
   try {
     await deleteChild(code);
     await loadFromCloud();
-    say(`🗑️ Everything stored for ${code} was deleted from the database.`);
+    say(`:cross: Everything stored for ${code} was deleted from the database.`);
   } catch (error) {
-    say(`⚠️ Could not delete ${code}: ${error.message}`);
+    say(`:warning: Could not delete ${code}: ${error.message}`);
   }
 }
 
@@ -355,13 +357,13 @@ async function removeChild(code) {
 function setupSource() {
   const who = document.getElementById('dash-who');
   if (!cloud) {
-    who.textContent = '📴 The online database is switched off (js/config.js), so only the DEMO children can be shown.';
+    setIconLine(who, ':cloud-off: The online database is switched off (js/config.js), so only the DEMO children can be shown.');
     return;
   }
-  who.textContent = `☁️ Logged in as ${teacherEmail()}. Children's work arrives by itself.`;
+  setIconLine(who, `:cloud: Logged in as ${teacherEmail()}. Children's work arrives by itself.`);
   document.getElementById('refresh-btn').hidden = false;
   document.getElementById('logout-btn').hidden = false;
-  document.getElementById('clear-note').textContent = 'When a child\'s work shows ☁️ Saved online, removes their code from this device, so the next child starts fresh. (Their work stays safe in the database.)';
+  setIconLine(document.getElementById('clear-note'), 'When a child\'s work shows :cloud: Saved online, removes their code from this device, so the next child starts fresh. (Their work stays safe in the database.)');
   document.getElementById('refresh-btn').addEventListener('click', loadFromCloud);
   document.getElementById('logout-btn').addEventListener('click', async () => {
     await logOut();

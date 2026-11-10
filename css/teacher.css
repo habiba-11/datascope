@@ -146,7 +146,7 @@ h2 {
   padding: 6px 10px;
 }
 
-/* ---------- 📊 Class ---------- */
+/* ----------  Class ---------- */
 .overview {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -218,7 +218,7 @@ h2 {
   text-align: left;
 }
 
-/* ---------- 👧 Children ---------- */
+/* ----------  Children ---------- */
 /* Wide tables scroll sideways on small screens instead of squashing. */
 .table-wrap {
   overflow-x: auto;
@@ -340,7 +340,7 @@ h2 {
   flex-shrink: 0;
 }
 
-/* ---------- 📥 Thesis data and ⚙️ Settings: a button + what it does ---------- */
+/* ----------  Thesis data and  Settings: a button + what it does ---------- */
 .action-list {
   list-style: none;
   padding: 0;
