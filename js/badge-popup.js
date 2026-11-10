@@ -2,10 +2,10 @@
 // Built on openModal() (js/modal.js), so it waits its turn in the pop-up line:
 // two badges at once show one after the other. The look and the timeline
 // (drop, flip, stamp, rays, confetti, Pip peeking) are in css/badges.css.
-import { openModal, pauseNextModal } from './modal.js';
+import { openModal, pauseNextModal, afterAllModals } from './modal.js';
 import { patchSVG, MYSTERY_SVG } from './badge-art.js';
 import { cheer } from './icon-text.js';
-import { itemForBadge, itemPicture } from './wardrobe.js';
+import { itemForBadge, itemPicture, openWardrobe } from './wardrobe.js';
 import { playSound } from './sounds.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -66,7 +66,7 @@ export function showBadgePopup(badge, onLanded) {
     const line = document.createElement('p');
     line.className = 'bp-wardrobe';
     line.innerHTML = itemPicture(item); // our own drawing
-    line.append(` New for Pip: the ${item.name}! Try it on in your backpack.`);
+    line.append(` New for Pip: the ${item.name}!`);
     body.append(line);
   }
 
@@ -76,7 +76,11 @@ export function showBadgePopup(badge, onLanded) {
     body,
     accent: badge.color,
     className: `badge-modal${badge.super ? ' super' : ''}`,
-    buttons: [{ label: 'Put it in my backpack →', value: 'keep', main: true }],
+    // Part 58d: "Try it on Pip" when this badge opened something in the Wardrobe.
+    buttons: [
+      ...(item ? [{ label: 'Try it on Pip', value: 'try', icon: 'owl' }] : []),
+      { label: 'Put it in my backpack →', value: 'keep', main: true },
+    ],
     onOpen: (dialog) => {
       // Pip cheers in the corner of the pop-up (wings up).
       dialog.querySelector('.modal-pip .pip')?.classList.replace('pip--happy', 'pip--cheer');
@@ -95,9 +99,12 @@ export function showBadgePopup(badge, onLanded) {
     },
   });
 
-  return done.then(() => {
+  return done.then((value) => {
     if (reduceMotion() || !flyFrom) onLanded();
     else flyToBackpack(flyFrom, onLanded);
+    // The badge still goes into the backpack; then (after any other waiting
+    // pop-up) the Wardrobe opens with the new thing already on Pip.
+    if (value === 'try' && item) afterAllModals(() => openWardrobe({ wear: item.id }));
   });
 }
 

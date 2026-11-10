@@ -51,7 +51,8 @@ export function itemPicture(item) {
 const TICK = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5 L10 17.5 L19 7" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export async function openWardrobe() {
+// `wear` (Part 58d): an item id to put on Pip at once (the badge pop-up's "Try it on Pip").
+export async function openWardrobe({ wear = '' } = {}) {
   if (!FEATURES.wardrobe) return;
   const items = await loadWardrobeItems();
   const byId = (id) => items.find((i) => i.id === id);
@@ -226,6 +227,17 @@ export async function openWardrobe() {
       ? 'Something new is waiting for me! Look for New!'
       : 'Hi! Pick something to dress me up. It is just for fun!');
     dialog.showModal();
-    $(`#wd-tab-${tab}`).focus();
+    const tryOn = byId(wear);
+    if (tryOn && open.includes(tryOn.id)) {
+      // Straight to the new thing: on its tab, on Pip, and Pip says his line.
+      tab = tryOn.slot;
+      markItemsSeen([tryOn.id]);
+      seen = getSeenItems();
+      if (outfit[tryOn.slot] !== tryOn.id) change(toggleItem(outfit, tryOn), tryOn.say);
+      else drawAll();
+      $(`[data-id="${tryOn.id}"]`)?.focus();
+    } else {
+      $(`#wd-tab-${tab}`).focus();
+    }
   });
 }

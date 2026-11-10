@@ -16,6 +16,15 @@ export function pauseNextModal(ms) {
   pauseBeforeNext = ms;
 }
 
+// Runs `fn` once no pop-up is open or waiting (at once if none is). Used by
+// the badge pop-up's "Try it on Pip", so the Wardrobe never opens on top of
+// another pop-up (Part 58d).
+const whenIdle = [];
+export function afterAllModals(fn) {
+  if (!queue.current) fn();
+  else whenIdle.push(fn);
+}
+
 // Opens a pop-up, or puts it in line if one is already open.
 // Returns a promise with the `value` of the button pressed ('close' for ✕ or Esc).
 //   icon:        the name of an illustration next to the title (js/illustrations.js)
@@ -127,5 +136,6 @@ function show({ options, resolve }) {
     const wait = pauseBeforeNext;
     pauseBeforeNext = 0;
     if (next) setTimeout(() => show(next), wait);
+    else whenIdle.splice(0).forEach((fn) => setTimeout(fn, wait));
   }
 }

@@ -9,13 +9,15 @@
 // (and read out to screen readers there), so Pip and the words are aria-hidden;
 // only the idle-help button (Part 43e) is a real button.
 import { pipSVG } from './pip.js';
+import { openWardrobe } from './wardrobe.js';
+import { FEATURES } from './config.js';
 import { animate } from './motion.js';
 import { playSound } from './sounds.js';
 import {
   PIP_EVENTS, isStale, pickLine, nextIdleMove, idleGap, IDLE_HELP_SECONDS, screenKey, shouldOfferHelp,
 } from './helpers/pip-lines.js';
 import { logEvent } from './helpers/log.js';
-import { setIconText } from './icon-text.js';
+import { setIconText, iconHTML } from './icon-text.js';
 
 const WIDE = '(min-width: 1240px)'; // the same width as in css/shell.css (Part 43c)
 const SAY_MS = 4500; // how long a line stays
@@ -175,8 +177,12 @@ export function mountPipStand() {
   stand.setAttribute('aria-label', 'Pip');
   stand.innerHTML = `
     <div class="pip-stand-bubble" id="pip-stand-bubble" hidden></div>
-    <div class="pip-stand-body pip-mascot" aria-hidden="true">${pipSVG()}</div>`;
+    <div class="pip-stand-body pip-mascot" aria-hidden="true">${pipSVG()}</div>
+    ${FEATURES.wardrobe ? `<button class="btn pip-dress-btn" type="button">${iconHTML('owl')} Dress Pip</button>` : ''}`;
   document.body.append(stand);
+  // Part 58d (Habiba): "Dress Pip" right under Pip, so children find it.
+  // It only opens when tapped, so it never interrupts the task.
+  stand.querySelector('.pip-dress-btn')?.addEventListener('click', () => openWardrobe());
   idleLoop();
   ['pointerdown', 'keydown', 'input', 'wheel', 'scroll'].forEach((type) => {
     window.addEventListener(type, restartIdleHelp, { passive: true, capture: true });

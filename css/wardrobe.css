@@ -376,3 +376,16 @@
 }
 
 .bp-wardrobe svg { width: 48px; height: 48px; overflow: visible; }
+
+/* Part 58d (Habiba): "Dress Pip" right under big Pip beside the card (laptop
+   screens; narrower screens use the backpack). Yellow so it is easy to see, but
+   not green: green is each screen's one main action. */
+.pip-dress-btn {
+  margin-top: 6px;
+  min-height: 48px;
+  padding: 6px 12px;
+  background: var(--color-plan);
+  font-size: 16px;
+  white-space: nowrap;
+  pointer-events: auto; /* the stand lets taps through; this button takes them */
+}

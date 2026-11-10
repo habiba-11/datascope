@@ -207,6 +207,10 @@
 .badge-modal .modal-actions .btn {
   min-height: 58px;
   font-size: 22px;
+}
+
+/* Only the one main button pulses (Part 58d: "Try it on Pip" may sit beside it). */
+.badge-modal .modal-actions .btn-main {
   animation: bp-pulse 1.6s ease-in-out 2.6s infinite;
 }
 
