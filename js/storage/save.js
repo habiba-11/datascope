@@ -218,6 +218,15 @@ export function markItemsSeen(ids) {
   saveWardrobe({ seen: [...new Set([...getSeenItems(), ...ids])] });
 }
 
+// The pop-up that introduces Pip's Wardrobe (Part 58e) is shown once per child.
+export function hasSeenWardrobeIntro() {
+  return wardrobeOf().introSeen === true;
+}
+
+export function markWardrobeIntroSeen() {
+  saveWardrobe({ introSeen: true });
+}
+
 // Teacher's switch: open every room on this device (to preview or test).
 // Kept when a child's work is cleared, because it belongs to the teacher.
 const PREVIEW_KEY = 'datascope:previewAll';

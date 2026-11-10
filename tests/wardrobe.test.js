@@ -180,3 +180,17 @@ test('the two wardrobe events are known log events (and nothing else is logged)'
   const { EVENT_TYPES } = await import('../js/helpers/log.js');
   assert.ok(EVENT_TYPES.includes('wardrobe-opened') && EVENT_TYPES.includes('outfit-changed'));
 });
+
+test('the Wardrobe intro pop-up is shown once per child, and again after the device is cleared', async () => {
+  const { hasSeenWardrobeIntro, markWardrobeIntroSeen } = await import('../js/storage/save.js');
+  setExplorerCode('OWL-07');
+  assert.equal(hasSeenWardrobeIntro(), false);
+  markWardrobeIntroSeen();
+  assert.equal(hasSeenWardrobeIntro(), true);
+  setExplorerCode('FOX-12');
+  assert.equal(hasSeenWardrobeIntro(), false, 'each child sees it once');
+  setExplorerCode('OWL-07');
+  clearChildData();
+  setExplorerCode('OWL-07');
+  assert.equal(hasSeenWardrobeIntro(), false);
+});

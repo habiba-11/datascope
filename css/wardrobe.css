@@ -389,3 +389,21 @@
   white-space: nowrap;
   pointer-events: auto; /* the stand lets taps through; this button takes them */
 }
+
+/* Part 58e: the pop-up that introduces the Wardrobe (start page, once per child). */
+.wd-intro-pip {
+  width: 150px;
+  margin: 0 auto var(--space-2);
+}
+
+.wd-intro ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.wd-intro li + li {
+  margin-top: var(--space-2);
+}
