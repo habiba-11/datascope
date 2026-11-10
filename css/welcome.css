@@ -1,7 +1,11 @@
-/* The start page (UI guide frame f1): one big action. Pip on the left, the
-   title and the code form on the right; they stack on a narrow screen. */
+/* The start page. Part 59g: the look of docs/design/datascope-welcome-ui.html.
+   The school yard is behind (js/scenes/schoolyard.js); Sara and Pip stand on
+   the left with "Dress Pip"; on the right a light panel holds the words and
+   the code card. They stack on a narrow screen (Pip and Sara first).
+   No background blur (slow on school laptops): the panel is see-through white. */
 .welcome-top {
-  padding: var(--space-3) var(--space-4) 0;
+  position: relative;
+  padding: var(--space-2) clamp(16px, 3vw, 44px) 0;
 }
 
 .welcome-top .logo {
@@ -10,8 +14,9 @@
   gap: var(--space-1);
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: 30px;
+  font-size: 34px;
   color: var(--color-navy);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
 }
 
 .welcome-top .logo-accent {
@@ -19,44 +24,92 @@
 }
 
 .welcome {
-  min-height: calc(100vh - 180px);
-  max-width: 1000px;
+  position: relative;
+  min-height: calc(100vh - 80px);
+  max-width: 1400px;
   margin: 0 auto;
-  padding: var(--space-3) var(--space-3) 140px;
+  padding: 0 clamp(16px, 3vw, 44px) var(--space-1);
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-  gap: var(--space-4);
+  gap: clamp(12px, 4vw, 64px);
 }
 
-.mascot {
-  width: min(240px, 60vw);
-  justify-self: center;
-}
-
-/* Part 58e: Pip with the "Dress Pip" button under him (js/welcome.js). */
+/* ---------- left: Sara and Pip standing together, "Dress Pip" under them ---------- */
 .mascot-col {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-2);
-  justify-self: center;
 }
 
+.welcome-stage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.welcome-sara {
+  width: clamp(110px, 13vw, 190px);
+  margin-right: -14px; /* Pip stands a little in front of her */
+}
+
+.welcome-sara svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.mascot {
+  position: relative;
+  z-index: 1;
+  width: clamp(180px, 22vw, 320px);
+}
+
+/* ---------- right: the words and the code card ---------- */
+.welcome-panel {
+  max-width: 600px;
+  padding: 16px 28px 14px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 44px;
+  box-shadow: 0 14px 40px rgba(8, 24, 40, 0.2);
+}
+
+/* Pip's hello, a speech bubble pointing at Pip on the left. */
 .welcome-pill {
+  position: relative;
   display: inline-block;
-  margin: 0 0 var(--space-2);
-  padding: 4px 16px;
+  margin: 0;
+  padding: 4px 20px;
   background: var(--color-card-bg);
-  border: var(--border-width) solid var(--color-navy);
+  border: 4px solid var(--color-navy);
   border-radius: 999px;
-  font-weight: 800;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 21px;
+  box-shadow: 0 5px 0 rgba(23, 50, 77, 0.25);
+}
+
+.welcome-pill::after {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  background: var(--color-card-bg);
+  border-left: 4px solid var(--color-navy);
+  border-bottom: 4px solid var(--color-navy);
+  transform: translateY(-50%) rotate(45deg);
 }
 
 .welcome-title {
-  margin: 0;
-  font-size: 52px;
-  line-height: 1.05;
+  margin: 10px 0 6px;
+  font-size: clamp(36px, 3.8vw, 64px);
+  line-height: 0.98;
+  text-shadow: 0 3px 0 rgba(255, 255, 255, 0.7);
 }
 
 .welcome-title span {
@@ -64,61 +117,146 @@
 }
 
 .welcome-lead {
-  margin: var(--space-2) 0 var(--space-3);
-  font-size: 20px;
-  font-weight: 700;
-  max-width: 34ch;
+  margin: 0 0 10px;
+  font-size: clamp(18px, 1.5vw, 21px);
+  font-weight: 800;
+  line-height: 1.35;
+  max-width: 30em;
 }
 
 .code-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-3);
+  gap: 8px;
+  padding: 14px 24px 18px;
   background: var(--color-card-bg);
-  border: var(--border-width) solid var(--color-navy);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  border: 4px solid var(--color-navy);
+  border-radius: 36px;
+  box-shadow: 0 8px 0 var(--color-navy), 0 22px 40px rgba(8, 24, 40, 0.3);
 }
 
 .code-form label {
   font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 19px;
+  font-weight: 700;
+  font-size: 22px;
+}
+
+/* The box and the green tick that pops in when the code is right. */
+.code-box {
+  position: relative;
 }
 
 #code-input {
-  min-height: 56px;
-  padding: 0 var(--space-2);
+  width: 100%;
+  box-sizing: border-box;
+  height: 58px;
+  padding: 0 56px 0 20px;
   font-family: var(--font-heading);
-  font-size: 26px;
-  letter-spacing: 2px;
+  font-weight: 700;
+  font-size: 30px;
+  letter-spacing: 4px;
   text-transform: uppercase;
+  color: var(--color-navy);
   background: #F4FAFF;
-  border: var(--border-width) solid var(--color-line);
-  border-radius: 14px;
+  border: 3.5px solid var(--color-line);
+  border-radius: 20px;
 }
 
 /* The example stays as written ("e.g. OWL-07"); only what is typed is in capitals. */
 #code-input::placeholder {
   text-transform: none;
-  letter-spacing: 0;
+  letter-spacing: 1px;
+  font-size: 24px;
+}
+
+.code-box.bad #code-input {
+  border-color: #C0392B;
+  background: #FFF4F2;
+}
+
+.code-box.good #code-input {
+  border-color: var(--color-btn-main-bg);
+  background: #EAF8EE;
+}
+
+.code-ok {
+  display: none;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  margin-top: -17px;
+  border-radius: 50%;
+  background: #4CC26B;
+  border: 3px solid var(--color-navy);
+  color: #fff;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 28px;
+  text-align: center;
+}
+
+.code-box.good .code-ok {
+  display: block;
+  animation: m-pop var(--duration-medium) var(--ease-spring);
 }
 
 .code-help {
   margin: 0;
-  font-size: 18px;
+  min-height: 2.7em;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #3E5A75;
 }
 
 .code-help.warn {
-  font-weight: 800;
+  color: #A93226;
+}
+
+.code-help.ok {
+  color: var(--color-btn-main-bg);
 }
 
 .code-form .btn-main {
-  margin-top: var(--space-1);
+  min-height: 56px;
+  font-size: 24px;
 }
 
-/* "Teacher's view": quiet, under the form (it asks for a password or PIN). */
+.code-form .btn-secondary {
+  min-height: 48px;
+  font-size: 20px;
+}
+
+/* "Teacher's view": quiet, under the card (it asks for a password or PIN). */
 .teacher-btn {
-  margin-top: var(--space-2);
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- narrow screens: Sara and Pip on top, then the panel ---------- */
+@media (max-width: 900px) {
+  .welcome {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+
+  .welcome-panel {
+    max-width: none;
+    padding: 18px 16px;
+    border-radius: 32px;
+  }
+
+  .welcome-pill::after {
+    display: none;
+  }
+
+  .welcome-sara {
+    width: 24vw;
+  }
+
+  .mascot {
+    width: 40vw;
+  }
 }

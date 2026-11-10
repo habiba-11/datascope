@@ -15,6 +15,7 @@ import { studio } from './studio.js';
 import { lab } from './lab.js';
 import { funfair } from './funfair.js';
 import { office } from './office.js';
+import { schoolyard } from './schoolyard.js';
 import { saraSVG } from '../characters.js';
 
 // Room (phase id) -> its place. Rooms move to scenes one part at a time;
@@ -84,12 +85,39 @@ export const ROOM_SCENES = {
       { kind: 'dust', x: 24, y: 47, seconds: 11, delay: -8 },
     ],
   },
+  // The start page (Part 59g): Sara and Pip stand in the page itself
+  // (js/welcome.js), so no `sara` here. Clouds drift (w = width in % of the
+  // stage); the school flag waves.
+  welcome: {
+    draw: schoolyard,
+    sara: null,
+    ambient: [
+      { kind: 'cloud', x: 8, y: 8, w: 18, seconds: 150, delay: -40 },
+      { kind: 'cloud', x: 46, y: 20, w: 12, seconds: 210, delay: -130 },
+      { kind: 'cloud', x: 74, y: 4, w: 9, seconds: 260, delay: -210 },
+      { kind: 'banner', x: 94.9, y: 18.8, w: 4.9, seconds: 2.2, delay: 0 },
+    ],
+  },
 };
 
 // What goes inside a moving thing (dust is just a round speck).
 const AMBIENT_INNER = {
+  cloud: '<svg viewBox="-90 -40 180 85" aria-hidden="true" focusable="false"><ellipse cx="0" cy="30" rx="84" ry="12" fill="#B9D2E8" opacity=".45"/><g fill="url(#ds-cloud)"><ellipse cx="0" cy="18" rx="72" ry="20"/><circle cx="-36" cy="10" r="24"/><circle cx="0" cy="-5" r="33"/><circle cx="38" cy="8" r="27"/><circle cx="64" cy="17" r="16"/></g></svg>',
+  banner: '<svg viewBox="0 -4 48 38" aria-hidden="true" focusable="false"><path d="M0 6 Q24 -4 47 6 V32 Q24 22 0 32Z" fill="#4CC26B"/><circle cx="23" cy="18" r="6" fill="#fff" opacity=".85"/></svg>',
   flag: '<svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><path d="M1 1 L29 10 L1 19Z" fill="#4CC26B" stroke="#17324D" stroke-width="2" stroke-linejoin="round"/></svg>',
 };
+
+// The CSS variables of one moving thing. A cloud also gets where its drift
+// starts and ends (--from, --to: in % of its own width, from just off the left
+// edge of the stage to just off the right edge); with reduced motion it rests at x.
+export function ambientStyle(a) {
+  let style = `--x: ${a.x}%; --y: ${a.y}%; --seconds: ${a.seconds}s; --delay: ${a.delay}s`;
+  if (a.w) style += `; --w: ${a.w}%`;
+  if (a.kind === 'cloud') {
+    style += `; --from: ${Math.round((-a.w - a.x) / a.w * 100)}%; --to: ${Math.round((100 - a.x) / a.w * 100)}%`;
+  }
+  return style;
+}
 
 // Sara cheers when the room is finished, then goes back to her room pose.
 const CHEER_MS = 4000;
@@ -116,9 +144,11 @@ export function mountScene(room) {
   scene.setAttribute('aria-hidden', 'true');
   scene.innerHTML = `
     <svg viewBox="0 0 960 600" preserveAspectRatio="none" focusable="false">${plan.draw()}</svg>
-    ${plan.ambient.map((a) => `<span class="scene-${a.kind}" style="--x: ${a.x}%; --y: ${a.y}%; --seconds: ${a.seconds}s; --delay: ${a.delay}s">${AMBIENT_INNER[a.kind] || ''}</span>`).join('')}`;
+    ${plan.ambient.map((a) => `<span class="scene-${a.kind}" style="${ambientStyle(a)}">${AMBIENT_INNER[a.kind] || ''}</span>`).join('')}`;
   document.body.prepend(scene);
   html.classList.add('has-scene');
+
+  if (!plan.sara) return true;
 
   // Sara stands in the left column beside big Pip (wide screens only, css/scenes.css).
   const cast = document.createElement('div');

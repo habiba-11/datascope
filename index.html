@@ -19,24 +19,32 @@
   <header class="welcome-top">
     <span class="logo" id="logo"></span>
   </header>
+  <!-- Part 59g: the look of docs/design/datascope-welcome-ui.html. Sara and Pip
+       stand on the left (js/welcome.js draws them), the words and the code on the right. -->
   <main class="welcome">
     <div class="mascot-col">
-      <div class="mascot m-float" id="mascot"></div>
+      <div class="welcome-stage">
+        <div class="welcome-sara" id="sara" aria-hidden="true"></div>
+        <div class="mascot" id="mascot"></div>
+      </div>
       <div id="dress-slot"></div>
     </div>
-    <div>
-      <p class="welcome-pill m-pop">Hoo-hoo! I'm Pip, your guide.</p>
-      <h1 class="welcome-title m-rise" style="--i: 1">Become a Data <span>Detective!</span></h1>
-      <p class="welcome-lead m-rise" style="--i: 2">Ask a question. Collect answers. Find out what the data says.</p>
-      <form id="code-form" class="code-form m-rise" style="--i: 3">
+    <section class="welcome-panel m-rise">
+      <p class="welcome-pill">Hoo-hoo! I'm Pip, your guide.</p>
+      <h1 class="welcome-title">Become a Data <span>Detective!</span></h1>
+      <p class="welcome-lead">Ask a question. Collect answers. Find out what the data says.</p>
+      <form id="code-form" class="code-form">
         <label for="code-input"><span data-icon="key"></span> Type your explorer code</label>
-        <input id="code-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. OWL-07">
-        <p class="code-help" id="code-help">Your teacher gives you this code. Please don't type your name!</p>
+        <div class="code-box" id="code-box">
+          <input id="code-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. OWL-07" aria-describedby="code-help">
+          <span class="code-ok" aria-hidden="true">✓</span>
+        </div>
+        <p class="code-help" id="code-help" role="status">Your teacher gives you this code. Please don't type your name!</p>
         <button class="btn btn-main" type="submit">Start exploring →</button>
         <button class="btn btn-secondary" id="see-how" type="button"><span data-icon="play"></span> Watch the story again</button>
       </form>
       <a class="btn btn-quiet teacher-btn" href="teacher/index.html"><span data-icon="chart"></span> Teacher's view</a>
-    </div>
+    </section>
   </main>
   <script type="module" src="js/welcome.js"></script>
   <div class="hills" aria-hidden="true">

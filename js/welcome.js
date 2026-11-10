@@ -8,18 +8,21 @@ import { pipSVG } from './pip.js';
 import { LOGO_SVG } from './icons.js';
 import { openStory } from './story.js';
 import { mountSky } from './ambient.js';
+import { mountScene } from './scenes/index.js';
+import { saraSVG } from './characters.js';
 import { fillIcons, setIconText, iconHTML } from './icon-text.js';
 import { openModal } from './modal.js';
 import { openWardrobe } from './wardrobe.js';
 import { FEATURES } from './config.js';
 
-// Part 43a: the living background (clouds only on the start page).
-mountSky('welcome');
+// Part 59g: the school yard behind the page (scenes off: plain; Part 43a sky as a fallback).
+if (!mountScene('welcome')) mountSky('welcome');
 fillIcons(); // Part 54b: our icons instead of emoji
 
 // Pip greets the child on the start page (cheering, wings up).
 document.getElementById('mascot').innerHTML = pipSVG('Pip the owl explorer');
 document.querySelector('#mascot .pip').classList.replace('pip--happy', 'pip--cheer');
+document.getElementById('sara').innerHTML = saraSVG('cheer'); // Part 59g: Sara cheers beside Pip
 document.getElementById('logo').innerHTML = `${LOGO_SVG}<span>Data<span class="logo-accent">Scope</span></span>`;
 
 const form = document.getElementById('code-form');
@@ -42,16 +45,39 @@ if (!hasSeenTutorial()) {
   storyWords.then((words) => openStory(words, input));
 }
 
-// The code in the box, saved; or null (then the child is told how codes look).
-function takeCode(message = 'Codes look like OWL-07 (letters, a dash and numbers). Ask your teacher for yours!') {
+// Part 59g: the code box shows how it is going (the look of
+// datascope-welcome-ui.html): red with a tip when something is wrong, green
+// with a tick when the code is right. Words and a tick, not only colour.
+const box = document.getElementById('code-box');
+const HELP_TEXT = help.textContent;
+
+function showCodeState(state, icon, text) {
+  box.classList.toggle('bad', state === 'bad');
+  box.classList.toggle('good', state === 'good');
+  help.classList.toggle('warn', state === 'bad');
+  help.classList.toggle('ok', state === 'good');
+  if (icon) setIconText(help, icon, text);
+  else help.textContent = text;
+}
+
+// Typing again: back to the calm help line.
+input.addEventListener('input', () => showCodeState('', '', HELP_TEXT));
+
+// The code in the box, saved; or null (then the child is told what to fix).
+function takeCode(message = 'Hmm, that code does not look right. Check each letter and number, then try again.') {
   const code = normalizeCode(input.value);
+  if (!code) {
+    showCodeState('bad', 'warning', 'Type your code first. It is on the card from your teacher.');
+    input.focus();
+    return null;
+  }
   if (!isValidCode(code)) {
-    setIconText(help, 'warning', message);
-    help.classList.add('warn');
+    showCodeState('bad', 'warning', message);
     input.focus();
     return null;
   }
   setExplorerCode(code);
+  showCodeState('good', '', `Welcome, explorer ${code}! Pip is so happy to see you.`);
   return code;
 }
 

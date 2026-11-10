@@ -40,6 +40,17 @@ export const SCENE_DEFS = [
   // the funfair tent (Chance Lab)
   lin('wall-tent', [[0, '#FFE0B8'], [1, '#FFC98A']]),
   lin('floor-sand', [[0, '#E9B26B'], [1, '#F6D49A']]),
+  // the school yard (start page)
+  lin('sky', [[0, '#5DB8F2'], [0.55, '#A9DCFA'], [1, '#E4F5FF']]),
+  lin('cloud', [[0, '#fff'], [0.6, '#F2F8FD'], [1, '#C9DDF0']]),
+  lin('hill-far', [[0, '#9ED8BC'], [1, '#C6E9D3']]),
+  lin('hill-mid', [[0, '#7BC999'], [1, '#5DB77D']]),
+  lin('grass', [[0, '#86D98C'], [0.5, '#52B766'], [1, '#328F4C']]),
+  rad('leaf-far', [[0, '#7CC99A'], [1, '#4E9F70']], 0.4, 0.3, 0.9),
+  lin('trunk', [[0, '#A56E3A'], [0.55, '#7A4A22'], [1, '#53301A']], 1, 0),
+  lin('brick', [[0, '#F0B27C'], [1, '#D98B52']]),
+  lin('roof', [[0, '#D2634A'], [1, '#A2412F']]),
+  lin('glass', [[0, '#D3F0FF'], [0.5, '#8CC6EE'], [1, '#5FA2D6']], 1, 1),
   // the detective office (Evidence Board)
   lin('wall-purple', [[0, '#E6DFFF'], [1, '#CBBEF7']]),
   // the maths workshop (Number Lab)

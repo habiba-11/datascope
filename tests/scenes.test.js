@@ -54,7 +54,8 @@ test('the scenes have no sun and no ticking clock (Round 4 rule; no timers)', ()
 
 test('each room scene: a known Sara pose, and only a few slow things moving inside the stage', () => {
   for (const [room, plan] of Object.entries(ROOM_SCENES)) {
-    assert.ok(SARA_MOODS.includes(plan.sara), room);
+    // The start page has no `sara`: she stands in the page itself (js/welcome.js).
+    assert.ok(room === 'welcome' ? plan.sara === null : SARA_MOODS.includes(plan.sara), room);
     assert.ok(plan.ambient.length <= 8, `${room}: ${plan.ambient.length} movers`);
     for (const a of plan.ambient) {
       assert.ok(a.x >= 0 && a.x <= 100 && a.y >= 0 && a.y <= 100, `${room}: inside the stage`);
