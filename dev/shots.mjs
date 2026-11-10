@@ -1,6 +1,8 @@
 // Developer tool (never shipped to children): takes screenshots of the main
 // pages for the thesis, at Chromebook (1366x768) and tablet (768x1024) size.
 // Run: npm run shots   ->   pictures land in dev/screenshots/ (not in Git).
+// Part 59 (scenes): npm run shots -- before   (or -- after) saves them in
+// docs/design/screens/before/ (or after/) instead, kept in Git for the thesis.
 // Uses playwright-core with the Chrome already installed on this computer.
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
@@ -9,7 +11,8 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const OUT = join(ROOT, 'dev', 'screenshots');
+const SET = process.argv[2]; // 'before', 'after' or nothing
+const OUT = SET ? join(ROOT, 'docs', 'design', 'screens', SET) : join(ROOT, 'dev', 'screenshots');
 const PORT = 5598;
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json' };
 
@@ -42,6 +45,8 @@ await mkdir(OUT, { recursive: true });
 const browser = await chromium.launch({ channel: 'chrome' });
 for (const [sizeName, width, height] of SIZES) {
   const page = await browser.newPage({ viewport: { width, height } });
+  // Pictures only: never send this test explorer's log to the real database.
+  await page.route('**/*supabase*/**', (route) => route.abort());
   // A test explorer with the teacher preview on, so every room opens.
   await page.goto(`http://localhost:${PORT}/index.html`);
   await page.evaluate(() => {
@@ -51,6 +56,11 @@ for (const [sizeName, width, height] of SIZES) {
   for (const [name, path] of PAGES) {
     await page.goto(`http://localhost:${PORT}${path}`);
     await page.waitForTimeout(1200); // fonts, data and the pop-in animations
+    // Close any room intro pop-up, so the picture shows the room itself.
+    for (let i = 0; i < 3 && await page.$('dialog[open]'); i++) {
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(500);
+    }
     await page.screenshot({ path: join(OUT, `${name}-${sizeName}.png`) });
   }
   await page.close();

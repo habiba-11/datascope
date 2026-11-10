@@ -14,6 +14,7 @@ import { finishPhase } from '../phase-progress.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { iconHTML, setIconText } from '../icon-text.js';
+import { seatKidSVG } from '../characters.js';
 
 // Data Hub in the 3-zone layout (UI guide): ONE task card with the pretend
 // class (seats) and the tally side by side, and ONE primary button that says
@@ -132,7 +133,8 @@ async function init() {
 // Two panels for one class: the seats (left) and the tally (right).
 function classPanelsHTML(c, twoClasses) {
   const size = c.data.values.length;
-  const seats = Array.from({ length: size }, (_, i) => `<li class="seat" id="${c.p}-seat-${i}"><span class="sr-only">Classmate ${i + 1}: not asked yet</span></li>`).join('');
+  // Part 59a: each seat is a small classmate (grey with a "?" until asked).
+  const seats = Array.from({ length: size }, (_, i) => `<li class="seat" id="${c.p}-seat-${i}">${seatKidSVG(i, false)}<span class="sr-only">Classmate ${i + 1}: not asked yet</span></li>`).join('');
   return `
     <div class="card-panels hub-panels" id="${c.p}-panels">
       <section>
@@ -211,7 +213,8 @@ function runSurvey(c, allKeys, { onProgress, onDone }) {
     c.answers.push(value);
 
     const seat = document.getElementById(`${c.p}-seat-${i}`);
-    seat.innerHTML = `<span aria-hidden="true">${labels.get(value)}</span><span class="sr-only">Classmate ${i + 1}: ${valueText(value, c.recipe)}</span>`;
+    // The classmate gets a face; the shirt and the answer badge take the bar's colour.
+    seat.innerHTML = `${seatKidSVG(i, true)}<span class="seat-badge" aria-hidden="true">${labels.get(value)}</span><span class="sr-only">Classmate ${i + 1}: ${valueText(value, c.recipe)}</span>`;
     seat.style.setProperty('--seat', `var(--color-${colourFor(allKeys, value)})`);
     seat.classList.add('seat--filled', 'm-pop');
     said.textContent = `Classmate ${i + 1} said: ${valueText(value, c.recipe)}`;

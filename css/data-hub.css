@@ -27,25 +27,41 @@
   background: #F4FAFF;
 }
 
+/* Part 59a: each seat is a small classmate (js/characters.js seatKidSVG). */
 .seat {
-  aspect-ratio: 1;
+  position: relative;
   max-width: 56px;
   justify-self: center;
   width: 100%;
-  border-radius: 50%;
-  border: 3px dashed var(--color-line);
+}
+
+.seat-kid {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* An answer arrived: its badge has the colour of its tally bar (the shirt
+   too), and the answer in words, so colour is never the only signal. */
+.seat-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border-radius: 13px;
+  background: var(--seat);
+  border: 2px solid var(--color-navy);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: 18px;
-}
-
-/* An answer arrived: the seat takes the colour of its tally bar. */
-.seat--filled {
-  background: var(--seat);
-  border: 3px solid var(--color-navy);
+  font-size: 15px;
+  line-height: 1;
+  color: var(--color-navy);
 }
 
 .seat-said {

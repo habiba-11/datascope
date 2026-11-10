@@ -21,8 +21,13 @@ export const BACKEND = {
 // wardrobe: true = children can dress Pip (Pip's Wardrobe). false = the
 //           "Dress Pip" buttons are hidden and Pip wears his explorer hat and
 //           magnifier everywhere, so that group's data has no wardrobe at all.
+// richScenes: true = each room is a place (a scene behind the card, Sara and
+//           Pip beside it, a few things gently moving; Part 59). false = a plain
+//           colour background and nothing moving behind the card, for slow
+//           school laptops. The tasks are the same either way.
 export const FEATURES = {
   wardrobe: true,
+  richScenes: true,
 };
 
 // True when the database is switched on AND filled in.

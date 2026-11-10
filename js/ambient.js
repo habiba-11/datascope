@@ -5,6 +5,7 @@
 // where, how slow) is in helpers/ambient.js (tested); the motion is in
 // css/ambient.css. Everything is decoration: aria-hidden, taps go through it.
 import { skyPlan } from './helpers/ambient.js';
+import { FEATURES } from './config.js';
 
 const NAVY = '#17324D';
 
@@ -61,6 +62,11 @@ function mover(className, vars, inner) {
 // `room`: 'ask', 'collect', 'graph', ... (see helpers/ambient.js ROOM_SHAPES).
 export function mountSky(room) {
   if (document.querySelector('.sky')) return; // only once per page
+  // Part 59: scenes switched off = a plain background, nothing moving.
+  if (!FEATURES.richScenes) {
+    document.documentElement.classList.add('scenes-off');
+    return;
+  }
   const plan = skyPlan(room);
 
   const sky = document.createElement('div');

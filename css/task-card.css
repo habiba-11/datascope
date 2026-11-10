@@ -460,6 +460,18 @@ html:has(.action-bar) {
     font-size: 16px;
   }
 
+  /* Part 59a (360px check): no room for "Why?" beside the About tab, so the
+     tab stays hanging under the strip and the "Why?" line goes under it. */
+  .about-row {
+    flex-wrap: wrap;
+    padding: 0 var(--space-2);
+  }
+
+  .why-line {
+    order: 2;
+    flex-basis: 100%;
+  }
+
   .action-bar,
   .status-line {
     padding-left: var(--space-2);

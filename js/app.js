@@ -11,6 +11,7 @@ import { startSync, STATUS_TEXT } from './storage/sync.js';
 import { backendReady } from './config.js';
 import { EXIT_BUTTON_HTML, setupExitButton } from './exit-button.js';
 import { mountSky } from './ambient.js';
+import { mountScene } from './scenes/index.js';
 import { mountPipStand } from './pip-stand.js';
 import { startHelperPointers } from './helper-pointer.js';
 import { setupMusic } from './music.js';
@@ -98,7 +99,8 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   root.querySelectorAll('.feedback').forEach((el) => el.setAttribute('aria-live', 'polite'));
 
   // Part 43a: the living background, with this room's own touch (My journey has no phase).
-  mountSky(phase || step);
+  // Part 59: rooms that are already a place get their scene instead.
+  if (!mountScene(phase || step)) mountSky(phase || step);
   mountPipStand(); // Part 43c: big Pip beside the card, alive and talking
   // Part 47b: the first time each helper appears in a room, Pip points at it.
   if (phase) startHelperPointers(phase);
