@@ -48,7 +48,12 @@ const BODY_FEATHERS = [[29.4, 86.9], [39.6, 97.1], [70.2, 97.1], [80.4, 86.9], [
   .map(([x, y]) => feather(x, y)).join(' ');
 const BELLY_FEATHERS = (y) => `M41.3 ${y} q4.7 6 9.35 0 q4.7 6 9.35 0 q4.7 6 9.35 0 q4.7 6 9.35 0`;
 // One eye: the iris and pupil (in .pip-pupils, so they can look up) are drawn separately.
-const iris = (cx) => `<circle cx="${cx}" cy="58.9" r="10.2" fill="url(#ds-pip-iris)"/><circle class="pip-pupil" cx="${cx}" cy="58.9" r="5.4" fill="#1B1008"/><circle class="pip-shine" cx="${cx + 3.4}" cy="54.6" r="3.1" fill="#fff"/><circle cx="${cx - 3.4}" cy="63.1" r="1.4" fill="#fff"/>`;
+const iris = (cx) => `<circle cx="${cx}" cy="58.9" r="10.2" fill="url(#ds-pip-iris)"/><circle class="pip-pupil" cx="${cx}" cy="58.9" r="5.4" fill="#1B1008"/><circle class="pip-shine" cx="${cx + 3.6}" cy="57" r="2.8" fill="#fff"/><circle cx="${cx - 3.4}" cy="63.1" r="1.4" fill="#fff"/>`;
+// Friendly eyes (Habiba, 10 Nov 2026: wide-open eyes looked like a stare):
+// a small resting upper eyelid over the top of each eye, and a soft "smiling"
+// line under it. Bigger lids looked grumpy or sleepy (four versions compared).
+// The blink lids (.pip-lids) still close over them.
+const eyelid = (cx) => `<path d="M${cx - 12.7} 49.5 A15.3 15.3 0 0 1 ${cx + 12.7} 49.5 Q${cx} 51.5 ${cx - 12.7} 49.5Z" fill="#A06E3E" ${LINE}/><path d="M${cx - 10} 66 Q${cx} 71 ${cx + 10} 66" stroke="#4A2D14" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".5"/>`;
 const WING_LEFT = `<path d="M26 61.4 Q2.2 80.1 12.4 112.4 Q29.4 107.3 34.5 83.5Z" fill="#7C4E27" ${LINE}/><path d="M12.4 112.4 Q15.8 100.5 20.9 93.7 M19.2 110.7 Q22.6 98.8 26.9 92" ${SOFT}/>`;
 const WING_RIGHT = `<path d="M94 61.4 Q117.8 80.1 107.6 112.4 Q90.6 107.3 85.5 83.5Z" fill="#7C4E27" ${LINE}/><path d="M107.6 112.4 Q104.2 100.5 99.1 93.7 M100.8 110.7 Q97.4 98.8 93.1 92" ${SOFT}/>`;
 
@@ -73,11 +78,12 @@ export function pipSVG(label = '', outfit = currentOutfit()) {
     <circle class="pip-eye" cx="43" cy="58" r="15.3" fill="#FFFBEF" ${LINE}/>
     <circle class="pip-eye" cx="77" cy="58" r="15.3" fill="#FFFBEF" ${LINE}/>
     <g class="pip-pupils">${iris(43)}${iris(77)}</g>
+    <g class="pip-eyelids">${eyelid(43)}${eyelid(77)}</g>
     <g class="pip-lids">
       <ellipse cx="43" cy="58" rx="16" ry="16" fill="#9A6A3A" ${LINE}/>
       <ellipse cx="77" cy="58" rx="16" ry="16" fill="#9A6A3A" ${LINE}/>
     </g>
-    <path class="pip-brows" d="M27.7 46.1 Q43 35.9 56.6 46.1 M63.4 46.1 Q77 35.9 92.3 46.1" stroke="#4A2D14" stroke-width="2.9" fill="none" stroke-linecap="round"/>
+    <path class="pip-brows" d="M29 41 Q43 31 55 39 M65 39 Q77 31 91 41" stroke="#4A2D14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
     <circle class="pip-blush" cx="24.3" cy="73.3" r="5.1" fill="#FF9A8B" opacity=".6"/>
     <circle class="pip-blush" cx="95.7" cy="73.3" r="5.1" fill="#FF9A8B" opacity=".6"/>
     ${layer(outfit, 'neck')}
