@@ -535,18 +535,35 @@ h1 {
 /* Part 54a (8 Nov 2026): our illustrations in place of emoji (js/icon-text.js).
    1.25 times the text, sitting on the text line like an emoji, so lines do
    not jump; it never shrinks inside a flex row. */
+/* 10 Nov 2026 (Habiba: "so small next to the sentence"): 1.6 times the text
+   (about 29 px next to 18 px words). The negative margins keep the line as
+   tall as before, so lines do not jump. A soft shadow below makes each icon
+   look like a little sticker. Headings use a smaller factor (see below). */
 .ds-icon {
   display: inline-block;
-  width: 1.25em;
-  height: 1.25em;
+  width: 1.6em;
+  height: 1.6em;
+  margin: -0.2em 0.05em -0.2em 0;
   flex-shrink: 0;
   line-height: 0;
-  vertical-align: -0.25em;
+  vertical-align: -0.4em;
 }
 
 .ds-icon svg {
   width: 100%;
   height: 100%;
+  filter: drop-shadow(0 1.5px 0 rgba(23, 50, 77, 0.22));
+}
+
+/* In big titles 1.6 would be too much: 1.3 times the title's size. */
+h1 .ds-icon,
+h2 .ds-icon,
+.task-question .ds-icon,
+.modal-title .ds-icon {
+  width: 1.3em;
+  height: 1.3em;
+  margin: -0.1em 0.05em -0.1em 0;
+  vertical-align: -0.28em;
 }
 
 /* Part 54g: a gentle shine for big reward pictures (the level on My ID): a
