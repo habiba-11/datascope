@@ -249,7 +249,24 @@ async function init() {
     });
     firstDraw = false;
     showTapHint();
+    makeSureItMoves(charts);
     replayAfterPopups(charts);
+  }
+
+  // Habiba's Edge (10 Nov 2026) drew the bars at full height from the very
+  // first frame: Chart.js skipped the entrance (it can, when the chart is
+  // attached or sized a moment after it is made). So two frames after drawing,
+  // a graph that is not animating starts its entrance again, on purpose.
+  function makeSureItMoves(drawn) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (drawn !== charts) return; // another graph was picked meanwhile
+      drawn.forEach((chart) => {
+        if (window.Chart.animator.running(chart)) return; // moving, as it should
+        chart.reset();
+        chart.update();
+      });
+    }));
   }
 
   // A graph drawn behind a pop-up would finish its entrance unseen (Habiba,
