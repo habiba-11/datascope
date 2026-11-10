@@ -91,12 +91,17 @@ async function init() {
             ${pipLineHTML(STEPS[0].pip, STEPS[0].question)}
 
             <section class="task" data-task="1">
-              <p>${iconLineHTML(evidenceBoard.claimPrompt)}</p>
-              <p class="sentence-starter">
-                <label for="claim-subject">I think</label> <input type="text" id="claim-subject" class="inline-input" placeholder="...">
-                <label for="claim-reason">because</label> <input type="text" id="claim-reason" class="inline-input" placeholder="...">
-              </p>
-              <div class="hint-list-slot" id="claim-hints"></div>
+              ${claimQuestionHTML(evidenceBoard.claimPrompt)}
+              <div class="sentence-starter">
+                <div class="claim-line">
+                  <label for="claim-subject">I think</label> <input type="text" id="claim-subject" class="inline-input" placeholder="...">
+                  <div class="claim-hint" id="claim-subject-hint"></div>
+                </div>
+                <div class="claim-line">
+                  <label for="claim-reason">because</label> <input type="text" id="claim-reason" class="inline-input" placeholder="...">
+                  <div class="claim-hint" id="claim-reason-hint"></div>
+                </div>
+              </div>
             </section>
 
             <section class="task" data-task="2" hidden>
@@ -138,9 +143,13 @@ async function init() {
   // "I think" and "because": each list says which line its answers finish.
   claimHint = answerHint('claim', 'claim-subject', evidenceBoard.claimAnswers, 'I think');
   becauseHint = answerHint('claim-because', 'claim-reason', evidenceBoard.becauseAnswers, 'because');
-  hints[1] = claimHint;
   hints[3] = answerHint('certainty-why', 'certainty-reason', certaintyWhy);
-  document.getElementById('claim-hints').append(claimHint.list, becauseHint.list);
+  // Part 60a (Habiba, 11 Nov 2026): each line has its own Hint button right
+  // under its box, and shows only its own answers (step 1 has no bar hint).
+  for (const [hint, slotId] of [[claimHint, 'claim-subject-hint'], [becauseHint, 'claim-reason-hint']]) {
+    hint.button.classList.add('btn-secondary');
+    document.getElementById(slotId).append(hint.button, hint.list);
+  }
   document.getElementById('sure-hints').append(hints[3].list);
   setupClaim();
   setupEvidence();
@@ -244,23 +253,31 @@ function setupClaim() {
   subject.addEventListener('input', show);
   reason.addEventListener('input', show);
 
-  // One Hint button for two boxes, and at most 3 answers on screen: the "I think"
-  // answers first, then the "because" answers once that box has words.
-  const showRightAnswers = () => {
-    const hintOpen = claimHint.button.disabled;
-    const subjectDone = subject.value.trim() !== '';
-    if (hintOpen && subjectDone) becauseHint.open({ focus: false });
-    claimHint.list.hidden = hintOpen && subjectDone;
-    becauseHint.list.hidden = !(hintOpen && subjectDone);
-    // The box the answers on screen go into glows (8 Nov 2026).
-    subject.classList.toggle('hint-target', hintOpen && !subjectDone);
-    reason.classList.toggle('hint-target', hintOpen && subjectDone && reason.value.trim() === '');
+  // Part 60a: each line's answers open only from its own Hint button. While a
+  // line's answers are open and its box is empty, the box glows (8 Nov 2026).
+  const glow = () => {
+    for (const [hint, box] of [[claimHint, subject], [becauseHint, reason]]) {
+      box.classList.toggle('hint-target', hint.button.disabled && box.value.trim() === '');
+    }
   };
-  claimHint.button.addEventListener('click', showRightAnswers);
-  subject.addEventListener('change', showRightAnswers);
-  reason.addEventListener('input', showRightAnswers);
-  subject.addEventListener('input', () => { if (subject.value.trim() === '') showRightAnswers(); });
-  showRightAnswers();
+  claimHint.button.addEventListener('click', glow);
+  becauseHint.button.addEventListener('click', glow);
+  subject.addEventListener('input', glow);
+  reason.addEventListener('input', glow);
+}
+
+// Part 60a (Habiba): the question the claim answers stands out. "Look at your
+// findings. How long do most kids sleep?" -> a small lead line, then the
+// question big. A prompt without a lead shows only the big question.
+function claimQuestionHTML(prompt) {
+  const parts = prompt.match(/^(.*[.!])\s+([^.!]+\?)$/);
+  const lead = parts ? parts[1] : '';
+  const question = parts ? parts[2] : prompt;
+  return `
+    <div class="claim-question">
+      ${lead ? `<p class="claim-question-lead">${iconLineHTML(lead)}</p>` : ''}
+      <p class="claim-question-text">${iconLineHTML(question)}</p>
+    </div>`;
 }
 
 function setupEvidence() {

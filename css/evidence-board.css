@@ -5,10 +5,53 @@
   align-items: start;
 }
 
+/* Part 60a: the question the claim answers, in its own box, big. */
+.claim-question {
+  background: var(--color-conclude-light);
+  border: var(--border-width) solid var(--color-navy);
+  border-left-width: 10px;
+  border-radius: 16px;
+  padding: 12px 18px;
+  margin-bottom: var(--space-2);
+}
+
+.claim-question p {
+  margin: 0;
+}
+
+.claim-question-lead {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.claim-question-text {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
 .sentence-starter {
   font-size: 19px;
   line-height: 2.2;
   font-weight: 700;
+}
+
+/* Each line's own Hint button and answers, right under its box. */
+.claim-line + .claim-line {
+  margin-top: var(--space-1);
+}
+
+.claim-hint {
+  line-height: 1.4;
+}
+
+.claim-hint .hint-btn {
+  margin-top: var(--space-1);
+}
+
+.claim-hint .hint-list {
+  margin-top: var(--space-1);
 }
 
 .inline-input {
