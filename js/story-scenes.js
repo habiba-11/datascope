@@ -171,12 +171,12 @@ const SCENES = {
     ${part('data-line="1"', svg(`<g transform="translate(804 174)"><g class="st-stamp-in"><rect x="-62" y="-20" width="124" height="40" rx="9" fill="#fff" fill-opacity=".92" stroke="#217A3B" stroke-width="4"/>${T(0, 9, 28, '#217A3B', 'LIKELY!')}</g></g>`))}
     ${part('data-line="2"', svg(`<g>${Array.from({ length: 24 }, (_, i) => `<rect class="st-confetti" x="${(i * 41 + 17) % 940}" y="-30" width="${8 + (i % 3) * 3}" height="${12 + (i % 4) * 2}" rx="2" fill="${KIDS[i % 4].shirt}" style="animation-delay: -${(i * 0.37) % 3.6}s; animation-duration: ${3 + (i % 5) * 0.4}s"/>`).join('')}</g>`))}`,
 
-  // Pip, big, and Sara: the pretend class (no number); then "Your mission!".
+  // From here on the child is the investigator, so Sara is gone and Pip is the
+  // main character, big (Habiba, 10 Nov 2026). The pretend class (no number);
+  // then "Your mission!" and Pip cheers.
   mission: () => `
-    ${part('data-before="2"', sara('idle', 20, 0.85))}
-    ${part('data-line="2"', sara('cheer', 20, 0.85))}
-    ${part('data-before="2"', pip(250, 190))}
-    ${part('data-line="2"', pip(250, 190, true))}
+    ${part('data-before="2"', pip(170, 260))}
+    ${part('data-line="2"', pip(170, 260, true))}
     ${part('data-line="1"', svg(pop(`<g transform="translate(590 76)">
       <rect x="5" y="8" width="270" height="214" rx="18" fill="${NAVY}" opacity=".2"/>
       <rect width="270" height="214" rx="18" fill="#fff" fill-opacity=".95" stroke="${NAVY}" stroke-width="3.6"/>

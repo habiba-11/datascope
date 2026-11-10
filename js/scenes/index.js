@@ -1,6 +1,7 @@
 // Part 59 (scenes): each room is a PLACE. This file puts the room's scene
-// behind the task card, and Sara in the left column next to big Pip.
-// The plan (which scene, which pose, what moves) is plain data here, so it is
+// behind the task card. Big Pip stands in the left column (Habiba, 10 Nov
+// 2026: Pip is the main character in the rooms; Sara is only in the story).
+// The plan (which scene, what moves) is plain data here, so it is
 // tested (tests/scenes.test.js); mountScene() is the only part that needs a page.
 //
 // Rules (Part 59): the scene is a still picture; only a few small things move
@@ -16,16 +17,14 @@ import { lab } from './lab.js';
 import { funfair } from './funfair.js';
 import { office } from './office.js';
 import { schoolyard } from './schoolyard.js';
-import { saraSVG } from '../characters.js';
 
 // Room (phase id) -> its place. Rooms move to scenes one part at a time;
 // a room not listed here keeps the Round 4 sky (js/ambient.js).
-// `sara`: her pose in this room. `ambient`: what moves in the scene
+// `ambient`: what moves in the scene
 // (x, y in % of the 960 x 600 stage).
 export const ROOM_SCENES = {
   collect: {
     draw: classroom,
-    sara: 'clip',
     // Dust specks floating in the window's light.
     ambient: [
       { kind: 'dust', x: 22, y: 58, seconds: 9, delay: 0 },
@@ -38,7 +37,6 @@ export const ROOM_SCENES = {
   },
   ask: {
     draw: studio,
-    sara: 'think',
     // Dust floating over the bookshelves.
     ambient: [
       { kind: 'dust', x: 10, y: 48, seconds: 10, delay: 0 },
@@ -49,7 +47,6 @@ export const ROOM_SCENES = {
   graph: {
     draw: lab,
     // Not 'point' (the mockup): big Pip stands in front of her and hid the stick.
-    sara: 'idle',
     // Dust in the light from the window.
     ambient: [
       { kind: 'dust', x: 8, y: 44, seconds: 10, delay: 0 },
@@ -59,7 +56,6 @@ export const ROOM_SCENES = {
   },
   chance: {
     draw: funfair,
-    sara: 'cheer',
     // The one thing that moves: a small flag waving on top of the striped pole.
     ambient: [
       { kind: 'flag', x: 2.3, y: 36.4, seconds: 2.4, delay: 0 },
@@ -67,7 +63,6 @@ export const ROOM_SCENES = {
   },
   conclude: {
     draw: office,
-    sara: 'write',
     // Dust over the desk.
     ambient: [
       { kind: 'dust', x: 8, y: 46, seconds: 10, delay: 0 },
@@ -77,7 +72,6 @@ export const ROOM_SCENES = {
   },
   number: {
     draw: workshop,
-    sara: 'think',
     // A little chalk dust drifting up from the chalkboard's tray.
     ambient: [
       { kind: 'dust', x: 18, y: 46, seconds: 10, delay: 0 },
@@ -85,12 +79,11 @@ export const ROOM_SCENES = {
       { kind: 'dust', x: 24, y: 47, seconds: 11, delay: -8 },
     ],
   },
-  // The start page (Part 59g): Sara and Pip stand in the page itself
-  // (js/welcome.js), so no `sara` here. Clouds drift (w = width in % of the
-  // stage); the school flag waves.
+  // The start page (Part 59g): big Pip stands in the page itself (js/welcome.js).
+  // Clouds drift (w = width in % of the stage); the school flag waves.
   welcome: {
     draw: schoolyard,
-    sara: null,
+    cast: false,
     ambient: [
       { kind: 'cloud', x: 8, y: 8, w: 18, seconds: 150, delay: -40 },
       { kind: 'cloud', x: 46, y: 20, w: 12, seconds: 210, delay: -130 },
@@ -119,9 +112,6 @@ export function ambientStyle(a) {
   return style;
 }
 
-// Sara cheers when the room is finished, then goes back to her room pose.
-const CHEER_MS = 4000;
-
 export function hasScene(room) {
   return FEATURES.richScenes && Boolean(ROOM_SCENES[room]);
 }
@@ -148,21 +138,7 @@ export function mountScene(room) {
   document.body.prepend(scene);
   html.classList.add('has-scene');
 
-  if (!plan.sara) return true;
-
-  // Sara stands in the left column beside big Pip (wide screens only, css/scenes.css).
-  const cast = document.createElement('div');
-  cast.className = 'scene-cast';
-  cast.setAttribute('aria-hidden', 'true');
-  cast.innerHTML = saraSVG(plan.sara);
-  document.body.append(cast);
-  html.classList.add('has-cast');
-
-  // A finished room: Sara cheers with Pip for a moment.
-  window.addEventListener('datascope:logged', (e) => {
-    if (e.detail.type !== 'phase-complete') return;
-    cast.innerHTML = saraSVG('cheer');
-    setTimeout(() => { cast.innerHTML = saraSVG(plan.sara); }, CHEER_MS);
-  });
+  // Big Pip gets the left column beside the card (wide screens, css/scenes.css).
+  if (plan.cast !== false) html.classList.add('has-cast');
   return true;
 }

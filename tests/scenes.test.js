@@ -52,10 +52,8 @@ test('the scenes have no sun and no ticking clock (Round 4 rule; no timers)', ()
   }
 });
 
-test('each room scene: a known Sara pose, and only a few slow things moving inside the stage', () => {
+test('each room scene: only a few slow things moving inside the stage', () => {
   for (const [room, plan] of Object.entries(ROOM_SCENES)) {
-    // The start page has no `sara`: she stands in the page itself (js/welcome.js).
-    assert.ok(room === 'welcome' ? plan.sara === null : SARA_MOODS.includes(plan.sara), room);
     assert.ok(plan.ambient.length <= 8, `${room}: ${plan.ambient.length} movers`);
     for (const a of plan.ambient) {
       assert.ok(a.x >= 0 && a.x <= 100 && a.y >= 0 && a.y <= 100, `${room}: inside the stage`);
@@ -100,4 +98,13 @@ test("the story's graph agrees with Sara's words: the centre number is 9", async
   const hours = [...sceneHTML('graph').matchAll(/(\d+) hours</g)].map((m) => Number(m[1]));
   const values = hours.flatMap((h, i) => Array(counts[i]).fill(h));
   assert.equal(values[Math.floor(values.length / 2)], 9);
+});
+
+test('Sara is only in the story: never in a room scene or on the start page (Habiba, 10 Nov 2026)', async () => {
+  const fs = await import('node:fs');
+  for (const file of ['js/scenes/index.js', 'js/welcome.js', 'index.html']) {
+    assert.doesNotMatch(fs.readFileSync(file, 'utf8'), /saraSVG|id="sara"/, file);
+  }
+  const { sceneHTML } = await import('../js/story-scenes.js');
+  assert.doesNotMatch(sceneHTML('mission'), /st-sara/, 'the Mission scene: Pip only');
 });

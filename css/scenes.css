@@ -111,8 +111,7 @@
   height: auto;
 }
 
-.tab-hidden .scene *,
-.tab-hidden .scene-cast {
+.tab-hidden .scene * {
   animation-play-state: paused;
 }
 
@@ -125,39 +124,17 @@
   padding: var(--space-1) var(--space-3);
 }
 
-/* ---------- the left column: Sara, with big Pip in front of her ---------- */
-/* Only on laptop screens (1240px and wider), like big Pip (Part 43c).
+/* ---------- the left column: big Pip, the main character (Habiba, 10 Nov 2026) ----------
+   Only on laptop screens (1240px and wider), like big Pip (Part 43c).
    Narrower: no column; the small Pip in the card talks instead. */
-.scene-cast {
-  display: none;
-}
-
 @media (min-width: 1240px) {
-  .has-cast .scene-cast {
-    display: block;
-    position: fixed;
-    left: 8px;
-    bottom: 16px;
-    z-index: 4; /* big Pip (z-index 5) stands in front of her */
-    width: 160px;
-    pointer-events: none;
-    transform-origin: 50% 100%;
-    animation: cast-breathe 4s ease-in-out infinite;
-  }
-
-  .scene-cast svg {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
   .has-cast .pip-stand {
-    left: 118px;
-    width: 160px;
+    left: 24px;
+    width: 230px;
   }
 
   /* The card, its button bar and the status line move right, centred in the
-     space beside the column (328px from the left at 1366). */
+     space beside Pip (328px from the left at 1366). */
   .has-cast .room-content.card-layout,
   .has-cast .action-bar,
   .has-cast .status-line {
@@ -166,7 +143,3 @@
   }
 }
 
-@keyframes cast-breathe {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.012); }
-}

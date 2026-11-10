@@ -9,7 +9,6 @@ import { LOGO_SVG } from './icons.js';
 import { openStory } from './story.js';
 import { mountSky } from './ambient.js';
 import { mountScene } from './scenes/index.js';
-import { saraSVG } from './characters.js';
 import { fillIcons, setIconText, iconHTML } from './icon-text.js';
 import { openModal } from './modal.js';
 import { openWardrobe } from './wardrobe.js';
@@ -22,7 +21,6 @@ fillIcons(); // Part 54b: our icons instead of emoji
 // Pip greets the child on the start page (cheering, wings up).
 document.getElementById('mascot').innerHTML = pipSVG('Pip the owl explorer');
 document.querySelector('#mascot .pip').classList.replace('pip--happy', 'pip--cheer');
-document.getElementById('sara').innerHTML = saraSVG('cheer'); // Part 59g: Sara cheers beside Pip
 document.getElementById('logo').innerHTML = `${LOGO_SVG}<span>Data<span class="logo-accent">Scope</span></span>`;
 
 const form = document.getElementById('code-form');
