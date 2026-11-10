@@ -183,6 +183,41 @@ export function markPhaseDone(phase, scenarioId = getSelectedScenarioId()) {
   return true;
 }
 
+// Pip's Wardrobe (Part 58a, 10 Nov 2026), per child code, only in this browser
+// (Habiba's choice: children never read the database). Online, the
+// "outfit-changed" log entries record what Pip wore.
+// { "OWL-07": { "worn": { "head": "party" }, "seen": ["scarf"] } }
+const WARDROBE_KEY = 'datascope:wardrobe';
+
+function wardrobeOf(code = getExplorerCode() || 'NO-CODE') {
+  return readObject(WARDROBE_KEY)[code] || {};
+}
+
+function saveWardrobe(changes) {
+  const all = readObject(WARDROBE_KEY);
+  const code = getExplorerCode() || 'NO-CODE';
+  all[code] = { ...(all[code] || {}), ...changes };
+  writeItem(WARDROBE_KEY, JSON.stringify(all));
+}
+
+// The saved outfit ({ slot: itemId }), or null when the child never changed it.
+export function getOutfit() {
+  return wardrobeOf().worn || null;
+}
+
+export function setOutfit(outfit) {
+  saveWardrobe({ worn: { ...outfit } });
+}
+
+// Items the child has already looked at (they lose their "New!").
+export function getSeenItems() {
+  return wardrobeOf().seen || [];
+}
+
+export function markItemsSeen(ids) {
+  saveWardrobe({ seen: [...new Set([...getSeenItems(), ...ids])] });
+}
+
 // Teacher's switch: open every room on this device (to preview or test).
 // Kept when a child's work is cleared, because it belongs to the teacher.
 const PREVIEW_KEY = 'datascope:previewAll';
@@ -196,10 +231,10 @@ export function setPreviewAll(on) {
 }
 
 // For shared devices: removes the child's code, chosen scenario, reasoning
-// log, seen pop-ups, tutorial and progress from THIS device, so the next child
+// log, seen pop-ups, tutorial, progress and Pip's outfit from THIS device, so the next child
 // starts clean. Teacher data is kept.
 export function clearChildData() {
-  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY, INTROS_KEY, TUTORIAL_KEY, PROGRESS_KEY, SENT_KEY]) {
+  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY, INTROS_KEY, TUTORIAL_KEY, PROGRESS_KEY, SENT_KEY, WARDROBE_KEY]) {
     memory.delete(key);
     try {
       localStorage.removeItem(key);

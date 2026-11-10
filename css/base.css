@@ -388,10 +388,11 @@ h1 {
   overflow: visible;
 }
 
-.pip path,
-.pip ellipse,
-.pip circle,
-.pip line {
+/* Part 58a: outfit items (.pip-item) keep their own colours and outlines. */
+.pip path:not(.pip-item *),
+.pip ellipse:not(.pip-item *),
+.pip circle:not(.pip-item *),
+.pip line:not(.pip-item *) {
   stroke: var(--color-navy);
   stroke-width: 3;
   stroke-linejoin: round;
@@ -428,7 +429,13 @@ h1 {
 }
 
 .pip-wing-left { transform-origin: 80% 20%; }
-.pip-wing-right { transform-origin: 20% 20%; }
+/* The right wing holds an item (Part 58a), which would change its own box, so it
+   turns around a fixed point of Pip's drawing (the top of the wing, as before). */
+.pip-wing-right { transform-box: view-box; transform-origin: 94px 70.8px; }
+
+/* The rainbow wings (Pip's Wardrobe) flutter; reduced motion stops it (rule above). */
+.pip-flutter { transform-box: view-box; transform-origin: 26px 70px; animation: pip-flutter 1.4s ease-in-out infinite; }
+@keyframes pip-flutter { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-10deg); } }
 
 /* The eyelids (body colour) are folded away, and close for a blink now and then. */
 .pip-lids ellipse { fill: #9A6334; }

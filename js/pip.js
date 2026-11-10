@@ -3,13 +3,40 @@
 // any size and its parts can move. Moods: 'happy' (default), 'think', 'cheer'.
 // The mood styles and the blink are in base.css; reduced motion stops the movement.
 import { setIconText, setIconLine } from './icon-text.js';
+import { OUTFIT_ART } from './art/pip-outfits.js';
+import { DEFAULT_OUTFIT } from './helpers/wardrobe.js';
+import { getOutfit } from './storage/save.js';
+import { FEATURES } from './config.js';
+
+// Part 58a (10 Nov 2026): Pip wears the child's outfit (Pip's Wardrobe) on
+// every screen. With the wardrobe switched off (js/config.js), or before the
+// child changes anything, Pip wears his explorer hat and magnifier.
+export function currentOutfit() {
+  if (!FEATURES.wardrobe) return { ...DEFAULT_OUTFIT };
+  return getOutfit() || { ...DEFAULT_OUTFIT };
+}
+
+// One layer of the outfit. Each item is wrapped in "pip-item", so Pip's own
+// navy outline style (css/base.css) does not repaint the item's colours.
+function layer(outfit, slot) {
+  const id = outfit[slot];
+  const art = id && OUTFIT_ART[id] && OUTFIT_ART[id][slot];
+  // The cape's golden clasp is drawn at the neck, in front of the body.
+  const clasp = slot === 'neck' && outfit.back && OUTFIT_ART[outfit.back]?.neck;
+  return (clasp ? `<g class="pip-item">${clasp}</g>` : '') + (art ? `<g class="pip-item pip-item-${id}">${art}</g>` : '');
+}
 
 // `label`: '' when Pip is decoration next to text (hidden from screen readers).
-export function pipSVG(label = '') {
+// `outfit`: { slot: itemId } (the wardrobe screen passes the one being tried).
+// Layers, back to front: back, Pip's body and eyes, neck, face, head, the beak
+// (after every item, so nothing ever covers it), then the right wing with the
+// held item inside it (so it moves when Pip waves or cheers).
+export function pipSVG(label = '', outfit = currentOutfit()) {
   const a11y = label ? `role="img" aria-label="${label}"` : 'aria-hidden="true" focusable="false"';
   return `
 <svg class="pip pip--happy" viewBox="0 0 120 132" ${a11y}>
   <g class="pip-all">
+    ${layer(outfit, 'back')}
     <path class="pip-tuft" d="M24 40 L22 14 L42 30 Z"/>
     <path class="pip-tuft" d="M96 40 L98 14 L78 30 Z"/>
     <g class="pip-wing pip-wing-left"><ellipse cx="20" cy="84" rx="10" ry="22"/></g>
@@ -31,16 +58,12 @@ export function pipSVG(label = '') {
     </g>
     <circle class="pip-blush" cx="28" cy="74" r="5"/>
     <circle class="pip-blush" cx="92" cy="74" r="5"/>
+    ${layer(outfit, 'neck')}
+    ${layer(outfit, 'face')}
+    ${layer(outfit, 'head')}
     <path class="pip-beak" d="M53 70 L67 70 L60 81 Z"/>
-    <path class="pip-hat-top" d="M36 30 Q38 6 60 6 Q82 6 84 30 Z"/>
-    <path class="pip-hat-band" d="M37 24 L83 24 L84 30 L36 30 Z"/>
-    <path class="pip-hat-brim" d="M18 32 Q60 20 102 32 Q60 42 18 32 Z"/>
     <path class="pip-foot" d="M44 122 l-6 7 h14 Z M76 122 l-6 7 h14 Z"/>
-    <g class="pip-wing pip-wing-right"><ellipse cx="100" cy="84" rx="10" ry="22"/></g>
-    <g class="pip-glass">
-      <line x1="104" y1="96" x2="96" y2="108"/>
-      <circle cx="109" cy="88" r="9"/>
-    </g>
+    <g class="pip-wing pip-wing-right"><ellipse cx="100" cy="84" rx="10" ry="22"/>${layer(outfit, 'held')}</g>
     <text class="pip-question" x="100" y="22">?</text>
     <g class="pip-sparkles">
       <path d="M10 18 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z"/>

@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataScope: Pip's Wardrobe (UI reference)</title>
+<!--
+  Pip's Wardrobe: the UI reference for Part 53. Open in a browser. One file, no build step.
+
+  What it shows (960x600 stage, scales to any window):
+   - Big Pip in the middle, dressed live. Pip bobs, blinks and reacts with a jump, sparkles and a short line.
+   - 5 category tabs: Hats, Face, Neck, Back, Hold. One item per slot. Tap to wear, tap again to take off.
+   - 16 items. States on the cards: wearing (green tick), New! (coral ribbon), locked (dark silhouette + lock).
+   - Tapping a locked item makes Pip say how to unlock it (Grade 5 words, same idea as the locked badges).
+   - "Take everything off", "Surprise me", and a demo link that unlocks everything so you can review the art.
+  Pretend child progress in this demo: badges Question Fixer, Brave Guesser, Data Collector, Graph Explorer;
+  phases Ask, Plan, Collect, Explore done. Not earned yet: Mind Changer, Middle Finder, Because Builder,
+  Evidence Expert, Chance Tester, Conclude.
+  Rules shown on screen: dressing Pip is just for fun and never changes the investigation.
+  Where the data lives: ITEMS in the script (in the app this becomes data/content/wardrobe.json + js/art/pip-outfits.js).
+  Slots, back to front: back, body, neck, face, head, held. Items never cover Pip's beak.
+  Look: Explorer's Toolkit. Navy #17324D, sky #E6F4FF, hills #BFE8C9, step colours ask #FF7A6B, plan #FFC531,
+  collect #38B6FF, explore #4CC26B, conclude #A596FF, green button #217A3B. Fonts: Baloo 2 + Nunito.
+  prefers-reduced-motion switches every animation off.
+-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@700;800&display=swap">
+<style>
+html,body{margin:0;height:100%;background:#E6F4FF;overflow:hidden;font-family:Nunito,system-ui,sans-serif;color:#17324D}
+#fit{position:absolute;left:50%;top:50%;width:960px;height:600px;transform-origin:center center}
+#app{position:relative;width:960px;height:600px;overflow:hidden;background:#D3EEFF}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:4px solid #FFC531;outline-offset:2px}
+.hdr{position:absolute;left:0;top:0;right:0;height:64px;display:flex;align-items:center;gap:14px;padding:0 20px;box-sizing:border-box;z-index:5}
+.back{border:3px solid #17324D;background:#fff;border-radius:16px;height:44px;padding:0 16px;font-weight:800;box-shadow:0 4px 0 #17324D;display:flex;align-items:center;gap:8px}
+.ttl{font-family:"Baloo 2",sans-serif;font-weight:700;font-size:30px;line-height:1}
+.count{margin-left:auto;border:3px solid #17324D;background:#FFF0C2;border-radius:999px;padding:6px 14px;font-weight:800;display:flex;align-items:center;gap:8px}
+.stage{position:absolute;left:0;top:0;width:520px;height:600px}
+.panel{position:absolute;left:520px;top:72px;width:420px;height:512px;background:#fff;border:4px solid #17324D;border-radius:26px;box-shadow:0 6px 0 #17324D;box-sizing:border-box;padding:14px 16px;display:flex;flex-direction:column}
+.tabs{display:flex;gap:6px}
+.tab{flex:1;border:3px solid #17324D;background:#E6F4FF;border-radius:14px;height:46px;font-weight:800;font-size:15px;position:relative;display:flex;align-items:center;justify-content:center;gap:4px}
+.tab[aria-selected=true]{background:#FFC531;box-shadow:0 3px 0 #17324D;transform:translateY(-1px)}
+.tab .dot{position:absolute;top:-7px;right:-4px;background:#FF7A6B;color:#fff;border:2px solid #17324D;border-radius:999px;font-size:11px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;line-height:1}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;align-content:start;flex:1}
+.card{position:relative;border:3px solid #17324D;background:#F4FAFF;border-radius:18px;height:128px;padding:6px 6px 8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px}
+.card .pv{width:100%;height:72px;display:flex;align-items:center;justify-content:center}
+.card .pv svg{width:100%;height:100%;overflow:visible}
+.card .nm{font-weight:800;font-size:14px;line-height:1.1;text-align:center;min-height:30px;display:flex;align-items:center}
+.card[aria-pressed=true]{background:#E4F8E8;border-color:#217A3B;box-shadow:0 0 0 3px #4CC26B}
+.tick{position:absolute;top:-9px;right:-9px;width:28px;height:28px;border-radius:50%;background:#217A3B;border:3px solid #17324D;display:flex;align-items:center;justify-content:center}
+.new{position:absolute;top:-9px;left:-6px;background:#FF7A6B;color:#fff;font-weight:800;font-size:12px;border:3px solid #17324D;border-radius:10px;padding:1px 7px;transform:rotate(-6deg);animation:newpulse 1.6s ease-in-out infinite}
+.card.locked{background:#EEF3F7;border-style:dashed;border-color:#7E91A5}
+.card.locked .pv svg{filter:brightness(0) opacity(.28)}
+.card.locked .nm{color:#4A6580}
+.lock{position:absolute;top:30px;left:50%;margin-left:-15px;width:30px;height:30px;border-radius:50%;background:#fff;border:3px solid #7E91A5;display:flex;align-items:center;justify-content:center}
+.card.shake{animation:shake .45s}
+.note{margin-top:8px;font-size:13px;font-weight:700;color:#4A6580;text-align:center}
+.acts{position:absolute;left:92px;top:520px;display:flex;gap:12px;z-index:4}
+.btn{border:3px solid #17324D;background:#fff;border-radius:16px;height:46px;padding:0 16px;font-weight:800;box-shadow:0 4px 0 #17324D;display:flex;align-items:center;gap:8px}
+.btn.go{background:#217A3B;color:#fff}
+.demo{position:absolute;left:22px;top:574px;font-size:12px;font-weight:800;background:none;border:none;color:#4A6580;text-decoration:underline;padding:0;z-index:4}
+.bub{position:absolute;left:112px;top:76px;width:330px;min-height:70px;background:#fff;border:4px solid #17324D;border-radius:22px;padding:12px 16px;box-sizing:border-box;font-family:"Baloo 2",sans-serif;font-weight:700;font-size:22px;line-height:1.15;z-index:3;animation:pop .35s ease-out both}
+.bub:after{content:"";position:absolute;left:150px;bottom:-22px;width:0;height:0;border:12px solid transparent;border-top:20px solid #17324D}
+.bub:before{content:"";position:absolute;left:154px;bottom:-14px;width:0;height:0;border:8px solid transparent;border-top:15px solid #fff;z-index:1}
+.pipwrap{position:absolute;left:124px;top:222px;width:240px;height:264px;z-index:2}
+.pipwrap svg{overflow:visible;width:100%;height:100%;display:block}
+.hop{animation:hop .7s cubic-bezier(.3,.7,.4,1)}
+.platform{position:absolute;left:104px;top:470px;width:280px;height:44px}
+.spk{position:absolute;width:26px;height:26px;pointer-events:none;z-index:4;animation:spark .8s ease-out both}
+.pbob{animation:pipbob 2.6s ease-in-out infinite}
+.beak{transform-box:fill-box;transform-origin:50% 0%}
+.talk .beak{animation:piptalk .26s ease-in-out infinite}
+.eyes{transform-box:fill-box;transform-origin:50% 50%;animation:pipblink 4.5s infinite}
+.wingR{transform-box:fill-box;transform-origin:50% 15%;animation:wingidle 3s ease-in-out infinite}
+.wfl{animation:flutter 1.4s ease-in-out infinite;transform-origin:26px 70px}
+.cloud{position:absolute;animation:drift 60s linear infinite}
+.sun{position:absolute;left:14px;top:76px}
+@keyframes pipbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes pipblink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.08)}}
+@keyframes piptalk{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7)}}
+@keyframes wingidle{0%,100%{transform:rotate(0)}50%{transform:rotate(-9deg)}}
+@keyframes flutter{0%,100%{transform:rotate(0)}50%{transform:rotate(-10deg)}}
+@keyframes hop{0%{transform:translateY(0) scale(1)}25%{transform:translateY(8px) scale(1.06,.92)}55%{transform:translateY(-30px) scale(.96,1.06)}80%{transform:translateY(0) scale(1.04,.96)}100%{transform:translateY(0) scale(1)}}
+@keyframes pop{0%{opacity:0;transform:scale(.85) translateY(8px)}100%{opacity:1;transform:none}}
+@keyframes spark{0%{opacity:0;transform:translate(0,0) scale(.3) rotate(0)}30%{opacity:1}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(1) rotate(90deg)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+@keyframes newpulse{0%,100%{transform:rotate(-6deg) scale(1)}50%{transform:rotate(-6deg) scale(1.1)}}
+@keyframes drift{from{transform:translateX(-160px)}to{transform:translateX(1100px)}}
+@keyframes sunglow{0%,100%{opacity:.35;transform:scale(.95)}50%{opacity:.7;transform:scale(1.1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</head>
+<body>
+<div id="fit"><div id="app">
+  <svg width="960" height="600" viewBox="0 0 960 600" style="position:absolute;left:0;top:0" aria-hidden="true">
+    <path d="M0 400 Q130 330 300 390 T560 380 T960 400 V600 H0Z" fill="#BFE8C9"/>
+    <path d="M0 470 Q200 410 400 466 T960 456 V600 H0Z" fill="#A6DDB5"/>
+    <g fill="#17324D" opacity=".0"></g>
+  </svg>
+  <div class="sun"><svg width="76" height="76" viewBox="-42 -42 84 84" aria-hidden="true"><circle r="34" fill="#FFE27A" style="animation:sunglow 3s ease-in-out infinite;transform-origin:0 0"/><circle r="22" fill="#FFC531" stroke="#17324D" stroke-width="3.5"/><circle cx="-7" cy="-3" r="2.6" fill="#17324D"/><circle cx="7" cy="-3" r="2.6" fill="#17324D"/><path d="M-7 6 Q0 12 7 6" fill="none" stroke="#17324D" stroke-width="2.6" stroke-linecap="round"/></svg></div>
+  <div class="cloud" style="top:92px;animation-delay:-10s"><svg width="120" height="50" viewBox="0 0 120 50" aria-hidden="true"><path d="M20 44 Q4 44 6 30 Q8 18 24 20 Q28 4 48 8 Q62 -2 76 12 Q96 8 100 26 Q116 28 112 40 Q110 46 100 44Z" fill="#fff"/></svg></div>
+  <div class="cloud" style="top:150px;animation-delay:-38s;animation-duration:80s"><svg width="90" height="40" viewBox="0 0 120 50" aria-hidden="true"><path d="M20 44 Q4 44 6 30 Q8 18 24 20 Q28 4 48 8 Q62 -2 76 12 Q96 8 100 26 Q116 28 112 40 Q110 46 100 44Z" fill="#fff"/></svg></div>
+
+  <div class="hdr">
+    <button class="back" type="button"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 L8 12 L15 19" fill="none" stroke="#17324D" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>My journey</button>
+    <div class="ttl">Pip's Wardrobe</div>
+    <div class="count" id="count"></div>
+  </div>
+
+  <div class="stage">
+    <div class="bub" id="bub" aria-live="polite"></div>
+    <div class="platform"><svg width="280" height="44" viewBox="0 0 280 44" aria-hidden="true"><ellipse cx="140" cy="26" rx="130" ry="16" fill="#17324D" fill-opacity=".18"/><ellipse cx="140" cy="20" rx="124" ry="15" fill="#FFF0C2" stroke="#17324D" stroke-width="4"/><ellipse cx="140" cy="18" rx="100" ry="9" fill="#fff" fill-opacity=".55"/></svg></div>
+    <div class="pipwrap" id="pip"></div>
+    <div class="acts">
+      <button class="btn" id="bare" type="button"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12 H19 M5 12 L10 7 M5 12 L10 17" fill="none" stroke="#17324D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Take everything off</button>
+      <button class="btn go" id="surprise" type="button"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 Q13.5 10.5 22 12 Q13.5 13.5 12 22 Q10.5 13.5 2 12 Q10.5 10.5 12 2Z" fill="#FFE27A" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>Surprise me</button>
+    </div>
+    <button class="demo" id="demo" type="button">Demo only: show every item unlocked</button>
+  </div>
+
+  <div class="panel">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="grid" id="grid" role="list"></div>
+    <div class="note">Dressing Pip is just for fun. It never changes your investigation.</div>
+  </div>
+</div></div>
+
+<script>
+const N = '#17324D';
+const S = 'stroke="#17324D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
+const S2 = 'stroke="#17324D" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"';
+const star = (cx, cy, r, fill) => { let p = []; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; p.push((cx + rr * Math.cos(a)).toFixed(1) + ' ' + (cy + rr * Math.sin(a)).toFixed(1)); } return `<path d="M${p.join(' L')}Z" fill="${fill}" stroke="#17324D" stroke-width="1.4" stroke-linejoin="round"/>`; };
+const hw = (y) => 16 * (y + 16) / 49;
+const band = (y1, y2, c) => `<path d="M${60 - hw(y1)} ${y1} L${60 + hw(y1)} ${y1} L${60 + hw(y2)} ${y2} L${60 - hw(y2)} ${y2}Z" fill="${c}"/>`;
+const scarfStripe = (x, c) => { const t = (x - 60) / 34, k = 1 - t * t; return `<path d="M${x} ${(84 + 7 * k).toFixed(1)} V${(96 + 7 * k).toFixed(1)}" stroke="${c}" stroke-width="4.5" stroke-linecap="butt"/>`; };
+
+/* ---- the items. Art is drawn in Pip's own 120x132 space. ---- */
+const ITEMS = [
+{ id: 'explorer', slot: 'head', name: 'Explorer hat', vb: '6 -28 108 72', say: 'Ready to explore!', unlock: { type: 'starter' },
+  art: { head: `<path d="M36 30 Q38 6 60 6 Q82 6 84 30Z" fill="#F4C542" ${S}/><path d="M37 24 L83 24 L84 30 L36 30Z" fill="#D9822B"/><path d="M18 32 Q60 20 102 32 Q60 42 18 32Z" fill="#F4C542" ${S}/><path d="M46 13 Q50 9 58 9" stroke="#fff" stroke-opacity=".7" stroke-width="3" fill="none" stroke-linecap="round"/>` } },
+{ id: 'detective', slot: 'head', name: 'Detective hat', vb: '6 -28 108 72', say: 'Every clue counts!', unlock: { type: 'badge', ref: 'Question Fixer' }, hint: 'Fix a confusing question to find this hat.',
+  art: { head: `<path d="M18 33 Q60 22 102 33 Q60 41 18 33Z" fill="#A8742E" ${S}/><path d="M35 31 Q34 4 60 4 Q86 4 85 31Z" fill="#C99443" ${S}/><path d="M36 25 H84 L85 31 H35Z" fill="#6B3F1E"/><circle cx="60" cy="3.5" r="3.2" fill="#6B3F1E" ${S2}/><path d="M55 14 Q55 9.5 60 9.5 Q65 9.5 65 13.5 Q65 17 60 18.5 V20" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="60" cy="23.4" r="1.6" fill="#fff"/><path d="M42 12 Q46 8 52 7" stroke="#fff" stroke-opacity=".55" stroke-width="2.6" fill="none" stroke-linecap="round"/>` } },
+{ id: 'party', slot: 'head', name: 'Party hat', vb: '6 -28 108 72', say: 'Party time!', unlock: { type: 'starter' },
+  art: { head: `<path d="M44 33 L60 -16 L76 33 Q60 40 44 33Z" fill="#FF7A6B" stroke="none"/>${band(6, 12, '#FFC531')}${band(20, 26, '#38B6FF')}<path d="M44 33 L60 -16 L76 33 Q60 40 44 33Z" fill="none" ${S}/><circle cx="60" cy="-16" r="5.5" fill="#FFC531" ${S}/><circle cx="55" cy="15" r="2" fill="#fff"/><circle cx="66" cy="14" r="2" fill="#fff"/><path d="M52 24 L57 4" stroke="#fff" stroke-opacity=".5" stroke-width="2.6" stroke-linecap="round"/>` } },
+{ id: 'wizard', slot: 'head', name: 'Wizard hat', vb: '6 -28 108 72', say: 'Abracadabra… I mean, data!', unlock: { type: 'badge', ref: 'Mind Changer', super: true }, hint: 'Change your guess after you see the data.',
+  art: { head: `<ellipse cx="60" cy="32" rx="46" ry="8.5" fill="#6E5BD6" ${S}/><path d="M36 32 Q42 6 72 -22 Q76 8 86 32 Q60 38 36 32Z" fill="#A596FF" ${S}/><path d="M37 28 Q60 34 85 28 L86 31.5 Q60 38 36 32Z" fill="#FFC531"/>${star(58, 14, 5.5, '#FFE27A')}${star(70, -2, 4, '#FFE27A')}${star(50, 25, 3.2, '#FFE27A')}<path d="M44 20 Q50 6 60 -4" stroke="#fff" stroke-opacity=".5" stroke-width="2.6" fill="none" stroke-linecap="round"/>` } },
+{ id: 'crown', slot: 'head', name: 'Gold crown', vb: '6 -28 108 72', say: 'Right in the middle!', unlock: { type: 'badge', ref: 'Middle Finder' }, hint: 'Sort the numbers to find the median.',
+  art: { head: `<path d="M30 33 L34 8 L46 20 L60 2 L74 20 L86 8 L90 33 Q60 40 30 33Z" fill="#FFC531" ${S}/><path d="M31 28 Q60 35 89 28" stroke="#E0951B" stroke-width="3" fill="none"/><circle cx="60" cy="19" r="5.4" fill="#FF7A6B" ${S2}/><circle cx="42" cy="27" r="3" fill="#38B6FF" ${S2}/><circle cx="78" cy="27" r="3" fill="#4CC26B" ${S2}/><circle cx="34" cy="8" r="3" fill="#FFF3A6" ${S2}/><circle cx="60" cy="2" r="3" fill="#FFF3A6" ${S2}/><circle cx="86" cy="8" r="3" fill="#FFF3A6" ${S2}/><path d="M36 28 L38 14" stroke="#fff" stroke-opacity=".65" stroke-width="2.6" stroke-linecap="round"/>` } },
+{ id: 'cap', slot: 'head', name: 'Graduation cap', vb: '6 -28 108 72', say: 'Look at me, a scientist!', unlock: { type: 'phase', ref: 'Conclude' }, hint: 'Finish all five steps to find this cap.',
+  art: { head: `<path d="M40 22 V35 Q60 43 80 35 V22Z" fill="#2B4C6F" ${S}/><path d="M60 0 L102 16 L60 31 L18 16Z" fill="#17324D" ${S}/><path d="M60 16 Q92 18 94 31" stroke="#FFC531" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="90" y="30" width="7" height="12" rx="2" fill="#FFC531" ${S2}/><circle cx="60" cy="16" r="3.2" fill="#FFC531" ${S2}/><path d="M30 14 L56 6" stroke="#fff" stroke-opacity=".4" stroke-width="2.4" stroke-linecap="round"/>` } },
+
+{ id: 'sunglasses', slot: 'face', name: 'Sunglasses', vb: '10 38 100 42', say: 'Cool, right?', unlock: { type: 'starter' },
+  art: { face: `<path d="M29.5 55 L19 50 M90.5 55 L101 50" fill="none" ${S}/><circle cx="43" cy="58" r="14.5" fill="#38B6FF" fill-opacity=".38" ${S}/><circle cx="77" cy="58" r="14.5" fill="#38B6FF" fill-opacity=".38" ${S}/><path d="M56.5 56 Q60 52.5 63.5 56" fill="none" ${S}/><path d="M33 51 Q36 47 41 46 M67 51 Q70 47 75 46" stroke="#fff" stroke-opacity=".85" stroke-width="2.8" fill="none" stroke-linecap="round"/>` } },
+{ id: 'professor', slot: 'face', name: 'Professor glasses', vb: '10 38 100 42', say: 'Hmm, fascinating!', unlock: { type: 'badge', ref: 'Because Builder', super: true }, hint: 'Explain 3 answers using "because".',
+  art: { face: `<path d="M29 56 L19 52 M91 56 L101 52" fill="none" stroke="#17324D" stroke-width="5.4" stroke-linecap="round"/><path d="M29 56 L19 52 M91 56 L101 52" fill="none" stroke="#E0A21B" stroke-width="2.6" stroke-linecap="round"/><path d="M56.5 56 Q60 52.5 63.5 56" fill="none" stroke="#17324D" stroke-width="5.4" stroke-linecap="round"/><path d="M56.5 56 Q60 52.5 63.5 56" fill="none" stroke="#E0A21B" stroke-width="2.6" stroke-linecap="round"/><circle cx="43" cy="58" r="15.5" fill="#fff" fill-opacity=".14" stroke="#17324D" stroke-width="5.6"/><circle cx="43" cy="58" r="15.5" fill="none" stroke="#E0A21B" stroke-width="2.6"/><circle cx="77" cy="58" r="15.5" fill="#fff" fill-opacity=".14" stroke="#17324D" stroke-width="5.6"/><circle cx="77" cy="58" r="15.5" fill="none" stroke="#E0A21B" stroke-width="2.6"/><path d="M33 51 Q36 47 41 46 M67 51 Q70 47 75 46" stroke="#fff" stroke-opacity=".9" stroke-width="2.6" fill="none" stroke-linecap="round"/>` } },
+
+{ id: 'bow', slot: 'neck', name: 'Bow tie', vb: '14 72 92 52', say: 'So fancy!', unlock: { type: 'starter' },
+  art: { neck: `<path d="M58 90 L36 79 Q33 90 36 101Z" fill="#FF7A6B" ${S}/><path d="M62 90 L84 79 Q87 90 84 101Z" fill="#FF7A6B" ${S}/><path d="M40 85 L52 90 M80 85 L68 90" stroke="#D9503F" stroke-width="2.4" stroke-linecap="round"/><rect x="53" y="83" width="14" height="14" rx="4" fill="#D9503F" ${S}/><path d="M40 82 Q38 88 39 93" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" fill="none" stroke-linecap="round"/>` } },
+{ id: 'scarf', slot: 'neck', name: 'Graph scarf', vb: '14 72 92 52', say: 'Bars on my scarf, like a graph!', unlock: { type: 'badge', ref: 'Graph Explorer' }, isNew: true, hint: 'Try 2 different graphs to find this scarf.',
+  art: { neck: `<path d="M70 98 L80 124 L95 116 L86 94Z" fill="#38B6FF" ${S}/><path d="M74 104 L88 98 M77 112 L91 106" stroke="#FFC531" stroke-width="4" stroke-linecap="round"/><path d="M26 84 Q60 98 94 84 L96 96 Q60 110 24 96Z" fill="#38B6FF" stroke="none"/>${scarfStripe(36, '#FF7A6B')}${scarfStripe(48, '#FFC531')}${scarfStripe(60, '#4CC26B')}${scarfStripe(72, '#FF7A6B')}${scarfStripe(84, '#FFC531')}<path d="M26 84 Q60 98 94 84 L96 96 Q60 110 24 96Z" fill="none" ${S}/>` } },
+
+{ id: 'cape', slot: 'back', name: 'Super cape', vb: '-4 40 128 100', say: 'Up, up and away with the evidence!', unlock: { type: 'badge', ref: 'Evidence Expert', super: true }, hint: 'Finish your Evidence Card to find this cape.',
+  art: { back: `<path d="M24 54 Q0 100 6 130 Q60 142 114 130 Q120 100 96 54 Q60 76 24 54Z" fill="#E85D4E" ${S}/><path d="M30 62 Q12 100 15 123 Q60 133 105 123 Q108 100 90 62 Q60 78 30 62Z" fill="#B63A2C"/><path d="M6 130 Q60 142 114 130" stroke="#FFC531" stroke-width="4.5" fill="none" stroke-linecap="round"/>` , neck: `<path d="M30 85 Q60 99 90 85" stroke="#17324D" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M30 85 Q60 99 90 85" stroke="#FFC531" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="29" cy="83" r="5.4" fill="#FFC531" ${S2}/><circle cx="91" cy="83" r="5.4" fill="#FFC531" ${S2}/>` } },
+{ id: 'wings', slot: 'back', name: 'Rainbow wings', vb: '-30 -14 180 150', say: 'Flutter flutter!', unlock: { type: 'phase', ref: 'Explore' }, hint: 'Finish the Explore step to find these wings.',
+  art: { back: (() => { const w = `<g class="wfl"><path d="M26 66 Q-22 34 -6 -8 Q24 12 32 52Z" fill="#BFEAFF" fill-opacity=".92" ${S}/><path d="M26 80 Q-16 88 -8 128 Q24 108 32 92Z" fill="#E3DDFF" fill-opacity=".92" ${S}/><path d="M24 62 Q4 36 2 6 M26 84 Q6 96 0 118" stroke="#fff" stroke-opacity=".9" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="2" cy="40" r="3.4" fill="#FF7A6B"/><circle cx="6" cy="102" r="3" fill="#FFC531"/></g>`; return w + `<g transform="translate(120 0) scale(-1 1)">${w}</g>`; })() } },
+
+{ id: 'magnifier', slot: 'held', name: 'Magnifier', vb: '86 52 52 58', say: 'I spy… a pattern!', unlock: { type: 'starter' },
+  art: { held: `<g transform="translate(104 94)"><path d="M3 -2 L-8 12" stroke="#17324D" stroke-width="8" stroke-linecap="round"/><path d="M3 -2 L-8 12" stroke="#9A5F26" stroke-width="4" stroke-linecap="round"/><circle cx="12" cy="-15" r="11" fill="#D3EEFF" ${S}/><circle cx="12" cy="-15" r="11" fill="none" stroke="#E0A21B" stroke-width="1.6" transform="scale(.8) translate(3 -3.75)"/><path d="M6 -19 Q8 -23 12 -24" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>` } },
+{ id: 'compass', slot: 'held', name: 'Compass', vb: '86 52 52 58', say: 'My guess points north!', unlock: { type: 'badge', ref: 'Brave Guesser' }, hint: 'Make a guess before you see the data.',
+  art: { held: `<g transform="translate(104 94)"><circle cx="11" cy="-14" r="12" fill="#FFC531" ${S}/><circle cx="11" cy="-14" r="8.6" fill="#fff" stroke="#17324D" stroke-width="1.8"/><path d="M11 -22 L14.6 -14 L7.4 -14Z" fill="#FF7A6B" ${S2}/><path d="M11 -6 L14.6 -14 L7.4 -14Z" fill="#9CC6E6" ${S2}/><circle cx="11" cy="-14" r="1.4" fill="#17324D"/><circle cx="11" cy="-28" r="2.6" fill="#E0A21B" ${S2}/></g>` } },
+{ id: 'clipboard', slot: 'held', name: 'Clipboard', vb: '86 52 52 58', say: 'Let me write that down.', unlock: { type: 'badge', ref: 'Data Collector' }, hint: 'Ask the whole pretend class.',
+  art: { held: `<g transform="translate(104 94)"><rect x="1" y="-32" width="22" height="30" rx="3.5" fill="#C99443" ${S}/><rect x="4.5" y="-27" width="15" height="22" fill="#fff" stroke="#17324D" stroke-width="1.8"/><rect x="7.5" y="-35" width="9" height="6" rx="2" fill="#9AA9B8" ${S2}/><path d="M7 -20 l3 3 l5 -6" stroke="#217A3B" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 -11 H17" stroke="#9CC6E6" stroke-width="2" stroke-linecap="round"/></g>` } },
+{ id: 'dice', slot: 'held', name: 'Lucky dice', vb: '86 52 52 58', say: 'Feeling lucky? Let us test it!', unlock: { type: 'badge', ref: 'Chance Tester' }, hint: 'Run 10 tries, then 500 tries.',
+  art: { held: `<g transform="translate(104 94) rotate(12 13 -15)"><rect x="2" y="-27" width="22" height="22" rx="5.5" fill="#FF7A6B" ${S}/><g fill="#fff"><circle cx="8" cy="-21" r="2.2"/><circle cx="18" cy="-21" r="2.2"/><circle cx="13" cy="-16" r="2.2"/><circle cx="8" cy="-11" r="2.2"/><circle cx="18" cy="-11" r="2.2"/></g></g>` } }
+];
+const SLOTS = [['head', 'Hats'], ['face', 'Face'], ['neck', 'Neck'], ['back', 'Back'], ['held', 'Hold']];
+const LOCKSVG = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="#7E91A5"/><path d="M8 11 V8 a4 4 0 0 1 8 0 V11" fill="none" stroke="#7E91A5" stroke-width="3" stroke-linecap="round"/></svg>';
+const TICKSVG = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 L10 17.5 L19 7" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+const state = { tab: 'head', worn: { head: 'explorer' }, showAll: false, seen: {}, line: 'Hi! Pick something to dress me up. It is just for fun!' };
+const byId = (id) => ITEMS.find(i => i.id === id);
+const unlocked = (it) => state.showAll || it.unlock.type !== 'badge' && it.unlock.type !== 'phase' ? true : (['Question Fixer', 'Brave Guesser', 'Data Collector', 'Graph Explorer', 'Ask', 'Plan', 'Collect', 'Explore'].includes(it.unlock.ref)) || state.showAll;
+const isUnlocked = (it) => state.showAll || it.unlock.type === 'starter' || ['Question Fixer', 'Brave Guesser', 'Data Collector', 'Graph Explorer', 'Ask', 'Plan', 'Collect', 'Explore'].includes(it.unlock.ref);
+
+function pipSVG(talking) {
+  const A = (slot, part) => { const id = state.worn[slot]; if (!id) return ''; const it = byId(id); return (it.art[part || slot]) || ''; };
+  const cape = state.worn.back ? byId(state.worn.back).art : {};
+  const held = A('held');
+  return `<svg viewBox="0 0 120 132" role="img" aria-label="Pip the owl${Object.values(state.worn).length ? ', wearing ' + Object.values(state.worn).map(i => byId(i).name.toLowerCase()).join(', ') : ''}" class="${talking ? 'talk' : ''}"><g class="pbob">
+${A('back')}
+<ellipse cx="20" cy="84" rx="10" ry="22" fill="#9A6A3A" ${S}/>
+<path d="M24 40 L22 14 L42 30 Z" fill="#9A6A3A" ${S}/><path d="M96 40 L98 14 L78 30 Z" fill="#9A6A3A" ${S}/>
+<ellipse cx="60" cy="78" rx="42" ry="46" fill="#9A6A3A" stroke="#17324D" stroke-width="4"/>
+<ellipse cx="60" cy="94" rx="27" ry="26" fill="#F7E1B5"/>
+<path d="M47 88 q6.5 7 13 0 q6.5 7 13 0" stroke="#C99443" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M47 100 q6.5 7 13 0 q6.5 7 13 0" stroke="#C99443" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<circle cx="43" cy="58" r="15" fill="#fff" ${S}/><circle cx="77" cy="58" r="15" fill="#fff" ${S}/>
+<g class="eyes"><circle cx="43" cy="59" r="7" fill="#17324D"/><circle cx="77" cy="59" r="7" fill="#17324D"/><circle cx="46" cy="56" r="2.5" fill="#fff"/><circle cx="80" cy="56" r="2.5" fill="#fff"/></g>
+<circle cx="28" cy="74" r="5" fill="#FF9A8B" opacity=".7"/><circle cx="92" cy="74" r="5" fill="#FF9A8B" opacity=".7"/>
+<g class="beak"><path d="M53 70 L67 70 L60 82 Z" fill="#FF9F1C" stroke="#17324D" stroke-width="2" stroke-linejoin="round"/></g>
+<path d="M44 122 l-6 7 h14 Z M76 122 l-6 7 h14 Z" fill="#FF9F1C"/>
+${state.worn.back && cape.neck ? cape.neck : ''}${A('neck')}
+${A('face')}${A('head')}
+<g class="wingR"><ellipse cx="100" cy="84" rx="10" ry="22" fill="#9A6A3A" ${S}/>${held}</g>
+</g></svg>`;
+}
+
+function render() {
+  document.getElementById('pip').innerHTML = pipSVG(state.talking);
+  document.getElementById('bub').textContent = state.line;
+  const total = ITEMS.length, got = ITEMS.filter(isUnlocked).length;
+  document.getElementById('count').innerHTML = '<svg width="20" height="20" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5 L39.5 22 L58 23.8 L44 36 L48.2 54 L32 44.6 L15.8 54 L20 36 L6 23.8 L24.5 22Z" fill="#FFC531" stroke="#17324D" stroke-width="5" stroke-linejoin="round"/></svg>You found ' + got + ' of ' + total + ' things';
+  document.getElementById('tabs').innerHTML = SLOTS.map(([s, n]) => {
+    const fresh = ITEMS.filter(i => i.slot === s && i.isNew && !state.seen[i.id] && isUnlocked(i)).length;
+    return `<button type="button" class="tab" role="tab" aria-selected="${state.tab === s}" data-tab="${s}">${n}${fresh ? `<span class="dot" aria-label="${fresh} new">${fresh}</span>` : ''}</button>`;
+  }).join('');
+  const list = ITEMS.filter(i => i.slot === state.tab);
+  document.getElementById('grid').innerHTML = list.map(it => {
+    const open = isUnlocked(it), on = state.worn[it.slot] === it.id;
+    const art = Object.values(it.art).join('');
+    const fresh = it.isNew && !state.seen[it.id] && open;
+    return `<button type="button" role="listitem" class="card${open ? '' : ' locked'}" data-id="${it.id}" aria-pressed="${on}" ${open ? '' : 'aria-label="' + it.name + ', locked. ' + it.hint + '"'}>
+      ${on ? `<span class="tick">${TICKSVG}</span>` : ''}${fresh ? '<span class="new">New!</span>' : ''}
+      <span class="pv"><svg viewBox="${it.vb}" aria-hidden="true">${art}</svg></span>
+      ${open ? '' : `<span class="lock">${LOCKSVG}</span>`}
+      <span class="nm">${it.name}</span></button>`;
+  }).join('');
+}
+
+let talkT = null, sparkN = 0;
+function say(text, talk) {
+  state.line = text; state.talking = true; render();
+  clearTimeout(talkT); talkT = setTimeout(() => { state.talking = false; document.querySelector('#pip svg') && document.querySelector('#pip svg').classList.remove('talk'); }, Math.min(2600, 600 + text.length * 55));
+  const b = document.getElementById('bub'); b.style.animation = 'none'; void b.offsetWidth; b.style.animation = '';
+}
+function celebrate() {
+  const w = document.getElementById('pip'); w.classList.remove('hop'); void w.offsetWidth; w.classList.add('hop');
+  const stage = document.querySelector('.stage');
+  for (let i = 0; i < 7; i++) {
+    const a = (i / 7) * Math.PI * 2 + Math.random() * .5, d = 90 + Math.random() * 60;
+    const el = document.createElement('div'); el.className = 'spk';
+    el.style.left = (232 + Math.cos(a) * 20) + 'px'; el.style.top = (350 + Math.sin(a) * 20) + 'px';
+    el.style.setProperty('--x', Math.cos(a) * d + 'px'); el.style.setProperty('--y', Math.sin(a) * d - 30 + 'px');
+    el.innerHTML = '<svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 1 Q13.6 10.4 23 12 Q13.6 13.6 12 23 Q10.4 13.6 1 12 Q10.4 10.4 12 1Z" fill="#FFC531" stroke="#17324D" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+    stage.appendChild(el); setTimeout(() => el.remove(), 900);
+  }
+}
+document.getElementById('tabs').addEventListener('click', (e) => { const t = e.target.closest('[data-tab]'); if (!t) return; state.tab = t.dataset.tab; render(); });
+document.getElementById('grid').addEventListener('click', (e) => {
+  const c = e.target.closest('[data-id]'); if (!c) return;
+  const it = byId(c.dataset.id);
+  if (!isUnlocked(it)) {
+    c.classList.add('shake'); setTimeout(() => c.classList.remove('shake'), 500);
+    say(it.hint, true); return;
+  }
+  state.seen[it.id] = true;
+  if (state.worn[it.slot] === it.id) { delete state.worn[it.slot]; say('Okay, that is off. What next?', true); }
+  else { state.worn[it.slot] = it.id; say(it.say, true); celebrate(); }
+  render();
+});
+document.getElementById('bare').onclick = () => { state.worn = {}; say('Brrr, I feel bare! Dress me again?', true); celebrate(); render(); };
+document.getElementById('surprise').onclick = () => {
+  const w = {};
+  SLOTS.forEach(([s]) => { const opts = ITEMS.filter(i => i.slot === s && isUnlocked(i)); if (opts.length && (s === 'head' || Math.random() < .6)) w[s] = opts[Math.floor(Math.random() * opts.length)].id; });
+  state.worn = w; say('Ta-da! Do you like my new look?', true); celebrate(); render();
+};
+document.getElementById('demo').onclick = function () { state.showAll = !state.showAll; if (!state.showAll) Object.keys(state.worn).forEach(s => { if (!isUnlocked(byId(state.worn[s]))) delete state.worn[s]; }); this.textContent = state.showAll ? 'Demo only: back to the pretend child progress' : 'Demo only: show every item unlocked'; render(); };
+
+function fit() { const k = Math.min(innerWidth / 960, innerHeight / 600); document.getElementById('fit').style.transform = 'translate(-50%,-50%) scale(' + k + ')'; }
+addEventListener('resize', fit); fit(); say(state.line, false); state.talking = false; render();
+</script>
+</body></html>

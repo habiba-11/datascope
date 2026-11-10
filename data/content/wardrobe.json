@@ -1,0 +1,21 @@
+{
+  "_about": "Pip's Wardrobe (Part 58, from docs/design/pip-wardrobe-ui.html). unlock.type: starter (free), badge (ref = a badge id in js/helpers/badges.js), step (ref = a finished step: explore or conclude). hint = what Pip says about a locked item. The art is in js/art/pip-outfits.js.",
+  "items": [
+    { "id": "explorer", "slot": "head", "name": "Explorer hat", "say": "Ready to explore!", "unlock": { "type": "starter" } },
+    { "id": "detective", "slot": "head", "name": "Detective hat", "say": "Every clue counts!", "unlock": { "type": "badge", "ref": "question-fixer" }, "hint": "Fix a confusing question to find this hat." },
+    { "id": "party", "slot": "head", "name": "Party hat", "say": "Party time!", "unlock": { "type": "starter" } },
+    { "id": "wizard", "slot": "head", "name": "Wizard hat", "say": "Abracadabra… I mean, data!", "unlock": { "type": "badge", "ref": "changed-mind" }, "hint": "Change your guess after you see the data." },
+    { "id": "crown", "slot": "head", "name": "Gold crown", "say": "Right in the middle!", "unlock": { "type": "badge", "ref": "middle-finder" }, "hint": "Sort the numbers to find the median." },
+    { "id": "cap", "slot": "head", "name": "Graduation cap", "say": "Look at me, a scientist!", "unlock": { "type": "step", "ref": "conclude" }, "hint": "Finish all five steps to find this cap." },
+    { "id": "sunglasses", "slot": "face", "name": "Sunglasses", "say": "Cool, right?", "unlock": { "type": "starter" } },
+    { "id": "professor", "slot": "face", "name": "Professor glasses", "say": "Hmm, fascinating!", "unlock": { "type": "badge", "ref": "because-builder" }, "hint": "Explain 3 answers using \"because\"." },
+    { "id": "bow", "slot": "neck", "name": "Bow tie", "say": "So fancy!", "unlock": { "type": "starter" } },
+    { "id": "scarf", "slot": "neck", "name": "Graph scarf", "say": "Bars on my scarf, like a graph!", "unlock": { "type": "badge", "ref": "graph-explorer" }, "hint": "Try 2 different graphs to find this scarf." },
+    { "id": "cape", "slot": "back", "name": "Super cape", "say": "Up, up and away with the evidence!", "unlock": { "type": "badge", "ref": "claim" }, "hint": "Finish your Evidence Card to find this cape." },
+    { "id": "wings", "slot": "back", "name": "Rainbow wings", "say": "Flutter flutter!", "unlock": { "type": "step", "ref": "explore" }, "hint": "Finish the Explore step to find these wings." },
+    { "id": "magnifier", "slot": "held", "name": "Magnifier", "say": "I spy… a pattern!", "unlock": { "type": "starter" } },
+    { "id": "compass", "slot": "held", "name": "Compass", "say": "My guess points north!", "unlock": { "type": "badge", "ref": "brave-guesser" }, "hint": "Make a guess before you see the data." },
+    { "id": "clipboard", "slot": "held", "name": "Clipboard", "say": "Let me write that down.", "unlock": { "type": "badge", "ref": "data-collector" }, "hint": "Ask the whole pretend class." },
+    { "id": "dice", "slot": "held", "name": "Lucky dice", "say": "Feeling lucky? Let us test it!", "unlock": { "type": "badge", "ref": "chance-tester" }, "hint": "Run 10 tries, then 500 tries." }
+  ]
+}

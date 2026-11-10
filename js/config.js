@@ -17,6 +17,14 @@ export const BACKEND = {
   publishableKey: 'sb_publishable_GM3Wy-nPH7WIeP2aaL16gA_XYK8--vh',
 };
 
+// Features that can be switched off for a pilot group (Part 58a, 10 Nov 2026).
+// wardrobe: true = children can dress Pip (Pip's Wardrobe). false = the
+//           "Dress Pip" buttons are hidden and Pip wears his explorer hat and
+//           magnifier everywhere, so that group's data has no wardrobe at all.
+export const FEATURES = {
+  wardrobe: true,
+};
+
 // True when the database is switched on AND filled in.
 export function backendReady() {
   return BACKEND.enabled && BACKEND.url !== '' && BACKEND.publishableKey !== '';
