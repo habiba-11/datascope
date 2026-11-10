@@ -30,39 +30,31 @@
   color: var(--color-navy);
 }
 
-/* ---------- the sky: drifting clouds and the hills (like the rooms) ----------
-   It fills the whole window behind the stage, so the hills never end at an edge. */
-.st-sky,
+/* ---------- Part 59s: the place (the school yard or the classroom) ----------
+   Drawn on the stage, wider and taller than it (js/story-scenes.js
+   PLACE_AREA), so it reaches the edges of any window; the dialog cuts off what
+   sticks out. Only the clouds and the school flag move (css/scenes.css). */
 .story-scene {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.st-sky {
-  overflow: hidden;
-}
-
-.st-cloud {
+.st-place {
   position: absolute;
-  left: 0;
-  width: 170px;
-  height: 68px;
-  animation: st-drift 62s linear infinite;
-}
-
-.st-cloud--1 { top: 14vh; animation-delay: -20s; }
-.st-cloud--2 { top: 24vh; width: 110px; height: 44px; animation-duration: 90s; animation-delay: -60s; }
-
-/* 3.5 times as wide as the stage, centred on it, and deep enough to reach the
-   bottom of any window (the dialog cuts off what sticks out). */
-.st-hills {
-  position: absolute;
-  left: -1200px;
-  top: 0;
-  width: 3360px;
-  height: 1600px;
+  inset: 0;
   pointer-events: none;
+}
+
+.st-place-picture {
+  position: absolute;
+  display: block;
+}
+
+/* The moving things are placed in % of the 960 x 600 stage. */
+.st-place-moving {
+  position: absolute;
+  inset: 0;
 }
 
 /* ---------- the top: the 5-step trail and the switches ---------- */
@@ -80,8 +72,12 @@
   display: flex;
   gap: 10px;
   margin: 0;
-  padding: 0;
+  padding: 5px 14px 5px 8px;
   list-style: none;
+  background: rgba(255, 255, 255, 0.9);
+  border: 3px solid var(--color-navy);
+  border-radius: 999px;
+  box-shadow: 0 5px 14px rgba(8, 24, 40, 0.2);
 }
 
 .story-step {
@@ -170,11 +166,98 @@
 .st-part[hidden] { display: none; }
 .st-defs { position: absolute; }
 
-.st-small-pip {
+/* Part 59s: the people and props of a scene, placed on the 960 x 600 stage. */
+.st-char {
   position: absolute;
-  left: 20px;
-  top: 310px;
-  width: 96px;
+}
+
+.st-char > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.st-props {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+}
+
+/* A prop pops in (a little bounce) when its part appears. */
+.st-pop {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: st-popin 0.55s ease-out both;
+}
+
+.st-bar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: st-grow 0.7s ease-out both;
+}
+
+/* A classmate's answer, in a speech bubble with a tail. */
+.st-bubble {
+  position: absolute;
+  box-sizing: border-box;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 3.4px solid var(--color-navy);
+  border-radius: 18px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 22px;
+  transform-origin: 50% 100%;
+  animation: st-popin 0.4s ease-out both;
+}
+
+.st-bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  background: #fff;
+  border-right: 3.4px solid var(--color-navy);
+  border-bottom: 3.4px solid var(--color-navy);
+  transform: rotate(45deg);
+}
+
+/* The die rolls in once, then rests. */
+.st-die {
+  position: absolute;
+  left: 840px;
+  top: 100px;
+  width: 64px;
+}
+
+.st-die-roll {
+  animation: st-rollin 1.4s cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
+
+.st-die svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.st-stamp-in {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: st-stamp 0.5s ease-out both;
+}
+
+/* Each piece turns around its own middle while it falls. */
+.st-confetti {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: st-fall 3.6s linear infinite;
 }
 
 .st-sara,
@@ -370,7 +453,7 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  /* see-through: the clouds and hills show behind the cover */
+  /* see-through: the school yard shows behind the cover (Part 59s) */
 }
 
 /* While the cover is up, the story behind it waits out of sight. */
@@ -392,6 +475,12 @@
   font-size: 44px;
   line-height: 1.05;
   text-align: center;
+  text-shadow: 0 3px 0 rgba(255, 255, 255, 0.8); /* Part 59s: readable over the school yard */
+}
+
+.story-cover-sub,
+.story-cover-note {
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.8);
 }
 
 .story-cover-sub {
@@ -413,7 +502,6 @@
   color: #4A6580;
 }
 
-@keyframes st-drift { from { transform: translateX(-260px); } to { transform: translateX(calc(100vw + 40px)); } }
 @keyframes st-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 @keyframes st-jump { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-22px); } }
 @keyframes st-point { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-6deg); } }
@@ -433,16 +521,11 @@
 @keyframes st-tw { 0%, 100% { opacity: 0.3; transform: scale(0.55) rotate(0deg); } 50% { opacity: 1; transform: scale(1) rotate(24deg); } }
 @keyframes st-roll { 0% { transform: rotate(0deg) translateY(0); } 25% { transform: rotate(120deg) translateY(-24px); } 50% { transform: rotate(240deg) translateY(0); } 75% { transform: rotate(330deg) translateY(-14px); } 100% { transform: rotate(360deg) translateY(0); } }
 @keyframes st-stamp { 0% { transform: scale(2.2) rotate(-20deg); opacity: 0; } 60% { transform: scale(0.92) rotate(10deg); opacity: 1; } 100% { transform: scale(1) rotate(10deg); opacity: 1; } }
-@keyframes st-fall { 0% { transform: translateY(-30px) rotate(0deg); } 100% { transform: translateY(380px) rotate(320deg); } }
+@keyframes st-fall { 0% { transform: translateY(-30px) rotate(0deg); } 100% { transform: translateY(480px) rotate(320deg); } }
+@keyframes st-rollin { 0% { transform: translate(-210px, -70px) rotate(-420deg); opacity: 0; } 35% { opacity: 1; } 60% { transform: translate(16px, 10px) rotate(40deg); } 78% { transform: translate(-10px, -34px) rotate(-18deg); } 100% { transform: translate(0, 0) rotate(0); } }
 @keyframes st-nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 @keyframes st-shoot { 0% { transform: translate(0, 0); opacity: 0; } 3% { opacity: 1; } 13% { transform: translate(260px, 110px); opacity: 0; } 100% { transform: translate(260px, 110px); opacity: 0; } }
 @keyframes st-dust { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(-80px) scale(1.1); opacity: 0; } }
-
-/* Reduced motion: the clouds rest in view. */
-@media (prefers-reduced-motion: reduce) {
-  .st-cloud--1 { transform: translateX(55vw); }
-  .st-cloud--2 { transform: translateX(18vw); }
-}
 
 /* ---------- Part 44c: read-aloud ---------- */
 .story-line-row {

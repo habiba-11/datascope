@@ -25,7 +25,8 @@ import {
   playStoryEffects, playStoryStart, playStoryEnd, EFFECT_SECONDS,
 } from './story-sounds.js';
 import { avatarSVG } from './story-characters.js';
-import { sceneHTML, STORY_DEFS } from './story-scenes.js';
+import { sceneHTML, placeHTML } from './story-scenes.js';
+import { mountSceneDefs } from './scenes/defs.js';
 
 const SOUND_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="currentColor"/><path d="M16 9 Q19 12 16 15 M18.5 6.5 Q24 12 18.5 17.5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>';
 // The design's bold tick for a step that is done (a drawing, not a thin ✓).
@@ -34,20 +35,6 @@ const TICK = '<svg width="20" height="20" viewBox="0 0 20 20" aria-label="done">
 const VOICE_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5 H20 V16 H12 L7 20 V16 H4 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M8 9.5 H16 M8 12.5 H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const AGAIN_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9 H8 L13 5 V19 L8 15 H4 Z" fill="currentColor"/><path d="M16 8 Q19 12 16 16 M18.5 5.5 Q23 12 18.5 18.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
 const MUSIC_ICON ='<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18 V6 L20 4 V16" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="3" fill="currentColor"/><circle cx="17.5" cy="16" r="3" fill="currentColor"/></svg>';
-
-// The sky behind every scene: drifting clouds (like the rooms), across the
-// whole window. The hills are part of the stage (so Sara always stands on
-// them), drawn much wider than it, so they reach both edges of any window.
-const SKY = `
-  <div class="st-sky" aria-hidden="true">
-    <svg class="st-cloud st-cloud--1" viewBox="-4 4 140 56"><ellipse cx="60" cy="30" rx="60" ry="22" fill="#fff"/><ellipse cx="30" cy="38" rx="34" ry="16" fill="#fff"/><ellipse cx="96" cy="40" rx="36" ry="16" fill="#fff"/></svg>
-    <svg class="st-cloud st-cloud--2" viewBox="-4 4 140 56"><ellipse cx="60" cy="30" rx="60" ry="22" fill="#fff"/><ellipse cx="30" cy="38" rx="34" ry="16" fill="#fff"/><ellipse cx="96" cy="40" rx="36" ry="16" fill="#fff"/></svg>
-  </div>`;
-const HILLS = `
-  <svg class="st-hills" viewBox="0 0 3360 1600" aria-hidden="true">
-    <path d="M0 360 C900 230 1400 300 1680 340 S2600 260 3360 330 L3360 1600 L0 1600 Z" fill="var(--color-hill-back)"/>
-    <path d="M0 430 C900 340 1400 370 1700 400 S2600 350 3360 410 L3360 1600 L0 1600 Z" fill="var(--color-hill-front)"/>
-  </svg>`;
 
 // Opens the story. `returnTo`: where the focus goes when it closes.
 export function openStory(words, returnTo) {
@@ -59,10 +46,8 @@ export function openStory(words, returnTo) {
   dialog.className = 'story';
   dialog.setAttribute('aria-labelledby', 'story-title');
   dialog.innerHTML = `
-    ${STORY_DEFS}
-    ${SKY}
     <div class="story-stage" id="story-stage">
-      ${HILLS}
+      <div class="st-place" id="story-place" aria-hidden="true"></div>
       <header class="story-top">
         <ol class="story-trail" id="story-trail" aria-label="The 5 steps"></ol>
         <div class="story-switches">
@@ -104,7 +89,9 @@ export function openStory(words, returnTo) {
       </div>
     </div>`;
   document.body.append(dialog);
+  mountSceneDefs(); // the shared gradients of the places and the cast (Part 59s)
   const get = (id) => dialog.querySelector(`#${id}`);
+  get('story-place').innerHTML = placeHTML(scenes[0].id); // the cover shows the school yard too
 
   // The 960 x 600 stage is scaled to fill the window, as big as fits (like the design).
   function fit() {
@@ -201,6 +188,7 @@ export function openStory(words, returnTo) {
     // A new scene: build its picture; then show its parts up to this line.
     if (shownScene !== position.scene) {
       shownScene = position.scene;
+      get('story-place').innerHTML = placeHTML(scene.id); // Part 59s: the school yard or the classroom
       get('story-scene').innerHTML = sceneHTML(scene.id);
     }
     // A part shows from its data-line on, or only before its data-before.

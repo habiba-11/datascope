@@ -1,262 +1,198 @@
-// Shell layer: the pictures of the story's 7 scenes (Part 44), copied from the
-// approved design (docs/design/frames/datascope-story-ui.html) so they look the
-// same. Each scene is built once when it opens. A part marked data-line="n"
-// shows from line n on, and data-before="n" only before line n (js/story.js),
-// so things pop in as the story goes on. data-says="n" marks the classmates
-// who answer on line n (their mouths move while the class speaks). The design's animations are in
-// css/story.css with an "st-" in front of their names. Changed from the design
-// (Habiba, 6 Nov 2026): the mission card says "Pretend class" with no number;
-// the thought bubble's words are centred; in the numbers scene Sara stands
-// further left and a little smaller, so the cards do not cover her.
+// Shell layer: the pictures of the story's 7 scenes. Part 59s (10 Nov 2026,
+// Habiba): the look of docs/design/datascope-story-ui-v2.html, with the same
+// 7 scenes and words (data/content/story.json). Each scene has a PLACE (the
+// school yard or the classroom of the rooms, js/scenes/) drawn on the stage,
+// so the props sit where they should (the graph on the whiteboard), and drawn
+// wider than the stage, so it reaches the edges of any window.
+// A part marked data-line="n" shows from line n on, and data-before="n" only
+// before line n (js/story.js), so things pop in as the story goes on.
+// data-says="n" marks the classmates who talk on line n (their mouths move).
+// The motions are in css/story.css ("st-" names); reduced motion stops them.
+// Changed from v2, on purpose: no sun, birds, flowers or butterfly (Round 4);
+// no slow camera push-in and no film grain (Part 59 motion and speed rules);
+// no class size ("a pretend class", Habiba 6 Nov 2026); the graph keeps the
+// story's numbers, so "the centre number is 9" stays true.
 // Our own drawings only: no child text ever goes through here.
 import { pipSVG } from './pip.js';
-import { saraSVG, classmateSVG } from './story-characters.js';
+import { saraSVG, kidSVG, KIDS } from './characters.js';
+import { classroom } from './scenes/classroom.js';
+import { schoolyard } from './scenes/schoolyard.js';
+import { ambientStyle } from './scenes/index.js';
 
-// The design's shared shapes (a star, a sparkle, a soft glow), used with <use>.
-export const STORY_DEFS = `
-<svg class="st-defs" width="0" height="0" aria-hidden="true" focusable="false"><defs>
-<radialGradient id="starGlow"><stop offset="0" stop-color="#FFE08A" stop-opacity="0.85"></stop><stop offset="1" stop-color="#FFE08A" stop-opacity="0"></stop></radialGradient>
-<path id="star5" d="M0 -10 L2.9 -3.8 L9.5 -3.1 L4.7 1.5 L5.9 8.1 L0 4.9 L-5.9 8.1 L-4.7 1.5 L-9.5 -3.1 L-2.9 -3.8 Z" fill="#FFC531" stroke="#17324D" stroke-width="1.4" stroke-linejoin="round"></path>
-<path id="spark4" d="M0 -10 Q1.5 -1.5 10 0 Q1.5 1.5 0 10 Q-1.5 1.5 -10 0 Q-1.5 -1.5 0 -10 Z" fill="#fff" stroke="#FFC531" stroke-width="1"></path>
-</defs></svg>`;
+const NAVY = '#17324D';
 
-// Pip, big and cheering (the last scene).
-const bigPip = () => pipSVG().replace('pip--happy', 'pip--cheer');
+// The place is drawn wider and taller than the 960 x 600 stage.
+export const PLACE_AREA = { x0: -420, x1: 1380, y0: -440, y1: 1040 };
+const OUTDOOR = new Set(['ask', 'plan', 'mission']);
+
+// The scene's place, with what moves in it outdoors: two clouds and the school flag.
+const CLOUD = '<svg viewBox="-90 -40 180 85" aria-hidden="true" focusable="false"><ellipse cx="0" cy="30" rx="84" ry="12" fill="#B9D2E8" opacity=".45"/><g fill="url(#ds-cloud)"><ellipse cx="0" cy="18" rx="72" ry="20"/><circle cx="-36" cy="10" r="24"/><circle cx="0" cy="-5" r="33"/><circle cx="38" cy="8" r="27"/><circle cx="64" cy="17" r="16"/></g></svg>';
+const FLAG = '<svg viewBox="0 -4 48 38" aria-hidden="true" focusable="false"><path d="M0 6 Q24 -4 47 6 V32 Q24 22 0 32Z" fill="#4CC26B"/><circle cx="23" cy="18" r="6" fill="#fff" opacity=".85"/></svg>';
+export function placeHTML(id) {
+  const { x0, x1, y0, y1 } = PLACE_AREA;
+  const outdoor = OUTDOOR.has(id);
+  const picture = outdoor ? schoolyard(PLACE_AREA) : classroom(PLACE_AREA);
+  const moving = outdoor ? [
+    `<span class="scene-cloud" style="${ambientStyle({ kind: 'cloud', x: 10, y: 6, w: 16, seconds: 120, delay: -30 })}">${CLOUD}</span>`,
+    `<span class="scene-cloud" style="${ambientStyle({ kind: 'cloud', x: 60, y: 16, w: 11, seconds: 170, delay: -110 })}">${CLOUD}</span>`,
+    `<span class="scene-banner" style="${ambientStyle({ kind: 'banner', x: 94.9, y: 18.8, w: 4.9, seconds: 2.2, delay: 0 })}">${FLAG}</span>`,
+  ].join('') : '';
+  return `<svg class="st-place-picture" viewBox="${x0} ${y0} ${x1 - x0} ${y1 - y0}" style="left: ${x0}px; top: ${y0}px; width: ${x1 - x0}px; height: ${y1 - y0}px" aria-hidden="true" focusable="false">${picture}</svg>
+    <div class="st-place-moving" aria-hidden="true">${moving}</div>`;
+}
+
+// ---------- small helpers ----------
+const at = (left, top, width, html, extra = '') => `<div class="st-char" style="left: ${left}px; top: ${top}px; width: ${width}px"${extra}>${html}</div>`;
+const part = (attrs, html) => `<div class="st-part" ${attrs}>${html}</div>`;
+const svg = (inner) => `<svg class="st-props" width="960" height="600" viewBox="0 0 960 600" aria-hidden="true" focusable="false">${inner}</svg>`;
+const T = (x, y, size, fill, text, anchor = 'middle', font = "'Baloo 2', sans-serif") => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="${font}" font-weight="700" font-size="${size}" fill="${fill}">${text}</text>`;
+const pop = (html, delay = 0) => `<g class="st-pop" style="animation-delay: ${delay}s">${html}</g>`;
+
+// Sara (200 x 340) at a size; Pip (120 x 132); a classmate (120 x 170).
+const sara = (mood, left, scale = 0.9) => at(left, 436 - 340 * scale, 200 * scale, saraSVG(mood, { story: true }));
+const pip = (left, width = 140, cheer = false) => at(left, 436 - width * 1.1, width, cheer ? pipSVG().replace('pip--happy', 'pip--cheer') : pipSVG());
+const DESK_X = [480, 600, 720, 840];
+const kid = (i, mood, says = '') => at(DESK_X[i] - 63, 190, 126, kidSVG(i, mood, { delay: i * 0.6 }), says ? ` data-says="${says}"` : '');
+
+// Four school desks in front of the classmates.
+const desks = () => svg(DESK_X.map((cx, i) => `
+  <ellipse cx="${cx}" cy="446" rx="66" ry="8" fill="${NAVY}" opacity=".16"/>
+  <rect x="${cx - 54}" y="392" width="7" height="50" fill="#8C5B2D"/><rect x="${cx + 47}" y="392" width="7" height="50" fill="#8C5B2D"/>
+  <path d="M${cx - 54} 350 H${cx + 54} L${cx + 62} 386 H${cx - 62}Z" fill="url(#ds-wood-top)" stroke="#8C5B2D" stroke-width="2"/>
+  <path d="M${cx - 50} 354 H${cx - 8} L${cx - 14} 372 H${cx - 56}Z" fill="#fff" opacity=".28"/>
+  <rect x="${cx - 62}" y="386" width="124" height="12" rx="2" fill="#A86F3B"/>
+  ${i % 2 ? `<rect x="${cx + 14}" y="358" width="34" height="18" rx="3" fill="#fff" stroke="#9AA9B8" stroke-width="1.6" transform="rotate(-6 ${cx + 30} 367)"/>` : `<rect x="${cx - 46}" y="360" width="30" height="14" rx="5" fill="#FF7A6B" stroke="${NAVY}" stroke-width="2"/><path d="M${cx - 8} 372 L${cx + 14} 360" stroke="#FFC531" stroke-width="4" stroke-linecap="round"/>`}`).join(''));
+
+// A speech bubble over a classmate.
+const bubble = (i, width, text, delay = 0) => `<div class="st-bubble" style="left: ${DESK_X[i] - width / 2}px; top: 128px; width: ${width}px; animation-delay: ${delay}s">${text}</div>`;
+
+// A card with a coloured top: a title and a big number.
+const numCard = (x, y, colour, title, value, delay = 0) => pop(`<g transform="translate(${x} ${y})">
+  <rect x="3" y="6" width="124" height="118" rx="14" fill="${NAVY}" opacity=".18"/>
+  <rect width="124" height="118" rx="14" fill="#fff" stroke="${NAVY}" stroke-width="3.4"/>
+  <path d="M0 22 a14 14 0 0 1 14 -14 H110 a14 14 0 0 1 14 14 V34 H0Z" fill="${colour}" stroke="${NAVY}" stroke-width="3.4" stroke-linejoin="round"/>
+  ${T(62, 29, 15, NAVY, title)}${T(62, 98, 46, NAVY, value)}</g>`, delay);
+
+// A die, drawn in 3D, that rolls in.
+const DIE = `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><ellipse cx="32" cy="58" rx="22" ry="4" fill="${NAVY}" opacity=".25"/>
+  <path d="M32 6 L54 18 L32 30 L10 18Z" fill="#FFC1B6" stroke="${NAVY}" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M10 18 L32 30 L32 54 L10 42Z" fill="#FF7A6B" stroke="${NAVY}" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M54 18 L32 30 L32 54 L54 42Z" fill="#C94A3D" stroke="${NAVY}" stroke-width="2.6" stroke-linejoin="round"/>
+  <g fill="${NAVY}"><g transform="matrix(22 -12 22 12 10 18)"><ellipse cx=".27" cy=".27" rx=".085" ry=".085"/><ellipse cx=".73" cy=".27" rx=".085" ry=".085"/><ellipse cx=".5" cy=".5" rx=".085" ry=".085"/><ellipse cx=".27" cy=".73" rx=".085" ry=".085"/><ellipse cx=".73" cy=".73" rx=".085" ry=".085"/></g>
+  <g transform="matrix(22 12 0 24 10 18)"><ellipse cx=".3" cy=".28" rx=".09" ry=".085"/><ellipse cx=".7" cy=".28" rx=".09" ry=".085"/><ellipse cx=".3" cy=".72" rx=".09" ry=".085"/><ellipse cx=".7" cy=".72" rx=".09" ry=".085"/></g>
+  <g transform="matrix(22 -12 0 24 32 30)"><ellipse cx=".3" cy=".3" rx=".09" ry=".085"/><ellipse cx=".5" cy=".5" rx=".09" ry=".085"/><ellipse cx=".7" cy=".7" rx=".09" ry=".085"/></g></g></svg>`;
+
+// The story's graph (the same numbers as before: the centre number is 9).
+const BARS = [[3, 1, '#FF7A6B'], [7, 2, '#38B6FF'], [8, 5, '#4CC26B'], [9, 6, '#4CC26B'], [10, 3, '#38B6FF']];
+function graph() {
+  const bars = BARS.map(([hours, kids, colour], i) => {
+    const x = 452 + i * 84;
+    const h = kids * 15;
+    return `<g transform="translate(${x} ${222 - h})"><rect class="st-bar" style="animation-delay: ${0.3 + i * 0.12}s" width="52" height="${h}" rx="6" fill="${colour}" stroke="${NAVY}" stroke-width="2.6"/></g>
+      ${T(x + 26, 214 - h, 16, NAVY, `${kids} ${kids === 1 ? 'kid' : 'kids'}`, 'middle', "'Nunito', sans-serif")}
+      ${T(x + 26, 244, 16, NAVY, `${hours} hours`, 'middle', "'Nunito', sans-serif")}`;
+  }).join('');
+  return `
+    <rect x="430" y="74" width="196" height="28" rx="14" fill="#D3EEFF" stroke="${NAVY}" stroke-width="2.6"/>${T(528, 94, 15, NAVY, 'WHAT: hours of sleep', 'middle', "'Nunito', sans-serif")}
+    <rect x="640" y="74" width="160" height="28" rx="14" fill="#FFF0C2" stroke="${NAVY}" stroke-width="2.6"/>${T(720, 94, 15, NAVY, 'HOW MANY: kids', 'middle', "'Nunito', sans-serif")}
+    <path d="M440 222 H872" stroke="${NAVY}" stroke-width="3" stroke-linecap="round"/>${bars}`;
+}
 
 const SCENES = {
-  // Sara wonders; a thought bubble pops in: "Do my classmates sleep enough?"
+  // Pip says hello; Sara wonders, and a thought bubble with a "?" pops up.
   ask: () => `
-<div style="position: absolute; left: 360px; top: 190px; width: 200px; height: 230px">${saraSVG('think')}</div>
-<div class="st-part" data-line="1">
-<svg style="position: absolute; left: 0; top: 72px; animation: st-popin 0.5s ease-out both; transform-origin: 480px 190px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
-<circle cx="552" cy="150" r="9" fill="#fff" stroke="#17324D" stroke-width="3"></circle>
-<circle cx="584" cy="124" r="14" fill="#fff" stroke="#17324D" stroke-width="3"></circle>
-<ellipse cx="740" cy="84" rx="190" ry="62" fill="#fff" stroke="#17324D" stroke-width="4"></ellipse>
-<path d="M606 70 a22 22 0 1 0 24 30 a17 17 0 1 1 -24 -30 Z" fill="#FFC531" stroke="#17324D" stroke-width="3"></path>
-<text x="758" y="78" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="26" fill="#17324D">Do my classmates</text>
-<text x="758" y="108" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="26" fill="#17324D">sleep enough?</text>
-<g font-family="'Baloo 2', sans-serif" font-weight="700" font-size="34" fill="#FF7A6B"><text x="880" y="150" style="animation: st-float 1.8s ease-in-out infinite">?</text><text x="620" y="190" style="animation: st-float 2.2s ease-in-out infinite; animation-delay: -0.8s">?</text></g>
-</svg>
-</div>`,
+    ${pip(70)}
+    ${part('data-before="1"', sara('clip', 410))}
+    ${part('data-line="1"', sara('think', 410))}
+    ${part('data-line="1"', svg(pop(`<g transform="translate(640 98)">
+      <circle cx="-78" cy="104" r="7" fill="#fff" stroke="${NAVY}" stroke-width="3"/><circle cx="-60" cy="78" r="11" fill="#fff" stroke="${NAVY}" stroke-width="3"/>
+      <ellipse cx="0" cy="26" rx="82" ry="52" fill="#fff" stroke="${NAVY}" stroke-width="3.4"/>${T(0, 54, 66, '#FF7A6B', '?')}</g>`)))}`,
 
-  // Sara writes her guess: the "My guess: 8 hours" card, with twinkling stars.
+  // Sara writes her guess on a sticky note; then Pip and a big green tick.
   plan: () => `
-<div style="position: absolute; left: 250px; top: 190px; width: 200px; height: 230px">${saraSVG('write')}</div>
-<svg style="position: absolute; left: 0; top: 72px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
-<g transform="translate(560,60) rotate(-4)"><g style="animation: st-popin 0.5s ease-out both; transform-origin: 115px 75px">
-<rect x="0" y="0" width="250" height="160" rx="12" fill="#FFF0C2" stroke="#17324D" stroke-width="4"></rect>
-<rect x="0" y="0" width="250" height="38" rx="12" fill="#FFC531" stroke="#17324D" stroke-width="4"></rect>
-<text x="125" y="28" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="24" fill="#17324D">My guess</text>
-<text x="125" y="112" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="60" fill="#17324D">8 hours</text>
-</g></g>
-<g transform="translate(520,56)"><g style="animation: st-starfloat 3s ease-in-out infinite"><circle r="26" fill="url(#starGlow)" style="animation: st-pulse 2s ease-in-out infinite"></circle><g style="transform-box: fill-box; transform-origin: 50% 50%; animation: st-tw 1.8s ease-in-out infinite"><use href="#star5" transform="scale(1.5)"></use></g><g transform="translate(16,-14) scale(0.5)"><g style="transform-box: fill-box; transform-origin: 50% 50%; animation: st-tw 1.2s ease-in-out infinite; animation-delay: -0.4s"><use href="#spark4"></use></g></g></g></g>
-<g transform="translate(850,48)"><g style="animation: st-starfloat 3.6s ease-in-out infinite; animation-delay: -1s"><circle r="22" fill="url(#starGlow)" style="animation: st-pulse 2.4s ease-in-out infinite"></circle><g style="transform-box: fill-box; transform-origin: 50% 50%; animation: st-tw 2.2s ease-in-out infinite; animation-delay: -0.8s"><use href="#star5" transform="scale(1.2)"></use></g></g></g>
-</svg>`,
+    ${sara('write', 330)}
+    ${svg(pop(`<g transform="translate(600 150) rotate(-4)">
+      <rect x="5" y="8" width="230" height="130" rx="8" fill="${NAVY}" opacity=".16"/>
+      <rect width="230" height="130" rx="8" fill="#FFE27A" stroke="#C99A1A" stroke-width="2.4"/>
+      <path d="M0 100 Q115 112 230 100 V130 H0Z" fill="#F7CF4D" opacity=".6"/>
+      <rect x="85" y="-10" width="60" height="22" rx="3" fill="#fff" opacity=".7" transform="rotate(-2 115 0)"/>
+      ${T(115, 44, 22, '#7A5A10', 'My guess')}${T(86, 100, 54, NAVY, '8')}${T(150, 100, 26, NAVY, 'hours')}
+      <g transform="translate(196 54)"><path d="M0 0 A18 18 0 1 0 20 26 A14 14 0 1 1 0 0Z" fill="#fff" stroke="#C99A1A" stroke-width="2"/></g></g>`))}
+    ${part('data-line="1"', pip(110))}
+    ${part('data-line="1"', svg(pop(`<g transform="translate(800 150)"><circle r="24" fill="#4CC26B" stroke="${NAVY}" stroke-width="3.4"/><path d="M-11 0 l8 9 l16 -18" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`)))}`,
 
-  // Four classmates; their answers pop up over their heads, and one is sleepy.
+  // Four classmates behind their desks answer; one is sleepy. Then their
+  // answers become four DATA cards, and Pip comes in.
   collect: () => `
-<div style="position: absolute; left: 150px; top: 190px; width: 200px; height: 230px">${saraSVG('clip')}</div>
-<div data-says="1" style="position: absolute; left: 400px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#38B6FF', skin: '#F2C4A0', hair: '#7A4A21', mood: 'idle', delay: 0 })}</div>
-<div data-says="1" style="position: absolute; left: 520px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#4CC26B', skin: '#8D5A3B', hair: '#1F1712', mood: 'idle', delay: 1 })}</div>
-<div data-says="2" style="position: absolute; left: 640px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#A596FF', skin: '#E8B08A', hair: '#D9822B', mood: 'idle', delay: 2 })}</div>
-<div data-says="2" style="position: absolute; left: 760px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#FFC531', skin: '#C68B59', hair: '#3B2A20', mood: 'sleepy', delay: 0 })}</div>
-<div class="st-part" data-line="1">
-<div style="position: absolute; left: 392px; top: 196px; width: 100px; height: 46px; box-sizing: border-box; background: #fff; border: 4px solid #17324D; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 22px; animation: st-popin 0.4s ease-out both">9 hours</div>
-<div style="position: absolute; left: 512px; top: 196px; width: 100px; height: 46px; box-sizing: border-box; background: #fff; border: 4px solid #17324D; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 22px; animation: st-popin 0.4s ease-out 0.5s both">8 hours</div>
-</div>
-<div class="st-part" data-line="2">
-<div style="position: absolute; left: 626px; top: 196px; width: 112px; height: 46px; box-sizing: border-box; background: #fff; border: 4px solid #17324D; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 22px; animation: st-popin 0.4s ease-out both">10 hours</div>
-<div style="position: absolute; left: 752px; top: 196px; width: 100px; height: 46px; box-sizing: border-box; background: #FFD9D4; border: 4px solid #17324D; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 22px; animation: st-popin 0.4s ease-out 0.5s both">3 hours</div>
-</div>`,
+    ${sara('clip', 110, 0.85)}
+    ${kid(0, 'idle', '1')}${kid(1, 'idle', '1')}${kid(2, 'idle', '2')}
+    ${part('data-before="2"', kid(3, 'idle'))}
+    ${part('data-line="2"', kid(3, 'sleepy', '2'))}
+    ${desks()}
+    ${part('data-line="1" data-before="3"', bubble(0, 96, 'Nine!') + bubble(1, 104, 'Eight!', 0.4))}
+    ${part('data-line="2" data-before="3"', bubble(2, 90, 'Ten!') + bubble(3, 128, 'Only 3...', 0.4))}
+    ${part('data-line="3"', svg(`${pop(T(660, 108, 32, '#217A3B', 'DATA'))}${[9, 8, 10, 3].map((v, i) => pop(`<g transform="translate(${434 + i * 112} 128)">
+      <rect x="3" y="6" width="92" height="96" rx="12" fill="${NAVY}" opacity=".16"/><rect width="92" height="96" rx="12" fill="#fff" stroke="${NAVY}" stroke-width="3.2"/>
+      <rect width="92" height="26" rx="12" fill="${KIDS[i].shirt}" stroke="${NAVY}" stroke-width="3.2"/>${T(46, 64, 40, NAVY, v)}${T(46, 88, 15, '#4A6580', 'hours')}</g>`, i * 0.15)).join('')}`) + pip(300, 110))}`,
 
-  // Sara points at a bar graph: WHAT and HOW MANY pills, and the bars grow.
+  // Sara points at the graph on the whiteboard; then "Most kids!" and "Only 1!"; then Pip.
   graph: () => `
-<div style="position: absolute; left: 110px; top: 190px; width: 200px; height: 230px">${saraSVG('point')}</div>
-<svg style="position: absolute; left: 0; top: 72px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
-<g transform="translate(450,14)"><g style="animation: st-popin 0.5s ease-out both; transform-origin: 234px 163px">
-<rect x="0" y="0" width="468" height="326" rx="22" fill="#fff" stroke="#17324D" stroke-width="4"></rect>
-<rect x="18" y="14" width="190" height="30" rx="15" fill="#D3EEFF" stroke="#17324D" stroke-width="3"></rect>
-<text x="113" y="35" text-anchor="middle" font-family="'Nunito', sans-serif" font-weight="800" font-size="16" fill="#17324D">WHAT: hours slept</text>
-<rect x="222" y="14" width="190" height="30" rx="15" fill="#FFF0C2" stroke="#17324D" stroke-width="3"></rect>
-<text x="317" y="35" text-anchor="middle" font-family="'Nunito', sans-serif" font-weight="800" font-size="16" fill="#17324D">HOW MANY: kids</text>
-<line x1="20" y1="270" x2="448" y2="270" stroke="#17324D" stroke-width="4" stroke-linecap="round"></line>
-<g style="transform-box: fill-box; transform-origin: 50% 100%">
-<rect x="28" y="242" width="62" height="28" rx="6" fill="#FF7A6B" stroke="#17324D" stroke-width="3" style="transform-box: fill-box; transform-origin: 50% 100%; animation: st-grow 0.6s ease-out 0.5s both"></rect>
-<rect x="112" y="214" width="62" height="56" rx="6" fill="#38B6FF" stroke="#17324D" stroke-width="3" style="transform-box: fill-box; transform-origin: 50% 100%; animation: st-grow 0.6s ease-out 0.7s both"></rect>
-<rect x="196" y="130" width="62" height="140" rx="6" fill="#38B6FF" stroke="#17324D" stroke-width="3" style="transform-box: fill-box; transform-origin: 50% 100%; animation: st-grow 0.7s ease-out 0.9s both"></rect>
-<rect x="280" y="102" width="62" height="168" rx="6" fill="#FFC531" stroke="#17324D" stroke-width="3" style="transform-box: fill-box; transform-origin: 50% 100%; animation: st-grow 0.8s ease-out 1.1s both"></rect>
-<rect x="364" y="186" width="62" height="84" rx="6" fill="#38B6FF" stroke="#17324D" stroke-width="3" style="transform-box: fill-box; transform-origin: 50% 100%; animation: st-grow 0.7s ease-out 1.3s both"></rect>
-</g>
-<g font-family="'Nunito', sans-serif" font-weight="800" font-size="18" fill="#17324D" text-anchor="middle" style="animation: st-rise 0.5s ease-out 1.6s both">
-<text x="59" y="234">1 kid</text><text x="143" y="206">2 kids</text><text x="227" y="122">5 kids</text><text x="311" y="94">6 kids</text><text x="395" y="178">3 kids</text>
-<text x="59" y="298">3 hours</text><text x="143" y="298">7 hours</text><text x="227" y="298">8 hours</text><text x="311" y="298">9 hours</text><text x="395" y="298">10 hours</text>
-</g>
-</g></g>
-</svg>`,
+    ${sara('point', 150, 0.85)}
+    ${svg(graph())}
+    ${part('data-line="1"', svg(pop(`<rect x="610" y="112" width="156" height="120" rx="14" fill="none" stroke="#217A3B" stroke-width="3.4" stroke-dasharray="9 7"/>
+      <g transform="translate(688 294)"><rect x="-56" y="-14" width="112" height="28" rx="14" fill="#217A3B" stroke="${NAVY}" stroke-width="3"/>${T(0, 6, 17, '#fff', 'Most kids!')}</g>
+      <g transform="translate(478 172)"><rect x="-46" y="-14" width="92" height="28" rx="14" fill="#FF7A6B" stroke="${NAVY}" stroke-width="3"/>${T(0, 6, 17, NAVY, 'Only 1!')}</g>`)))}
+    ${part('data-line="2"', pip(800, 120))}`,
 
-  // The numbers in order, the centre number and the mean; then "My guess was 8";
-  // then chance: a die rolls, and "should" and "did" bars grow.
+  // The centre number and the mean; then Sara's guess; then how sure, and a die rolls.
   numbers: () => `
-<div style="position: absolute; left: 116px; top: 224px; width: 170px; height: 196px">${saraSVG('point')}</div>
-<svg style="position: absolute; left: 0; top: 72px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
-<defs><pattern id="stripe" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="#FFF0C2"></rect><rect width="5" height="10" fill="#FFC531"></rect></pattern></defs>
-<g font-family="'Baloo 2', sans-serif" font-weight="700" font-size="40" fill="#17324D" text-anchor="middle">
-<g style="animation: st-rise 0.4s ease-out 0.1s both"><rect x="296" y="22" width="60" height="76" rx="14" fill="#fff" stroke="#17324D" stroke-width="4"></rect><text x="326" y="76">3</text></g>
-<g style="animation: st-rise 0.4s ease-out 0.25s both"><rect x="364" y="22" width="60" height="76" rx="14" fill="#fff" stroke="#17324D" stroke-width="4"></rect><text x="394" y="76">8</text></g>
-<g style="animation: st-rise 0.4s ease-out 0.4s both"><rect x="432" y="22" width="60" height="76" rx="14" fill="#D5F2DC" stroke="#17324D" stroke-width="4"></rect><text x="462" y="76">9</text></g>
-<g style="animation: st-rise 0.4s ease-out 0.55s both"><rect x="500" y="22" width="60" height="76" rx="14" fill="#fff" stroke="#17324D" stroke-width="4"></rect><text x="530" y="76">9</text></g>
-<g style="animation: st-rise 0.4s ease-out 0.7s both"><rect x="568" y="22" width="60" height="76" rx="14" fill="#fff" stroke="#17324D" stroke-width="4"></rect><text x="598" y="76">10</text></g>
-</g>
-<g style="animation: st-popin 0.5s ease-out 0.9s both; transform-origin: 380px 200px">
-<rect x="296" y="124" width="150" height="104" rx="20" fill="#D5F2DC" stroke="#17324D" stroke-width="4"></rect>
-<text x="371" y="156" text-anchor="middle" font-family="'Nunito', sans-serif" font-weight="800" font-size="18" fill="#17324D">Centre number</text>
-<text x="371" y="206" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="48" fill="#17324D">9</text>
-</g>
-<g style="animation: st-popin 0.5s ease-out 1.1s both; transform-origin: 540px 200px">
-<rect x="462" y="124" width="150" height="104" rx="20" fill="#D3EEFF" stroke="#17324D" stroke-width="4"></rect>
-<text x="537" y="156" text-anchor="middle" font-family="'Nunito', sans-serif" font-weight="800" font-size="18" fill="#17324D">Mean</text>
-<text x="537" y="206" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="48" fill="#17324D">7.8</text>
-</g>
-</svg>
-<div class="st-part" data-line="1">
-<svg style="position: absolute; left: 0; top: 72px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
-<g transform="translate(296,250) rotate(-1.5)"><g style="animation: st-popin 0.5s ease-out both; transform-origin: 160px 30px">
-<rect x="0" y="0" width="332" height="62" rx="18" fill="#FFF0C2" stroke="#17324D" stroke-width="4"></rect>
-<text x="166" y="40" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="24" fill="#17324D">My guess was 8. Very close!</text>
-</g></g>
-</svg>
-</div>
-<div class="st-part" data-line="2">
-<svg style="position: absolute; left: 0; top: 72px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
-<defs><pattern id="stripe2" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="#FFF0C2"></rect><rect width="5" height="10" fill="#FFC531"></rect></pattern></defs>
-<g transform="translate(656,14)"><g style="animation: st-popin 0.5s ease-out both; transform-origin: 140px 160px">
-<rect x="0" y="0" width="280" height="326" rx="22" fill="#fff" stroke="#17324D" stroke-width="4"></rect>
-<rect x="18" y="14" width="150" height="30" rx="15" fill="#E3DEFF" stroke="#17324D" stroke-width="3"></rect>
-<text x="93" y="35" text-anchor="middle" font-family="'Nunito', sans-serif" font-weight="800" font-size="16" fill="#17324D">Chance, too!</text>
-<g transform="translate(176,66)"><g style="transform-box: fill-box; transform-origin: 50% 50%; animation: st-roll 1.4s ease-in-out 2">
-<rect x="0" y="0" width="80" height="80" rx="16" fill="#fff" stroke="#17324D" stroke-width="4"></rect>
-<circle cx="22" cy="22" r="6" fill="#17324D"></circle><circle cx="58" cy="22" r="6" fill="#17324D"></circle><circle cx="22" cy="40" r="6" fill="#17324D"></circle><circle cx="58" cy="40" r="6" fill="#17324D"></circle><circle cx="22" cy="58" r="6" fill="#17324D"></circle><circle cx="58" cy="58" r="6" fill="#17324D"></circle>
-</g></g>
-<text x="22" y="100" font-family="'Nunito', sans-serif" font-weight="800" font-size="18" fill="#17324D">Roll a die:</text>
-<text x="22" y="124" font-family="'Nunito', sans-serif" font-weight="800" font-size="18" fill="#17324D">how likely is 6?</text>
-<line x1="26" y1="296" x2="256" y2="296" stroke="#17324D" stroke-width="4" stroke-linecap="round"></line>
-<rect x="50" y="216" width="70" height="80" rx="6" fill="url(#stripe2)" stroke="#17324D" stroke-width="3" style="transform-box: fill-box; transform-origin: 50% 100%; animation: st-grow 0.6s ease-out 1.4s both"></rect>
-<rect x="160" y="196" width="70" height="100" rx="6" fill="#FFC531" stroke="#17324D" stroke-width="3" style="transform-box: fill-box; transform-origin: 50% 100%; animation: st-grow 0.6s ease-out 1.6s both"></rect>
-<g font-family="'Nunito', sans-serif" font-weight="800" font-size="18" fill="#17324D" text-anchor="middle" style="animation: st-rise 0.4s ease-out 2s both"><text x="85" y="206">Should</text><text x="195" y="186">Did</text><text x="85" y="240" font-size="22">16.7%</text><text x="195" y="240" font-size="22">20%</text></g>
-</g></g>
-</svg>
-</div>`,
+    ${part('data-before="1"', sara('point', 150, 0.85))}
+    ${part('data-line="1"', sara('think', 150, 0.85))}
+    ${svg(numCard(416, 82, '#FFC531', 'Centre number', '9', 0.1) + numCard(552, 82, '#38B6FF', 'Mean', '7.8', 0.3))}
+    ${part('data-line="1"', svg(numCard(688, 82, '#A596FF', "Sara's guess", '8')))}
+    ${part('data-line="1"', pip(800, 120))}
+    ${part('data-line="2"', svg(pop(`<g transform="translate(430 226)">
+      <rect width="430" height="14" rx="7" fill="#E1EEF8" stroke="${NAVY}" stroke-width="2.6"/><rect width="300" height="14" rx="7" fill="#4CC26B" opacity=".9"/>
+      <circle cx="300" cy="7" r="11" fill="#fff" stroke="${NAVY}" stroke-width="3.4"/>
+      ${T(0, 36, 15, '#4A6580', 'Not sure', 'start', "'Nunito', sans-serif")}${T(430, 36, 15, '#4A6580', 'Very sure', 'end', "'Nunito', sans-serif")}</g>`)) + '<div class="st-die"><div class="st-die-roll">' + DIE + '</div></div>')}`,
 
-  // The Evidence Card; then "How sure? Likely" on the ruler; then the Checked! stamp,
-  // confetti, and the classmates clap.
+  // The Evidence Card; then the LIKELY! stamp; then the class claps under confetti.
   conclude: () => `
-<div style="position: absolute; left: 130px; top: 190px; width: 200px; height: 230px">${saraSVG('cheer')}</div>
-<svg style="position: absolute; left: 0; top: 72px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
-<g transform="translate(320,12)"><g style="animation: st-popin 0.5s ease-out both; transform-origin: 186px 167px">
-<rect x="0" y="0" width="372" height="334" rx="22" fill="#fff" stroke="#17324D" stroke-width="4"></rect>
-<path d="M2 44 L2 26 Q2 2 26 2 L346 2 Q370 2 370 26 L370 44 Z" fill="#A596FF"></path>
-<line x1="2" y1="44" x2="370" y2="44" stroke="#17324D" stroke-width="4"></line>
-<text x="22" y="32" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="24" fill="#17324D">My Evidence Card</text>
-<rect x="20" y="60" width="96" height="30" rx="15" fill="#FFD9D4" stroke="#17324D" stroke-width="3"></rect>
-<text x="68" y="81" text-anchor="middle" font-family="'Nunito', sans-serif" font-weight="800" font-size="18" fill="#17324D">I think</text>
-<text x="22" y="118" font-family="'Nunito', sans-serif" font-weight="800" font-size="19" fill="#17324D" style="animation: st-rise 0.5s ease-out 0.4s both">Most kids sleep 8 to 9 hours.</text>
-<rect x="20" y="134" width="108" height="30" rx="15" fill="#D3EEFF" stroke="#17324D" stroke-width="3"></rect>
-<text x="74" y="155" text-anchor="middle" font-family="'Nunito', sans-serif" font-weight="800" font-size="18" fill="#17324D">My proof</text>
-<text x="22" y="192" font-family="'Nunito', sans-serif" font-weight="800" font-size="19" fill="#17324D" style="animation: st-rise 0.5s ease-out 0.9s both">The centre number is 9.</text>
-<text x="22" y="216" font-family="'Nunito', sans-serif" font-weight="800" font-size="19" fill="#17324D" style="animation: st-rise 0.5s ease-out 1.2s both">The tallest bar is 9 hours.</text>
-</g></g>
-</svg>
-<div class="st-part" data-line="1">
-<svg style="position: absolute; left: 320px; top: 72px; animation: st-rise 0.5s ease-out both" width="372" height="360" viewBox="0 0 372 360" aria-hidden="true">
-<g transform="translate(0,12)">
-<rect x="20" y="232" width="116" height="30" rx="15" fill="#FFF0C2" stroke="#17324D" stroke-width="3"></rect>
-<text x="78" y="253" text-anchor="middle" font-family="'Nunito', sans-serif" font-weight="800" font-size="18" fill="#17324D">How sure?</text>
-<text x="152" y="254" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="22" fill="#17324D">Likely</text>
-<rect x="22" y="276" width="66" height="30" rx="8" fill="#FF7A6B" stroke="#17324D" stroke-width="3"></rect>
-<rect x="94" y="276" width="66" height="30" rx="8" fill="#FFB36B" stroke="#17324D" stroke-width="3"></rect>
-<rect x="166" y="276" width="66" height="30" rx="8" fill="#FFE08A" stroke="#17324D" stroke-width="3"></rect>
-<rect x="238" y="276" width="66" height="30" rx="8" fill="#B8E6A0" stroke="#17324D" stroke-width="6" style="animation: st-nudge 0.8s ease-in-out infinite"></rect>
-<rect x="310" y="276" width="42" height="30" rx="8" fill="#4CC26B" stroke="#17324D" stroke-width="3"></rect>
-</g>
-</svg>
-</div>
-<div class="st-part" data-before="2">
-<div style="position: absolute; left: 730px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#38B6FF', skin: '#F2C4A0', hair: '#7A4A21', mood: 'idle', delay: 0 })}</div>
-<div style="position: absolute; left: 830px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#4CC26B', skin: '#8D5A3B', hair: '#1F1712', mood: 'idle', delay: 1 })}</div>
-</div>
-<div class="st-part" data-line="2">
-<div style="position: absolute; left: 730px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#38B6FF', skin: '#F2C4A0', hair: '#7A4A21', mood: 'clap', delay: 0 })}</div>
-<div style="position: absolute; left: 830px; top: 262px; width: 100px; height: 200px; transform: scale(0.85); transform-origin: top left">${classmateSVG({ shirt: '#4CC26B', skin: '#8D5A3B', hair: '#1F1712', mood: 'clap', delay: 1 })}</div>
-</div>
-<div class="st-part" data-line="2">
-<svg style="position: absolute; left: 0; top: 72px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
-<g transform="translate(562,64) rotate(10)"><g style="animation: st-stamp 0.5s ease-out both; transform-box: fill-box; transform-origin: 50% 50%">
-<rect x="0" y="0" width="128" height="46" rx="12" fill="#fff" stroke="#217A3B" stroke-width="5"></rect>
-<text x="64" y="32" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="26" fill="#217A3B">Checked!</text>
-</g></g>
-<g>
-<rect x="60" y="0" width="12" height="18" rx="3" fill="#FF7A6B" style="animation: st-fall 3.4s linear infinite"></rect>
-<rect x="150" y="0" width="12" height="18" rx="3" fill="#FFC531" style="animation: st-fall 4.2s linear infinite; animation-delay: -1s"></rect>
-<rect x="260" y="0" width="12" height="18" rx="3" fill="#A596FF" style="animation: st-fall 3.8s linear infinite; animation-delay: -2s"></rect>
-<rect x="380" y="0" width="12" height="18" rx="3" fill="#38B6FF" style="animation: st-fall 3.3s linear infinite; animation-delay: -0.4s"></rect>
-<rect x="470" y="0" width="12" height="18" rx="3" fill="#4CC26B" style="animation: st-fall 4.5s linear infinite; animation-delay: -2.4s"></rect>
-<rect x="560" y="0" width="12" height="18" rx="3" fill="#FFC531" style="animation: st-fall 4s linear infinite; animation-delay: -3s"></rect>
-<rect x="650" y="0" width="12" height="18" rx="3" fill="#A596FF" style="animation: st-fall 3.6s linear infinite; animation-delay: -1.4s"></rect>
-<rect x="720" y="0" width="12" height="18" rx="3" fill="#FF7A6B" style="animation: st-fall 4.4s linear infinite; animation-delay: -3.2s"></rect>
-<rect x="800" y="0" width="12" height="18" rx="3" fill="#38B6FF" style="animation: st-fall 3.5s linear infinite; animation-delay: -0.9s"></rect>
-<rect x="890" y="0" width="12" height="18" rx="3" fill="#4CC26B" style="animation: st-fall 4.1s linear infinite; animation-delay: -2.8s"></rect>
-<rect x="20" y="0" width="12" height="18" rx="3" fill="#FFC531" style="animation: st-fall 3.9s linear infinite; animation-delay: -1.9s"></rect>
-<rect x="930" y="0" width="12" height="18" rx="3" fill="#FF7A6B" style="animation: st-fall 4.3s linear infinite; animation-delay: -0.2s"></rect>
-</g>
-</svg>
-</div>`,
+    ${part('data-before="2"', sara('write', 110, 0.85))}
+    ${part('data-line="2"', sara('cheer', 110, 0.85))}
+    ${part('data-line="2"', DESK_X.map((_, i) => kid(i, 'clap', '2')).join('') + desks())}
+    ${svg(pop(`<g transform="translate(424 70)">
+      <rect x="4" y="8" width="448" height="124" rx="14" fill="${NAVY}" opacity=".18"/>
+      <rect width="448" height="124" rx="14" fill="#fff" stroke="${NAVY}" stroke-width="3.4"/>
+      <path d="M0 28 a14 14 0 0 1 14 -14 H434 a14 14 0 0 1 14 14 V38 H0Z" fill="#A596FF" stroke="${NAVY}" stroke-width="3.4" stroke-linejoin="round"/>
+      ${T(224, 33, 20, '#fff', 'EVIDENCE CARD')}
+      ${T(20, 70, 18, NAVY, 'Claim: most kids sleep 8 to 9 hours.', 'start', "'Nunito', sans-serif")}
+      ${T(20, 102, 18, NAVY, 'Proof: the centre number is 9.', 'start', "'Nunito', sans-serif")}</g>`))}
+    ${part('data-line="1"', svg(`<g transform="translate(804 174)"><g class="st-stamp-in"><rect x="-62" y="-20" width="124" height="40" rx="9" fill="#fff" fill-opacity=".92" stroke="#217A3B" stroke-width="4"/>${T(0, 9, 28, '#217A3B', 'LIKELY!')}</g></g>`))}
+    ${part('data-line="2"', svg(`<g>${Array.from({ length: 24 }, (_, i) => `<rect class="st-confetti" x="${(i * 41 + 17) % 940}" y="-30" width="${8 + (i % 3) * 3}" height="${12 + (i % 4) * 2}" rx="2" fill="${KIDS[i % 4].shirt}" style="animation-delay: -${(i * 0.37) % 3.6}s; animation-duration: ${3 + (i % 5) * 0.4}s"/>`).join('')}</g>`))}`,
 
-  // Big Pip cheers among glowing stars and a shooting star; then the pretend class
-  // (no number: Habiba, 6 Nov 2026); then an empty Evidence Card: "You fill it in!"
+  // Pip, big, and Sara: the pretend class (no number); then "Your mission!".
   mission: () => `
-<div style="position: absolute; left: 70px; top: 100px; width: 120px; height: 132px; transform: scale(2.5); transform-origin: top left">${bigPip()}</div>
-<svg style="position: absolute; left: 0; top: 72px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
-<g transform="translate(90,86)"><g style="animation: st-starfloat 3s ease-in-out infinite"><circle r="34" fill="url(#starGlow)" style="animation: st-pulse 2s ease-in-out infinite"></circle><g style="transform-box: fill-box; transform-origin: 50% 50%; animation: st-tw 1.7s ease-in-out infinite"><use href="#star5" transform="scale(2)"></use></g></g></g>
-<g transform="translate(380,60)"><g style="animation: st-starfloat 3.4s ease-in-out infinite; animation-delay: -1.2s"><circle r="26" fill="url(#starGlow)" style="animation: st-pulse 2.3s ease-in-out infinite"></circle><g style="transform-box: fill-box; transform-origin: 50% 50%; animation: st-tw 2s ease-in-out infinite; animation-delay: -0.6s"><use href="#star5" transform="scale(1.5)"></use></g></g></g>
-<g transform="translate(340,250)"><g style="animation: st-starfloat 2.8s ease-in-out infinite; animation-delay: -0.5s"><circle r="22" fill="url(#starGlow)" style="animation: st-pulse 1.9s ease-in-out infinite"></circle><g style="transform-box: fill-box; transform-origin: 50% 50%; animation: st-tw 1.5s ease-in-out infinite; animation-delay: -0.9s"><use href="#star5" transform="scale(1.2)"></use></g></g></g>
-<g transform="translate(200,40) scale(0.7)"><g style="transform-box: fill-box; transform-origin: 50% 50%; animation: st-tw 1.3s ease-in-out infinite"><use href="#spark4"></use></g></g>
-<g transform="translate(300,180) scale(0.5)"><g style="transform-box: fill-box; transform-origin: 50% 50%; animation: st-tw 1.1s ease-in-out infinite; animation-delay: -0.5s"><use href="#spark4"></use></g></g>
-<g style="animation: st-shoot 3.2s ease-in infinite"><g transform="translate(900,20) rotate(25)"><line x1="0" y1="0" x2="-70" y2="-28" stroke="#FFE08A" stroke-width="3" stroke-linecap="round" opacity="0.7"></line><use href="#star5" transform="scale(0.9)"></use></g></g>
-<g fill="#FFC531"><circle cx="250" cy="300" r="3" style="animation: st-dust 2.6s ease-out infinite"></circle><circle cx="420" cy="310" r="2.5" style="animation: st-dust 3s ease-out infinite; animation-delay: -1s"></circle><circle cx="150" cy="320" r="3" style="animation: st-dust 2.8s ease-out infinite; animation-delay: -1.8s"></circle><circle cx="500" cy="290" r="2" style="animation: st-dust 2.4s ease-out infinite; animation-delay: -0.4s"></circle></g>
-</svg>
-<div class="st-part" data-line="1">
-<svg style="position: absolute; left: 0; top: 72px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
-<g transform="translate(400,120)"><g style="animation: st-popin 0.5s ease-out both; transform-origin: 118px 100px">
-<rect x="0" y="0" width="236" height="216" rx="22" fill="#fff" stroke="#17324D" stroke-width="4"></rect>
-<rect x="20" y="14" width="196" height="30" rx="15" fill="#D3EEFF" stroke="#17324D" stroke-width="3"></rect>
-<text x="118" y="35" text-anchor="middle" font-family="'Nunito', sans-serif" font-weight="800" font-size="16" fill="#17324D">Pretend class</text>
-<g stroke="#17324D" stroke-width="3">
-<circle cx="36" cy="76" r="14" fill="#FF7A6B"></circle><circle cx="82" cy="76" r="14" fill="#FFC531"></circle><circle cx="128" cy="76" r="14" fill="#38B6FF"></circle><circle cx="174" cy="76" r="14" fill="#4CC26B"></circle>
-<circle cx="36" cy="114" r="14" fill="#A596FF"></circle><circle cx="82" cy="114" r="14" fill="#FF7A6B"></circle><circle cx="128" cy="114" r="14" fill="#FFC531"></circle><circle cx="174" cy="114" r="14" fill="#38B6FF"></circle>
-<circle cx="36" cy="152" r="14" fill="#4CC26B"></circle><circle cx="82" cy="152" r="14" fill="#A596FF"></circle><circle cx="128" cy="152" r="14" fill="#FF7A6B"></circle><circle cx="174" cy="152" r="14" fill="#FFC531"></circle>
-</g>
-<text x="118" y="198" text-anchor="middle" font-family="'Nunito', sans-serif" font-weight="800" font-size="18" fill="#17324D">Try it again and again!</text>
-</g></g>
-</svg>
-</div>
-<div class="st-part" data-line="2">
-<svg style="position: absolute; left: 0; top: 72px" width="960" height="360" viewBox="0 0 960 360" aria-hidden="true">
-<g style="animation: st-rise 0.4s ease-out both"><path d="M644 228 L690 228" stroke="#17324D" stroke-width="5" stroke-linecap="round"></path><path d="M680 216 L694 228 L680 240" stroke="#17324D" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></g>
-<g transform="translate(706,120)"><g style="animation: st-popin 0.5s ease-out both; transform-origin: 113px 108px">
-<rect x="0" y="0" width="226" height="216" rx="22" fill="#F4F0FF" stroke="#17324D" stroke-width="4" stroke-dasharray="10 8"></rect>
-<text x="113" y="46" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="700" font-size="24" fill="#17324D">Your Evidence Card</text>
-<rect x="22" y="68" width="182" height="28" rx="14" fill="#FFD9D4" stroke="#17324D" stroke-width="3"></rect>
-<rect x="22" y="108" width="182" height="28" rx="14" fill="#D3EEFF" stroke="#17324D" stroke-width="3"></rect>
-<rect x="22" y="148" width="182" height="28" rx="14" fill="#FFF0C2" stroke="#17324D" stroke-width="3"></rect>
-<text x="113" y="204" text-anchor="middle" font-family="'Nunito', sans-serif" font-weight="800" font-size="18" fill="#17324D">You fill it in!</text>
-</g></g>
-</svg>
-</div>`,
-
+    ${part('data-before="2"', sara('idle', 20, 0.85))}
+    ${part('data-line="2"', sara('cheer', 20, 0.85))}
+    ${part('data-before="2"', pip(250, 190))}
+    ${part('data-line="2"', pip(250, 190, true))}
+    ${part('data-line="1"', svg(pop(`<g transform="translate(590 76)">
+      <rect x="5" y="8" width="270" height="214" rx="18" fill="${NAVY}" opacity=".2"/>
+      <rect width="270" height="214" rx="18" fill="#fff" fill-opacity=".95" stroke="${NAVY}" stroke-width="3.6"/>
+      ${T(135, 36, 22, NAVY, 'A pretend class')}
+      ${Array.from({ length: 15 }, (_, i) => {
+        const k = KIDS[i % 4];
+        return `<g transform="translate(${43 + (i % 5) * 46} ${76 + Math.floor(i / 5) * 46})"><ellipse cy="12" rx="17" ry="10" fill="${k.shirt}" stroke="${NAVY}" stroke-width="2.4"/><circle r="14" fill="${k.skin}" stroke="${NAVY}" stroke-width="2.4"/><path d="M-14 -3 Q0 -20 14 -3 Q0 -9 -14 -3Z" fill="${k.hair}"/><circle cx="-5" cy="2" r="1.8" fill="${NAVY}"/><circle cx="5" cy="2" r="1.8" fill="${NAVY}"/><path d="M-5 7 Q0 11 5 7" stroke="${NAVY}" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>`;
+      }).join('')}</g>`)))}
+    ${part('data-line="2"', svg(pop(`<g transform="translate(590 318)">
+      <rect x="4" y="6" width="270" height="68" rx="20" fill="${NAVY}" opacity=".2"/>
+      <rect width="270" height="68" rx="20" fill="#217A3B" stroke="${NAVY}" stroke-width="3.6"/>
+      ${T(146, 45, 30, '#fff', 'Your mission!')}
+      <path d="M26 34 l4 -12 l4 12 l12 4 l-12 4 l-4 12 l-4 -12 l-12 -4Z" fill="#FFC531" stroke="${NAVY}" stroke-width="2" stroke-linejoin="round"/></g>`)))}`,
 };
 
-// The scene's picture, and small Pip watching from the side (not in the last scene).
+// The scene's people and props (its place is drawn by placeHTML).
 export function sceneHTML(id) {
-  const small = id === 'mission' ? '' : `<div class="st-small-pip">${pipSVG()}</div>`;
-  return SCENES[id]() + small;
+  return SCENES[id]();
 }

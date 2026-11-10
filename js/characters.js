@@ -49,7 +49,10 @@ const SARA_TORSO = `
   <path d="M92 122 L90 154 M108 122 L110 154" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`;
 
 const SARA_EYE = (cx) => `<ellipse cx="${cx}" cy="79" rx="9.6" ry="10.6" fill="#fff" stroke="#A87B55" stroke-width=".8"/><circle cx="${cx}" cy="80" r="6.6" fill="#5B3B22"/><circle cx="${cx}" cy="80" r="3.4" fill="#1B1008"/><circle cx="${cx + 2.6}" cy="76.6" r="2.3" fill="#fff"/><path d="M${cx - 10} 76 Q${cx} 66 ${cx + 10} 76" stroke="#2B1C14" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
-const SARA_HEAD = `
+const SARA_MOUTH_OPEN = '<g class="st-mouth-open"><path d="M88 101 Q100 126 112 101Z" fill="#7A2A22"/><rect x="92" y="101" width="16" height="5" rx="2" fill="#fff"/><ellipse cx="100" cy="115" rx="7" ry="4" fill="#F27A7A"/></g>';
+// In the story (`story` true) her eyes blink and her mouth can open while she
+// talks (css/story.css); in the rooms and on the start page she stays still.
+const saraHead = (story) => `
   <circle cx="54" cy="40" r="22" fill="url(#ds-hair)"/><circle cx="146" cy="40" r="22" fill="url(#ds-hair)"/>
   <ellipse cx="64" cy="56" rx="10" ry="5" fill="#FFC531" transform="rotate(-18 64 56)"/><ellipse cx="136" cy="56" rx="10" ry="5" fill="#FFC531" transform="rotate(18 136 56)"/>
   <rect x="90" y="100" width="20" height="20" rx="8" fill="${SKIN_DARK}"/>
@@ -58,25 +61,30 @@ const SARA_HEAD = `
   <path d="M62 74 Q56 28 100 26 Q144 28 138 74 Q130 48 100 50 Q70 48 62 74Z" fill="url(#ds-hair)"/>
   <path d="M76 40 Q92 32 114 36" stroke="#9A7A62" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".6"/>
   <path d="M71 64 Q82 58 93 62 M107 62 Q118 58 129 64" stroke="#2B1C14" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-  ${SARA_EYE(82)}${SARA_EYE(118)}
+  <g${story ? ' class="st-blink"' : ''}>${SARA_EYE(82)}${SARA_EYE(118)}</g>
   <path d="M99 88 Q104 94 99 96" stroke="${SKIN_DARK}" stroke-width="2" fill="none" stroke-linecap="round"/>
   <circle cx="76" cy="96" r="7" fill="#F07A6A" opacity=".3"/><circle cx="124" cy="96" r="7" fill="#F07A6A" opacity=".3"/>
-  <path d="M88 102 Q100 113 112 102" stroke="#8A3B2E" stroke-width="3.2" fill="none" stroke-linecap="round"/>`;
+  <path${story ? ' class="st-mouth-closed"' : ''} d="M88 102 Q100 113 112 102" stroke="#8A3B2E" stroke-width="3.2" fill="none" stroke-linecap="round"/>${story ? SARA_MOUTH_OPEN : ''}`;
 
 // Sara, 200 x 340, standing on her shadow. `mood`: one of SARA_MOODS.
-export function saraSVG(mood = 'idle') {
+// `story`: true in the story (js/story-scenes.js): she bobs, blinks, talks and
+// points with the story's classes (css/story.css). `viewBox`: a crop, e.g. her
+// face for the story's dialog card.
+export function saraSVG(mood = 'idle', { story = false, viewBox = '0 0 200 340' } = {}) {
   const pose = POSES[mood] || POSES.idle;
-  return `<svg class="cast-sara" viewBox="0 0 200 340" aria-hidden="true" focusable="false">
+  const front = story && mood === 'point' ? `<g class="st-point">${pose.front}</g>` : pose.front;
+  const cls = story ? `st-sara st-sara--${mood}` : 'cast-sara';
+  return `<svg class="${cls}" viewBox="${viewBox}" aria-hidden="true" focusable="false">
   <ellipse cx="100" cy="332" rx="58" ry="8" fill="#17324D" opacity=".2"/>
-  ${SARA_LEGS}${SARA_TORSO}${pose.behind}${SARA_HEAD}${pose.front}</svg>`;
+  ${SARA_LEGS}<g${story ? ' class="st-body"' : ''}>${SARA_TORSO}${pose.behind}${saraHead(story)}${front}</g></svg>`;
 }
 
 // The classmates' looks (invented kids), used in turn.
 export const KIDS = [
-  { skin: '#EFC8A4', hair: '#3B2A20', style: 'short' },
-  { skin: '#8D5A3B', hair: '#1F1612', style: 'curly' },
-  { skin: '#F4D0B0', hair: '#B5702A', style: 'long' },
-  { skin: '#D9A87A', hair: '#2FA39A', style: 'scarf' },
+  { skin: '#EFC8A4', skinDark: '#C79A74', hair: '#3B2A20', style: 'short', shirt: '#38B6FF' },
+  { skin: '#8D5A3B', skinDark: '#6E4128', hair: '#1F1612', style: 'curly', shirt: '#4CC26B' },
+  { skin: '#F4D0B0', skinDark: '#CDA27C', hair: '#B5702A', style: 'long', shirt: '#A596FF', glasses: true },
+  { skin: '#D9A87A', skinDark: '#B3825A', hair: '#2FA39A', style: 'scarf', shirt: '#FFC531' },
 ];
 
 const SEAT_HAIR = {
@@ -96,4 +104,49 @@ export function seatKidSVG(index, answered) {
     ? `<circle cx="24" cy="18" r="12" fill="${kid.skin}" stroke="#17324D" stroke-width="2"/><path d="${SEAT_HAIR[kid.style]}" fill="${kid.hair}"/><circle cx="19.5" cy="19" r="1.7" fill="#17324D"/><circle cx="28.5" cy="19" r="1.7" fill="#17324D"/><path d="M20 24 Q24 27 28 24" stroke="#17324D" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
     : '<circle cx="24" cy="18" r="12" fill="#E6ECF2" stroke="#9AA9B8" stroke-width="2"/><text x="24" y="24" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="700" font-size="16" fill="#6E8196">?</text>';
   return `<svg class="seat-kid" viewBox="0 0 48 54" aria-hidden="true" focusable="false"><ellipse cx="24" cy="50" rx="17" ry="3.4" fill="#17324D" opacity=".16"/>${body}${face}</svg>`;
+}
+
+// A classmate in the story (120 x 170): kid `index` of KIDS. `mood`: idle,
+// sleepy (eyes shut, a yawning mouth, a "z") or clap. The classes are the
+// story's (css/story.css): the body bobs, the mouth opens while the class
+// speaks, the sleepy one yawns, the hands clap. `delay` starts the bob later.
+export function kidSVG(index, mood = 'idle', { delay = 0, viewBox = '0 0 120 170' } = {}) {
+  const kid = KIDS[index % KIDS.length];
+  const sk = kid.skin;
+  const skd = kid.skinDark;
+  let hair = '';
+  let back = '';
+  let cover = '';
+  if (kid.style === 'short') hair = `<path d="M30 64 Q26 26 60 24 Q94 26 90 64 Q80 44 60 44 Q40 44 30 64Z" fill="${kid.hair}"/>`;
+  if (kid.style === 'curly') hair = [[34, 48, 12], [47, 33, 13], [62, 28, 14], [78, 33, 13], [88, 48, 12], [29, 62, 9], [93, 62, 9]].map(([cx, cy, r]) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${kid.hair}"/>`).join('');
+  if (kid.style === 'long') {
+    back = `<path d="M27 60 Q20 130 34 156 L86 156 Q100 130 93 60Z" fill="${kid.hair}"/>`;
+    hair = `<path d="M30 62 Q34 26 60 26 Q86 26 90 62 Q72 44 60 52 Q48 44 30 62Z" fill="${kid.hair}"/>`;
+  }
+  if (kid.style === 'scarf') {
+    back = `<path d="M22 70 Q20 22 60 20 Q100 22 98 70 Q102 112 90 132 L30 132 Q18 112 22 70Z" fill="${kid.hair}"/><path d="M30 120 Q60 144 90 120 L98 138 Q60 160 22 138Z" fill="${kid.hair}"/>`;
+    cover = `<path d="M34 54 Q60 40 86 54" stroke="${kid.hair}" stroke-width="12" fill="none"/>`;
+  }
+  const sleepy = mood === 'sleepy';
+  const eyes = sleepy
+    ? '<path d="M38 68 Q46 74 54 68 M66 68 Q74 74 82 68" stroke="#2B1C14" stroke-width="3" fill="none" stroke-linecap="round"/>'
+    : `<g class="st-blink">${[47, 73].map((cx) => `<ellipse cx="${cx}" cy="68" rx="5.6" ry="6.4" fill="#fff"/><circle cx="${cx}" cy="69" r="3.8" fill="#2B1C14"/><circle cx="${cx + 1.4}" cy="67" r="1.4" fill="#fff"/>`).join('')}</g>`;
+  const brows = sleepy ? '' : '<path d="M40 57 Q47 53 54 56 M66 56 Q73 53 80 57" stroke="#2B1C14" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+  const mouth = sleepy
+    ? '<ellipse class="st-kid-yawn" cx="60" cy="88" rx="5" ry="4" fill="#7A2A22"/>'
+    : '<path class="st-kid-mouth-closed" d="M50 84 Q60 94 70 84" stroke="#8A3B2E" stroke-width="3" fill="none" stroke-linecap="round"/><g class="st-kid-mouth-open"><path d="M50 83 Q60 102 70 83Z" fill="#7A2A22"/></g>';
+  const glasses = kid.glasses ? '<circle cx="47" cy="68" r="10.5" fill="#fff" fill-opacity=".18" stroke="#17324D" stroke-width="2.6"/><circle cx="73" cy="68" r="10.5" fill="#fff" fill-opacity=".18" stroke="#17324D" stroke-width="2.6"/><path d="M57.5 67 H62.5 M36.5 66 L30 62 M83.5 66 L90 62" stroke="#17324D" stroke-width="2.6" fill="none" stroke-linecap="round"/>' : '';
+  const hand = (cx) => `<circle cx="${cx}" cy="138" r="9" fill="${sk}" stroke="${skd}" stroke-width="1.6"/>`;
+  const hands = mood === 'clap'
+    ? `<g class="st-clap">${hand(52)}</g><g class="st-clap st-clap--back">${hand(68)}</g>`
+    : `<circle cx="28" cy="162" r="9" fill="${sk}" stroke="${skd}" stroke-width="1.6"/><circle cx="92" cy="162" r="9" fill="${sk}" stroke="${skd}" stroke-width="1.6"/>`;
+  const zzz = sleepy ? '<text class="st-zzz" x="92" y="34" font-family="Baloo 2, sans-serif" font-weight="700" font-size="18" fill="#17324D">z</text>' : '';
+  return `<svg class="st-kid st-kid--${mood}" viewBox="${viewBox}" aria-hidden="true" focusable="false" style="--delay: -${delay}s">
+  <g class="st-kid-body">${back}
+    <path d="M8 170 Q6 120 36 110 L84 110 Q114 120 112 170Z" fill="${kid.shirt}"/><path d="M8 170 Q6 120 36 110 L84 110 Q114 120 112 170Z" fill="url(#ds-shade)"/><path d="M48 110 L60 126 L72 110Z" fill="#fff" opacity=".75"/>
+    <rect x="52" y="92" width="16" height="22" rx="6" fill="${skd}"/><circle cx="31" cy="70" r="6.5" fill="${sk}"/><circle cx="89" cy="70" r="6.5" fill="${sk}"/>
+    <ellipse cx="60" cy="66" rx="29" ry="32" fill="${sk}"/><ellipse cx="60" cy="66" rx="29" ry="32" fill="url(#ds-shine)" opacity=".6"/><ellipse cx="60" cy="66" rx="29" ry="32" fill="url(#ds-shade)" opacity=".4"/>
+    ${hair}${cover}${brows}${eyes}${glasses}<path d="M59 74 Q62 79 59 80" stroke="${skd}" stroke-width="1.6" fill="none"/>
+    <circle cx="40" cy="80" r="5" fill="#F07A6A" opacity=".3"/><circle cx="80" cy="80" r="5" fill="#F07A6A" opacity=".3"/>${mouth}${hands}${zzz}
+  </g></svg>`;
 }

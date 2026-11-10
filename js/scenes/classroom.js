@@ -6,7 +6,7 @@
 // Left out on purpose: the sun (Round 4 rule), a ticking clock (it looks
 // like a timer), the blur filters (slow on school laptops) and the wall
 // posters (they sat right behind the step bar's words).
-import { floor } from './parts.js';
+import { floor, STAGE } from './parts.js';
 
 const NAVY = '#17324D';
 
@@ -44,12 +44,15 @@ function whiteboard() {
   <rect x="440" y="266" width="420" height="10" rx="3" fill="#B0BEC9" stroke="#8A9BAD" stroke-width="1.5"/>${pens}`;
 }
 
-export function classroom() {
+// `area`: the edges to draw to (STAGE, or wider in the story).
+export function classroom(area = STAGE) {
+  const { x0, x1, y0, y1 } = area;
+  const width = x1 - x0;
   return `
-  <rect width="960" height="600" fill="url(#ds-wall)"/>
-  <rect y="262" width="960" height="112" fill="url(#ds-wains)"/>
-  <rect y="258" width="960" height="7" fill="#fff" opacity=".85"/>
-  ${floor(372)}
+  <rect x="${x0}" y="${y0}" width="${width}" height="${y1 - y0}" fill="url(#ds-wall)"/>
+  <rect x="${x0}" y="262" width="${width}" height="112" fill="url(#ds-wains)"/>
+  <rect x="${x0}" y="258" width="${width}" height="7" fill="#fff" opacity=".85"/>
+  ${floor(372, 'ds-floor', area)}
   ${windowWithCurtains()}
   <path d="M60 262 L300 262 L690 520 L330 520Z" fill="url(#ds-beam)" opacity=".5"/>
   ${whiteboard()}`;

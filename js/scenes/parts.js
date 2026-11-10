@@ -3,17 +3,23 @@
 const NAVY = '#17324D';
 export const STEP_COLOURS = ['#FF7A6B', '#FFC531', '#38B6FF', '#4CC26B', '#A596FF'];
 
+// The normal stage is 960 x 600. The story draws its places wider and taller
+// (Part 59s), so they reach the edges of any window: `area` gives the edges.
+export const STAGE = { x0: 0, x1: 960, y0: 0, y1: 600 };
+
 // A wooden floor from `top` down to the bottom, with boards that run away
 // from the viewer, and a white skirting line along the wall.
-export function floor(top, gradient = 'ds-floor') {
+export function floor(top, gradient = 'ds-floor', area = STAGE) {
+  const { x0, x1, y1 } = area;
+  const width = x1 - x0;
   let lines = '';
-  for (let x = -400; x <= 1360; x += 96) lines += `<path d="M${x} 600 L${Math.round(480 + (x - 480) * 0.3)} ${top}"/>`;
-  const boards = [24, 56, 98, 154, 218].map((dy) => `<path d="M0 ${top + dy} H960"/>`).join('');
+  for (let x = x0 - 400; x <= x1 + 400; x += 96) lines += `<path d="M${x} ${y1} L${Math.round(480 + (x - 480) * 0.3)} ${top}"/>`;
+  const boards = [24, 56, 98, 154, 218].map((dy) => `<path d="M${x0} ${top + dy} H${x1}"/>`).join('');
   return `
-  <rect y="${top}" width="960" height="${600 - top}" fill="url(#${gradient})"/>
+  <rect x="${x0}" y="${top}" width="${width}" height="${y1 - top}" fill="url(#${gradient})"/>
   <g stroke="#8C5B2D" stroke-width="2" opacity=".24">${lines}${boards}</g>
-  <rect y="${top - 6}" width="960" height="9" fill="#FFF7E6"/>
-  <rect y="${top}" width="960" height="4" fill="${NAVY}" opacity=".12"/>`;
+  <rect x="${x0}" y="${top - 6}" width="${width}" height="9" fill="#FFF7E6"/>
+  <rect x="${x0}" y="${top}" width="${width}" height="4" fill="${NAVY}" opacity=".12"/>`;
 }
 
 // A wooden shelf at (x, y), `w` wide, with `items` standing on it (drawn above y = 0).

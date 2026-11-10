@@ -78,3 +78,26 @@ test("an answered seat kid wears the colour of the answer's bar; an empty one is
 test('an unknown Sara pose falls back to standing still', () => {
   assert.equal(saraSVG('flying'), saraSVG('idle'));
 });
+
+// Part 59s: the story in the look of datascope-story-ui-v2.html.
+test('the story: every scene draws, with its place, using only shared gradients and no filters', async () => {
+  const { sceneHTML, placeHTML } = await import('../js/story-scenes.js');
+  const story = (await import('../data/content/story.json', { with: { type: 'json' } })).default;
+  for (const { id } of story.scenes) {
+    const html = sceneHTML(id) + placeHTML(id);
+    for (const used of usedIds(html)) assert.ok(DEFINED.has(used), `${id} uses #${used}`);
+    assert.doesNotMatch(html, /filter|feGaussianBlur|feTurbulence|mix-blend/, id);
+    assert.doesNotMatch(html, /sun|clock/i, `${id}: no sun or clock (Round 4)`);
+    // Words on screen only (numbers inside drawings are coordinates).
+    const words = [...html.matchAll(/>([^<>]+)</g)].map((m) => m[1]).join(' ');
+    assert.doesNotMatch(words, /\b25\b/, `${id}: no class size (Habiba, 6 Nov 2026)`);
+  }
+});
+
+test("the story's graph agrees with Sara's words: the centre number is 9", async () => {
+  const { sceneHTML } = await import('../js/story-scenes.js');
+  const counts = [...sceneHTML('graph').matchAll(/(\d+) kids?</g)].map((m) => Number(m[1]));
+  const hours = [...sceneHTML('graph').matchAll(/(\d+) hours</g)].map((m) => Number(m[1]));
+  const values = hours.flatMap((h, i) => Array(counts[i]).fill(h));
+  assert.equal(values[Math.floor(values.length / 2)], 9);
+});
