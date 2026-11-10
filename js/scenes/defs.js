@@ -37,6 +37,9 @@ export const SCENE_DEFS = [
   // the science lab (Graph Lab): mint walls and a mint floor
   lin('wall-mint', [[0, '#D8F5EE'], [1, '#B2E6DB']]),
   lin('floor-mint', [[0, '#9ED8C8'], [1, '#C7EEDF']]),
+  // the funfair tent (Chance Lab)
+  lin('wall-tent', [[0, '#FFE0B8'], [1, '#FFC98A']]),
+  lin('floor-sand', [[0, '#E9B26B'], [1, '#F6D49A']]),
   // the maths workshop (Number Lab)
   lin('wall-blue', [[0, '#D6E9FF'], [1, '#B7D6F5']]),
   lin('panel', [[0, '#E3A765'], [1, '#C98B50']]),

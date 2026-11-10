@@ -55,6 +55,29 @@
   100% { opacity: 0; transform: translate(24px, -60px); }
 }
 
+/* The funfair flag (Chance Lab) waves from the pole, like cloth in a breeze.
+   With reduced motion it simply hangs still (same picture, no movement). */
+.scene-flag {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 3.4%;
+  transform-origin: 0 50%;
+  will-change: transform;
+  animation: scene-flag var(--seconds) ease-in-out var(--delay) infinite;
+}
+
+.scene-flag svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@keyframes scene-flag {
+  0%, 100% { transform: skewY(0) scaleX(1); }
+  50% { transform: skewY(6deg) scaleX(0.9); }
+}
+
 .tab-hidden .scene *,
 .tab-hidden .scene-cast {
   animation-play-state: paused;

@@ -13,6 +13,7 @@ import { classroom } from './classroom.js';
 import { workshop } from './workshop.js';
 import { studio } from './studio.js';
 import { lab } from './lab.js';
+import { funfair } from './funfair.js';
 import { saraSVG } from '../characters.js';
 
 // Room (phase id) -> its place. Rooms move to scenes one part at a time;
@@ -54,6 +55,14 @@ export const ROOM_SCENES = {
       { kind: 'dust', x: 20, y: 42, seconds: 11, delay: -8 },
     ],
   },
+  chance: {
+    draw: funfair,
+    sara: 'cheer',
+    // The one thing that moves: a small flag waving on top of the striped pole.
+    ambient: [
+      { kind: 'flag', x: 2.3, y: 36.4, seconds: 2.4, delay: 0 },
+    ],
+  },
   number: {
     draw: workshop,
     sara: 'think',
@@ -64,6 +73,11 @@ export const ROOM_SCENES = {
       { kind: 'dust', x: 24, y: 47, seconds: 11, delay: -8 },
     ],
   },
+};
+
+// What goes inside a moving thing (dust is just a round speck).
+const AMBIENT_INNER = {
+  flag: '<svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><path d="M1 1 L29 10 L1 19Z" fill="#4CC26B" stroke="#17324D" stroke-width="2" stroke-linejoin="round"/></svg>',
 };
 
 // Sara cheers when the room is finished, then goes back to her room pose.
@@ -91,7 +105,7 @@ export function mountScene(room) {
   scene.setAttribute('aria-hidden', 'true');
   scene.innerHTML = `
     <svg viewBox="0 0 960 600" preserveAspectRatio="none" focusable="false">${plan.draw()}</svg>
-    ${plan.ambient.map((a) => `<span class="scene-${a.kind}" style="--x: ${a.x}%; --y: ${a.y}%; --seconds: ${a.seconds}s; --delay: ${a.delay}s"></span>`).join('')}`;
+    ${plan.ambient.map((a) => `<span class="scene-${a.kind}" style="--x: ${a.x}%; --y: ${a.y}%; --seconds: ${a.seconds}s; --delay: ${a.delay}s">${AMBIENT_INNER[a.kind] || ''}</span>`).join('')}`;
   document.body.prepend(scene);
   html.classList.add('has-scene');
 
