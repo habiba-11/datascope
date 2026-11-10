@@ -53,7 +53,7 @@ function votesNode(data) {
   });
   const mode = el('p', '', 'fd-mode');
   const modeLabel = el('span');
-  setIconText(modeLabel, 'trophy', 'Most common (mode): ');
+  modeLabel.textContent = 'Most common (mode): ';
   mode.append(modeLabel, el('b', data.mode));
   return [list, mode];
 }

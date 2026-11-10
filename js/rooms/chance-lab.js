@@ -11,7 +11,7 @@ import { pipSay } from '../pip.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { wireChoiceCards } from '../choices.js';
-import { iconHTML, setIconLine } from '../icon-text.js';
+import { setIconLine } from '../icon-text.js';
 import {
   deviceHTML, tokenHTML, playDevice, resetDevice, isSpinner, SPINNER_COLOURS,
 } from '../chance-devices.js';
@@ -92,7 +92,7 @@ async function init() {
               <div class="certainty-scale likely-scale" id="certainty-scale" role="group" aria-label="How likely">
                 ${certaintyButtonsHTML()}
               </div>
-              <label for="predict-reason" class="reason-label">${iconHTML('pencil')} Why do you think so?</label>
+              <label for="predict-reason" class="reason-label">Why do you think so?</label>
               <textarea id="predict-reason" class="reason-input" rows="2" placeholder="Because..."></textarea>
               <div class="hint-list-slot" id="why-hints"></div>
               <p class="feedback" id="predict-feedback" hidden></p>
@@ -271,11 +271,11 @@ function setupPredict() {
   function checkComplete() {
     if (!chosen) return;
     if (!reasonInput.value.trim()) {
-      setIconLine(feedback, ':pencil: Now say why you think so!');
+      setIconLine(feedback, 'Now say why you think so!');
       feedback.hidden = false;
       return;
     }
-    setIconLine(feedback, `:thumbsup: You think ${selectedDevice.target} is "${chosen.toLowerCase()}". Let's test it!`);
+    setIconLine(feedback, `You think ${selectedDevice.target} is "${chosen.toLowerCase()}". Let's test it!`);
     feedback.hidden = false;
     markComplete(2);
   }
@@ -323,7 +323,7 @@ function runTrial(device) {
 function outcomeCardHTML(device, row, tested) {
   const name = /^[1-6]$/.test(row.name) ? `Rolling a ${row.name}` : row.name;
   const goal = row.name === device.target;
-  const tracked = goal ? `<span class="tracked">${iconHTML('star')} we track this</span>` : '';
+  const tracked = goal ? '<span class="tracked">we track this</span>' : '';
   const line = (word, pct, big, small, fillClass) => `
     <div class="bar-line">
       <div class="bar-head"><span class="bar-word">${word}</span><span class="bar-value">${big}</span></div>

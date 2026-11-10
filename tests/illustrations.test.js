@@ -134,3 +134,40 @@ test('Habiba chose A: an icon moves for 8 seconds, then rests; hover or a reward
   assert.equal(MOVE_MS, 8000);
   assert.match(ILLUSTRATION_CSS, /\.ds-illo\.ds-rest:not\(:hover\):not\(\.cheer\) \*\{animation:none!important\}/);
 });
+
+// Fewer icons (Habiba, 11 Nov 2026): the teacher view shows only the warning icon.
+test('a page can show only some icons: the others vanish with their space', async () => {
+  const { iconParts, showOnlyIcons, iconHTML } = await import('../js/icon-text.js');
+  showOnlyIcons(['warning']);
+  try {
+    assert.deepEqual(iconParts(':star: 5 stars'), [{ text: '5 stars' }]);
+    assert.deepEqual(iconParts(':warning: Could not load'), [{ icon: 'warning' }, { text: ' Could not load' }]);
+    assert.equal(iconHTML('cloud'), '');
+  } finally {
+    showOnlyIcons(null);
+  }
+  assert.deepEqual(iconParts(':star: 5 stars'), [{ icon: 'star' }, { text: ' 5 stars' }]);
+});
+
+// Scan, 11 Nov 2026: a file used iconHTML() without importing it, and only the
+// games screens crashed. Every file that calls an icon helper must import it.
+test('every file that uses an icon helper imports it', async () => {
+  const { readdirSync, readFileSync, statSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const HELPERS = ['iconHTML', 'iconNode', 'iconLineHTML', 'setIconText', 'setIconLine', 'withoutIcons', 'fillIcons'];
+  const files = [];
+  const walk = (dir) => readdirSync(dir).forEach((f) => {
+    const p = join(dir, f);
+    if (statSync(p).isDirectory()) { if (f !== 'vendor') walk(p); } else if (f.endsWith('.js')) files.push(p);
+  });
+  walk('js');
+  for (const file of files) {
+    if (file.endsWith('icon-text.js')) continue;
+    const code = readFileSync(file, 'utf8');
+    const imports = [...code.matchAll(/import\s*\{([^}]*)\}\s*from\s*'[^']*icon-text\.js'/g)].flatMap((m) => m[1].split(',').map((n) => n.trim()));
+    for (const helper of HELPERS) {
+      const calls = new RegExp(`(^|[^.\\w])${helper}\\(`, 'm');
+      if (calls.test(code.replace(/\/\/.*$/gm, ''))) assert.ok(imports.includes(helper), `${file} uses ${helper}() without importing it`);
+    }
+  }
+});

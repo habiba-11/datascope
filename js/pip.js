@@ -3,7 +3,7 @@
 // any size and its parts can move. Moods: 'happy' (default), 'think', 'cheer'.
 // The mood styles and the blink are in base.css; reduced motion stops the movement.
 // Part 59p: redrawn in the rooms mockup's look (see pipSVG below).
-import { setIconText, setIconLine } from './icon-text.js';
+import { withoutIcons } from './icon-text.js';
 import { OUTFIT_ART } from './art/pip-outfits.js';
 import { DEFAULT_OUTFIT } from './helpers/wardrobe.js';
 import { getOutfit } from './storage/save.js';
@@ -127,11 +127,10 @@ export function pipMoodFor(mood, ms = 1400) {
 // Pip says something: in the sidebar bubble (old layout) or in the Pip line
 // of the task card (new layout). Both are marked with data-pip-text.
 // `icon` (Part 54b): the name of an illustration shown before the words.
-export function pipSay(text, icon = '') {
+// Habiba, 11 Nov 2026: Pip's lines are words only (Pip stands right there).
+export function pipSay(text) {
   document.querySelectorAll('[data-pip-text]').forEach((el) => {
-    // Part 52e: a Pip moment, so the icon may move.
-    if (icon) setIconText(el, icon, text, true);
-    else setIconLine(el, text, true); // our texts may name icons as :name:
+    el.textContent = withoutIcons(text);
   });
 }
 

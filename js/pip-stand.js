@@ -16,8 +16,9 @@ import { playSound } from './sounds.js';
 import {
   PIP_EVENTS, isStale, pickLine, nextIdleMove, idleGap, IDLE_HELP_SECONDS, screenKey, shouldOfferHelp,
 } from './helpers/pip-lines.js';
-import { logEvent } from './helpers/log.js';
-import { setIconText, iconHTML } from './icon-text.js';
+import { logEvent } from './helpers/log.js';
+
+import { setIconText, iconHTML, withoutIcons } from './icon-text.js';
 
 const WIDE = '(min-width: 1240px)'; // the same width as in css/shell.css (Part 43c)
 const SAY_MS = 4500; // how long a line stays
@@ -109,7 +110,7 @@ function sayInCard(text, move) {
   if (!line) return;
   // The instruction's own parts (words and maybe an icon) come back after.
   const instruction = [...line.childNodes];
-  setIconText(line, 'owl', text, true); // a Pip moment: may move (Part 52e)
+  line.textContent = withoutIcons(text); // Pip's words only (no owl icon: Habiba, 11 Nov 2026)
   const said = line.textContent;
   setTimeout(() => { if (line.textContent === said) line.replaceChildren(...instruction); }, SAY_MS);
 }

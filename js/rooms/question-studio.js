@@ -15,7 +15,7 @@ import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { wireChoiceCards } from '../choices.js';
 import { showMissionCard } from '../mission.js';
-import { iconHTML, setIconText, setIconLine } from '../icon-text.js';
+import { setIconText, setIconLine } from '../icon-text.js';
 import { illustration } from '../illustrations.js';
 
 // Question Studio in the 3-zone layout (UI guide). One room, two phases:
@@ -33,7 +33,8 @@ const STEPS = [
   { label: 'Predict', phase: 'plan', question: ':crystal-ball: Predict first!', pip: 'Scientists predict first, then check.' },
 ];
 // Part 54c: our texts name their icons as :name: (js/icon-text.js).
-const STRIP = { ask: ':question: Ask · Question Studio', plan: ':map: Plan · Question Studio' };
+// The card header: words only (Habiba, 11 Nov 2026; the step bar shows the step).
+const STRIP = { ask: 'Ask · Question Studio', plan: 'Plan · Question Studio' };
 
 let step = 0;
 let bar = null;
@@ -100,20 +101,20 @@ async function init() {
               <div class="hint-list-slot" id="hint-slot-2"></div>
             </div>
             <aside class="fixit-example">
-              <p>${iconHTML('thumbsup')} A good question looks like this:</p>
+              <p>A good question looks like this:</p>
               <p class="fixit-example-q">${goodQuestion}</p>
             </aside>
           </div>
           <!-- 8 Nov 2026: the checklist goes under both columns, 2 across, so the box, tip and hint stay near the top -->
-          <p class="fixit-checklist-title" id="checklist-title-2">${iconHTML('clipboard')} Your question is ready when all 5 have a ✓:</p>
+          <p class="fixit-checklist-title" id="checklist-title-2">Your question is ready when all 5 have a ✓:</p>
           <ul class="fixit-checklist" id="checklist-2" aria-labelledby="checklist-title-2"></ul>
         </section>
 
         <section class="task bonus-step" data-step="3" hidden>
           <div class="bonus-offer" id="bonus-offer">
-            <p class="bonus-note">${iconHTML('star')} This one is extra. You can try it, or skip it.</p>
+            <p class="bonus-note">This one is extra. You can try it, or skip it.</p>
             <div class="bonus-buttons">
-              <button type="button" class="btn btn-main" id="bonus-yes">${iconHTML('star')} Try the bonus</button>
+              <button type="button" class="btn btn-main" id="bonus-yes">Try the bonus</button>
               <button type="button" class="btn btn-secondary" id="bonus-no">No thanks, continue →</button>
             </div>
           </div>
@@ -121,7 +122,7 @@ async function init() {
             <label for="own-question">My own question:</label>
             <textarea id="own-question" class="fixit-input" rows="2" placeholder="Type a question..."></textarea>
             <p class="fixit-tip" id="fixit-tip-own" aria-live="polite"></p>
-            <p class="fixit-checklist-title" id="checklist-title-own">${iconHTML('clipboard')} Your question is ready when all 5 have a ✓:</p>
+            <p class="fixit-checklist-title" id="checklist-title-own">Your question is ready when all 5 have a ✓:</p>
             <ul class="fixit-checklist" id="checklist-own" aria-labelledby="checklist-title-own"></ul>
           </div>
         </section>
@@ -160,7 +161,7 @@ function showStep(n) {
   pipSay(pip);
   // The card's colour and name follow the phase (Ask coral, Plan yellow).
   document.querySelector('.card-layout').style.setProperty('--accent', `var(--color-${phase})`);
-  setIconLine(document.querySelector('.task-card-title'), STRIP[phase]);
+  document.querySelector('.task-card-title').textContent = STRIP[phase];
   setCurrentStep(phase);
   // Ask and Plan share this page, so Plan starts (and its intro opens) on reaching the guess.
   enterPhase(phase);
@@ -374,7 +375,7 @@ function saveTypedGuess() {
   const input = document.getElementById('predict-input');
   if (input.value === '') {
     const feedback = document.getElementById('predict-feedback');
-    setIconText(feedback, 'pencil', 'Type a number first!');
+    feedback.textContent = 'Type a number first!';
     feedback.hidden = false;
     return;
   }
@@ -386,7 +387,7 @@ function savePrediction(guess) {
   const { recipe } = selectedScenario;
   const shown = recipe.answerType === 'number' ? guess : `"${guess}"`;
   const feedback = document.getElementById('predict-feedback');
-  setIconText(feedback, 'thumbsup', `Your prediction: ${shown}. Now let's collect the data!`);
+  feedback.textContent = `Your prediction: ${shown}. Now let's collect the data!`;
   feedback.hidden = false;
   logEvent('question-studio', 'prediction', {
     about: recipe.question, scenarioId: recipe.id, guess: recipe.answerType === 'number' ? Number(guess) : guess,

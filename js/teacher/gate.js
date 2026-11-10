@@ -7,6 +7,7 @@
 import { checkPin } from '../helpers/pin.js';
 import { backendReady } from '../config.js';
 import { isLoggedIn, logIn } from './cloud.js';
+import './calm-icons.js'; // first: only warning icons in the teacher view
 import { setIconLine, fillIcons } from '../icon-text.js';
 
 fillIcons(); // the page's <span data-icon> icons (Part 54h)

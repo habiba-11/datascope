@@ -5,7 +5,7 @@
 // later with textContent, never through here.
 import { pipSVG } from './pip.js';
 import { stepStates } from './helpers/stepper.js';
-import { iconHTML, iconLineHTML } from './icon-text.js';
+import { iconHTML, iconLineHTML, withoutIcons } from './icon-text.js';
 
 // Prof's comment 6: the room's summary is a tab a child can reopen at any time,
 // in the same spot on every card (js/phase-intro.js fills it). It hangs under the
@@ -17,7 +17,7 @@ const ABOUT_TAB_HTML = `
   <div class="about-row">
     <p class="why-line" id="why-line" hidden></p>
     <button class="about-tab" id="about-tab" type="button" aria-expanded="false" aria-controls="about-panel" hidden>
-      ${iconHTML('book')} About this room <span class="about-arrow" aria-hidden="true">▼</span>
+      About this room <span class="about-arrow" aria-hidden="true">▼</span>
     </button>
   </div>
   <div class="about-panel" id="about-panel" hidden></div>`;
@@ -29,7 +29,8 @@ const ABOUT_TAB_HTML = `
 export function taskCardHTML({ title, pill = '', tabsHTML = '', bodyHTML }) {
   const strip = tabsHTML
     ? `<div class="task-card-tabs">${tabsHTML}</div>`
-    : `<p class="task-card-title">${iconLineHTML(title, true)}</p>${pill ? `<span class="task-card-pill">${iconLineHTML(pill)}</span>` : ''}`;
+    // Habiba, 11 Nov 2026: no icons on the header (the step bar shows the room).
+    : `<p class="task-card-title">${withoutIcons(title)}</p>${pill ? `<span class="task-card-pill">${withoutIcons(pill)}</span>` : ''}`;
   return `
     <section class="task-card m-rise">
       <header class="task-card-strip">${strip}</header>
@@ -53,7 +54,7 @@ export function pipLineHTML(text, question = '') {
       <span class="pip-mascot pip-mascot--line">${pipSVG()}</span>
       <div class="pip-line-words">
         ${question ? `<h1 class="task-question">${iconLineHTML(question)}</h1>` : ''}
-        <p class="pip-line-text" data-pip-text aria-live="polite">${iconLineHTML(text, true)}</p>
+        <p class="pip-line-text" data-pip-text aria-live="polite">${withoutIcons(text)}</p>
       </div>
     </div>`;
 }

@@ -1,8 +1,9 @@
 // Layer 3: the prompt engine. Gentle hints and sentence starters for the
 // open questions (architecture row 8: guided prompts and "I think ___ because ___").
 import { logEvent } from './log.js';
-import { appendAnswer, answerSource } from './suggestions.js';
-import { setIconText } from '../icon-text.js';
+import { appendAnswer, answerSource } from './suggestions.js';
+
+import { setIconText, withoutIcons } from '../icon-text.js';
 
 // Tips, one per tap (Question Studio's fix-its: fixing the question is the skill
 // itself, so those hints stay words to read). The button and its list are kept
@@ -50,7 +51,7 @@ export function createHint(key, room, hints) {
     shown += 1;
 
     const item = document.createElement('li');
-    setIconText(item, 'owl', hint.text || hint, true); // Pip gives a hint: may move (Part 52e)
+    item.textContent = withoutIcons(hint.text || hint); // words only (Habiba, 11 Nov 2026)
     if (hint.answer) item.append(answerChip(key, room, hint));
     list.append(item);
     logEvent(room, 'hint', { prompt: key, hintNumber: shown });

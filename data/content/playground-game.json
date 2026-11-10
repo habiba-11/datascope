@@ -8,10 +8,10 @@
     { "flawed": "Isn't football the best game?", "fix": "Which game did you play most at recess this week?", "choice": { "goodFirst": false, "whenWords": "this week", "whenWhy": "everyone answers about the same week.", "pushyWords": "\"Isn't\" and \"best\"" } },
     { "flawed": "Do you like games?", "fix": "What is your favourite recess game this week?", "topicWords": ["game", "play", "recess", "sport"] }
   ],
-  "planPrompt": ":crystal-ball: Predict! Which game will most kids pick?",
+  "planPrompt": "Predict! Which game will most kids pick?",
   "graphLab": {
-    "tell": ":chart: What does this graph tell us about recess games?",
-    "notTell": ":question: What can't this graph tell us?",
+    "tell": "What does this graph tell us about recess games?",
+    "notTell": "What can't this graph tell us?",
     "noLine": "Games have no order. A line between them could fool you. So we show dots on sticks instead.",
     "tellAnswers": [
       "{top} is the most common answer, with {topCount}.",
@@ -25,10 +25,10 @@
     ]
   },
   "chanceLab": {
-    "story": ":ball: Pip uses chance to pick today's recess game!"
+    "story": "Pip uses chance to pick today's recess game!"
   },
   "evidenceBoard": {
-    "claimPrompt": ":magnifier: Look at your findings. Which game do most kids pick?",
+    "claimPrompt": "Look at your findings. Which game do most kids pick?",
     "claimAnswers": [
       "{top} is the most popular game",
       "only {lowCount} picks {low}",
@@ -47,10 +47,10 @@
       "the data showed me something new"
     ],
     "kind": "category",
-    "predictPrompt": ":crystal-ball: Predict first! Which game did the most kids pick?",
-    "checkPrompt": ":magnifier: Tap Show the mode to check it.",
+    "predictPrompt": "Predict first! Which game did the most kids pick?",
+    "checkPrompt": "Tap Show the mode to check it.",
     "whyNoMean": {
-      "question": ":question: Why can't we find the mean of favourite games?",
+      "question": "Why can't we find the mean of favourite games?",
       "options": [
         { "text": "Games are words, not numbers. We can't add them up.", "correct": true },
         { "text": "There are too many games to count.", "correct": false },
@@ -58,7 +58,7 @@
       ]
     },
     "realLife": {
-      "story": ":pizza: The canteen sold these lunches today:",
+      "story": "The canteen sold these lunches today:",
       "items": ["Pizza", "Rice", "Pizza", "Soup", "Pizza", "Rice"],
       "modeQuestion": "Which lunch should the canteen make the most?"
     }

@@ -15,6 +15,13 @@ installIllustrationStyles();
 // Only a real icon name counts; anything else stays as it is.
 const TOKEN = /:([a-z]+(?:-[a-z]+)*):/g;
 
+// Fewer icons (Habiba, 11 Nov 2026): a page may show only some icons. The
+// teacher view is an adult tool, so it keeps only the warning icon
+// (js/teacher/calm-icons.js). null = every icon.
+let onlyIcons = null;
+export function showOnlyIcons(names) { onlyIcons = names ? new Set(names) : null; }
+const shown = (name) => !onlyIcons || onlyIcons.has(name);
+
 // Splits a text into parts: { icon } or { text }. No DOM here, so it is tested.
 export function iconParts(text) {
   const parts = [];
@@ -22,8 +29,9 @@ export function iconParts(text) {
   for (const m of String(text).matchAll(TOKEN)) {
     if (!ILLUSTRATIONS[m[1]]) continue;
     if (m.index > last) parts.push({ text: text.slice(last, m.index) });
-    parts.push({ icon: m[1] });
-    last = m.index + m[0].length;
+    if (shown(m[1])) parts.push({ icon: m[1] });
+    // A hidden icon takes its space with it.
+    last = m.index + m[0].length + (shown(m[1]) ? 0 : (text[m.index + m[0].length] === ' ' ? 1 : 0));
   }
   if (last < String(text).length) parts.push({ text: String(text).slice(last) });
   return parts;
@@ -48,6 +56,7 @@ export function withoutIcons(text) {
 // The icon as HTML, for templates that are already HTML (our own words only).
 // `label`: say what the icon means, only when no words next to it say it.
 export function iconHTML(name, label = '', animate = false) {
+  if (!shown(name)) return '';
   return `<span class="ds-icon">${illustration(name, { size: 24, label, animate })}</span>`;
 }
 
@@ -63,6 +72,7 @@ export function iconNode(name, label = '', animate = false) {
 // inside `root` gets that illustration (decorative: words sit next to it).
 export function fillIcons(root = document) {
   root.querySelectorAll('[data-icon]').forEach((span) => {
+    if (!shown(span.dataset.icon)) { span.remove(); return; }
     span.classList.add('ds-icon');
     span.innerHTML = illustration(span.dataset.icon, { size: 24, animate: false });
   });
@@ -70,6 +80,7 @@ export function fillIcons(root = document) {
 
 // Fills `element` with an icon and a text (the text stays plain text).
 export function setIconText(element, name, text, animate = false) {
+  if (!shown(name)) { element.textContent = text; return; }
   element.replaceChildren(iconNode(name, '', animate), document.createTextNode(` ${text}`));
 }
 

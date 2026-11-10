@@ -15,7 +15,7 @@ import { pipSay } from '../pip.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { wireChoiceCards } from '../choices.js';
-import { iconHTML, setIconText, setIconLine } from '../icon-text.js';
+import { iconHTML, setIconText, setIconLine, withoutIcons } from '../icon-text.js';
 
 // Graph Lab in the 3-zone layout (UI guide), laid out like the f13 design
 // (4 Nov 2026): a small "Pick a graph to draw" toolbar on top of the chart
@@ -82,7 +82,7 @@ async function init() {
 
   const reflectionHTML = (id, icon, question) => `
     <section class="reflection" data-step="${id === 'tell' ? 1 : 2}" hidden>
-      <label for="${id}">${iconHTML(icon)} ${question.replace(/^\S+\s/, '')}</label>
+      <label for="${id}">${withoutIcons(question)}</label>
       <textarea id="${id}" rows="3" placeholder="Write your idea here..."></textarea>
       <div class="hint-list-slot" id="${id}-hints"></div>
     </section>`;
@@ -101,7 +101,7 @@ async function init() {
         <div class="graph-layout${partner ? ' graph-layout--two' : ''}">
           <div class="graph-look">
             <div class="graph-toolbar" id="graph-toolbar">
-              <p class="graph-toolbar-label" id="graph-toolbar-label">${iconHTML('chart')} Pick a graph to explore:</p>
+              <p class="graph-toolbar-label" id="graph-toolbar-label">Pick a graph to explore:</p>
               <div class="kind-tabs" id="kind-tabs" aria-labelledby="graph-toolbar-label">
                 ${CHART_TYPES.map((t) => `<button class="kind-tab" data-value="${t.value}" type="button" aria-label="${t.name}: ${t.use}">${t.icon}<span>${t.name}</span></button>`).join('')}
               </div>

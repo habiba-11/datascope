@@ -7,10 +7,10 @@
     { "flawed": "Don't you think big shoes are better?", "fix": "What shoe size do you wear this year?", "choice": { "goodFirst": true, "whenWords": "this year", "whenWhy": "feet grow, and we want the size now.", "pushyWords": "\"Don't\" and \"better\"" } },
     { "flawed": "Are your shoes new?", "fix": "How many pairs of shoes did you get this year?", "topicWords": ["shoe", "size", "feet", "foot", "sneaker", "trainer"] }
   ],
-  "planPrompt": ":crystal-ball: Predict! Which shoe size do most kids wear?",
+  "planPrompt": "Predict! Which shoe size do most kids wear?",
   "graphLab": {
-    "tell": ":chart: What does this graph tell us about our shoe sizes?",
-    "notTell": ":question: What can't this graph tell us?",
+    "tell": "What does this graph tell us about our shoe sizes?",
+    "notTell": "What can't this graph tell us?",
     "tellAnswers": [
       "{top} are most common, with {topCount} each.",
       "Fewer kids wear {low}, only {lowCount} each.",
@@ -23,10 +23,10 @@
     ]
   },
   "chanceLab": {
-    "story": ":shoe: The shoe shop gives a prize. Chance picks the winner!"
+    "story": "The shoe shop gives a prize. Chance picks the winner!"
   },
   "evidenceBoard": {
-    "claimPrompt": ":magnifier: Look at your findings. Which shoe sizes are most common?",
+    "claimPrompt": "Look at your findings. Which shoe sizes are most common?",
     "claimAnswers": [
       "{top} are the most common sizes",
       "the sizes go from {min} to {max}",
@@ -45,11 +45,11 @@
       "the data showed me something new"
     ],
     "kind": "number",
-    "predictPrompt": ":ruler: Now estimate! If all feet were one size, what size would it be?",
-    "build": ":target: Type 5 shoe sizes. Their mean must be {target}.",
-    "mistake": { "story": ":shoe: Mia wrote down 5 friends' shoe sizes.", "numbers": [36, 34, 38, 33, 35] },
+    "predictPrompt": "Now estimate! If all feet were one size, what size would it be?",
+    "build": "Type 5 shoe sizes. Their mean must be {target}.",
+    "mistake": { "story": "Mia wrote down 5 friends' shoe sizes.", "numbers": [36, 34, 38, 33, 35] },
     "realLife": {
-      "story": ":shop: A shoe shop sold these sizes this week:",
+      "story": "A shoe shop sold these sizes this week:",
       "numbers": [36, 34, 35, 34, 37, 36, 34],
       "modeQuestion": "Which size should the shop order the most?",
       "medianQuestion": "The shop lines up the boxes, smallest to biggest. Put the sizes in order. Then tap the one in the centre."

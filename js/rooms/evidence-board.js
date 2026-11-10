@@ -18,8 +18,9 @@ import { whenIntroClosed } from '../phase-intro.js';
 import { countWords } from '../helpers/feedback.js';
 import { pipSay } from '../pip.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML, wordsNoteHTML } from '../task-card.js';
-import { setupActionBar } from '../action-bar.js';
-import { iconHTML, iconLineHTML, setIconText, setIconLine } from '../icon-text.js';
+import { setupActionBar } from '../action-bar.js';
+
+import { iconLineHTML, setIconText, setIconLine } from '../icon-text.js';
 
 // Claim -> Evidence -> How sure (Paper 17's three parts). The audience/form task
 // was removed on 26 Oct 2026 (Habiba's decision: it had no purpose for the child).
@@ -111,14 +112,14 @@ async function init() {
               <div class="certainty-scale likely-scale" id="certainty-scale" role="group" aria-label="How sure">
                 ${certaintyButtonsHTML('choice-btn')}
               </div>
-              <label for="certainty-reason" class="reason-label">${iconHTML('pencil')} Why are you that sure?</label>
+              <label for="certainty-reason" class="reason-label">Why are you that sure?</label>
               <textarea id="certainty-reason" rows="2" placeholder="Because..."></textarea>
               <div class="hint-list-slot" id="sure-hints"></div>
             </section>
           </div>
 
           <section class="evidence-card" id="evidence-card" aria-labelledby="card-title">
-            <h2 class="evidence-card-title" id="card-title">${iconHTML('medal')} My Evidence Card</h2>
+            <h2 class="evidence-card-title" id="card-title">My Evidence Card</h2>
             <div class="card-slot" data-slot="1"><span class="slot-number" aria-hidden="true">1</span><div><strong>I think...</strong><p class="slot-text" id="slot-claim">Not yet</p></div></div>
             <div class="card-slot" data-slot="2"><span class="slot-number" aria-hidden="true">2</span><div><strong>My proof</strong><p class="slot-text" id="slot-proof">Not yet</p></div></div>
             <div class="card-slot" data-slot="3"><span class="slot-number" aria-hidden="true">3</span><div><strong>How sure am I?</strong><p class="slot-text" id="slot-sure">Not yet</p></div></div>

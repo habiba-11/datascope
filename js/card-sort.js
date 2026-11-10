@@ -7,7 +7,6 @@
 // The rules are in helpers/sort-cards.js.
 import { moveItem, isSorted, centreIndexes, dropIndex } from './helpers/sort-cards.js';
 import { pulse } from './motion.js';
-import { setIconText } from './icon-text.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -77,7 +76,7 @@ export function mountCardSort(container, numbers, onSorted, { pickCentre = null 
 
   // Part 56: every card becomes one big tap target; the child picks the centre.
   function askForCentre(centre) {
-    setIconText(status, 'tap', 'In order! Now tap the card in the centre.');
+    status.textContent = 'In order! Now tap the card in the centre.';
     [...row.children].forEach((card, i) => {
       card.classList.add('pickable');
       const pick = el('button', '', 'sort-pick');
@@ -160,6 +159,6 @@ export function mountCardSort(container, numbers, onSorted, { pickCentre = null 
     if (!done && isSorted(cards.map((c) => c.value))) finish();
   }
 
-  setIconText(status, 'tap', 'Drag the cards, or use ← →, from smallest to biggest.');
+  status.textContent = 'Drag the cards, or use ← →, from smallest to biggest.';
   render();
 }

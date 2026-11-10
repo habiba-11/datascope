@@ -50,10 +50,11 @@ function el(tag, text, className) {
   return element;
 }
 
-// "Why? Graphs help us SEE the answer." (the target icon, a bold "Why?", then the line)
+// "Why? Graphs help us SEE the answer." (a bold "Why?", then the line; no icon
+// since 11 Nov 2026, Habiba)
 function whyNodes(why) {
   const label = el('strong', '', '');
-  setIconText(label, 'target', 'Why? ');
+  label.textContent = 'Why? ';
   return [label, document.createTextNode(why)];
 }
 

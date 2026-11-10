@@ -7,10 +7,10 @@
     { "flawed": "Isn't staying up late bad for you?", "fix": "What time did you go to bed last night?", "choice": { "goodFirst": false, "whenWords": "last night", "whenWhy": "everyone answers about the same night.", "pushyWords": "\"Isn't\" and \"bad\"" } },
     { "flawed": "Do you sleep a lot?", "fix": "How many hours did you sleep last night?", "topicWords": ["sleep", "slept", "bed", "asleep", "nap"] }
   ],
-  "planPrompt": ":crystal-ball: Predict! How many hours did most kids sleep?",
+  "planPrompt": "Predict! How many hours did most kids sleep?",
   "graphLab": {
-    "tell": ":chart: What does this graph tell us about our sleep?",
-    "notTell": ":question: What can't this graph tell us?",
+    "tell": "What does this graph tell us about our sleep?",
+    "notTell": "What can't this graph tell us?",
     "tellAnswers": [
       "{top} is the most common answer, with {topCount}.",
       "Only {lowCount} slept {low}.",
@@ -23,10 +23,10 @@
     ]
   },
   "chanceLab": {
-    "story": ":moon: Pip can't pick a bedtime story. Let's use chance to decide!"
+    "story": "Pip can't pick a bedtime story. Let's use chance to decide!"
   },
   "evidenceBoard": {
-    "claimPrompt": ":magnifier: Look at your findings. How long do most kids sleep?",
+    "claimPrompt": "Look at your findings. How long do most kids sleep?",
     "claimAnswers": [
       "a typical kid sleeps about {median}",
       "the most common sleep time is {top}",
@@ -45,11 +45,11 @@
       "the data showed me something new"
     ],
     "kind": "number",
-    "predictPrompt": ":ruler: Now estimate! If every kid slept the same, how many hours would that be?",
-    "build": ":target: Type 5 sleep times. Their mean must be {target} hours.",
-    "mistake": { "story": ":moon: Mia asked 5 friends how long they slept.", "numbers": [10, 7, 6, 9, 8] },
+    "predictPrompt": "Now estimate! If every kid slept the same, how many hours would that be?",
+    "build": "Type 5 sleep times. Their mean must be {target} hours.",
+    "mistake": { "story": "Mia asked 5 friends how long they slept.", "numbers": [10, 7, 6, 9, 8] },
     "realLife": {
-      "story": ":tent: At a camp, 7 kids slept these hours:",
+      "story": "At a camp, 7 kids slept these hours:",
       "numbers": [8, 10, 8, 11, 9, 8, 12],
       "modeQuestion": "Which sleep time came up the most?",
       "medianQuestion": "Put the hours in order, smallest to biggest. Then tap the one in the centre."

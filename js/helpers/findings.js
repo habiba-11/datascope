@@ -61,7 +61,7 @@ function dataPart(kind, values, stats) {
       })),
       // "Same mean, different spread" is the lesson, so it is said in words.
       note: sameMean && stats.range !== b.range
-        ? `:scales: Same mean (${formatMean(stats.mean)}), but the range is ${stats.range} vs ${b.range}.`
+        ? `Same mean (${formatMean(stats.mean)}), but the range is ${stats.range} vs ${b.range}.`
         : null,
     };
   }

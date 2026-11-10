@@ -301,7 +301,7 @@ function buildExampleHTML(example, target) {
         ${step(3, example.checkText, '', example.checkSum)}
       </ol>
       <p class="build-example-end">${iconLineHTML(example.endText)}</p>
-      <p class="build-example-turn">${iconHTML('pencil')} Your turn: make a mean of ${target}!</p>
+      <p class="build-example-turn">Your turn: make a mean of ${target}!</p>
     </aside>`;
 }
 
@@ -315,10 +315,10 @@ const TASK_HTML = {
       <p class="feedback" id="predict-feedback" hidden></p>
 
       <div class="revise-box" id="revise-box" hidden>
-        <p><strong>${iconHTML('question')} Has the data changed your mind?</strong></p>
+        <p><strong>Has the data changed your mind?</strong></p>
         <div class="choice-row">
-          <button class="btn choice-btn" id="keep-guess-btn" type="button">${iconHTML('thumbsup')} Keep my ${word}</button>
-          <button class="btn choice-btn" id="change-guess-btn" type="button">${iconHTML('pencil')} Change my ${word}</button>
+          <button class="btn choice-btn" id="keep-guess-btn" type="button">Keep my ${word}</button>
+          <button class="btn choice-btn" id="change-guess-btn" type="button">Change my ${word}</button>
         </div>
         <div class="revise-form" id="revise-form" hidden>
           <span>My new ${word}:</span>
@@ -342,7 +342,7 @@ const TASK_HTML = {
             ${[1, 2, 3, 4, 5].map((i) => `<label class="build-box">Friend ${i}<input type="number" class="build-input"></label>`).join('')}
           </div>
           <p class="build-total" id="build-total" aria-live="polite"></p>
-          <button class="btn btn-secondary build-example-btn" id="build-example-btn" type="button" aria-expanded="false" aria-controls="build-example-box">${iconHTML('magnifier')} See an example</button>
+          <button class="btn btn-secondary build-example-btn" id="build-example-btn" type="button" aria-expanded="false" aria-controls="build-example-box">See an example</button>
           <div class="hint-list-slot" id="build-hint-slot"></div>
         </div>
         <!-- Opened, the example sits on the right (Habiba, 8 Nov 2026); below on narrow screens. -->
@@ -362,7 +362,7 @@ const TASK_HTML = {
       </div>
       <p class="feedback" id="mistake-feedback" hidden></p>
       <div class="sort-box" id="sort-box" hidden>
-        <p><strong>${iconHTML('cards')} Now you fix it! Put Mia's numbers in order.</strong></p>
+        <p><strong>Now you fix it! Put Mia's numbers in order.</strong></p>
       </div>
       <p class="feedback" id="sort-feedback" hidden></p>
     </section>`,
@@ -450,7 +450,7 @@ const TASK_SETUP = {
       // Guess first: the numbers stay hidden until the child has made a guess.
       const guess = readGuess('predict');
       if (guess === null) {
-        show(feedback, kind === 'category' ? `:tap: Pick your ${word} first!` : `:pencil: Type your ${word} first!`);
+        show(feedback, kind === 'category' ? `Pick your ${word} first!` : `Type your ${word} first!`);
         return;
       }
       const box = document.getElementById('stats-box');
@@ -524,10 +524,10 @@ const TASK_SETUP = {
       const sum = filled.reduce((s, box) => s + Number(box.value), 0);
       const done = filled.length === 5 && sum === need;
       totalLine.classList.toggle('build-total--done', done);
-      if (!filled.length) setIconLine(totalLine, `:scales: Your 5 numbers must add up to ${need} (5 × ${target}).`);
+      if (!filled.length) setIconLine(totalLine, `Your 5 numbers must add up to ${need} (5 × ${target}).`);
       else if (done) setIconLine(totalLine, `:check: Your 5 numbers add up to ${need}. Now tap Check my numbers!`);
-      else if (filled.length < 5) setIconLine(totalLine, `:scales: So far: ${sum}. All 5 must add up to ${need}.`);
-      else setIconLine(totalLine, `:scales: Your 5 numbers add up to ${sum}. You need ${need}.`);
+      else if (filled.length < 5) setIconLine(totalLine, `So far: ${sum}. All 5 must add up to ${need}.`);
+      else setIconLine(totalLine, `Your 5 numbers add up to ${sum}. You need ${need}.`);
       // An old "Not yet" or "Fill in all 5" would contradict the line above: it goes.
       if (feedback.dataset.kind === 'retry') {
         feedback.hidden = true;
@@ -543,7 +543,7 @@ const TASK_SETUP = {
     exampleBtn.addEventListener('click', () => {
       exampleBox.hidden = !exampleBox.hidden;
       exampleBtn.setAttribute('aria-expanded', String(!exampleBox.hidden));
-      setIconText(exampleBtn, 'magnifier', exampleBox.hidden ? 'See an example' : 'Hide the example');
+      exampleBtn.textContent = exampleBox.hidden ? 'See an example' : 'Hide the example';
     });
 
     // After all-the-same numbers, the child may take up Pip's challenge. No
@@ -553,14 +553,14 @@ const TASK_SETUP = {
       const numbers = inputs.map((box) => Number(box.value));
       if (isAllSame(numbers) || mean(numbers) !== target) return;
       allSameSolved = false;
-      show(feedback, `:check: Well done! They are different now, and the mean is still ${target}. :party:`);
+      show(feedback, `:check: Well done! They are different now, and the mean is still ${target}.`);
       logEvent('number-lab', 'build-varied', { scenarioId: recipe.id, target });
       cheer(feedback);
     }));
 
     checkBuild = () => {
       if (inputs.some((input) => input.value === '')) {
-        show(feedback, ':pencil: Fill in all 5 numbers first!');
+        show(feedback, 'Fill in all 5 numbers first!');
         feedback.dataset.kind = 'retry';
         return;
       }
@@ -570,8 +570,8 @@ const TASK_SETUP = {
         // All the same is correct, so it never blocks; Pip just asks for more.
         allSameSolved = isAllSame(numbers);
         show(feedback, allSameSolved
-          ? `:check: Yes! The mean is exactly ${target}. :question: Can you make them different? Try one down, one up.`
-          : `:check: Yes! The mean of your numbers is exactly ${target}. :party:`);
+          ? `:check: Yes! The mean is exactly ${target}. Can you make them different? Try one down, one up.`
+          : `:check: Yes! The mean of your numbers is exactly ${target}.`);
         tracker.solved({ allSame: allSameSolved, usedHint: filledByHint });
         cheer(feedback);
         bar.setHint(null);
@@ -705,8 +705,8 @@ function setupRevision(n, getOldGuess) {
     keepBtn.classList.add('active');
     logEvent('number-lab', 'revision', { about: recipe.question, scenarioId: recipe.id, changed: false, oldGuess: getOldGuess() });
     finish(kind === 'category'
-      ? `:thumbsup: You kept your ${word}: ${getOldGuess()}. Look at the mode above. Does it back you up?`
-      : `:thumbsup: You kept your ${word}: ${getOldGuess()}. Which number above backs it up?`);
+      ? `You kept your ${word}: ${getOldGuess()}. Look at the mode above. Does it back you up?`
+      : `You kept your ${word}: ${getOldGuess()}. Which number above backs it up?`);
   });
 
   changeBtn.addEventListener('click', () => {
@@ -722,7 +722,7 @@ function setupRevision(n, getOldGuess) {
     const newGuess = readGuess('new-guess');
     const reason = reasonInput.value.trim();
     if (newGuess === null || !reason) {
-      show(feedback, `:pencil: Give your new ${word} AND say why.`);
+      show(feedback, `Give your new ${word} AND say why.`);
       return;
     }
     numberFacts.changedWithReason = true;
@@ -730,7 +730,7 @@ function setupRevision(n, getOldGuess) {
     logEvent('number-lab', 'revision', {
       about: recipe.question, scenarioId: recipe.id, changed: true, oldGuess: getOldGuess(), newGuess, reason, ...reasonHint.answerFields(),
     });
-    finish(`:pencil: You changed from ${getOldGuess()} to ${newGuess} because ${reason}. Changing your mind with evidence is what data detectives do! :magnifier:`);
+    finish(`You changed from ${getOldGuess()} to ${newGuess} because ${reason}. Changing your mind with evidence is what data detectives do! :magnifier:`);
   };
 }
 

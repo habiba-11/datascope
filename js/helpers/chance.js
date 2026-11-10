@@ -52,8 +52,8 @@ export function trialMessage({ count, verb, target, timesHit, pct, theory, previ
 
   if (previous && count > previous.count) {
     message += gap < previous.gap
-      ? ` :target: That's closer than your ${previous.count} ${verb}, which gave ${previous.pct}%.`
-      : ` :sparkle: This time it was NOT closer than ${previous.count} ${verb}. Chance can surprise us! Big tests are usually closer.`;
+      ? ` That's closer than your ${previous.count} ${verb}, which gave ${previous.pct}%.`
+      : ` This time it was NOT closer than ${previous.count} ${verb}. Chance can surprise us! Big tests are usually closer.`;
   } else if (count < 500) {
     message += ' Try a bigger test. Will it get closer?';
   } else {

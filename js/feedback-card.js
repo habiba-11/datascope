@@ -8,7 +8,8 @@ import { openModal } from './modal.js';
 import { STEP_OF_PHASE, PHASES } from './helpers/progress.js';
 import { SOURCE_CHIPS } from './helpers/feedback.js';
 import { playSound, playStars } from './sounds.js';
-import { pipReacts } from './motion.js';
+import { pipReacts } from './motion.js';
+
 import { cheer, setIconLine, setIconText } from './icon-text.js';
 
 const PHASE_NAMES = {
@@ -108,7 +109,7 @@ export function showFeedbackCard(phase, card) {
   if (card.yourWork) {
     const work = at(el('div', '', 'ps-box ps-you'), 1800);
     const workTitle = el('h3');
-    setIconText(workTitle, 'pencil', card.yourWork.label); // our icons (Part 54i)
+    workTitle.textContent = card.yourWork.label; // words only (Habiba, 11 Nov 2026)
     work.append(workTitle, el('p', `"${card.yourWork.text}"`, 'ps-quote'));
     if (SOURCE_CHIPS[card.yourWork.source]) {
       const chip = el('span', '', 'ps-source');
