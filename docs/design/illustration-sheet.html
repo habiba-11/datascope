@@ -21,7 +21,6 @@ b{display:block;font-family:"Baloo 2",system-ui,sans-serif;font-size:18px} i{fon
 <div id="sheet"></div>
 <script type="module">
 import { ILLUSTRATIONS, illustration, installIllustrationStyles } from '../../js/illustrations.js';
-import { FLAT_STANDINS } from '../../js/illustrations-flat.js';
 
 // What each icon means (the first 26: Habiba's notes from the approved sheet).
 const SET_1 = {
@@ -34,7 +33,15 @@ const SET_1 = {
   book: 'Maths recap, learn', moon: 'Sleep (the story question)', flag: 'Finish, goal reached',
   flame: 'Streak, hot', sparkle: 'Shine, new',
 };
-// Part 52c: batch 2 of the 44 (new 3D drawings, waiting for Habiba's OK).
+// Part 52d: batch 3, the last of the 44 (new 3D drawings, waiting for Habiba's OK).
+const BATCH_3 = {
+  bricks: 'Build it (top brick drops on)', cart: 'Shopping, real life (rolls)', cards: 'Card sort, recap (front card fans)',
+  pin: 'You are here, badges (hops)', feather: 'Light, chance (floats)', 'wizard-hat': 'Why-Wizard badge (star spins)',
+  chick: 'First steps badge (peeks out, blinks)', puzzle: 'Steps of the journey (hops)', rocket: 'Level up (hovers, flame flickers)',
+  'arrow-up': 'Level up, better (arrow pushes up)', email: 'Teacher login (wobbles)', gear: 'Settings (turns slowly)',
+  download: 'Export for the thesis (arrow goes down)', broom: 'Clear this device (sweeps)',
+};
+// Part 52c: batch 2 of the 44 (approved by Habiba, 10 Nov 2026).
 const BATCH_2 = {
   brain: 'What I learned (thinks, twinkles)', owl: 'Pip, our mascot (wobbles, blinks)',
   'lock-open': 'Unlocked (shackle pops up)', door: 'Leave the room (door opens a little)',
@@ -61,12 +68,14 @@ const section = (title, names, notes, isNew) => `<h2>${title} (${names.length})<
   + names.map((n) => card(n, notes[n] || '', isNew)).join('') + '</div>';
 
 installIllustrationStyles();
-const flat = Object.keys(FLAT_STANDINS).filter((n) => !SET_1[n] && !BATCH_1[n] && !BATCH_2[n]);
+// Any icon in js/illustrations.js that is in no list above (there should be none).
+const other = Object.keys(ILLUSTRATIONS).filter((n) => !SET_1[n] && !BATCH_1[n] && !BATCH_2[n] && !BATCH_3[n]);
 document.getElementById('sheet').innerHTML =
-  section('Batch 2: new in 3D, please check', Object.keys(BATCH_2), BATCH_2, true)
+  section('Batch 3: new in 3D, please check', Object.keys(BATCH_3), BATCH_3, true)
   + section('Habiba\'s set', Object.keys(SET_1), SET_1, false)
   + section('Batch 1 (approved)', Object.keys(BATCH_1), BATCH_1, false)
-  + section('Not redrawn yet (old flat drawing, still used by the app)', flat, {}, false);
+  + section('Batch 2 (approved)', Object.keys(BATCH_2), BATCH_2, false)
+  + (other.length ? section('Not on any list yet', other, {}, false) : '');
 
 let paused = false;
 document.getElementById('tog').onclick = function () {

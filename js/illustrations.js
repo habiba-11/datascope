@@ -7,7 +7,6 @@
    Every icon MOVES (idle animation, playful faces on some, hover jump). Options: { animate:false } keeps it still.
    No label  -> decorative (aria-hidden). With label -> role="img" + aria-label.
    Gradient ids are made unique per icon instance (the "~" in the source), so many icons can share one page. */
-import { FLAT_STANDINS } from './illustrations-flat.js';
 const O = '#17324D';
 const N = O;
 const ln = (w = 2.6) => `stroke="${O}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
@@ -30,9 +29,13 @@ const CLOUD = 'M18 50 Q6 50 6 39 Q6 29 16 28 Q18 16 30 16 Q40 16 44 25 Q46 24 48
 const ARCS = 'M50 26 A19 19 0 0 0 14 25 M14 38 A19 19 0 0 0 50 39';
 const BRAIN = 'M32 10 Q24 4 16 10 Q8 12 8 22 Q4 28 8 36 Q8 46 18 48 Q24 56 32 50 Q40 56 46 48 Q56 46 56 36 Q60 28 56 22 Q56 12 48 10 Q40 4 32 10Z';
 const SPEAKER = 'M8 24 H18 L32 12 V52 L18 40 H8Z';
-// A 3D block: side (dark), top (light), then the front face.
+const PIN = 'M32 57 C32 57 12 37 12 24 A20 20 0 0 1 52 24 C52 37 32 57 32 57Z';
+const FEATHER = 'M50 6 Q22 10 14 38 L12 50 L24 46 Q50 36 50 6Z';
+const PUZZLE = 'M10 18 H24 Q22 9 30 9 Q38 9 36 18 H50 V32 Q59 30 59 38 Q59 46 50 44 V56 H10 V44 Q19 46 19 38 Q19 30 10 32Z';
+// A 3D block (w wide, h high): side (dark), top (light), then the front face.
 // (The outline is set once on the group, so the drawing stays under 2.5 KB.)
-const blk = (x, y, s, front, top, side) => `<g ${ln(2.2)}><path d="M${x + s} ${y + 2} L${x + s + 4} ${y - 2} V${y + s - 4} L${x + s} ${y + s}Z" fill="${side}"/><path d="M${x + 2} ${y} L${x + 6} ${y - 4} H${x + s + 4} L${x + s} ${y}Z" fill="${top}"/><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="3" fill="${front}"/></g><path d="M${x + 4} ${y + 4} H${x + 10}" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round"/>`;
+const bk = (x, y, w, h, front, top, side) => `<g ${ln(2.2)}><path d="M${x + w} ${y + 2} L${x + w + 4} ${y - 2} V${y + h - 4} L${x + w} ${y + h}Z" fill="${side}"/><path d="M${x + 2} ${y} L${x + 6} ${y - 4} H${x + w + 4} L${x + w} ${y}Z" fill="${top}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${front}"/></g><path d="M${x + 4} ${y + 4} H${x + 10}" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round"/>`;
+const blk = (x, y, s, front, top, side) => bk(x, y, s, s, front, top, side); // a square block
 
 const ILLUSTRATIONS = {
 die: `<defs>${LG('t', [[0, '#FFD0C7'], [1, '#FF9A8B']], 0, 0, 1, 1)}${LG('l', [[0, '#FF8B7B'], [1, '#F2604F']])}${LG('r', [[0, '#DB5545'], [1, '#B63A2C']])}</defs>
@@ -263,10 +266,55 @@ tools: `<defs>${LG('m', METAL_H, 0, 0, 1, 1)}${marble('b', '#C9EEFF', '#38B6FF',
 <path d="M3 15 Q18 8 32 17 Q46 8 61 15 V53 Q46 50 32 58 Q18 50 3 53Z" fill="${U('cv')}" ${ln(2.8)}/>
 <path d="M7 15 Q19 10 32 18 V54 Q19 47 7 50Z" fill="${U('pg')}" ${ln(2.4)}/><path d="M57 15 Q45 10 32 18 V54 Q45 47 57 50Z" fill="${U('pr')}" ${ln(2.4)}/>
 <path d="M12 22 Q20 21 27 24 M12 30 Q20 29 27 32 M12 38 Q20 37 27 40 M37 24 Q44 21 52 22 M37 32 Q44 29 52 30 M37 40 Q44 37 52 38" fill="none" stroke="#7FCF92" stroke-width="2.2" stroke-linecap="round"/>
-<path d="M9 52 Q19 49 31 56 M33 56 Q45 49 55 52" fill="none" stroke="#9BDDAA" stroke-width="2" stroke-linecap="round"/>`
+<path d="M9 52 Q19 49 31 56 M33 56 Q45 49 55 52" fill="none" stroke="#9BDDAA" stroke-width="2" stroke-linecap="round"/>`,
+// ---------- Part 52d (10 Nov 2026): batch 3, the last of the 44, redrawn in 3D ----------
+bricks: `<defs>${LG('r', [[0, '#FFB3A8'], [1, '#E2513F']], 0, 0, 1, 1)}${LG('o', [[0, '#FFD0C7'], [1, '#FF7A6B']], 0, 0, 1, 1)}</defs>
+${bk(6, 38, 22, 16, U('r'), '#FFD9D2', '#B63A2C')}${bk(34, 38, 22, 16, U('r'), '#FFD9D2', '#B63A2C')}
+<g class="il-drop">${bk(20, 17, 22, 16, U('o'), '#FFE6E1', '#C9493A')}</g>`,
+cart: `<defs>${LG('b', [[0, '#C4EEFF'], [0.45, '#38B6FF'], [1, '#1C7DB8']], 0, 0, 1, 1)}${marble('w', '#FFF3A6', '#FFC531', '#D9860B')}</defs>
+<path d="M17 21 H58 L52 43 H21Z" fill="#155E8F" ${ln()}/><path d="M15 18 H56 L50 40 H19Z" fill="${U('b')}" ${ln()}/><path d="M27 18 L29 40 M39 18 L38 40 M17 29 H53" stroke="#fff" stroke-opacity=".7" stroke-width="2.4"/>
+<path d="M4 10 H12 L19 40 L17 46 H52" fill="none" stroke="${O}" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 10 H12 L19 40 L17 46 H52" fill="none" stroke="#C9D6E2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="23" cy="53" r="5.5" fill="${U('w')}" ${ln()}/><circle cx="47" cy="53" r="5.5" fill="${U('w')}" ${ln()}/>`,
+cards: `<defs>${LG('p', [[0, '#E3DDFF'], [1, '#7B68E0']], 0, 0, 1, 1)}${LG('w', [[0, '#FFFFFF'], [1, '#DDE8F2']], 0, 0, 1, 1)}</defs>
+<g transform="rotate(-12 23 31)"><rect x="11" y="14" width="28" height="38" rx="4" fill="#4A3AB0" ${ln()}/><rect x="9" y="12" width="28" height="38" rx="4" fill="${U('p')}" ${ln()}/><path d="M15 19 V44" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/></g>
+<g class="il-fan"><g transform="rotate(10 38 33)"><rect x="26" y="16" width="28" height="38" rx="4" fill="#8C9AA8" ${ln()}/><rect x="24" y="14" width="28" height="38" rx="4" fill="${U('w')}" ${ln()}/><path d="M32 25 H44 L37 44" fill="none" stroke="${O}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="29" cy="47" r="2" fill="#FF7A6B"/><circle cx="47" cy="19" r="2" fill="#FF7A6B"/></g></g>`,
+pin: `<defs>${RG('r', [[0, '#FFC4BB'], [0.5, '#FF7A6B'], [1, '#C43A2B']], 0.35, 0.25, 0.85)}</defs>
+<ellipse cx="32" cy="58" rx="11" ry="3.5" fill="#9CC6E6" stroke="${O}" stroke-width="2"/>
+<g class="il-pinb"><path d="${PIN}" fill="#A8301F" transform="translate(1.5 1.5)" ${ln()}/><path d="${PIN}" fill="${U('r')}" ${ln()}/><circle cx="32" cy="24" r="7.5" fill="#fff" stroke="${O}" stroke-width="2.4"/>${shine(21, 16, 5, 2.5, -45, 0.8)}</g>`,
+feather: `<defs>${LG('f', [[0, '#C4EEFF'], [0.5, '#38B6FF'], [1, '#1C6FA6']], 0, 0, 1, 1)}</defs>
+<path d="${FEATHER}" fill="#155E8F" transform="translate(2 2)" ${ln()}/><path d="${FEATHER}" fill="${U('f')}" ${ln()}/><path d="M50 6 L10 56" stroke="${O}" stroke-width="3" stroke-linecap="round"/>
+<path d="M38 18 L30 17 M34 26 L24 25 M28 34 L19 33" stroke="${O}" stroke-width="2" stroke-linecap="round"/><path d="M44 12 Q40 14 37 18" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3" stroke-linecap="round"/>`,
+'wizard-hat': `<defs>${LG('h', [[0, '#E3DDFF'], [0.5, '#A596FF'], [1, '#5B48C2']], 0, 0, 1, 1)}${LG('b', [[0, '#C9BEFF'], [1, '#6E5BD6']])}</defs>
+<path d="M5 53 Q32 63 59 53 Q32 43 5 53Z" fill="#4A3AB0" ${ln()}/><path d="M5 51 Q32 61 59 51 Q32 41 5 51Z" fill="${U('b')}" ${ln()}/>
+<path d="M14 48 L33 5 L50 46 Q32 52 14 48Z" fill="${U('h')}" ${ln()}/><path d="M28 16 L21 34" stroke="#fff" stroke-opacity=".6" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M16 45 Q32 50 48 44" fill="none" stroke="${O}" stroke-width="6.4" stroke-linecap="round"/><path d="M16 45 Q32 50 48 44" fill="none" stroke="#FFC531" stroke-width="3.6" stroke-linecap="round"/>
+<path class="il-hstar" d="M33 22 L35 28 L41 30 L35 32 L33 38 L31 32 L25 30 L31 28Z" fill="#FFE27A" stroke="${O}" stroke-width="1.5" stroke-linejoin="round"/>`,
+chick: `<defs>${RG('y', [[0, '#FFF6C4'], [0.5, '#FFE27A'], [1, '#E9A919']], 0.35, 0.3, 0.85)}${LG('s', [[0, '#FFFFFF'], [1, '#D6E2EC']])}</defs>
+<g class="il-peek"><circle cx="32" cy="36" r="20" fill="${U('y')}" ${ln()}/><path d="M30 17 Q31 10 36 14" fill="none" stroke="${O}" stroke-width="2.4" stroke-linecap="round"/><g class="il-eyes"><circle cx="25" cy="32" r="2.8" fill="${O}"/><circle cx="39" cy="32" r="2.8" fill="${O}"/><circle cx="25.9" cy="31.1" r=".9" fill="#fff"/><circle cx="39.9" cy="31.1" r=".9" fill="#fff"/></g>
+<path d="M29 38 H35 L32 42Z" fill="#F59E0B" stroke="${O}" stroke-width="1.5" stroke-linejoin="round"/><path d="M18 30 Q19 24 24 21" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="3" stroke-linecap="round"/></g>
+<path d="M9 44 L15 39 L21 46 L27 39 L33 46 L39 39 L45 46 L51 39 L55 44 Q56 60 32 60 Q8 60 9 44Z" fill="${U('s')}" ${ln()}/><path d="M13 50 Q16 56 24 57" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>`,
+puzzle: `<defs>${LG('g', [[0, '#B8F2A8'], [0.5, '#4CC26B'], [1, '#2A8F47']], 0, 0, 1, 1)}</defs>
+<path d="${PUZZLE}" fill="#1F7A39" transform="translate(2 2.5)" ${ln()}/><path d="${PUZZLE}" fill="${U('g')}" ${ln()}/><path d="M15 36 V24 H21" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>${shine(30, 13, 3, 1.5, 0, 0.7)}`,
+rocket: `<defs>${LG('w', [[0, '#FFFFFF'], [0.6, '#E3EDF6'], [1, '#A9B9C9']], 0, 0, 1, 0)}${LG('r', [[0, '#FFB3A8'], [1, '#D04535']], 0, 0, 1, 1)}${RG('g', [[0, '#F2FBFF'], [0.55, '#A8E0FF'], [1, '#2AA3E8']], 0.35, 0.3, 0.8)}${LG('f', [[0, '#FFF3A6'], [0.5, '#FFC531'], [1, '#FF7A6B']])}</defs>
+<path class="il-thrust" d="M24 42 Q32 64 40 42Z" fill="${U('f')}" ${ln()}/><path d="M20 32 L10 45 L21 42Z M44 32 L54 45 L43 42Z" fill="${U('r')}" ${ln()}/>
+<path d="M32 4 Q46 16 44 42 H20 Q18 16 32 4Z" fill="${U('w')}" ${ln()}/><path d="M32 4 Q38 9 41 15 H23 Q26 9 32 4Z" fill="${U('r')}" ${ln()}/><circle cx="32" cy="26" r="6.4" fill="${U('g')}" stroke="${O}" stroke-width="2.4"/>${shine(30, 24, 2, 1.2, -40, 0.9)}<path d="M25 20 Q23.5 30 25 38" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`,
+'arrow-up': `<defs>${RG('o', [[0, '#C7F7B4'], [0.5, '#4CC26B'], [1, '#2A8F47']], 0.35, 0.28, 0.85)}${LG('g', [[0, '#FFFFFF', 0.85], [1, '#FFFFFF', 0]])}</defs>
+<circle cx="32" cy="32" r="26" fill="${U('o')}" ${ln(2.8)}/><g class="il-up"><path d="M32 46 V20 M21 31 L32 20 L43 31" fill="none" stroke="#14602B" stroke-opacity=".4" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 2)"/><path d="M32 46 V20 M21 31 L32 20 L43 31" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></g>
+<ellipse cx="32" cy="16" rx="16" ry="8" fill="${U('g')}"/>`,
+email: `<defs>${LG('e', [[0, '#FFFFFF'], [0.5, '#D3EEFF'], [1, '#8FCBF0']], 0, 0, 1, 1)}${LG('f', [[0, '#FFFFFF'], [1, '#E3EDF6']])}</defs>
+<rect x="8" y="17" width="52" height="38" rx="5" fill="#5FA6D6" ${ln()}/><rect x="6" y="14" width="52" height="38" rx="5" fill="${U('e')}" ${ln()}/><path d="M8 50 L26 33 M56 50 L38 33" stroke="${O}" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M8 17 L32 36 L56 17" fill="${U('f')}" ${ln()}/><path d="M12 22 L20 28" stroke="#fff" stroke-opacity=".85" stroke-width="3" stroke-linecap="round"/>`,
+gear: `<defs>${LG('m', METAL_H, 0, 0, 1, 1)}</defs>
+<g class="il-cog"><g fill="#A9B9C9" ${ln()}>${[0, 45, 90, 135, 180, 225, 270, 315].map((a) => `<rect x="27" y="3" width="10" height="13" rx="2" transform="rotate(${a} 32 32)"/>`).join('')}</g>
+<circle cx="32" cy="32" r="19" fill="${U('m')}" ${ln()}/><circle cx="32" cy="32" r="13" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"/><circle cx="32" cy="32" r="7" fill="#fff" ${ln()}/></g>${shine(24, 22, 6, 3, -40, 0.75)}`,
+download: `<defs>${LG('b', [[0, '#C4EEFF'], [0.45, '#38B6FF'], [1, '#1C7DB8']], 0, 0, 1, 1)}${LG('t', [[0, '#FFFFFF'], [1, '#C9D6E2']])}</defs>
+<path d="M8 40 V51 Q8 57 14 57 H50 Q56 57 56 51 V40 H46 V47 H18 V40Z" fill="${U('t')}" ${ln()}/>
+<g class="il-down"><path d="M32 6 V30" stroke="${O}" stroke-width="10.5" stroke-linecap="round"/><path d="M32 6 V30" stroke="#38B6FF" stroke-width="5" stroke-linecap="round"/><path d="M19 26 L32 42 L45 26Z" fill="${U('b')}" ${ln()}/><path d="M30.5 8 V26" stroke="#fff" stroke-opacity=".7" stroke-width="1.8" stroke-linecap="round"/></g>`,
+broom: `<defs>${LG('s', [[0, '#FFF0A0'], [0.5, '#FFC531'], [1, '#D9860B']], 0, 0, 1, 1)}</defs>
+<path d="M50 6 L30 34" stroke="${O}" stroke-width="8.4" stroke-linecap="round"/><path d="M50 6 L30 34" stroke="#C99443" stroke-width="4" stroke-linecap="round"/><path d="M49 7 L31.5 31.5" stroke="#F6D79E" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M25.5 33 L39.5 43 L31.5 61 Q19.5 61 11.5 53Z" fill="#B5700A" ${ln()}/><path d="M24 30 L38 40 L30 58 Q18 58 10 50Z" fill="${U('s')}" ${ln()}/>
+<path d="M24 30 L38 40" stroke="${O}" stroke-width="7.4" stroke-linecap="round"/><path d="M24 30 L38 40" stroke="#FF7A6B" stroke-width="4" stroke-linecap="round"/><path d="M16 50 L26 41 M22 55 L31 45" stroke="#D9860B" stroke-width="2.4" stroke-linecap="round"/>`
 };
-// Part 52a: names not drawn in 3D yet use their old flat drawing for now (js/illustrations-flat.js).
-for (const [name, body] of Object.entries(FLAT_STANDINS)) if (!ILLUSTRATIONS[name]) ILLUSTRATIONS[name] = body;
 /* ---------- playful layer: faces, sparkles, glow, motion ---------- */
 const eyes = (a, b, r) => `<g class="il-eyes"><circle cx="${a[0]}" cy="${a[1]}" r="${r || 2.6}" fill="${N}"/><circle cx="${b[0]}" cy="${b[1]}" r="${r || 2.6}" fill="${N}"/><circle cx="${a[0] + 0.9}" cy="${a[1] - 0.9}" r="0.9" fill="#fff"/><circle cx="${b[0] + 0.9}" cy="${b[1] - 0.9}" r="0.9" fill="#fff"/></g>`;
 const smile = (x, y, w) => `<path d="M${x - w} ${y} Q${x} ${y + w * 0.9} ${x + w} ${y}" fill="none" stroke="${N}" stroke-width="2.4" stroke-linecap="round"/>`;
@@ -296,6 +344,8 @@ const EXTRAS = {
   moon: tw(8, 56, 0.8, 0.5),
   key: tw(54, 12, 0.9, 0.4),
   brain: tw(54, 8, 0.9, 0) + tw(9, 54, 0.7, 0.8),
+  'wizard-hat': tw(10, 14, 0.9, 0) + tw(56, 24, 0.8, 0.7),
+  rocket: tw(8, 12, 0.8, 0.3) + tw(56, 8, 0.9, 0.9),
 };
 const BACK0 = {
   bulb: `<circle class="il-glow" cx="32" cy="26" r="29" fill="#FFE27A"/>`,
@@ -395,6 +445,22 @@ const ILLUSTRATION_CSS = `
 .il-pennant{transform-origin:32px 5px;animation:il-wave 1.4s ease-in-out infinite}
 .il-hammer{transform-origin:14px 52px;animation:il-hammer 2s ease-in-out infinite}
 .il-book-green{animation:il-bob 2.8s ease-in-out infinite}
+.il-drop{transform-origin:31px 33px;animation:il-dropin 2.8s ease-in-out infinite}
+.il-cart{animation:il-roll 2.6s ease-in-out infinite}
+.il-fan{transform-origin:38px 54px;animation:il-wobble 2.6s ease-in-out infinite}
+.il-pinb{transform-origin:32px 57px;animation:il-hop 2.4s ease-in-out infinite}
+.il-feather{animation:il-search 3.2s ease-in-out infinite}
+.il-wizard-hat{transform-origin:32px 56px;animation:il-bobble 3s ease-in-out infinite}
+.il-hstar{transform-origin:33px 30px;animation:il-spinpulse 2.4s ease-in-out infinite}
+.il-peek{animation:il-peek 2.8s ease-in-out infinite}
+.il-puzzle{transform-origin:32px 56px;animation:il-hop 2.8s ease-in-out infinite}
+.il-rocket{animation:il-launch 2.4s ease-in-out infinite}
+.il-thrust{transform-origin:32px 42px;animation:il-flicker 1.1s ease-in-out infinite}
+.il-up{animation:il-up 1.8s ease-in-out infinite}
+.il-email{transform-origin:32px 54px;animation:il-wobble 3s ease-in-out infinite}
+.il-cog{transform-origin:32px 32px;animation:il-turn 8s linear infinite}
+.il-down{animation:il-dl 1.8s ease-in-out infinite}
+.il-broom{transform-origin:50px 6px;animation:il-tilt 1.8s ease-in-out infinite}
 .ds-illo:hover .il,.ds-illo.cheer .il{animation:il-jump .55s ease-out 2}
 .ds-illo.still *{animation:none!important}
 .ds-paused .ds-illo *{animation-play-state:paused!important}
@@ -443,6 +509,12 @@ const ILLUSTRATION_CSS = `
 @keyframes il-ajar{0%,50%,100%{transform:scaleX(1)}65%,85%{transform:scaleX(.8)}}
 @keyframes il-waveout{0%,100%{opacity:.35;transform:translateX(0)}50%{opacity:1;transform:translateX(2px)}}
 @keyframes il-flutter{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.07)}}
+@keyframes il-dropin{0%,50%,100%{transform:translateY(0) scale(1)}15%{transform:translateY(-6px) scale(1)}30%{transform:translateY(0) scale(1.03,.95)}40%{transform:translateY(0) scale(1)}}
+@keyframes il-roll{0%,100%{transform:translateX(-3px)}50%{transform:translateX(3px)}}
+@keyframes il-peek{0%,55%,100%{transform:translateY(0)}20%{transform:translateY(-4px)}35%{transform:translateY(0)}}
+@keyframes il-launch{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes il-up{0%,100%{transform:translateY(1px)}50%{transform:translateY(-3px)}}
+@keyframes il-dl{0%,100%{transform:translateY(-2px)}50%{transform:translateY(2px)}}
 @keyframes il-hammer{0%,50%,100%{transform:rotate(0)}20%{transform:rotate(-14deg)}30%{transform:rotate(3deg)}}
 @media (prefers-reduced-motion: reduce){.ds-illo *{animation:none!important}}
 `;
