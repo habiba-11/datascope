@@ -85,7 +85,10 @@ async function init() {
   TASK_TITLES.predict = kind === 'category' ? ':crystal-ball: Your prediction' : ':ruler: Your estimate';
   // Part 51: the games scenario never talks about numbers.
   if (kind === 'category') TASK_PIP.realLife = 'Data is everywhere in real life!';
-  TASK_PIP.predict = fromPlan ? 'Was your prediction right? Let us check!' : 'Estimate first, then check the statistics!';
+  // Scan, 10 Nov 2026: games with no Plan prediction (e.g. a cleared device)
+  // had the number words "Estimate ... statistics" here, against Part 51.
+  if (fromPlan) TASK_PIP.predict = 'Was your prediction right? Let us check!';
+  else TASK_PIP.predict = kind === 'category' ? 'Predict first, then check the mode!' : 'Estimate first, then check the statistics!';
 
   const { values } = generateClassData(recipe);
   const valuesB = partner ? generateClassData(partner).values : null;
