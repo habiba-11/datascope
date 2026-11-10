@@ -308,6 +308,36 @@ function makePieConfig(labels, data, recipe) {
   };
 }
 
+// How each kind of graph comes in (10 Nov 2026, Habiba: "movement when I open
+// them"). Bars grow up one after another; a line's points rise left to right;
+// a pie spins open; the dots drop in and bounce, one by one. The number labels
+// follow their bar or dot. Graph Lab uses none of this with reduced motion.
+// Returns options to add to a Chart.js config (Chart.js 4).
+export const ENTRANCE_STEP_MS = { bar: 110, line: 150, dot: 70 };
+
+export function chartEntrance(type) {
+  // Each bar / point / dot starts a little after the one before it.
+  const oneByOne = (ms) => (ctx) => (ctx.type === 'data' && ctx.mode === 'default' ? ctx.dataIndex * ms : 0);
+  if (type === 'pie') {
+    return { animation: { animateRotate: true, animateScale: true, duration: 1100, easing: 'easeOutQuart' } };
+  }
+  if (type === 'dot') {
+    return {
+      animation: { duration: 700, easing: 'easeOutBounce', delay: oneByOne(ENTRANCE_STEP_MS.dot) },
+      // From just above the chart: the dots fall into place.
+      animations: { y: { from: (ctx) => (ctx.chart.chartArea ? ctx.chart.chartArea.top - 30 : 0) } },
+    };
+  }
+  if (type === 'line') {
+    return {
+      animation: { duration: 650, easing: 'easeOutQuad', delay: oneByOne(ENTRANCE_STEP_MS.line) },
+      // From the bottom of the chart: the line waves up into place.
+      animations: { y: { from: (ctx) => (ctx.chart.scales?.y ? ctx.chart.scales.y.getPixelForValue(0) : 0) } },
+    };
+  }
+  return { animation: { duration: 700, easing: 'easeOutBack', delay: oneByOne(ENTRANCE_STEP_MS.bar) } };
+}
+
 // `recipe` gives the words: chartAxis (the axis title) and valueLabel ("Size {value}").
 // `yMax` is optional: when comparing two classes, both charts use the same height.
 export function makeChartConfig(type, labels, data, recipe, yMax) {

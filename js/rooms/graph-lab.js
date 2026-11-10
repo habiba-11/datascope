@@ -2,7 +2,7 @@ import { mountShell, exploreCardTabsHTML } from '../app.js';
 import { generateClassData } from '../helpers/generator.js';
 import { compareValues } from '../helpers/stats.js';
 import {
-  buildFrequencyData, makeChartConfig, directLabelsPlugin, describeChart, pieKeyPosition, lineFits, valueText, countText, tallestIndex, triedText,
+  buildFrequencyData, makeChartConfig, chartEntrance, directLabelsPlugin, describeChart, pieKeyPosition, lineFits, valueText, countText, tallestIndex, triedText,
 } from '../helpers/charts.js';
 import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios.js';
 import { logEvent } from '../helpers/log.js';
@@ -236,10 +236,12 @@ async function init() {
       // A pie's key goes beside it, or under it on a narrow chart.
       if (type === 'pie') config.options.plugins.legend.position = pieKeyPosition(canvas.parentElement.clientWidth);
       config.options.onClick = onChartTap(c);
-      // A new chart grows in with a little bounce. Chart.js does not follow
-      // "reduce motion" by itself, so we switch its animation off then.
+      // Each kind of graph comes in its own way (10 Nov 2026, helpers/charts.js
+      // chartEntrance). Chart.js does not follow "reduce motion" by itself,
+      // so we switch its animation off then.
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      config.options.animation = reduceMotion ? false : { duration: 800, easing: 'easeOutBack' };
+      if (reduceMotion) config.options.animation = false;
+      else Object.assign(config.options, chartEntrance(type));
       return new Chart(canvas, config);
     });
     showTapHint();

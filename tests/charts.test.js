@@ -240,3 +240,23 @@ test("the toolbar counter counts the graphs tried, and cheers at all 4", () => {
   assert.equal(triedText(2), "Graphs tried: 2 of 4");
   assert.equal(triedText(4), 'Graphs tried: 4 of 4 :party:');
 });
+
+// ---------- 10 Nov 2026: each graph comes in its own way ----------
+import { chartEntrance, ENTRANCE_STEP_MS } from '../js/helpers/charts.js';
+
+test('graphs come in with movement: bars one after another, a spinning pie, falling dots, a rising line', () => {
+  const at = (opts, dataIndex) => opts.animation.delay({ type: 'data', mode: 'default', dataIndex });
+  const bar = chartEntrance('bar');
+  assert.equal(at(bar, 0), 0);
+  assert.equal(at(bar, 3), 3 * ENTRANCE_STEP_MS.bar); // the 4th bar starts last
+  assert.equal(bar.animation.delay({ type: 'chart', mode: 'default' }), 0); // the axes do not wait
+  const pie = chartEntrance('pie');
+  assert.ok(pie.animation.animateRotate && pie.animation.animateScale);
+  const dot = chartEntrance('dot');
+  assert.equal(dot.animation.easing, 'easeOutBounce');
+  assert.equal(dot.animations.y.from({ chart: { chartArea: { top: 50 } } }), 20); // just above the chart
+  const line = chartEntrance('line');
+  assert.equal(line.animations.y.from({ chart: { scales: { y: { getPixelForValue: () => 300 } } } }), 300); // from the bottom
+  // A whole entrance stays short (under 3 s for 12 bars), so children never wait.
+  assert.ok(at(bar, 11) + bar.animation.duration < 3000);
+});
