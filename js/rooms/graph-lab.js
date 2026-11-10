@@ -245,6 +245,27 @@ async function init() {
       return new Chart(canvas, config);
     });
     showTapHint();
+    replayAfterPopups(charts);
+  }
+
+  // A graph drawn behind a pop-up (the room's intro, a badge) would finish its
+  // entrance unseen (Habiba, 10 Nov 2026: "the bar and pie are not moving").
+  // So once every pop-up is closed, it comes in again. Nothing with reduced motion.
+  function replayAfterPopups(drawn) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!document.querySelector('dialog[open]')) return;
+    const check = () => {
+      if (drawn !== charts) return; // another graph was picked meanwhile
+      if (document.querySelector('dialog[open]')) {
+        setTimeout(check, 200);
+        return;
+      }
+      drawn.forEach((chart) => {
+        chart.reset();
+        chart.update();
+      });
+    };
+    setTimeout(check, 200);
   }
 
   let firstChart = true;

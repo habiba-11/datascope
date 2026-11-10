@@ -313,13 +313,15 @@ function makePieConfig(labels, data, recipe) {
 // a pie spins open; the dots drop in and bounce, one by one. The number labels
 // follow their bar or dot. Graph Lab uses none of this with reduced motion.
 // Returns options to add to a Chart.js config (Chart.js 4).
-export const ENTRANCE_STEP_MS = { bar: 110, line: 150, dot: 70 };
+// Bars and the pie are slower and springier since 10 Nov 2026 (Habiba: "not
+// moving": they were too quick to notice next to the bouncing dots).
+export const ENTRANCE_STEP_MS = { bar: 170, line: 150, dot: 70 };
 
 export function chartEntrance(type) {
   // Each bar / point / dot starts a little after the one before it.
   const oneByOne = (ms) => (ctx) => (ctx.type === 'data' && ctx.mode === 'default' ? ctx.dataIndex * ms : 0);
   if (type === 'pie') {
-    return { animation: { animateRotate: true, animateScale: true, duration: 1100, easing: 'easeOutQuart' } };
+    return { animation: { animateRotate: true, animateScale: true, duration: 1600, easing: 'easeInOutCubic' } };
   }
   if (type === 'dot') {
     return {
@@ -335,7 +337,8 @@ export function chartEntrance(type) {
       animations: { y: { from: (ctx) => (ctx.chart.scales?.y ? ctx.chart.scales.y.getPixelForValue(0) : 0) } },
     };
   }
-  return { animation: { duration: 700, easing: 'easeOutBack', delay: oneByOne(ENTRANCE_STEP_MS.bar) } };
+  // Bars: each grows up from the bottom and springs a little at the top.
+  return { animation: { duration: 1000, easing: 'easeOutElastic', delay: oneByOne(ENTRANCE_STEP_MS.bar) } };
 }
 
 // `recipe` gives the words: chartAxis (the axis title) and valueLabel ("Size {value}").
