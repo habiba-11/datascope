@@ -40,6 +40,8 @@ export const SCENE_DEFS = [
   // the funfair tent (Chance Lab)
   lin('wall-tent', [[0, '#FFE0B8'], [1, '#FFC98A']]),
   lin('floor-sand', [[0, '#E9B26B'], [1, '#F6D49A']]),
+  // the detective office (Evidence Board)
+  lin('wall-purple', [[0, '#E6DFFF'], [1, '#CBBEF7']]),
   // the maths workshop (Number Lab)
   lin('wall-blue', [[0, '#D6E9FF'], [1, '#B7D6F5']]),
   lin('panel', [[0, '#E3A765'], [1, '#C98B50']]),

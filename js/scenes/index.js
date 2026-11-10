@@ -14,6 +14,7 @@ import { workshop } from './workshop.js';
 import { studio } from './studio.js';
 import { lab } from './lab.js';
 import { funfair } from './funfair.js';
+import { office } from './office.js';
 import { saraSVG } from '../characters.js';
 
 // Room (phase id) -> its place. Rooms move to scenes one part at a time;
@@ -61,6 +62,16 @@ export const ROOM_SCENES = {
     // The one thing that moves: a small flag waving on top of the striped pole.
     ambient: [
       { kind: 'flag', x: 2.3, y: 36.4, seconds: 2.4, delay: 0 },
+    ],
+  },
+  conclude: {
+    draw: office,
+    sara: 'write',
+    // Dust over the desk.
+    ambient: [
+      { kind: 'dust', x: 8, y: 46, seconds: 10, delay: 0 },
+      { kind: 'dust', x: 14, y: 50, seconds: 12, delay: -4 },
+      { kind: 'dust', x: 20, y: 44, seconds: 11, delay: -8 },
     ],
   },
   number: {
