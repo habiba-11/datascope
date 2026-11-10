@@ -149,7 +149,7 @@ export const STAR_WORDS = { 3: 'Great thinking!', 2: 'Good thinking!', 1: 'Nice 
 // Where "Your work" came from, as the small chip on the card says it.
 export const SOURCE_CHIPS = {
   own: ':pencil: your own words', // :name: = icon (Part 54d)
-  choice: ':tap: your own choice',
+  choice: 'your own choice', // no icon (Habiba, 10 Nov 2026)
   hint: ':bulb: a hint',
   'hint-edited': ':bulb: a hint you changed',
   mixed: ':pencil::bulb: your words and a hint',
