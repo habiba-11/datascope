@@ -31,6 +31,9 @@ export const SCENE_DEFS = [
   lin('board', [[0, '#FFFFFF'], [1, '#E4EBF2']], 1, 1),
   lin('beam', [[0, '#FFF3B8', 0.7], [1, '#FFE9A0', 0]], 1, 1),
   lin('curtain', [[0, '#F08A7A'], [0.25, '#E26B5B'], [0.5, '#F29A8A'], [0.75, '#DE6353'], [1, '#EE8272']], 1, 0),
+  // the warm study (Question Studio): a warm wall and a cork pinboard
+  lin('wall-warm', [[0, '#FFE9C2'], [1, '#F6CF92']]),
+  '<pattern id="ds-cork" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#D9A767"/><circle cx="4" cy="5" r="1.6" fill="#B98543"/><circle cx="12" cy="11" r="1.4" fill="#C0914E"/><circle cx="10" cy="3" r="1" fill="#E4B982"/></pattern>',
   // the maths workshop (Number Lab)
   lin('wall-blue', [[0, '#D6E9FF'], [1, '#B7D6F5']]),
   lin('panel', [[0, '#E3A765'], [1, '#C98B50']]),

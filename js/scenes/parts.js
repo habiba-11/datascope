@@ -23,6 +23,23 @@ export function shelf(x, y, w, items) {
     <rect x="6" y="9" width="6" height="14" fill="#8C5B2D"/><rect x="${w - 12}" y="9" width="6" height="14" fill="#8C5B2D"/></g>`;
 }
 
+// A row of `n` books standing on a shelf, starting at x0, about `h` tall.
+export function bookRow(n, x0, h) {
+  return Array.from({ length: n }, (_, i) => {
+    const height = h - (i % 3) * 6;
+    return `<rect x="${x0 + i * 15}" y="${-height}" width="13" height="${height}" rx="2" fill="${STEP_COLOURS[i % 5]}" stroke="${NAVY}" stroke-width="1.6"/><path d="M${x0 + i * 15 + 3} ${-height + 8} h7" stroke="#fff" stroke-width="2" opacity=".7"/>`;
+  }).join('');
+}
+
+// A lamp hanging from the ceiling at (x, y), with a soft cone of light.
+export function lamp(x, y, colour) {
+  return `<g transform="translate(${x} ${y})">
+    <path d="M0 -60 V0" stroke="#6E4524" stroke-width="3"/>
+    <path d="M-40 52 L0 400 L40 52Z" fill="#FFF3B0" opacity=".13"/>
+    <path d="M-26 40 Q-28 6 0 0 Q28 6 26 40Z" fill="${colour}" stroke="${NAVY}" stroke-width="2.6"/>
+    <ellipse cy="44" rx="30" ry="9" fill="#FFF3B0" opacity=".9"/></g>`;
+}
+
 // A potted plant standing at (x, y), `scale` times its normal size.
 export function plant(x, y, scale = 1) {
   return `<g transform="translate(${x} ${y}) scale(${scale})">

@@ -11,6 +11,7 @@ import { FEATURES } from '../config.js';
 import { mountSceneDefs } from './defs.js';
 import { classroom } from './classroom.js';
 import { workshop } from './workshop.js';
+import { studio } from './studio.js';
 import { saraSVG } from '../characters.js';
 
 // Room (phase id) -> its place. Rooms move to scenes one part at a time;
@@ -29,6 +30,16 @@ export const ROOM_SCENES = {
       { kind: 'dust', x: 40, y: 70, seconds: 12, delay: -2 },
       { kind: 'dust', x: 46, y: 62, seconds: 9.5, delay: -7 },
       { kind: 'dust', x: 52, y: 76, seconds: 11.5, delay: -4 },
+    ],
+  },
+  ask: {
+    draw: studio,
+    sara: 'think',
+    // Dust floating over the bookshelves.
+    ambient: [
+      { kind: 'dust', x: 10, y: 48, seconds: 10, delay: 0 },
+      { kind: 'dust', x: 16, y: 44, seconds: 12, delay: -5 },
+      { kind: 'dust', x: 22, y: 50, seconds: 11, delay: -8 },
     ],
   },
   number: {
