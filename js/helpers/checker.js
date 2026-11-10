@@ -135,7 +135,7 @@ export function questionChecklist(question, options = {}) {
   });
 }
 
-// The check to fix next (8 Nov 2026: the checklist marks it "👉 Fix this
+// The check to fix next (8 Nov 2026: the checklist marks it "Fix this
 // next"): the check of the first rule still broken, in the same order as the
 // tips. null when the question passes, or when the first problem has no check
 // (too few words: its tip is shown instead).

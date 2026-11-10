@@ -1,10 +1,10 @@
 // Shell layer: Pip points at the helpers (Part 47b, Round 4 pilot feedback:
 // the children did not notice the Hint, Maths recap and My findings buttons).
-// The helpers stay where they are (Habiba, 7 Nov 2026): the 💡 Hint under the
-// question, 📘 Maths recap and 📋 My findings in the top bar. The first time
+// The helpers stay where they are (Habiba, 7 Nov 2026): the Hint under the
+// question, Maths recap and My findings in the top bar. The first time
 // each one appears in a room, a yellow arrow bounces next to it, pointing at
 // it, with its "when to use me" line, and Pip says a line. Maths recap and My
-// findings: once per room, per child. Every 💡 Hint button: the first time it
+// findings: once per room, per child. Every Hint button: the first time it
 // is on screen (8 Nov 2026). Logged as "tray-intro-seen". (The About tab's "Show me
 // the helpers" button was removed, Habiba, 8 Nov 2026.) Words and the arrow's
 // spot: helpers/pointers.js (tested).
@@ -71,7 +71,7 @@ function point(helpers, auto) {
   pipTalk('tray');
 }
 
-// Every 💡 Hint button gets its arrow the first time it is on screen (8 Nov
+// Every Hint button gets its arrow the first time it is on screen (8 Nov
 // 2026, Habiba: "on all hint buttons"); Maths recap and My findings once per room.
 const pointedHints = new WeakSet();
 

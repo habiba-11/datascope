@@ -479,7 +479,7 @@ body.modal-open {
 }
 
 
-/* Part 42c: "🎯 Why?" at the top of a phase's pop-up and the About panel,
+/* Part 42c: "Why?" at the top of a phase's pop-up and the About panel,
    the first thing read: what the room is for. */
 .intro-why {
   margin: 0 0 var(--space-2);

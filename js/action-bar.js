@@ -33,7 +33,7 @@ export function setupActionBar({ back = null, hint = null, primary }) {
     left.append(el);
   }
 
-  // label:       what happens next, e.g. "▶ Run survey"
+  // label:       what happens next, e.g. "Run survey"
   // enabled:     false shows `whyDisabled` on the button instead (e.g. "Write your idea first")
   // onClick:     what the button does
   // ready:       true gives it the "press me" nudge: a small hop and a ring

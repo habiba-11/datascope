@@ -1,7 +1,7 @@
-// Layer 3: "📋 My findings", the summary a child sees before writing their
+// Layer 3: "My findings", the summary a child sees before writing their
 // claim in Evidence Board (Round 2, Habiba's feedback 26 Oct 2026), laid out
-// like the f11 design (Part 37d, 4 Nov 2026) in 3 parts: ❓ our question,
-// 🔢 the data (drawn), 🧠 my thinking (the child's own words, in order).
+// like the f11 design (Part 37d, 4 Nov 2026) in 3 parts: our question,
+// the data (drawn), my thinking (the child's own words, in order).
 // Pure, tested in Node (tests/findings.test.js). The numbers come from stats.js.
 import { formatMean, compareValues } from './stats.js';
 
@@ -35,7 +35,7 @@ export function votes(values) {
   return list.map(([value, count]) => ({ value: String(value), count, pct: Math.round((count / biggest) * 100) }));
 }
 
-// 🔢 The data: bars for words, tiles + a number line for numbers, two sets of
+// The data: bars for words, tiles + a number line for numbers, two sets of
 // tiles for two classes.
 function dataPart(kind, values, stats) {
   if (kind === 'category') {
@@ -75,7 +75,7 @@ function dataPart(kind, values, stats) {
   };
 }
 
-// 🧠 My thinking: the child's own words, in the order they happened.
+// My thinking: the child's own words, in the order they happened.
 // "Your guess matched" is only for words (guess = a mode); never a score.
 function thinkingPart(kind, stats, journey) {
   const { plan, number, graph } = journey.phases;

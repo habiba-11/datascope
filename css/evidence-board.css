@@ -138,7 +138,7 @@
   background: white;
 }
 
-/* ---------- "📋 My findings" pop-up (js/findings-popup.js, f11 design) ----------
+/* ---------- "My findings" pop-up (js/findings-popup.js, f11 design) ----------
    3 sections: question, data (drawn), my thinking. It scrolls inside, with
    its one button pinned at the bottom. Reduced motion: base.css stops the
    rise-in, and the bars below do not grow. */

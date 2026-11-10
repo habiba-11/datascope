@@ -39,7 +39,7 @@
 }
 
 /* "Press me": the ready green button hops a little and sends out a yellow
-   ring every 2.4 s (Habiba, 4 Nov 2026: a hint to tap it, e.g. "▶ Run survey").
+   ring every 2.4 s (Habiba, 4 Nov 2026: a hint to tap it, e.g. "Run survey").
    It rests while the button is pressed, so the press-down still feels real.
    Reduced motion: no hop, but the ring stays on, still (see the end of this file). */
 .m-nudge {

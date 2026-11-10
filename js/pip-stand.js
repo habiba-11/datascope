@@ -52,7 +52,7 @@ function whenNoModal() {
 const GAP_MS = 2500;
 let queue = Promise.resolve();
 
-// `options.help`: a function for a "💡 Yes, help me!" button in the bubble (idle help).
+// `options.help`: a function for a "Yes, help me!" button in the bubble (idle help).
 // `options.ms`: how long the line stays.
 export function pipTalk(event, options = {}) {
   const asked = Date.now();
@@ -161,7 +161,7 @@ function offerHelp() {
     logEvent('shell', 'idle-help-taken', { screen });
     hint.click();
   } : null;
-  // No 💡 on screen: calm words only, so Pip never offers help it cannot give.
+  // No Hint button on screen: calm words only, so Pip never offers help it cannot give.
   pipTalk(hint ? 'idle' : 'idleCalm', { help, ms: 9000 });
 }
 

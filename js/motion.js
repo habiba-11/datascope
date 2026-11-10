@@ -111,8 +111,8 @@ export function enterRoom(element) {
   gsap.from(element, { y: 24, opacity: 0, duration: MOTION.medium, ease: MOTION.out, clearProps: 'all' });
 }
 
-// A step (or Explore tab) opens: it springs in while a 🔒 shakes, becomes a 🔑,
-// turns, becomes 🔓 and floats away (Part 21b). Without motion it just appears.
+// A step (or Explore tab) opens: it springs in while a lock shakes, becomes a key,
+// turns, becomes an open lock and floats away (Part 21b). Without motion it just appears.
 export function unlockStep(element) {
   const gsap = gsapOrNull();
   if (!gsap || !element) return;

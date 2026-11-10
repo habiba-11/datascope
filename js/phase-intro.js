@@ -1,8 +1,8 @@
 // Shell layer: what each phase is about (Part 14, Part 33). A pop-up opens by
-// itself the first time a child reaches a phase; the "📖 About this room" tab on
+// itself the first time a child reaches a phase; the "About this room" tab on
 // the task card shows the same words, and more, at any time (Prof's comment 6).
 // Texts: data/content/phases.json.
-// Part 42c (Round 4): each phase also says WHY the room exists ("🎯 Why?"), in
+// Part 42c (Round 4): each phase also says WHY the room exists ("Why?"), in
 // the pop-up and next to the tab; games get their own words. Not in the tab's
 // panel: the line is right above it (Habiba, 6 Nov 2026: "repetitive").
 import { openModal } from './modal.js';
@@ -127,7 +127,7 @@ export function setIntroPhase(phase) {
   autoIntroClosed = showPhaseIntro(phase);
 }
 
-// The "🎯 Why?" line next to the tab (task-card.js). Question Studio moves
+// The "Why?" line next to the tab (task-card.js). Question Studio moves
 // from Ask to Plan, so it is filled again for the new phase.
 async function fillWhyLine(phase) {
   const line = document.getElementById('why-line');
@@ -142,7 +142,7 @@ export function whenIntroClosed() {
   return autoIntroClosed;
 }
 
-// The "📖 About this room" tab opens and closes its panel inside the card.
+// The "About this room" tab opens and closes its panel inside the card.
 export function setupAboutTab() {
   const tab = document.getElementById('about-tab');
   const panel = document.getElementById('about-panel');

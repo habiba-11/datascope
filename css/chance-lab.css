@@ -218,7 +218,7 @@
   animation-play-state: paused;
 }
 
-/* A round token for one outcome: colour, 🦉 / 🪶 or the number (the name is written next to it). */
+/* A round token for one outcome: colour, owl / feather icons (coin), or the number (the name is written next to it). */
 .cl-token {
   flex-shrink: 0;
   width: 30px;
@@ -544,7 +544,7 @@
   box-shadow: 0 4px 0 var(--color-navy);
 }
 
-/* The goal (the outcome we track): a gold frame and a soft gold card, plus its ⭐ words. */
+/* The goal (the outcome we track): a gold frame and a soft gold card, plus its star and words. */
 .outcome-card.goal {
   background: var(--color-plan-light);
   box-shadow: 0 4px 0 var(--color-navy), 0 0 0 4px var(--color-gold);
@@ -673,7 +673,7 @@
   }
 }
 
-/* Phones: "⭐ we track this" may take two lines, and the big numbers are a
+/* Phones: "we track this" may take two lines, and the big numbers are a
    little smaller, so everything stays inside its card. */
 @media (max-width: 560px) {
   .tracked {

@@ -1,9 +1,9 @@
 // Teacher dashboard (Part 20, Prof's comment 6; layout 27 Oct 2026).
 // A top bar (who is logged in, Refresh, Log out) and 4 tabs:
-//   📊 Class        the big picture: key numbers and two charts
-//   👧 Children     a short list; "Open" shows one child's page (detail.js)
-//   📥 Thesis data  optional downloads, and the DEMO switch
-//   ⚙️ Settings     this device: clear it, preview the rooms
+//   Class        the big picture: key numbers and two charts
+//   Children     a short list; "Open" shows one child's page (detail.js)
+//   Thesis data  optional downloads, and the DEMO switch
+//   Settings     this device: clear it, preview the rooms
 // Where the children's work comes from: the online database (Part 22), read
 // straight from it (cloud.js) after the email + password login (gate.js).
 // No files (decided 4 Nov 2026, after Prof and the ethics check agreed): with
@@ -79,7 +79,7 @@ function currentRows() {
   return filter.value ? rows.filter((r) => r.scenarioId === filter.value) : rows;
 }
 
-// ---------- 📊 Class ----------
+// ---------- Class ----------
 
 function renderClass(rows) {
   const o = classOverview(rows);
@@ -134,7 +134,7 @@ function renderCharts(o) {
   ];
 }
 
-// ---------- 👧 Children ----------
+// ---------- Children ----------
 
 function renderChildren(rows) {
   const body = document.getElementById('class-rows');
@@ -258,7 +258,7 @@ function onTabChange(tabId) {
   if (tabId === 'tab-class' && Object.keys(titles).length) renderClass(currentRows());
 }
 
-// ---------- 📥 Thesis data (real children only: DEMO rows are never exported) ----------
+// ---------- Thesis data (real children only: DEMO rows are never exported) ----------
 
 document.getElementById('export-thesis-btn').addEventListener('click', () => {
   // All scenarios, whatever the filter shows, so the file is always complete.
@@ -299,7 +299,7 @@ demoBtn.addEventListener('click', () => {
   render();
 });
 
-// ---------- ⚙️ Settings ----------
+// ---------- Settings ----------
 
 twoTapButton(document.getElementById('clear-device-btn'), ':warning: Tap again to clear this device', () => {
   clearChildData();

@@ -112,7 +112,7 @@ async function init() {
   tasks.forEach((task, i) => TASK_SETUP[task](i + 1, data));
   showTask(1);
 
-  // The maths recap (Part 18): a 📘 button, and the first time it opens by
+  // The maths recap (Part 18): a button, and the first time it opens by
   // itself, right after the Number Lab intro is closed.
   addRecapButton(kind, 'number-lab');
   whenIntroClosed().then(() => autoOpenRecap(kind));

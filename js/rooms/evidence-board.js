@@ -146,7 +146,7 @@ async function init() {
   setupCertainty();
   showTask(1);
 
-  // "📋 My findings": the child's own numbers and words, so they don't have to
+  // "My findings": the child's own numbers and words, so they don't have to
   // remember them while writing the claim. Opens by itself after the intro
   // (until Conclude is done), and the button reopens it at any time.
   const kind = numberLabKind(recipe);

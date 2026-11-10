@@ -1,4 +1,4 @@
-// Shell layer: the "🚪 Exit" button in the quiet status line (Habiba, 4 Nov 2026).
+// Shell layer: the "Exit" button in the quiet status line (Habiba, 4 Nov 2026).
 // It asks first, sends any work that is still waiting, then forgets the code on
 // this device and goes back to the start page. The work stays online, so the
 // same code later carries on. Anything not sent yet stays in the browser and

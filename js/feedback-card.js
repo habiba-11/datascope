@@ -9,7 +9,7 @@ import { STEP_OF_PHASE, PHASES } from './helpers/progress.js';
 import { SOURCE_CHIPS } from './helpers/feedback.js';
 import { playSound, playStars } from './sounds.js';
 import { pipReacts } from './motion.js';
-import { setIconLine } from './icon-text.js';
+import { setIconLine, setIconText } from './icon-text.js';
 
 const PHASE_NAMES = {
   ask: 'Ask', plan: 'Plan', collect: 'Collect', graph: 'Graph Lab',
@@ -107,7 +107,9 @@ export function showFeedbackCard(phase, card) {
   // "Your work": the child's own answer (plain text), and where it came from.
   if (card.yourWork) {
     const work = at(el('div', '', 'ps-box ps-you'), 1800);
-    work.append(el('h3', `✏️ ${card.yourWork.label}`), el('p', `"${card.yourWork.text}"`, 'ps-quote'));
+    const workTitle = el('h3');
+    setIconText(workTitle, 'pencil', card.yourWork.label); // our icons (Part 54i)
+    work.append(workTitle, el('p', `"${card.yourWork.text}"`, 'ps-quote'));
     if (SOURCE_CHIPS[card.yourWork.source]) {
       const chip = el('span', '', 'ps-source');
       setIconLine(chip, SOURCE_CHIPS[card.yourWork.source]);
@@ -144,7 +146,9 @@ export function showFeedbackCard(phase, card) {
     body.append(row);
   } else {
     const done = at(el('div', '', 'ps-box ps-done-all'), 3200);
-    done.append(el('h3', '🎉 Your whole journey is done!'), el('p', 'You asked, planned, collected, explored and concluded.'));
+    const doneTitle = el('h3');
+    setIconText(doneTitle, 'party', 'Your whole journey is done!');
+    done.append(doneTitle, el('p', 'You asked, planned, collected, explored and concluded.'));
     body.append(done);
   }
 
@@ -156,7 +160,7 @@ export function showFeedbackCard(phase, card) {
     accent: STEP_OF_PHASE[phase],
     className: 'phase-summary',
     body,
-    buttons: [{ label: next ? `Unlock ${PHASE_NAMES[next]} →` : '🎉 Finish', value: 'next', main: true }],
+    buttons: [{ label: next ? `Unlock ${PHASE_NAMES[next]} →` : 'Finish', icon: next ? '' : 'party', value: 'next', main: true }],
     beforeClose: () => stars.stop(),
     onOpen: (dialog) => {
       stars = playStarSound(card.stars);

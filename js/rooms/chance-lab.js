@@ -26,7 +26,7 @@ const DEVICES = {
 };
 
 // Chance Lab in the 3-zone layout (UI guide): Explore tabs on the card, a
-// mini stepper, and ONE primary button that says what it does ("▶ Spin 500 times").
+// mini stepper, and ONE primary button that says what it does ("Spin 500 times").
 const STEP_LABELS = ['Pick a game', 'How likely?', 'Test it'];
 const RUN_SIZES = [10, 50, 500];
 const RECENT_SHOWN = 12; // the last results, as small tokens
@@ -160,7 +160,7 @@ function showTask(n) {
 // "flips" -> "Flip": the device's own word, for the run button.
 const runWord = (device) => device.verb[0].toUpperCase() + device.verb.slice(1, -1);
 
-// The run button on the lab table: "▶ Roll 50 times", or "⏳ Rolling..." while
+// The run button on the lab table: "Roll 50 times", or "Rolling..." while
 // the device moves. It invites a tap (nudge) until the first test is done.
 function refreshRunButton() {
   const button = document.getElementById('run-btn');
@@ -319,7 +319,7 @@ function runTrial(device) {
 // One small card per outcome (f12, made compact 4 Nov 2026 so the cards fit
 // side by side): "Should 16.7%" over its striped bar, then "Did 20%" over its
 // solid bar (the outcome's colour), with the small words under each bar.
-// The goal's card has a gold frame AND "⭐ we track this".
+// The goal's card has a gold frame AND "we track this".
 function outcomeCardHTML(device, row, tested) {
   const name = /^[1-6]$/.test(row.name) ? `Rolling a ${row.name}` : row.name;
   const goal = row.name === device.target;

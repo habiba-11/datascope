@@ -396,7 +396,7 @@ function savePrediction(guess) {
   finishPhase('plan', { guessText: String(shown) });
 }
 
-// Shows the checker's tips under a question (or ✅). Each tip starts with its
+// Shows the checker's tips under a question (or check). Each tip starts with its
 // own emoji, so colour is never the only signal.
 // Part 45: ONE tip at a time (the first thing to fix), and the checklist of 5
 // ticks that turn green as the question gets better. Each tick has a word and

@@ -14,8 +14,8 @@ export const HELPERS = {
   findings: { when: 'See what you found so far.' },
 };
 
-// Which helper a button is, from its words ("💡 Need a hint?", "📘 Maths recap",
-// "📋 My findings"), or null.
+// Which helper a button is, from its words ("Need a hint?", "Maths recap",
+// "My findings"), or null.
 export function helperId(text) {
   if (/recap/i.test(text)) return 'recap';
   if (/findings/i.test(text)) return 'findings';

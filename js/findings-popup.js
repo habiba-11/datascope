@@ -1,7 +1,7 @@
-// Shell layer: the "📋 My findings" pop-up in Evidence Board, laid out like
-// the f11 design (Part 37d, 4 Nov 2026): ❓ our question, 🔢 the data (bars
+// Shell layer: the "My findings" pop-up in Evidence Board, laid out like
+// the f11 design (Part 37d, 4 Nov 2026): our question, the data (bars
 // for words, tiles and a number line for numbers, two classes side by side),
-// 🧠 my thinking (a timeline of the child's own words).
+// my thinking (a timeline of the child's own words).
 // The content comes from buildFindings() (helpers/findings.js). The child's
 // words go in with textContent only.
 import { openModal } from './modal.js';

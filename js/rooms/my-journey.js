@@ -1,6 +1,6 @@
 // "My journey" (Part 19, Prof's comment 6), laid out like the f10 design
 // (Part 37c, 4 Nov 2026): a slim celebration line, then 3 tabs with
-// "🧠 What I learned" first, "🗺️ My journey" (the 7 stops) and "🪪 My ID".
+// "What I learned" first, "My journey" (the 7 stops) and "My ID".
 // Built with textContent: most of this is what the child typed.
 // Time per phase is NOT shown here (teacher only, decided 25 Oct 2026).
 // No files and no Print button (Habiba, 4 Nov 2026): the work goes online by itself.

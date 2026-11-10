@@ -21,7 +21,7 @@
   }
 }
 
-/* A room's own tool (📘 Maths recap, 📋 My findings) sits in the top bar. */
+/* A room's own tool (Maths recap, My findings) sits in the top bar. */
 .room-tools {
   display: contents;
 }
@@ -264,7 +264,7 @@
   min-height: 320px;
 }
 
-/* The ℹ️ and backpack buttons sit together on the right of the header. */
+/* The info and backpack buttons sit together on the right of the header. */
 .header-actions {
   display: flex;
   align-items: center;
@@ -323,7 +323,7 @@
   padding: 6px 14px;
 }
 
-/* A room title with a button beside it (📘 Maths recap, 📋 My findings). */
+/* A room title with a button beside it (Maths recap, My findings). */
 .room-title-row {
   display: flex;
   align-items: center;

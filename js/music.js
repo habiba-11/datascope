@@ -1,6 +1,6 @@
 // Shell layer: the calm background music (Part 43d, Round 4 pilot feedback).
 // The score is in helpers/music-score.js (tested). Habiba's choice: music ON
-// by default but quiet, with its own 🎵 switch, separate from the sound effects.
+// by default but quiet, with its own switch, separate from the sound effects.
 // Made by the browser (Web Audio), so there are no music files. The story
 // (Part 44) plays the same loop and turns it down while someone speaks (duckMusic).
 import { audioContext } from './sounds.js';

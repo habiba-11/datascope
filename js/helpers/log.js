@@ -15,19 +15,19 @@ export const EVENT_TYPES = [
   'reflection',   // what a graph tells / does NOT tell
   'claim',        // the final Evidence Board claim
   'teacher-tag',  // a misconception the teacher tagged (teacher view)
-  'popup-seen',   // a phase's summary was shown (auto: the pop-up by itself; via: 'tab' from 📖 About this room)
+  'popup-seen',   // a phase's summary was shown (auto: the pop-up by itself; via: 'tab' from About this room)
   'phase-start',  // the child entered a phase not yet done (time per phase = first start to complete)
   'phase-complete', // the child finished a phase (logged once per code + scenario)
   'phase-feedback', // the feedback card shown at the end of a phase, with its stars
-  'recap-viewed', // the maths recap pop-up was opened (auto or 📘), and which cards were looked at
-  'findings-viewed', // Evidence Board: the child's "📋 My findings" summary was opened (auto or by tapping)
+  'recap-viewed', // the maths recap pop-up was opened (auto or the Maths recap button), and which cards were looked at
+  'findings-viewed', // Evidence Board: the child's "My findings" summary was opened (auto or by tapping)
   'chart-switch', // Graph Lab: the child tried another kind of graph (from, chartType)
   'cards-sorted', // Number Lab: the child put Mia's numbers in order (the card sort); centre = the median
   'badge-earned', // a badge patch was earned and shown (badgeId, phase; backfill: found in an older log)
   'build-varied', // Number Lab: after 8, 8, 8, 8, 8 the child also made different numbers with the same mean
   // Round 4 (pilot feedback, 5 Nov 2026): new events only, no field renamed.
   'mission-seen', // Part 42a: Pip's Mission card was shown after picking a scenario (scenarioId)
-  'idle-help-shown', // Part 43e: no tap for 10 s, Pip offered help (screen, hintButton: a 💡 button was there)
+  'idle-help-shown', // Part 43e: no tap for 10 s, Pip offered help (screen, hintButton: a Hint button was there)
   'idle-help-taken', // Part 43e: the child tapped Pip's "Yes, help me!" (screen)
   'fixit-choice', // Part 45: Fix 1 "Which question is better?" (scenarioId, picked A or B, correct, tries)
   'bonus-seen', // Part 46: the bonus step "Write your OWN question" was shown (scenarioId)

@@ -48,7 +48,7 @@
   font-weight: 800;
 }
 
-/* "📖 About this room" (Prof's comment 6): it hangs from the strip, on the right,
+/* "About this room" (Prof's comment 6): it hangs from the strip, on the right,
    and is yellow in every room, so it can't be mistaken for an Explore room's tab. */
 .about-row {
   display: flex;
@@ -58,7 +58,7 @@
   padding: 0 var(--space-3);
 }
 
-/* Part 42c: "🎯 Why? Graphs help us SEE the answer." On the left of the About
+/* Part 42c: "Why? Graphs help us SEE the answer." On the left of the About
    tab, in space that was empty, so the task does not move down. */
 .why-line {
   margin: 8px auto 0 0;
@@ -312,7 +312,7 @@ html:has(.action-bar) {
   color: var(--color-muted-text);
 }
 
-/* Not sent yet / offline: it stands out (yellow AND the ⚠️ / 📴 words). */
+/* Not sent yet / offline: it stands out (yellow AND the warning / offline icons and words). */
 .status-info .sync-status[data-status="error"],
 .status-info .sync-status[data-status="offline"] {
   padding: 2px 12px;
@@ -343,7 +343,7 @@ html:has(.action-bar) {
 }
 
 /* The Explore rooms as tabs filling the card's header strip (Number Lab,
-   Graph Lab, Chance Lab). Done = ✓, current = white, locked = "🔒 More soon". */
+   Graph Lab, Chance Lab). Done = ✓, current = white, locked = "More soon". */
 .task-card-strip:has(.task-card-tabs) {
   padding: 0;
 }
@@ -385,7 +385,7 @@ html:has(.action-bar) {
   color: var(--color-muted-text);
 }
 
-/* A room's own tool (📘 Maths recap) in the top bar. */
+/* A room's own tool (Maths recap) in the top bar. */
 .room-tool {
   font-size: 18px;
 }

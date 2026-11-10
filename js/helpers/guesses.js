@@ -1,6 +1,6 @@
 // Helper layer: the two guesses (Part 50, Round 4 pilot: the children mixed up
 // the Plan guess and the Number Lab guess). Habiba chose option A (7 Nov 2026):
-// - Plan asks for a PREDICTION before any data ("🔮 most kids slept...").
+// - Plan asks for a PREDICTION before any data ("most kids slept...").
 // - Number Lab asks for an ESTIMATE of the mean after seeing the data, and
 //   reminds the child of their prediction.
 // - Games has no mean, so Number Lab checks the Plan prediction against the

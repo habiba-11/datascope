@@ -279,7 +279,7 @@ export function setCurrentStep(stepId) {
   });
 }
 
-// Puts a room's own tool (e.g. "📘 Maths recap") next to its title, so it
+// Puts a room's own tool (e.g. "Maths recap") next to its title, so it
 // never crowds the task text underneath. In the card layout it goes into the
 // top bar instead (UI guide: at most 3 buttons there).
 export function addTitleButton(button) {
