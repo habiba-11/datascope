@@ -77,7 +77,7 @@ async function init() {
           <div class="scenario-grid" id="scenario-grid">
             ${scenarios.map((s, i) => `
               <button class="scenario-card m-pop" style="--i: ${i}" data-id="${s.id}" type="button">
-                <span class="scenario-emoji" aria-hidden="true">${illustration(s.content.icon, { size: 56 })}</span>
+                <span class="scenario-emoji" aria-hidden="true">${illustration(s.content.icon, { size: 56, animate: false })}</span>
                 <span class="scenario-title">${s.content.cardTitle}</span>
                 <span class="scenario-question">${s.recipe.question}</span>
                 ${doneBefore.has(s.id) ? '<span class="scenario-done">✓ Done before</span>' : ''}

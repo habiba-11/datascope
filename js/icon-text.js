@@ -3,7 +3,12 @@
 // The icon is our own SVG; the text always goes in as plain text, so a
 // child's own words can never be read as code. Sized by css/base.css (.ds-icon):
 // 1.25 times the text, on the text line, like the emoji it replaces.
-import { illustration, ILLUSTRATIONS } from './illustrations.js';
+import { illustration, ILLUSTRATIONS, installIllustrationStyles } from './illustrations.js';
+
+// Part 52a (10 Nov 2026): every page imports this file, so the icons' motion
+// styles are added here, once. Icons next to words stay STILL (a child is
+// reading); pass animate = true only for rewards, headers, hints and Pip.
+installIllustrationStyles();
 
 // Part 54c: OUR texts (code and data/content, never a child's words) may name
 // an icon anywhere as :name:, e.g. ":crystal-ball: Predict!" or "Next: :star: Bonus".
@@ -41,15 +46,15 @@ export function withoutIcons(text) {
 
 // The icon as HTML, for templates that are already HTML (our own words only).
 // `label`: say what the icon means, only when no words next to it say it.
-export function iconHTML(name, label = '') {
-  return `<span class="ds-icon">${illustration(name, { size: 24, label })}</span>`;
+export function iconHTML(name, label = '', animate = false) {
+  return `<span class="ds-icon">${illustration(name, { size: 24, label, animate })}</span>`;
 }
 
 // The icon as a page element.
-export function iconNode(name, label = '') {
+export function iconNode(name, label = '', animate = false) {
   const span = document.createElement('span');
   span.className = 'ds-icon';
-  span.innerHTML = illustration(name, { size: 24, label }); // our own SVG, never child text
+  span.innerHTML = illustration(name, { size: 24, label, animate }); // our own SVG, never child text
   return span;
 }
 
@@ -58,7 +63,7 @@ export function iconNode(name, label = '') {
 export function fillIcons(root = document) {
   root.querySelectorAll('[data-icon]').forEach((span) => {
     span.classList.add('ds-icon');
-    span.innerHTML = illustration(span.dataset.icon, { size: 24 });
+    span.innerHTML = illustration(span.dataset.icon, { size: 24, animate: false });
   });
 }
 

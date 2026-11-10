@@ -40,7 +40,7 @@ export function showBadgePopup(badge, onLanded) {
     <div class="bp-burst">${burstHTML(badge.super ? 28 : 16)}</div>
     <div class="bp-stamp"><div class="bp-flip"><div class="bp-flip-inner">
       <div class="bp-face bp-back">${MYSTERY_SVG}</div>
-      <div class="bp-face bp-front">${patchSVG(badge)}</div>
+      <div class="bp-face bp-front">${patchSVG(badge, false, true)}</div>
     </div></div></div>`; // our own drawings only, no child text
 
   const why = document.createElement('p');
