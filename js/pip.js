@@ -48,12 +48,16 @@ const BODY_FEATHERS = [[29.4, 86.9], [39.6, 97.1], [70.2, 97.1], [80.4, 86.9], [
   .map(([x, y]) => feather(x, y)).join(' ');
 const BELLY_FEATHERS = (y) => `M41.3 ${y} q4.7 6 9.35 0 q4.7 6 9.35 0 q4.7 6 9.35 0 q4.7 6 9.35 0`;
 // One eye: the iris and pupil (in .pip-pupils, so they can look up) are drawn separately.
-const iris = (cx) => `<circle cx="${cx}" cy="58.9" r="10.2" fill="url(#ds-pip-iris)"/><circle class="pip-pupil" cx="${cx}" cy="58.9" r="4.6" fill="#1B1008"/><circle class="pip-shine" cx="${cx + 3.6}" cy="57" r="2.3" fill="#fff"/><circle cx="${cx - 3.4}" cy="63.1" r="1.4" fill="#fff"/>`;
-// Happy face (Habiba, 10 Nov 2026). Tried and rejected: eyelids and lines
-// under the eyes ("like he wants to cry"), light cheeks under the eyes ("puffy
-// eyes"). Kept: clear eyes with slightly smaller pupils and one small sparkle,
-// thin relaxed eyebrows, rosy pink cheeks on the face and a small smile under
-// the beak. Versions compared in docs/design/screens/after/pip-eye-versions-*.png.
+const iris = (cx) => `<circle cx="${cx}" cy="59.7" r="10.2" fill="url(#ds-pip-iris)"/><circle class="pip-pupil" cx="${cx}" cy="59.7" r="5.4" fill="#1B1008"/><circle class="pip-shine" cx="${cx + 3.4}" cy="55.5" r="3.1" fill="#fff"/><circle cx="${cx - 3.4}" cy="64" r="1.4" fill="#fff"/>`;
+// A small arched upper eyelid: its lower edge curves UP, so Pip looks alert
+// and friendly (not sleepy). Static: the blink lids (.pip-lids) close over it.
+const eyelid = (cx) => `<path d="M${cx - 13} 49.9 A15.3 15.3 0 0 1 ${cx + 13} 49.9 Q${cx} 46.5 ${cx - 13} 49.9Z" fill="#B98456" stroke="#4A2D14" stroke-width="1.7" stroke-linejoin="round"/>`;
+// Pip's face (Habiba's own Pip SVG, pasted 10 Nov 2026, drawn here at 85%
+// like the rest of him): rounded ear tufts, a small arched eyelid on each eye,
+// the iris a little low, soft eyebrows and pink cheeks. It replaces the
+// versions tried before (droopy lids, lines or light cheeks under the eyes, a
+// smile under the beak). Her SVG's blur filter and wing-flap animation are
+// left out: soft see-through cheeks instead, and Pip's moods move his wings.
 
 const WING_LEFT = `<path d="M26 61.4 Q2.2 80.1 12.4 112.4 Q29.4 107.3 34.5 83.5Z" fill="#7C4E27" ${LINE}/><path d="M12.4 112.4 Q15.8 100.5 20.9 93.7 M19.2 110.7 Q22.6 98.8 26.9 92" ${SOFT}/>`;
 const WING_RIGHT = `<path d="M94 61.4 Q117.8 80.1 107.6 112.4 Q90.6 107.3 85.5 83.5Z" fill="#7C4E27" ${LINE}/><path d="M107.6 112.4 Q104.2 100.5 99.1 93.7 M100.8 110.7 Q97.4 98.8 93.1 92" ${SOFT}/>`;
@@ -68,8 +72,8 @@ export function pipSVG(label = '', outfit = currentOutfit()) {
     ${layer(outfit, 'back')}
     <path class="pip-foot" d="M37.9 120.9 l-6.8 6.8 h6.8 l3.4 -3.4 l3.4 3.4 h6.8 Z M73.6 120.9 l-6.8 6.8 h6.8 l3.4 -3.4 l3.4 3.4 h6.8 Z" fill="#F08A12" stroke="#B2600A" stroke-width="1.3" stroke-linejoin="round"/>
     <g class="pip-wing pip-wing-left">${WING_LEFT}</g>
-    <path class="pip-tuft" d="M24.3 39.3 L20.9 10.4 L43 29.1Z" fill="#8A5A30" ${LINE}/>
-    <path class="pip-tuft" d="M95.7 39.3 L99.1 10.4 L77 29.1Z" fill="#8A5A30" ${LINE}/>
+    <path class="pip-tuft" d="M24.3 41 Q14.1 13.8 31.1 15.5 Q41.3 18.9 43 30.8Z" fill="#8A5A30" ${LINE}/>
+    <path class="pip-tuft" d="M95.7 41 Q105.9 13.8 88.9 15.5 Q78.7 18.9 77 30.8Z" fill="#8A5A30" ${LINE}/>
     <ellipse class="pip-body" cx="60" cy="76.7" rx="42.5" ry="45.9" fill="url(#ds-pip-body)" ${LINE}/>
     <ellipse cx="60" cy="76.7" rx="42.5" ry="45.9" fill="url(#ds-shine)" opacity=".5"/>
     <path d="M26 61.4 Q29.4 49.5 39.6 47.8 M94 61.4 Q90.6 49.5 80.4 47.8 ${BODY_FEATHERS}" ${SOFT}/>
@@ -79,17 +83,17 @@ export function pipSVG(label = '', outfit = currentOutfit()) {
     <circle class="pip-eye" cx="43" cy="58" r="15.3" fill="#FFFBEF" ${LINE}/>
     <circle class="pip-eye" cx="77" cy="58" r="15.3" fill="#FFFBEF" ${LINE}/>
     <g class="pip-pupils">${iris(43)}${iris(77)}</g>
+    <g class="pip-eyelids">${eyelid(43)}${eyelid(77)}</g>
     <g class="pip-lids">
       <ellipse cx="43" cy="58" rx="16" ry="16" fill="#9A6A3A" ${LINE}/>
       <ellipse cx="77" cy="58" rx="16" ry="16" fill="#9A6A3A" ${LINE}/>
     </g>
-    <path class="pip-brows" d="M31 44 Q43 38 54 42 M66 42 Q77 38 89 44" stroke="#4A2D14" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <circle class="pip-blush" cx="24.3" cy="76" r="7" fill="#FF8A7A" opacity=".55"/>
-    <circle class="pip-blush" cx="95.7" cy="76" r="7" fill="#FF8A7A" opacity=".55"/>
+    <path class="pip-brows" d="M28.6 41 Q43 32.5 55.8 41 M64.3 41 Q77 32.5 91.5 41" stroke="#4A2D14" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <circle class="pip-blush" cx="24.3" cy="73.3" r="6" fill="#FF9A8B" opacity=".45"/>
+    <circle class="pip-blush" cx="95.7" cy="73.3" r="6" fill="#FF9A8B" opacity=".45"/>
     ${layer(outfit, 'neck')}
     ${layer(outfit, 'face')}
     ${layer(outfit, 'head')}
-    <path class="pip-smile" d="M49 84 Q60 93 71 84" stroke="#4A2D14" stroke-width="2" fill="none" stroke-linecap="round"/>
     <g class="pip-beak">
       <path d="M53.2 69.9 L66.8 69.9 L60 82.7Z" fill="url(#ds-pip-beak)" stroke="#B2600A" stroke-width="1.5" stroke-linejoin="round"/>
       <path d="M54.9 79.3 L65.1 79.3 L60 86.9Z" fill="#E27A10" stroke="#B2600A" stroke-width="1.4" stroke-linejoin="round"/>
