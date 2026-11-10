@@ -549,7 +549,12 @@ h1 {
   vertical-align: -0.4em;
 }
 
+/* 10 Nov 2026 (Habiba: icons next to words sat too low): the icon styles
+   (js/illustrations.js) make every icon "vertical-align: middle", which moved
+   this holder's baseline and dropped the icon about 10 px in plain sentences.
+   Here the drawing sits on the baseline again, so the holder alone lines it up. */
 .ds-icon svg {
+  vertical-align: baseline;
   width: 100%;
   height: 100%;
   filter: drop-shadow(0 1.5px 0 rgba(23, 50, 77, 0.22));
