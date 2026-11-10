@@ -128,3 +128,9 @@ test('no fading or flashing faster than 3 times a second (one fade per cycle, so
     if (fading.has(name)) assert.ok(Number(seconds) >= 0.34, `${name} fades every ${seconds} s`);
   }
 });
+
+test('Habiba chose A: an icon moves for 8 seconds, then rests; hover or a reward wakes it', async () => {
+  const { MOVE_MS } = await import('../js/icon-text.js');
+  assert.equal(MOVE_MS, 8000);
+  assert.match(ILLUSTRATION_CSS, /\.ds-illo\.ds-rest:not\(:hover\):not\(\.cheer\) \*\{animation:none!important\}/);
+});

@@ -464,6 +464,7 @@ const ILLUSTRATION_CSS = `
 .ds-illo:hover .il,.ds-illo.cheer .il{animation:il-jump .55s ease-out 2}
 .ds-illo.still *{animation:none!important}
 .ds-illo.ds-calm *{animation:none!important}
+.ds-illo.ds-rest:not(:hover):not(.cheer) *{animation:none!important}
 .ds-paused .ds-illo *{animation-play-state:paused!important}
 @keyframes il-tumble{0%,60%,100%{transform:translateY(0) rotate(0)}10%{transform:translateY(-6px) rotate(-16deg)}25%{transform:translateY(-3px) rotate(14deg)}40%{transform:translateY(0) rotate(-6deg)}50%{transform:rotate(3deg)}}
 @keyframes il-hop{0%,55%,100%{transform:translateY(0) scale(1,1)}10%{transform:translateY(0) scale(1.08,.9)}26%{transform:translateY(-6px) scale(.95,1.06)}42%{transform:translateY(0) scale(1.06,.94)}50%{transform:scale(1,1)}}

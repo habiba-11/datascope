@@ -82,6 +82,7 @@ export function cheer(root, delay = 0) {
   if (!root) return;
   setTimeout(() => {
     const icons = root.matches?.('svg.ds-illo') ? [root] : [...root.querySelectorAll('svg.ds-illo')];
+    icons.forEach(restLater); // a reward wakes the icon for another 8 seconds
     icons.forEach((svg) => svg.classList.add('cheer'));
     setTimeout(() => icons.forEach((svg) => svg.classList.remove('cheer')), 1200);
   }, delay);
@@ -99,12 +100,26 @@ export function pickMoving(icons, max = MAX_MOVING) {
   return new Set([...inPopUp, ...rest].slice(0, max));
 }
 
+// Habiba chose A (10 Nov 2026): an icon moves for 8 seconds after it appears,
+// then rests ("ds-rest": its still pose). It moves again while the pointer is on
+// it (or a finger has just tapped it), and cheer() wakes it for another 8 seconds.
+// Lively when it matters, and it saves the Chromebook's battery.
+export const MOVE_MS = 8000;
+const restTimers = new WeakMap();
+function restLater(svg) {
+  clearTimeout(restTimers.get(svg));
+  svg.classList.remove('ds-rest');
+  restTimers.set(svg, setTimeout(() => svg.classList.add('ds-rest'), MOVE_MS));
+}
+
 function calmExtras() {
-  const icons = [...document.querySelectorAll('svg.ds-illo:not(.still)')]
+  const icons = [...document.querySelectorAll('svg.ds-illo:not(.still):not(.ds-rest)')]
     .filter((svg) => svg.getClientRects().length) // hidden icons do not count
     .map((svg) => ({ svg, inPopUp: !!svg.closest('dialog, [role="dialog"]') }));
   const moving = pickMoving(icons);
   icons.forEach((icon) => icon.svg.classList.toggle('ds-calm', !moving.has(icon)));
+  // Each icon that starts moving gets its 8 seconds (once; cheer() gives more).
+  moving.forEach((icon) => { if (!restTimers.has(icon.svg)) restLater(icon.svg); });
 }
 
 // Checked again (once per frame at most) whenever the page adds or removes something.
