@@ -42,6 +42,10 @@ test("Pip keeps every part his moods and moves need (css/base.css, css/shell.css
   }
 });
 
+test('the Number Lab workshop has no words or digits (Part 51: the games scenario visits it)', () => {
+  assert.doesNotMatch(ROOM_SCENES.number.draw(), /<text/);
+});
+
 test('the scenes have no sun and no ticking clock (Round 4 rule; no timers)', () => {
   for (const [room, plan] of Object.entries(ROOM_SCENES)) {
     assert.doesNotMatch(plan.draw(), /sun|clock/i, room);

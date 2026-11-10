@@ -31,6 +31,10 @@ export const SCENE_DEFS = [
   lin('board', [[0, '#FFFFFF'], [1, '#E4EBF2']], 1, 1),
   lin('beam', [[0, '#FFF3B8', 0.7], [1, '#FFE9A0', 0]], 1, 1),
   lin('curtain', [[0, '#F08A7A'], [0.25, '#E26B5B'], [0.5, '#F29A8A'], [0.75, '#DE6353'], [1, '#EE8272']], 1, 0),
+  // the maths workshop (Number Lab)
+  lin('wall-blue', [[0, '#D6E9FF'], [1, '#B7D6F5']]),
+  lin('panel', [[0, '#E3A765'], [1, '#C98B50']]),
+  rad('leaf', [[0, '#8BE393'], [0.55, '#4DB462'], [1, '#25774A']], 0.35, 0.3, 0.85),
   // Sara
   lin('hoodie', [[0, '#FF9A8B'], [0.55, '#F26A58'], [1, '#C94A3D']], 1, 1),
   lin('jeans', [[0, '#4C78B5'], [0.5, '#6A97D2'], [1, '#3F669F']], 1, 0),

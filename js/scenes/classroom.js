@@ -2,10 +2,12 @@
 // docs/design/datascope-rooms-ui.html). Drawn on a 960 x 600 stage; the
 // window and the floor are on the left, where Sara and Pip stand.
 // It is a still picture: the only things that move are the dust specks
-// (separate small elements, see SCENE_AMBIENT in js/scenes/index.js).
+// (separate small elements, see `ambient` in js/scenes/index.js).
 // Left out on purpose: the sun (Round 4 rule), a ticking clock (it looks
 // like a timer), the blur filters (slow on school laptops) and the wall
 // posters (they sat right behind the step bar's words).
+import { floor } from './parts.js';
+
 const NAVY = '#17324D';
 
 function windowWithCurtains() {
@@ -42,23 +44,12 @@ function whiteboard() {
   <rect x="440" y="266" width="420" height="10" rx="3" fill="#B0BEC9" stroke="#8A9BAD" stroke-width="1.5"/>${pens}`;
 }
 
-function floor() {
-  let lines = '';
-  for (let x = -400; x <= 1360; x += 96) lines += `<path d="M${x} 600 L${Math.round(480 + (x - 480) * 0.3)} 372"/>`;
-  const boards = [396, 428, 470, 526, 590].map((y) => `<path d="M0 ${y} H960"/>`).join('');
-  return `
-  <rect y="372" width="960" height="228" fill="url(#ds-floor)"/>
-  <g stroke="#8C5B2D" stroke-width="2" opacity=".24">${lines}${boards}</g>
-  <rect y="366" width="960" height="9" fill="#FFF7E6"/>
-  <rect y="372" width="960" height="4" fill="${NAVY}" opacity=".12"/>`;
-}
-
 export function classroom() {
   return `
   <rect width="960" height="600" fill="url(#ds-wall)"/>
   <rect y="262" width="960" height="112" fill="url(#ds-wains)"/>
   <rect y="258" width="960" height="7" fill="#fff" opacity=".85"/>
-  ${floor()}
+  ${floor(372)}
   ${windowWithCurtains()}
   <path d="M60 262 L300 262 L690 520 L330 520Z" fill="url(#ds-beam)" opacity=".5"/>
   ${whiteboard()}`;
