@@ -576,7 +576,7 @@ const TASK_SETUP = {
       } else {
         // The hint shows the idea behind the mean: the total, shared fairly.
         // Part 55: short; the live total line shows what to change.
-        show(feedback, `:question: Not yet: their mean is ${Math.round(theirMean * 100) / 100}. Look at the total.`);
+        show(feedback, `:cross: Not yet: their mean is ${Math.round(theirMean * 100) / 100}. Look at the total.`);
         feedback.dataset.kind = 'retry';
         tracker.wrong();
         encourage(feedback);
@@ -590,7 +590,7 @@ const TASK_SETUP = {
       task: 'find-mias-mistake',
       isCorrect: (answer) => answer === (miaSays(numbers) === median(numbers) ? 'yes' : 'no'),
       correctText: ':check: Right! Mia forgot to put the numbers in order first.',
-      hintText: ':question: Not quite. What must we do first to find the median?',
+      hintText: ':cross: Not quite. What must we do first to find the median?',
       // Then the child sorts the cards themselves; the task is done once sorted.
       onCorrect: () => {
         stage.mistake = 'sort';
@@ -620,7 +620,7 @@ const TASK_SETUP = {
       task: 'real-life-mode',
       isCorrect: (answer) => asAnswer(answer) === theMode,
       correctText: `:check: Yes! ${theMode} comes up ${timesIn(list, theMode)} times. That's more than any other. It is the mode.`,
-      hintText: ':question: Not quite. Count how many times each one comes up.',
+      hintText: ':cross: Not quite. Count how many times each one comes up.',
       onCorrect: () => {
         if (realLife.medianQuestion) document.getElementById('median-question').hidden = false;
         else markComplete(n);
@@ -644,7 +644,7 @@ const TASK_SETUP = {
           cheer(feedback);
           markComplete(n);
         } else {
-          show(feedback, ':question: Not quite. The centre has the same number of cards on each side. Count them!');
+          show(feedback, ':cross: Not quite. The centre has the same number of cards on each side. Count them!');
           tracker.wrong();
           encourage(feedback);
         }
@@ -659,7 +659,7 @@ const TASK_SETUP = {
       task: 'why-no-mean',
       isCorrect: (answer) => options[Number(answer)].correct,
       correctText: ':check: Yes! We can only add up numbers. For words, we use the mode.',
-      hintText: ":question: Not quite. Can you add 'Football' + 'Tag'?",
+      hintText: ":cross: Not quite. Can you add 'Football' + 'Tag'?",
       onCorrect: () => markComplete(n),
     });
   },
@@ -672,7 +672,7 @@ const TASK_SETUP = {
       task: 'compare-range',
       isCorrect: (answer) => answer === wider,
       correctText: `:check: Yes! ${wider}'s range is ${big}. ${narrower}'s range is only ${small}. The mean alone hides this!`,
-      hintText: ':question: Not quite. Look at the range of each class.',
+      hintText: ':cross: Not quite. Look at the range of each class.',
       onCorrect: () => markComplete(n),
     });
   },

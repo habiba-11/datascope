@@ -17,4 +17,4 @@ export function choiceExplanation(choice) {
 }
 
 // A wrong pick: a nudge to look for the two things, never the answer.
-export const TRY_AGAIN = ':question: Not quite. Look again: which one says a time, and has no pushy words?';
+export const TRY_AGAIN = ':cross: Not quite. Look again: which one says a time, and has no pushy words?';
