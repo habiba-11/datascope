@@ -118,7 +118,11 @@ async function init() {
     if (i === 0) surveyStep(classes[0], { label: `Next: ${shortName(partner)} →`, ready: true, onClick: () => showStep(1) });
     if (i === 1) surveyStep(classes[1], { label: 'Compare the classes →', ready: true, onClick: () => showStep(2) });
     if (i === 2) {
-      classes.forEach((c) => renderTally(c, allKeys, scaleMax(), 'compare'));
+      // Built afresh each time, so the bars grow again when the child comes back.
+      classes.forEach((c) => {
+        document.getElementById(`${c.p}-tally-compare`).replaceChildren();
+        renderTally(c, allKeys, scaleMax(), 'compare');
+      });
       bar.setPrimary(goToGraphs);
     }
   }
@@ -167,11 +171,15 @@ function renderTally(c, allKeys, scaleMax, where = '') {
   const tally = document.getElementById(`${c.p}-tally${where ? `-${where}` : ''}`);
   const counts = countAnswers(c.keys, c.answers);
   if (!tally.children.length) {
-    tally.innerHTML = c.keys.map((key) => `
-      <div class="tally-col" data-key="${key}" style="--bar: var(--color-${colourFor(allKeys, key)})">
+    tally.innerHTML = c.keys.map((key, i) => `
+      <div class="tally-col" data-key="${key}" style="--bar: var(--color-${colourFor(allKeys, key)}); --i: ${i}">
         <div class="tally-track"><span class="tally-count"></span><div class="tally-bar"></div></div>
         <span class="tally-label">${tallyWords(key, 0, c.recipe, c.plain).value}</span>
       </div>`).join('');
+    // 10 Nov 2026 (Habiba: "no movement" in the reading Compare step): the
+    // browser first draws the new bars at zero, so they can GROW to their
+    // heights (setting both in one go made them simply appear).
+    void tally.offsetHeight;
   }
   tally.querySelectorAll('.tally-col').forEach((col) => {
     // Part 43b: a tapped column wiggles with a tick (just for fun; it changes nothing).

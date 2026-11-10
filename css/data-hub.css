@@ -200,3 +200,11 @@
   border: var(--border-width) solid var(--color-navy);
   border-radius: 999px;
 }
+
+/* 10 Nov 2026: in "Compare the classes" the bars grow one after another, a
+   little slower, so the two classes build up side by side. */
+.compare-panels .tally-bar,
+.compare-panels .tally-count {
+  transition-duration: 0.9s;
+  transition-delay: calc(var(--i, 0) * 120ms);
+}
