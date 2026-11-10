@@ -49,13 +49,11 @@ const BODY_FEATHERS = [[29.4, 86.9], [39.6, 97.1], [70.2, 97.1], [80.4, 86.9], [
 const BELLY_FEATHERS = (y) => `M41.3 ${y} q4.7 6 9.35 0 q4.7 6 9.35 0 q4.7 6 9.35 0 q4.7 6 9.35 0`;
 // One eye: the iris and pupil (in .pip-pupils, so they can look up) are drawn separately.
 const iris = (cx) => `<circle cx="${cx}" cy="58.9" r="10.2" fill="url(#ds-pip-iris)"/><circle class="pip-pupil" cx="${cx}" cy="58.9" r="4.6" fill="#1B1008"/><circle class="pip-shine" cx="${cx + 3.6}" cy="57" r="2.3" fill="#fff"/><circle cx="${cx - 3.4}" cy="63.1" r="1.4" fill="#fff"/>`;
-// Happy face (Habiba, 10 Nov 2026: wide eyes looked like a stare, then
-// eyelids and lines under the eyes looked sad, "like he wants to cry"; the
-// versions are compared in docs/design/screens/after/pip-eye-versions.png).
-// Soft light cheeks push up under each eye (a smiling eye shape, no dark
-// line), the pupils are a little smaller with one small sparkle, and a small
-// smile sits under the beak. The blink lids (.pip-lids) close over it all.
-const cheek = (cx) => `<path d="M${cx - 13.1} 66 Q${cx} 59 ${cx + 13.1} 66 A15.3 15.3 0 0 1 ${cx - 13.1} 66Z" fill="#E9C9A0"/><path d="M${cx - 11.1} 65 Q${cx} 58.5 ${cx + 11.1} 65" stroke="#C49660" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+// Happy face (Habiba, 10 Nov 2026). Tried and rejected: eyelids and lines
+// under the eyes ("like he wants to cry"), light cheeks under the eyes ("puffy
+// eyes"). Kept: clear eyes with slightly smaller pupils and one small sparkle,
+// thin relaxed eyebrows, rosy pink cheeks on the face and a small smile under
+// the beak. Versions compared in docs/design/screens/after/pip-eye-versions-*.png.
 
 const WING_LEFT = `<path d="M26 61.4 Q2.2 80.1 12.4 112.4 Q29.4 107.3 34.5 83.5Z" fill="#7C4E27" ${LINE}/><path d="M12.4 112.4 Q15.8 100.5 20.9 93.7 M19.2 110.7 Q22.6 98.8 26.9 92" ${SOFT}/>`;
 const WING_RIGHT = `<path d="M94 61.4 Q117.8 80.1 107.6 112.4 Q90.6 107.3 85.5 83.5Z" fill="#7C4E27" ${LINE}/><path d="M107.6 112.4 Q104.2 100.5 99.1 93.7 M100.8 110.7 Q97.4 98.8 93.1 92" ${SOFT}/>`;
@@ -81,14 +79,13 @@ export function pipSVG(label = '', outfit = currentOutfit()) {
     <circle class="pip-eye" cx="43" cy="58" r="15.3" fill="#FFFBEF" ${LINE}/>
     <circle class="pip-eye" cx="77" cy="58" r="15.3" fill="#FFFBEF" ${LINE}/>
     <g class="pip-pupils">${iris(43)}${iris(77)}</g>
-    <g class="pip-cheeks">${cheek(43)}${cheek(77)}</g>
     <g class="pip-lids">
       <ellipse cx="43" cy="58" rx="16" ry="16" fill="#9A6A3A" ${LINE}/>
       <ellipse cx="77" cy="58" rx="16" ry="16" fill="#9A6A3A" ${LINE}/>
     </g>
     <path class="pip-brows" d="M31 44 Q43 38 54 42 M66 42 Q77 38 89 44" stroke="#4A2D14" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <circle class="pip-blush" cx="24.3" cy="73.3" r="5.1" fill="#FF9A8B" opacity=".6"/>
-    <circle class="pip-blush" cx="95.7" cy="73.3" r="5.1" fill="#FF9A8B" opacity=".6"/>
+    <circle class="pip-blush" cx="24.3" cy="76" r="7" fill="#FF8A7A" opacity=".55"/>
+    <circle class="pip-blush" cx="95.7" cy="76" r="7" fill="#FF8A7A" opacity=".55"/>
     ${layer(outfit, 'neck')}
     ${layer(outfit, 'face')}
     ${layer(outfit, 'head')}
