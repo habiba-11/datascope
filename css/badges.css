@@ -225,7 +225,7 @@
 .badge-modal .modal-pip .pip-wing-right {
   /* A fixed point (the wing may hold an item, Part 58a): the bottom of the wing. */
   transform-box: view-box;
-  transform-origin: 100px 101.6px;
+  transform-origin: 104px 110px; /* Part 59p: the new wing's tip */
   animation: bp-wave 0.5s ease-in-out 2.4s 3;
 }
 

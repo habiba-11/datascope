@@ -1,5 +1,5 @@
-// Part 59 (scenes): the shared SVG gradients for the room scenes and the
-// characters, written ONCE per page (a hidden <svg> at the top of <body>).
+// Part 59 (scenes): the shared SVG gradients for the room scenes, the
+// characters and Pip, written ONCE per page (a hidden <svg> at the top of <body>).
 // Every id starts with "ds-", so it never clashes with the icons' "~" ids.
 // No blur or noise filters: they are slow on school laptops (Part 59 rule 6).
 
@@ -7,7 +7,18 @@ const lin = (id, stops, x2 = 0, y2 = 1) => `<linearGradient id="ds-${id}" x1="0"
   stops.map(([at, colour, opacity]) => `<stop offset="${at}" stop-color="${colour}"${opacity === undefined ? '' : ` stop-opacity="${opacity}"`}/>`).join('')
 }</linearGradient>`;
 
+// A round gradient, lit from (cx, cy) (fractions of the shape's box).
+const rad = (id, stops, cx, cy, r) => `<radialGradient id="ds-${id}" cx="${cx}" cy="${cy}" r="${r}">${
+  stops.map(([at, colour]) => `<stop offset="${at}" stop-color="${colour}"/>`).join('')
+}</radialGradient>`;
+
 export const SCENE_DEFS = [
+  // Pip (js/pip.js, Part 59p): lit from the top left
+  rad('pip-body', [[0, '#C58A52'], [0.6, '#9A6A3A'], [1, '#6E4524']], 0.38, 0.3, 0.85),
+  rad('pip-belly', [[0, '#FFF3D6'], [1, '#EBC98C']], 0.4, 0.25, 0.9),
+  rad('pip-iris', [[0, '#E9A53A'], [1, '#7A4A12']], 0.4, 0.35, 0.7),
+  lin('pip-hat', [[0, '#FBD968'], [0.6, '#F0B52E'], [1, '#CF8A1B']], 1, 1),
+  lin('pip-beak', [[0, '#FFC15A'], [1, '#F08A12']], 1, 1),
   // light and shadow, laid over a shape to make it round
   lin('shine', [[0, '#fff', 0.55], [0.5, '#fff', 0]], 1, 1),
   lin('shade', [[0.4, '#17324D', 0], [1, '#17324D', 0.28]], 1, 1),

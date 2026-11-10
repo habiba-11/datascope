@@ -7,9 +7,9 @@
 // "neck" part (its golden clasp), drawn in the neck layer.
 // OUTFIT_VIEW[id] = the part of Pip's space the item card shows (its viewBox).
 //
-// The explorer hat and the magnifier are Pip's own hat and glass from before
-// (same classes, so the moods in css/base.css still move them): with the
-// default outfit, Pip looks exactly as before.
+// The explorer hat and the magnifier are Pip's own hat and glass (same
+// classes, so the moods in css/base.css still move them). Part 59p: the hat
+// was redrawn with Pip in the rooms mockup's look.
 
 const S = 'stroke="#17324D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
 const S2 = 'stroke="#17324D" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"';
@@ -41,7 +41,8 @@ const WING = `<g class="pip-flutter"><path d="M26 66 Q-22 34 -6 -8 Q24 12 32 52Z
 
 export const OUTFIT_ART = {
   // ---------- head ----------
-  explorer: { head: `<path class="pip-hat-top" d="M36 30 Q38 6 60 6 Q82 6 84 30 Z" ${S}/><path class="pip-hat-band" d="M37 24 L83 24 L84 30 L36 30 Z" ${S}/><path class="pip-hat-brim" d="M18 32 Q60 20 102 32 Q60 42 18 32 Z" ${S}/>` },
+  // Part 59p: the explorer hat of the rooms mockup (85% size, like Pip himself).
+  explorer: { head: `<path class="pip-hat-top" d="M36.2 34.2 Q37.9 7 60 7 Q82.1 7 83.8 34.2Z" fill="url(#ds-pip-hat)" stroke="#8A5A12" stroke-width="2"/><path class="pip-hat-band" d="M37.1 26.6 L82.9 26.6 L83.8 34.2 L36.2 34.2Z" fill="#B96F1E"/><circle cx="60" cy="30.4" r="3.7" fill="#FFE27A" stroke="#8A5A12" stroke-width="1.2"/><path d="M44.7 15.5 Q49.8 10.4 56.6 10.4" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".7"/><path class="pip-hat-brim" d="M15.8 35.9 Q60 20.6 104.2 35.9 Q60 47.8 15.8 35.9Z" fill="url(#ds-pip-hat)" stroke="#8A5A12" stroke-width="2"/><path d="M22.6 37.6 Q60 47.8 97.4 37.6" stroke="#8A5A12" stroke-width="1.7" fill="none" opacity=".45"/>` },
   detective: { head: `<path d="M18 33 Q60 22 102 33 Q60 41 18 33Z" fill="#A8742E" ${S}/><path d="M35 31 Q34 4 60 4 Q86 4 85 31Z" fill="#C99443" ${S}/><path d="M36 25 H84 L85 31 H35Z" fill="#6B3F1E"/><circle cx="60" cy="3.5" r="3.2" fill="#6B3F1E" ${S2}/><path d="M55 14 Q55 9.5 60 9.5 Q65 9.5 65 13.5 Q65 17 60 18.5 V20" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="60" cy="23.4" r="1.6" fill="#fff"/><path d="M42 12 Q46 8 52 7" stroke="#fff" stroke-opacity=".55" stroke-width="2.6" fill="none" stroke-linecap="round"/>` },
   party: { head: `<path d="M44 33 L60 -16 L76 33 Q60 40 44 33Z" fill="#FF7A6B" stroke="none"/>${band(6, 12, '#FFC531')}${band(20, 26, '#38B6FF')}<path d="M44 33 L60 -16 L76 33 Q60 40 44 33Z" fill="none" ${S}/><circle cx="60" cy="-16" r="5.5" fill="#FFC531" ${S}/><circle cx="55" cy="15" r="2" fill="#fff"/><circle cx="66" cy="14" r="2" fill="#fff"/><path d="M52 24 L57 4" stroke="#fff" stroke-opacity=".5" stroke-width="2.6" stroke-linecap="round"/>` },
   wizard: { head: `<ellipse cx="60" cy="32" rx="46" ry="8.5" fill="#6E5BD6" ${S}/><path d="M36 32 Q42 6 72 -22 Q76 8 86 32 Q60 38 36 32Z" fill="#A596FF" ${S}/><path d="M37 28 Q60 34 85 28 L86 31.5 Q60 38 36 32Z" fill="#FFC531"/>${star(58, 14, 5.5, '#FFE27A')}${star(70, -2, 4, '#FFE27A')}${star(50, 25, 3.2, '#FFE27A')}<path d="M44 20 Q50 6 60 -4" stroke="#fff" stroke-opacity=".5" stroke-width="2.6" fill="none" stroke-linecap="round"/>` },

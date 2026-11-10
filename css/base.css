@@ -388,31 +388,8 @@ h1 {
   overflow: visible;
 }
 
-/* Part 58a: outfit items (.pip-item) keep their own colours and outlines. */
-.pip path:not(.pip-item *),
-.pip ellipse:not(.pip-item *),
-.pip circle:not(.pip-item *),
-.pip line:not(.pip-item *) {
-  stroke: var(--color-navy);
-  stroke-width: 3;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-
-.pip-body,
-.pip-tuft,
-.pip-wing ellipse { fill: #9A6334; }
-.pip-belly { fill: #FCE3B0; }
-.pip-feather { fill: none; stroke-width: 2.5 !important; }
-.pip-eye { fill: white; }
-.pip-pupil { fill: var(--color-navy); stroke: none !important; }
-.pip-shine { fill: white; stroke: none !important; }
-.pip-blush { fill: var(--color-ask); stroke: none !important; opacity: 0.55; }
-.pip-beak,
-.pip-foot { fill: #F59E0B; }
-.pip-hat-top,
-.pip-hat-brim { fill: var(--color-plan); }
-.pip-hat-band { fill: var(--color-ask); }
+/* Part 59p: Pip's colours and outlines are written in his drawing (js/pip.js),
+   like the outfit items; only the magnifier's glass is coloured here. */
 .pip-glass circle { fill: #DFF3FF; }
 .pip-glass line { stroke-width: 5; }
 
@@ -431,14 +408,13 @@ h1 {
 .pip-wing-left { transform-origin: 80% 20%; }
 /* The right wing holds an item (Part 58a), which would change its own box, so it
    turns around a fixed point of Pip's drawing (the top of the wing, as before). */
-.pip-wing-right { transform-box: view-box; transform-origin: 94px 70.8px; }
+.pip-wing-right { transform-box: view-box; transform-origin: 91px 71px; } /* Part 59p: the new wing's shoulder */
 
 /* The rainbow wings (Pip's Wardrobe) flutter; reduced motion stops it (rule above). */
 .pip-flutter { transform-box: view-box; transform-origin: 26px 70px; animation: pip-flutter 1.4s ease-in-out infinite; }
 @keyframes pip-flutter { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-10deg); } }
 
 /* The eyelids (body colour) are folded away, and close for a blink now and then. */
-.pip-lids ellipse { fill: #9A6334; }
 .pip-lids { transform: scaleY(0); animation: pip-blink 5s infinite; }
 
 @keyframes pip-blink {
@@ -454,7 +430,7 @@ h1 {
   opacity: 0;
 }
 
-.pip-sparkles path { fill: var(--color-plan); stroke-width: 2 !important; }
+.pip-sparkles path { fill: var(--color-plan); }
 .pip-sparkles { opacity: 0; transform: scale(0.4); }
 
 /* Think: eyes look up, a "?" appears, the glass comes up to look closer. */
