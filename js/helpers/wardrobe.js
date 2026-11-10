@@ -83,3 +83,14 @@ export function newItems(availableIds, seenIds, items) {
   const seen = new Set(seenIds);
   return availableIds.filter((id) => !seen.has(id) && items.find((i) => i.id === id)?.unlock.type !== 'starter');
 }
+
+// What changed between two outfits, one entry per slot, for the log
+// ("outfit-changed" { slot, itemId }; itemId null = taken off).
+export function outfitChanges(before, after) {
+  return SLOT_NAMES
+    .filter((slot) => (before[slot] || null) !== (after[slot] || null))
+    .map((slot) => ({ slot, itemId: after[slot] || null }));
+}
+
+// The tabs on the Wardrobe screen, in Habiba's order (not the drawing order).
+export const TABS = ['head', 'face', 'neck', 'back', 'held'].map((slot) => SLOTS.find((s) => s.slot === slot));

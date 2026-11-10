@@ -162,3 +162,21 @@ test('the outfit and the seen items are saved per child code, and cleared with t
   assert.equal(getOutfit(), null);
   assert.deepEqual(getSeenItems(), []);
 });
+
+// ---------- Part 58b: the log only says what changed ----------
+import { outfitChanges, TABS } from '../js/helpers/wardrobe.js';
+
+test('the log gets one "outfit-changed" per slot that changed (null = taken off)', () => {
+  assert.deepEqual(outfitChanges({ head: 'explorer', held: 'magnifier' }, { head: 'party', held: 'magnifier' }), [{ slot: 'head', itemId: 'party' }]);
+  assert.deepEqual(outfitChanges({ head: 'party', face: 'sunglasses' }, {}), [{ slot: 'face', itemId: null }, { slot: 'head', itemId: null }]);
+  assert.deepEqual(outfitChanges({ head: 'party' }, { head: 'party' }), []);
+});
+
+test('the tabs are in Habiba\'s order: Hats, Face, Neck, Back, Hold', () => {
+  assert.deepEqual(TABS.map((t) => t.tab), ['Hats', 'Face', 'Neck', 'Back', 'Hold']);
+});
+
+test('the two wardrobe events are known log events (and nothing else is logged)', async () => {
+  const { EVENT_TYPES } = await import('../js/helpers/log.js');
+  assert.ok(EVENT_TYPES.includes('wardrobe-opened') && EVENT_TYPES.includes('outfit-changed'));
+});

@@ -34,6 +34,8 @@ export const EVENT_TYPES = [
   'bonus-choice', // Part 46: the child tried the bonus or skipped it (scenarioId, taken: true or false)
   'reallife-sorted', // 8 Nov 2026: Number Lab real life, the child tapped "Put them in order" before finding the centre (scenarioId)
   'tray-intro-seen', // Part 47b: Pip pointed at a helper (phase, helper: hint, recap or findings; auto: first time, or asked again)
+  'wardrobe-opened', // Part 58b: Pip's Wardrobe was opened (room 'wardrobe'; just for fun, NOT reasoning data)
+  'outfit-changed', // Part 58b: one slot of Pip's outfit changed (slot, itemId; null = taken off; NOT reasoning data)
 ];
 
 export const TASK_RESULTS = ['correct', 'after-hint', 'incorrect'];

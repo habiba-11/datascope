@@ -1,0 +1,378 @@
+/* Pip's Wardrobe (Part 58b, 10 Nov 2026), js/wardrobe.js.
+   Copied from Habiba's approved design (docs/design/pip-wardrobe-ui.html):
+   Pip on a stage at the left, the tabs and item cards in a white panel at the
+   right. Reduced motion: the global rule in base.css stops every animation. */
+
+.wardrobe {
+  width: min(980px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  overflow: auto;
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: var(--radius-card);
+  background: var(--color-collect-light);
+  color: var(--color-text);
+  box-shadow: var(--shadow-card);
+}
+
+.wardrobe::backdrop { background: rgba(23, 50, 77, 0.45); }
+
+/* ---------- top line: title, how many found, Done ---------- */
+.wd-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 12px 20px;
+}
+
+.wd-head h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 30px;
+}
+
+.wd-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 6px 14px;
+  border: 3px solid var(--color-navy);
+  border-radius: 999px;
+  background: var(--color-plan-light);
+  font-weight: 800;
+}
+
+/* ---------- body: stage + panel ---------- */
+.wd-body {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: var(--space-3);
+  padding: 0 20px 20px;
+}
+
+.wd-stage {
+  position: relative;
+  min-height: 470px;
+  border-radius: 22px;
+  overflow: hidden;
+  /* soft hills at the bottom, like the rest of the app */
+  background:
+    radial-gradient(120% 60% at 30% 100%, var(--color-hill-front) 0 45%, transparent 46%),
+    radial-gradient(120% 60% at 80% 100%, var(--color-hill-back) 0 50%, transparent 51%),
+    #D3EEFF;
+}
+
+.wd-bubble {
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  transform: translateX(-50%);
+  width: min(330px, calc(100% - 32px));
+  min-height: 64px;
+  margin: 0;
+  padding: 12px 16px;
+  border: 4px solid var(--color-navy);
+  border-radius: 22px;
+  background: white;
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  z-index: 2;
+}
+
+/* the bubble's tail, pointing down at Pip */
+.wd-bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -20px;
+  margin-left: -10px;
+  border: 10px solid transparent;
+  border-top: 16px solid var(--color-navy);
+}
+
+.wd-pop { animation: wd-pop 0.35s var(--ease-out) both; }
+
+@keyframes wd-pop {
+  from { opacity: 0; transform: translateX(-50%) scale(0.85) translateY(8px); }
+  to { opacity: 1; transform: translateX(-50%); }
+}
+
+.wd-pip {
+  position: absolute;
+  left: 50%;
+  top: 118px;
+  width: 210px;
+  margin-left: -105px;
+  z-index: 1;
+}
+
+.wd-pip .pip { overflow: visible; }
+
+/* Pip stands on a round, soft yellow platform. */
+.wd-platform {
+  position: absolute;
+  left: 50%;
+  top: 340px;
+  width: 260px;
+  height: 34px;
+  margin-left: -130px;
+  border: 4px solid var(--color-navy);
+  border-radius: 50%;
+  background: var(--color-plan-light);
+  box-shadow: 0 6px 0 rgba(23, 50, 77, 0.18);
+}
+
+.wd-hop { animation: wd-hop 0.7s cubic-bezier(0.3, 0.7, 0.4, 1); }
+
+@keyframes wd-hop {
+  0% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(8px) scale(1.06, 0.92); }
+  55% { transform: translateY(-30px) scale(0.96, 1.06); }
+  80% { transform: translateY(0) scale(1.04, 0.96); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.wd-spark {
+  position: absolute;
+  left: 50%;
+  top: 230px;
+  pointer-events: none;
+  z-index: 3;
+  animation: wd-spark 0.8s ease-out both;
+}
+
+@keyframes wd-spark {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.3); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(1); }
+}
+
+.wd-actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  z-index: 2;
+}
+
+/* ---------- the panel: tabs, cards, note ---------- */
+.wd-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  border: 4px solid var(--color-navy);
+  border-radius: 26px;
+  background: white;
+  box-shadow: 0 6px 0 var(--color-navy);
+}
+
+.wd-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.wd-tab {
+  position: relative;
+  flex: 1;
+  min-height: 48px;
+  border: 3px solid var(--color-navy);
+  border-radius: 14px;
+  background: var(--color-collect-light);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* The tab you are on: yellow, raised, AND underlined (never colour alone). */
+.wd-tab[aria-selected="true"] {
+  background: var(--color-plan);
+  box-shadow: 0 3px 0 var(--color-navy);
+  text-decoration: underline 3px;
+  text-underline-offset: 4px;
+}
+
+.wd-dot {
+  position: absolute;
+  top: -10px;
+  right: -6px;
+  padding: 0 6px;
+  border: 2px solid var(--color-navy);
+  border-radius: 999px;
+  background: var(--color-ask);
+  color: white;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.wd-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+  align-content: start;
+  flex: 1;
+}
+
+.wd-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  height: 132px;
+  padding: 6px 6px 8px;
+  border: 3px solid var(--color-navy);
+  border-radius: 18px;
+  background: #F4FAFF;
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+  transition: transform var(--duration-fast);
+}
+
+.wd-card:active { transform: translateY(2px); }
+
+.wd-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 76px;
+}
+
+.wd-preview svg { width: 100%; height: 100%; overflow: visible; }
+
+.wd-name {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+}
+
+/* Wearing: a green frame AND a tick. */
+.wd-card[aria-pressed="true"] {
+  border-color: var(--color-btn-main-bg);
+  background: var(--color-explore-light);
+  box-shadow: 0 0 0 3px var(--color-explore);
+}
+
+.wd-tick {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--color-navy);
+  border-radius: 50%;
+  background: var(--color-btn-main-bg);
+}
+
+.wd-tick svg { width: 18px; height: 18px; }
+
+.wd-new {
+  position: absolute;
+  top: -10px;
+  left: -6px;
+  padding: 1px 7px;
+  border: 3px solid var(--color-navy);
+  border-radius: 10px;
+  background: var(--color-ask);
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+  transform: rotate(-6deg);
+  animation: wd-new 1.6s ease-in-out infinite;
+}
+
+@keyframes wd-new {
+  0%, 100% { transform: rotate(-6deg) scale(1); }
+  50% { transform: rotate(-6deg) scale(1.1); }
+}
+
+/* Locked: a dashed grey card, a soft silhouette, a lock AND the words in the label. */
+.wd-card.locked {
+  border-style: dashed;
+  border-color: var(--color-locked);
+  background: var(--color-locked-light);
+}
+
+.wd-card.locked .wd-preview svg { filter: brightness(0) opacity(0.25); }
+.wd-card.locked .wd-name { color: var(--color-muted-text); }
+
+.wd-lock {
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  margin-left: -17px;
+  display: flex;
+  padding: 2px;
+  border: 3px solid var(--color-locked);
+  border-radius: 50%;
+  background: white;
+}
+
+.wd-shake { animation: wd-shake 0.45s; }
+
+@keyframes wd-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+.wd-note {
+  margin: 10px 0 0;
+  color: var(--color-muted-text);
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ---------- smaller windows: the stage above the panel ---------- */
+@media (max-width: 860px) {
+  .wd-body { grid-template-columns: 1fr; }
+  .wd-count { display: none; }
+  .wd-done { margin-left: auto; } /* Done stays at the right */
+}
+
+/* ---------- the "Dress Pip" buttons and the badge pop-up line ---------- */
+.shelf-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.bp-wardrobe {
+  order: 5; /* under the "why" line, above the button (css/badges.css orders the parts) */
+  animation: bp-rise 0.4s var(--ease-out) 1.7s both;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 8px 0 0;
+  font-weight: 800;
+}
+
+.bp-wardrobe svg { width: 48px; height: 48px; overflow: visible; }

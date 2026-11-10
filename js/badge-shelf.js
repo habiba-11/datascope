@@ -8,6 +8,8 @@ import { getExplorerCode } from './storage/save.js';
 import { flipIn } from './motion.js';
 import { patchSVG } from './badge-art.js';
 import { iconHTML } from './icon-text.js';
+import { openWardrobe } from './wardrobe.js';
+import { FEATURES } from './config.js';
 
 // Called once by setupCelebrations(), after the backpack button exists.
 export function setupBadgeShelf() {
@@ -22,6 +24,11 @@ export function setupBadgeShelf() {
     dialog.innerHTML = shelfHTML(backpack(readLog(), getExplorerCode()));
     const closeBtn = dialog.querySelector('.shelf-close');
     closeBtn.addEventListener('click', () => dialog.close());
+    // Part 58b: "Dress Pip" closes the backpack and opens Pip's Wardrobe.
+    dialog.querySelector('.shelf-dress')?.addEventListener('click', () => {
+      dialog.close();
+      openWardrobe();
+    });
     dialog.showModal();
     // Start at the top of the shelf, even though focus is on Close at the bottom.
     closeBtn.focus({ preventScroll: true });
@@ -70,7 +77,10 @@ function shelfHTML(patches) {
       </span>
       <p>Badges are for good thinking, not for being fast.</p>
       <ul class="shelf-grid">${slots}</ul>
-      <button class="btn btn-main shelf-close" type="button">Close</button>
+      <div class="shelf-actions">
+        ${FEATURES.wardrobe ? `<button class="btn shelf-dress" type="button">${iconHTML('owl')} Dress Pip</button>` : ''}
+        <button class="btn btn-main shelf-close" type="button">Close</button>
+      </div>
     </div>
   `;
 }

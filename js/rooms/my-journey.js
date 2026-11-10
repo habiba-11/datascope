@@ -24,6 +24,8 @@ import { taskCardHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
 import { setIconLine } from '../icon-text.js';
 import { illustration } from '../illustrations.js';
+import { openWardrobe } from '../wardrobe.js';
+import { FEATURES } from '../config.js';
 
 const MAX_STARS = STOPS.length * 3;
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -76,6 +78,13 @@ function celebrationNode(journey, code) {
     el('span', `:key: ${code || 'No code yet'}`, 'j-pill'),
     el('span', `:star: ${journey.totalStars} of ${MAX_STARS}`, 'j-pill'),
   );
+  // Part 58b: Pip's Wardrobe opens from here too (never from inside a task).
+  if (FEATURES.wardrobe) {
+    const dress = el('button', ':owl: Dress Pip', 'btn j-dress');
+    dress.type = 'button';
+    dress.addEventListener('click', () => openWardrobe());
+    line.append(dress);
+  }
   return line;
 }
 

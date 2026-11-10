@@ -14,6 +14,8 @@ import { BACKPACK_SVG } from './icons.js';
 import { currentPhase } from './phase-progress.js';
 import { pipSay } from './pip.js';
 import { setIconText } from './icon-text.js';
+import { loadWardrobeItems } from './wardrobe.js';
+import { FEATURES } from './config.js';
 
 // How many patches the child has (the backpack counter and the level use this).
 export function countBadges() {
@@ -36,6 +38,9 @@ export function setupCelebrations() {
   const code = getExplorerCode();
   setupSoundToggle();
   setupBadgeShelf();
+  // Part 58b: load Pip's Wardrobe items now, so a badge pop-up can say which
+  // new thing it opened for Pip (it is built at once and cannot wait).
+  if (FEATURES.wardrobe) loadWardrobeItems().catch(() => {});
   if (!code) return;
 
   // An older log may already have earned patches (from before Part 21b).

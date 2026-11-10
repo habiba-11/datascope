@@ -99,3 +99,14 @@ export function pipSay(text, icon = '') {
     else setIconLine(el, text, true); // our texts may name icons as :name:
   });
 }
+
+// Part 58b: after the Wardrobe closes, every Pip on the page wears the new
+// outfit at once (same place, same mood). The Wardrobe's own Pip is left alone.
+export function dressAllPips(outfit = currentOutfit()) {
+  const fresh = document.createElement('template');
+  fresh.innerHTML = pipSVG('', outfit).trim();
+  const inside = fresh.content.firstElementChild.innerHTML;
+  document.querySelectorAll('svg.pip').forEach((svg) => {
+    if (!svg.closest('.wardrobe')) svg.innerHTML = inside;
+  });
+}

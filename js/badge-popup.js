@@ -5,6 +5,7 @@
 import { openModal, pauseNextModal } from './modal.js';
 import { patchSVG, MYSTERY_SVG } from './badge-art.js';
 import { cheer } from './icon-text.js';
+import { itemForBadge, itemPicture } from './wardrobe.js';
 import { playSound } from './sounds.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -58,6 +59,16 @@ export function showBadgePopup(badge, onLanded) {
     body.append(tag);
   }
   body.append(why);
+  // Part 58b: a badge that opens something in Pip's Wardrobe says so here,
+  // once, inside this pop-up (no extra pop-up, never on top of a feedback card).
+  const item = itemForBadge(badge.id);
+  if (item) {
+    const line = document.createElement('p');
+    line.className = 'bp-wardrobe';
+    line.innerHTML = itemPicture(item); // our own drawing
+    line.append(` New for Pip: the ${item.name}! Try it on in your backpack.`);
+    body.append(line);
+  }
 
   let chime = null; // the stamp's chime, cancelled if the pop-up closes first
   const done = openModal({
