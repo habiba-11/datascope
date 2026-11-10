@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="is-loading">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="css/story.css">
   <link rel="stylesheet" href="css/welcome.css">
   <link rel="stylesheet" href="css/wardrobe.css">
+  <!-- Part 60b: if js/welcome.js ever fails, the hidden page still shows after 1.5 s. -->
+  <script>setTimeout(function () { document.documentElement.classList.remove('is-loading'); }, 1500);</script>
 </head>
 <body>
   <header class="welcome-top">

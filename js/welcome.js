@@ -9,7 +9,7 @@ import { LOGO_SVG } from './icons.js';
 import { openStory } from './story.js';
 import { mountSky } from './ambient.js';
 import { mountScene } from './scenes/index.js';
-import { fillIcons, setIconText, iconHTML } from './icon-text.js';
+import { fillIcons, setIconText } from './icon-text.js';
 import { openModal } from './modal.js';
 import { openWardrobe } from './wardrobe.js';
 import { FEATURES } from './config.js';
@@ -102,13 +102,18 @@ form.addEventListener('submit', async (event) => {
 if (FEATURES.wardrobe) {
   const dress = document.createElement('button');
   dress.type = 'button';
-  dress.className = 'btn pip-dress-btn';
-  dress.innerHTML = `${iconHTML('owl')} Dress Pip`; // our own icon and words
+  dress.className = 'btn pip-dress-btn pip-dress-btn--big';
+  dress.textContent = 'Dress Pip'; // Part 60b (Habiba): bigger, words only
   dress.addEventListener('click', () => {
     if (takeCode('Type your explorer code first, so Pip can remember his outfit!')) openWardrobe();
   });
   document.getElementById('dress-slot').append(dress);
 }
+
+// Part 60b (Habiba: "after Exit the background comes late, it feels glitchy"):
+// the page stayed hidden over a sky colour (css/welcome.css) until now. Pip,
+// the yard, the logo and the button are drawn, so everything shows at once.
+document.documentElement.classList.remove('is-loading');
 
 // The one-time pop-up: Pip dressed up, three short lines, two buttons.
 function introduceWardrobe() {

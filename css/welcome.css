@@ -37,6 +37,24 @@
 }
 
 /* ---------- left: big Pip, the main character, "Dress Pip" under him ---------- */
+/* Part 60b: until js/welcome.js has drawn Pip, the yard and the logo, the
+   window shows only the yard's sky and grass, so nothing pops in piece by piece.
+   If that script ever fails, a timer in index.html shows the page after 1.5 s. */
+html.is-loading {
+  background: linear-gradient(#5DB8F2 0%, #A9DCFA 45%, #E4F5FF 58%, #7CCB7A 58%, #4FA85A 100%) fixed;
+}
+
+html.is-loading body {
+  visibility: hidden;
+}
+
+/* Part 60b (Habiba): "Dress Pip" on the start page is big and has no icon. */
+.pip-dress-btn.pip-dress-btn--big {
+  min-height: 60px;
+  padding: 10px 32px;
+  font-size: 22px;
+}
+
 .mascot-col {
   display: flex;
   flex-direction: column;
