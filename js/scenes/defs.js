@@ -34,6 +34,9 @@ export const SCENE_DEFS = [
   // the warm study (Question Studio): a warm wall and a cork pinboard
   lin('wall-warm', [[0, '#FFE9C2'], [1, '#F6CF92']]),
   '<pattern id="ds-cork" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#D9A767"/><circle cx="4" cy="5" r="1.6" fill="#B98543"/><circle cx="12" cy="11" r="1.4" fill="#C0914E"/><circle cx="10" cy="3" r="1" fill="#E4B982"/></pattern>',
+  // the science lab (Graph Lab): mint walls and a mint floor
+  lin('wall-mint', [[0, '#D8F5EE'], [1, '#B2E6DB']]),
+  lin('floor-mint', [[0, '#9ED8C8'], [1, '#C7EEDF']]),
   // the maths workshop (Number Lab)
   lin('wall-blue', [[0, '#D6E9FF'], [1, '#B7D6F5']]),
   lin('panel', [[0, '#E3A765'], [1, '#C98B50']]),
