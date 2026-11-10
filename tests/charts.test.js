@@ -244,14 +244,20 @@ test("the toolbar counter counts the graphs tried, and cheers at all 4", () => {
 // ---------- 10 Nov 2026: each graph comes in its own way ----------
 import { chartEntrance, ENTRANCE_STEP_MS } from '../js/helpers/charts.js';
 
-test('graphs come in with movement: bars one after another, a spinning pie, falling dots, a rising line', () => {
+test('graphs come in with movement: bars one after another, a popping pie, falling dots, a rising line', () => {
   const at = (opts, dataIndex) => opts.animation.delay({ type: 'data', mode: 'default', dataIndex });
   const bar = chartEntrance('bar');
   assert.equal(at(bar, 0), 0);
   assert.equal(at(bar, 3), 3 * ENTRANCE_STEP_MS.bar); // the 4th bar starts last
   assert.equal(bar.animation.delay({ type: 'chart', mode: 'default' }), 0); // the axes do not wait
   const pie = chartEntrance('pie');
-  assert.ok(pie.animation.animateRotate && pie.animation.animateScale);
+  // 10 Nov 2026 (Habiba): no slow spin; it pops open from the middle, quickly.
+  assert.ok(pie.animation.animateScale && !pie.animation.animateRotate);
+  assert.ok(pie.animation.duration <= 800);
+  // The first graph waits until the room is on screen: every bar starts later.
+  const first = chartEntrance('bar', 700);
+  assert.equal(at(first, 0), 700);
+  assert.equal(at(first, 2), 700 + 2 * ENTRANCE_STEP_MS.bar);
   const dot = chartEntrance('dot');
   assert.equal(dot.animation.easing, 'easeOutBounce');
   assert.equal(dot.animations.y.from({ chart: { chartArea: { top: 50 } } }), 20); // just above the chart

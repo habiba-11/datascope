@@ -121,6 +121,9 @@ async function init() {
   });
 
   let charts = [];
+  // The first graph waits until the room has faded in (10 Nov 2026).
+  let firstDraw = true;
+  const ROOM_SETTLE_MS = 700;
   let currentType = 'bar';
   const typesTried = new Set(); // for the feedback card: "You tried 3 kinds of graph"
   const chartRow = document.getElementById('chart-row');
@@ -241,31 +244,41 @@ async function init() {
       // so we switch its animation off then.
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (reduceMotion) config.options.animation = false;
-      else Object.assign(config.options, chartEntrance(type));
+      else Object.assign(config.options, chartEntrance(type, firstDraw ? ROOM_SETTLE_MS : 0));
       return new Chart(canvas, config);
     });
+    firstDraw = false;
     showTapHint();
     replayAfterPopups(charts);
   }
 
-  // A graph drawn behind a pop-up (the room's intro, a badge) would finish its
-  // entrance unseen (Habiba, 10 Nov 2026: "the bar and pie are not moving").
-  // So once every pop-up is closed, it comes in again. Nothing with reduced motion.
+  // A graph drawn behind a pop-up would finish its entrance unseen (Habiba,
+  // 10 Nov 2026: "the bar and pie are not moving"). A pop-up may already be
+  // open (the room's intro) or open just after (a badge for trying a new
+  // graph). So for 2.5 s we watch: once a pop-up has opened AND every pop-up
+  // is closed again, the graph comes in again. Nothing with reduced motion.
+  const POPUP_WATCH_MS = 2500;
   function replayAfterPopups(drawn) {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if (!document.querySelector('dialog[open]')) return;
+    const started = Date.now();
+    let sawPopup = false;
     const check = () => {
       if (drawn !== charts) return; // another graph was picked meanwhile
       if (document.querySelector('dialog[open]')) {
+        sawPopup = true;
         setTimeout(check, 200);
         return;
       }
-      drawn.forEach((chart) => {
-        chart.reset();
-        chart.update();
-      });
+      if (sawPopup) {
+        drawn.forEach((chart) => {
+          chart.reset();
+          chart.update();
+        });
+        return;
+      }
+      if (Date.now() - started < POPUP_WATCH_MS) setTimeout(check, 200);
     };
-    setTimeout(check, 200);
+    check();
   }
 
   let firstChart = true;

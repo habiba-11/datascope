@@ -317,11 +317,16 @@ function makePieConfig(labels, data, recipe) {
 // moving": they were too quick to notice next to the bouncing dots).
 export const ENTRANCE_STEP_MS = { bar: 170, line: 150, dot: 70 };
 
-export function chartEntrance(type) {
+// `startMs`: wait before starting (the first graph waits until the room is on
+// screen, 10 Nov 2026: Habiba saw no bars growing; they grew while the room
+// was still fading in).
+export function chartEntrance(type, startMs = 0) {
   // Each bar / point / dot starts a little after the one before it.
-  const oneByOne = (ms) => (ctx) => (ctx.type === 'data' && ctx.mode === 'default' ? ctx.dataIndex * ms : 0);
+  const oneByOne = (ms) => (ctx) => (ctx.type === 'data' && ctx.mode === 'default' ? startMs + ctx.dataIndex * ms : 0);
   if (type === 'pie') {
-    return { animation: { animateRotate: true, animateScale: true, duration: 1600, easing: 'easeInOutCubic' } };
+    // Habiba (10 Nov 2026) did not like the slow spin: the pie pops open from
+    // the middle with a small bounce, quickly.
+    return { animation: { animateRotate: false, animateScale: true, duration: 700, easing: 'easeOutBack', delay: oneByOne(0) } };
   }
   if (type === 'dot') {
     return {
@@ -338,7 +343,8 @@ export function chartEntrance(type) {
     };
   }
   // Bars: each grows up from the bottom and springs a little at the top.
-  return { animation: { duration: 1000, easing: 'easeOutElastic', delay: oneByOne(ENTRANCE_STEP_MS.bar) } };
+  // easeOutBack: a small overshoot (elastic shot the tallest bar above the chart).
+  return { animation: { duration: 1000, easing: 'easeOutBack', delay: oneByOne(ENTRANCE_STEP_MS.bar) } };
 }
 
 // `recipe` gives the words: chartAxis (the axis title) and valueLabel ("Size {value}").
