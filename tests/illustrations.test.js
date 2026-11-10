@@ -93,3 +93,38 @@ test(':name: anywhere in our texts becomes an icon; anything else stays text', (
   assert.match(iconLineHTML(':star: Bonus'), /^<span class="ds-icon"><svg [\s\S]*<\/svg><\/span> Bonus$/);
   assert.equal(withoutIcons(':crystal-ball: Predict! :star:'), 'Predict!');
 });
+
+// ---------- Part 52e (10 Nov 2026): motion, kept calm ----------
+import { ILLUSTRATION_CSS } from '../js/illustrations.js';
+import { pickMoving, MAX_MOVING } from '../js/icon-text.js';
+
+test('at most 12 icons move at once; icons in a pop-up come first', () => {
+  assert.equal(MAX_MOVING, 12);
+  const page = Array.from({ length: 15 }, (_, i) => ({ id: i, inPopUp: false }));
+  const popUp = [{ id: 'a', inPopUp: true }, { id: 'b', inPopUp: true }];
+  const moving = pickMoving([...page, ...popUp]);
+  assert.equal(moving.size, 12);
+  assert.ok(moving.has(popUp[0]) && moving.has(popUp[1]), 'the pop-up icons move');
+  assert.ok(!moving.has(page[10]), 'the 11th page icon is calm');
+  assert.equal(pickMoving(page.slice(0, 5)).size, 5, 'fewer than 12: all move');
+});
+
+test('room headers, Pip and hints may move; icons next to words stay still', () => {
+  assert.match(iconLineHTML(':star: Bonus', true), /class="ds-illo"/);
+  assert.match(iconLineHTML(':star: Bonus'), /class="ds-illo still"/);
+});
+
+test('reduced motion, a hidden tab and the 12-icon limit all stop the motion', () => {
+  assert.match(ILLUSTRATION_CSS, /@media \(prefers-reduced-motion: reduce\)\{\.ds-illo \*\{animation:none!important\}\}/);
+  assert.match(ILLUSTRATION_CSS, /\.ds-paused \.ds-illo \*\{animation-play-state:paused!important\}/);
+  assert.match(ILLUSTRATION_CSS, /\.ds-illo\.ds-calm \*\{animation:none!important\}/);
+});
+
+test('no fading or flashing faster than 3 times a second (one fade per cycle, so a cycle is at least 0.34 s)', () => {
+  const fading = new Set([...ILLUSTRATION_CSS.matchAll(/@keyframes ([\w-]+)\{((?:[^{}]|\{[^}]*\})*)\}/g)]
+    .filter(([, , body]) => /opacity/.test(body)).map(([, name]) => name));
+  assert.ok(fading.size >= 3, 'the check finds the fading animations');
+  for (const [, name, seconds] of ILLUSTRATION_CSS.matchAll(/animation:([\w-]+) ([\d.]+)s/g)) {
+    if (fading.has(name)) assert.ok(Number(seconds) >= 0.34, `${name} fades every ${seconds} s`);
+  }
+});

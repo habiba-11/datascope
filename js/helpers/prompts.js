@@ -37,7 +37,7 @@ export function createHint(key, room, hints) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'btn hint-btn';
-  setIconText(button, 'bulb', 'Need a hint?');
+  setIconText(button, 'bulb', 'Need a hint?', true); // a hint: may move (Part 52e)
 
   const list = document.createElement('ul');
   list.className = 'hint-list';
@@ -50,13 +50,13 @@ export function createHint(key, room, hints) {
     shown += 1;
 
     const item = document.createElement('li');
-    setIconText(item, 'owl', hint.text || hint);
+    setIconText(item, 'owl', hint.text || hint, true); // Pip gives a hint: may move (Part 52e)
     if (hint.answer) item.append(answerChip(key, room, hint));
     list.append(item);
     logEvent(room, 'hint', { prompt: key, hintNumber: shown });
 
     const more = shown < hints.length;
-    if (more) setIconText(button, 'bulb', 'Another hint');
+    if (more) setIconText(button, 'bulb', 'Another hint', true);
     else button.textContent = 'No more hints. You can do it!';
     button.disabled = !more;
   });
@@ -80,7 +80,7 @@ export function createAnswerHint(key, room, suggestions, box, { line = '' } = {}
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'btn hint-btn';
-  setIconText(button, 'bulb', 'Need a hint?');
+  setIconText(button, 'bulb', 'Need a hint?', true); // a hint: may move (Part 52e)
 
   const list = document.createElement('ul');
   list.className = 'hint-list suggestion-list';

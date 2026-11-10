@@ -29,7 +29,7 @@ const ABOUT_TAB_HTML = `
 export function taskCardHTML({ title, pill = '', tabsHTML = '', bodyHTML }) {
   const strip = tabsHTML
     ? `<div class="task-card-tabs">${tabsHTML}</div>`
-    : `<p class="task-card-title">${iconLineHTML(title)}</p>${pill ? `<span class="task-card-pill">${iconLineHTML(pill)}</span>` : ''}`;
+    : `<p class="task-card-title">${iconLineHTML(title, true)}</p>${pill ? `<span class="task-card-pill">${iconLineHTML(pill)}</span>` : ''}`;
   return `
     <section class="task-card m-rise">
       <header class="task-card-strip">${strip}</header>
@@ -53,7 +53,7 @@ export function pipLineHTML(text, question = '') {
       <span class="pip-mascot pip-mascot--line">${pipSVG()}</span>
       <div class="pip-line-words">
         ${question ? `<h1 class="task-question">${iconLineHTML(question)}</h1>` : ''}
-        <p class="pip-line-text" data-pip-text aria-live="polite">${iconLineHTML(text)}</p>
+        <p class="pip-line-text" data-pip-text aria-live="polite">${iconLineHTML(text, true)}</p>
       </div>
     </div>`;
 }

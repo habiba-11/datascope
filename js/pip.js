@@ -71,7 +71,8 @@ export function pipMoodFor(mood, ms = 1400) {
 // `icon` (Part 54b): the name of an illustration shown before the words.
 export function pipSay(text, icon = '') {
   document.querySelectorAll('[data-pip-text]').forEach((el) => {
-    if (icon) setIconText(el, icon, text);
-    else setIconLine(el, text); // our texts may name icons as :name:
+    // Part 52e: a Pip moment, so the icon may move.
+    if (icon) setIconText(el, icon, text, true);
+    else setIconLine(el, text, true); // our texts may name icons as :name:
   });
 }

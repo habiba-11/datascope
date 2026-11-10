@@ -85,7 +85,7 @@ function sayInBubble(text, move, { help = null, ms = SAY_MS } = {}) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'btn btn-quiet pip-help-btn';
-    setIconText(button, 'bulb', 'Yes, help me!');
+    setIconText(button, 'bulb', 'Yes, help me!', true); // a hint: may move (Part 52e)
     button.addEventListener('click', () => {
       bubble.hidden = true;
       help();
@@ -107,7 +107,7 @@ function sayInCard(text, move) {
   if (!line) return;
   // The instruction's own parts (words and maybe an icon) come back after.
   const instruction = [...line.childNodes];
-  setIconText(line, 'owl', text);
+  setIconText(line, 'owl', text, true); // a Pip moment: may move (Part 52e)
   const said = line.textContent;
   setTimeout(() => { if (line.textContent === said) line.replaceChildren(...instruction); }, SAY_MS);
 }

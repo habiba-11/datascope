@@ -9,7 +9,7 @@ import { STEP_OF_PHASE, PHASES } from './helpers/progress.js';
 import { SOURCE_CHIPS } from './helpers/feedback.js';
 import { playSound, playStars } from './sounds.js';
 import { pipReacts } from './motion.js';
-import { setIconLine, setIconText } from './icon-text.js';
+import { cheer, setIconLine, setIconText } from './icon-text.js';
 
 const PHASE_NAMES = {
   ask: 'Ask', plan: 'Plan', collect: 'Collect', graph: 'Graph Lab',
@@ -147,7 +147,8 @@ export function showFeedbackCard(phase, card) {
   } else {
     const done = at(el('div', '', 'ps-box ps-done-all'), 3200);
     const doneTitle = el('h3');
-    setIconText(doneTitle, 'party', 'Your whole journey is done!');
+    setIconText(doneTitle, 'party', 'Your whole journey is done!', true);
+    cheer(doneTitle, 3400); // the finale: a happy jump when the box appears (Part 52e)
     done.append(doneTitle, el('p', 'You asked, planned, collected, explored and concluded.'));
     body.append(done);
   }

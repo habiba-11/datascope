@@ -103,7 +103,7 @@ async function fillAboutPanel(panel, phase) {
   if (!intro) return;
   // Part 54b: the room's icon (phases.json "icon" is an illustration name).
   const title = el('p', '', 'about-title');
-  setIconText(title, intro.icon, intro.title);
+  setIconText(title, intro.icon, intro.title, true); // the room's header icon may move (Part 52e)
   const done = el('p', '', 'about-done');
   done.append(iconNode('check'), document.createTextNode(` You are done when: ${intro.doneWhen}`));
   panel.replaceChildren(title, ...introNodes(phase, intro), done);

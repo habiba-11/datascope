@@ -112,14 +112,23 @@ bugs" rule:** deliberate changes based on the pilot children's feedback.
 - **Thesis data:** every answer logs `answerSource` (own / hint / hint-edited);
   only own and hint-edited answers count as evidence of reasoning.
 - **Look ("Explorer's Toolkit"):** sky-blue background, navy outlines, a colour per
-- **Icons (Part 54, 8-10 Nov 2026):** no keyboard emoji anywhere: our own illustrations
-  (`js/illustrations.js`, contact sheet `docs/design/illustration-sheet.html`). A new icon
-  follows the same style (64x64, navy 3 px outline, palette fills, one highlight, no ids,
-  no gradients, under 1.5 KB) and goes on the sheet. `npm test` fails on any emoji.
   step (Ask coral, Plan yellow, Collect blue, Explore green, Conclude purple),
   Baloo 2 + Nunito, Pip the owl. Text at least 18px (short navigation labels may be
   14 to 16px). Colour is never the only signal. Tap targets at least 48px.
   Reduced motion is respected everywhere.
+- **Icons (Part 54, then 3D and moving in Part 57, 10 Nov 2026):** no keyboard emoji
+  anywhere: our own illustrations (`js/illustrations.js`, 70 icons; contact sheet
+  `docs/design/illustration-sheet.html`, open it with Live Server). A new icon copies
+  Habiba's 3D style: 64x64, navy outline about 2.6 px, gradients lit from the top-left,
+  a darker copy behind for the extruded side, one gloss, under 2.5 KB, gradient ids
+  written with `~`; it gets its own small idle motion (a class in ILLUSTRATION_CSS) and
+  goes on the sheet. Faces only on mascot-like icons (star, heart, bulb, flame, moon,
+  Pip the owl, the chick). **Motion only where it rewards or guides:** room header,
+  pop-up titles, Pip lines, hint buttons, badges and the finale (`cheer()` = a happy
+  jump). Icons next to words, in lists, tables, cards and the step bar stay still
+  (`animate` is false by default in `js/icon-text.js`). Never more than 12 move on
+  a screen (pop-ups first); motion pauses in a hidden tab; reduced motion stops it all;
+  nothing fades faster than 3 times a second (tested). `npm test` fails on any emoji.
 - **Sound is ON by default** (changed 5 Nov 2026), with a remembered on/off
   toggle. Every sound belongs to a motion and is timed to it; every confetti and
   every badge landing has its sound.
@@ -139,9 +148,17 @@ bugs" rule:** deliberate changes based on the pilot children's feedback.
 
 ## 7. Known open items
 
-- Icons (Part 54) not yet seen on a real Chromebook, tablet or phone, nor with a screen
-  reader (icons are hidden from screen readers unless they carry meaning alone). The
-  badge shine and the coin tokens were only checked in Chrome on Windows.
+- Icons (Parts 54 and 57) not yet seen on a real Chromebook, tablet or phone, nor with a
+  screen reader (icons are hidden from screen readers unless they carry meaning alone).
+  The motion, the badge shine and the coin tokens were only checked in Chrome on Windows.
+- **Icon motion cost (Part 57, measured 10 Nov 2026, Chrome on Windows, CPU throttled 4x,
+  no graphics card in the test browser):** frames stay smooth (45 to 60 fps in the
+  rooms, 60 fps with the maximum of 12 moving icons), but the main thread is much
+  busier while icons move (12 icons: about 6% when still, 75 to 100% when moving;
+  rooms with 2 to 3 moving icons: about +15 to +40 points). 210 moving icons (no limit)
+  drop to 17 fps, so the 12-icon limit matters. Open for Habiba: let each icon move
+  for a few seconds after it appears and then rest (saves battery on Chromebooks).
+  Check on a real Chromebook (Task Manager: the tab's CPU %).
 
 - Not yet tested on a real Chromebook or tablet, or with a real screen reader.
 - Read-aloud voices differ per device. Chrome on Windows offline had only Microsoft George, Hazel and Susan; Google voices need the internet; a Chromebook may have others. Listen on the school laptops; if the voices sound robotic, record the lines as small audio files (Part 44 option).
@@ -226,6 +243,7 @@ Parts 42 to 51. Claude commits each part; nothing is pushed until Habiba says "p
 | 55 | 8 Nov | `07a68b7` `519b400` | **Build it, simpler** (Habiba: "confusing and crowded"; she chose A and A): ONE goal sentence ("Type 5 sleep times. Their mean must be 8 hours.", content `build` with {target}; `buildGoal` removed), the 5 boxes, a **live total line** ("Your 5 numbers add up to 38. You need 40.", green with a ✓ at 40; never shows the mean), the worked example behind "See an example", the hint as before. A wrong try: "Not yet: their mean is 7.6. Look at the total." (goes when the boxes change). **Thesis: the live total makes Build it easier; report build-mean tries before and after 8 Nov apart.** |
 | 56 | 8 Nov | `58af439` | **Real life median, the child does both steps** (Habiba): question 2 uses the card sort (drag or ← →) instead of the "Put them in order" button and the 4 answer buttons; when sorted, "Now tap the card in the centre"; a wrong tap shows the places 1 to 7 under the cards. Words: "Put the hours in order, smallest to biggest. Then tap the one in the centre." `reallife-sorted` now means the child sorted; `real-life-median` wrong taps count as tries. **Thesis: report real-life-median results before and after 8 Nov apart.** |
 | 54 | 8-10 Nov | `a30e6db` `55050db` `b21e119` `1b1e22b` `cd33615` `ddd2ed6` `d70053d` `59a8453` `f9514f7` (this commit) | **Every emoji replaced by our own illustrations** (Habiba's spec and her 26 icons; 44 more drawn in the same style and shown on `docs/design/illustration-sheet.html`: 70 in all). `js/illustrations.js` (the icons) and `js/icon-text.js` (puts an icon before words; the words stay plain text). Our texts name icons as `:name:` (e.g. ":crystal-ball: Predict!"); content stores `"icon": "moon"`. Badges keep their patch frame with the colourful icon inside and a gentle shine; the level is a 96 px picture on My ID. The step bar keeps its navy line icons. Kept as text: → ← ✓ ✕ ○ ★ ☆ ▼ ▲. Tests: `no-emoji.test.js` (no emoji in js/css/html/data; every icon name exists), `illustrations.test.js`. Size: 37.3 KB (about 9 KB compressed), offline, no font or CDN. **Thesis: idle-help `screen` values lost their emoji after 8 Nov (e.g. "Bonus" for "⭐ Bonus"); match them by hand. The CSV exports are unchanged.** |
+| 57 | 10 Nov | `a0b855a` `dea9018` `154ad6d` `d33690d` `3e0941b` (this commit) (commits say "Part 52a" to "52e": Habiba's spec was called Part 52) | **Icons in 3D, and they move** (Habiba's new 26 + the other 44 redrawn in the same style, 3 batches checked on the contact sheet; the flat file is gone). Idle motion per icon, faces on mascot-like ones, hover/tap jump, `cheer()` on rewards (badge landing, finale). Motion only on room headers, pop-up titles, Pip lines, hints, badges, finale; everything else still. At most 12 moving (pop-ups first), paused in a hidden tab, off with reduced motion. Fixed on the way: icons next to words had dropped about 10 px in sentences (`.ds-icon svg` sits on the baseline again). Size: 77 KB, 18 KB compressed (was 37 KB / 9 KB). Measured cost: see section 7. No log field changed. |
 
 **Decisions (Habiba, 8 Nov 2026):** fireworks only on My journey (rooms: confetti only); no "Show me the helpers" button; Pip offers help only when a 💡 is on screen. The "top buttons don't work" report (8 Nov) could not be reproduced (every top button worked in Chrome at 1366x768 and 1366x625) and was dropped by Habiba.
 

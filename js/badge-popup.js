@@ -4,6 +4,7 @@
 // (drop, flip, stamp, rays, confetti, Pip peeking) are in css/badges.css.
 import { openModal, pauseNextModal } from './modal.js';
 import { patchSVG, MYSTERY_SVG } from './badge-art.js';
+import { cheer } from './icon-text.js';
 import { playSound } from './sounds.js';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -70,6 +71,8 @@ export function showBadgePopup(badge, onLanded) {
       dialog.querySelector('.modal-pip .pip')?.classList.replace('pip--happy', 'pip--cheer');
       // A soft chime when the badge is stamped (only if sound is on: playSound checks).
       chime = setTimeout(() => playSound('badgeFound'), reduceMotion() ? 0 : STAMP_MS);
+      // Part 52e: when the badge lands, its icon does a happy jump.
+      cheer(dialog.querySelector('.bp-front'), reduceMotion() ? 0 : STAMP_MS);
     },
     // Before the pop-up goes, remember where the badge is, so a copy can fly from there.
     beforeClose: (dialog) => {

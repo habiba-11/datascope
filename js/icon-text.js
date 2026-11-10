@@ -30,13 +30,14 @@ export function iconParts(text) {
 }
 
 // The same text with its :name: shown as icons, as HTML (for our HTML templates).
-export function iconLineHTML(text) {
-  return iconParts(text).map((p) => (p.icon ? iconHTML(p.icon) : p.text)).join('');
+// `animate` (Part 52e): true only for room headers, Pip and hints.
+export function iconLineHTML(text, animate = false) {
+  return iconParts(text).map((p) => (p.icon ? iconHTML(p.icon, '', animate) : p.text)).join('');
 }
 
 // The same, into an element (the words go in as plain text).
-export function setIconLine(element, text) {
-  element.replaceChildren(...iconParts(text).map((p) => (p.icon ? iconNode(p.icon) : document.createTextNode(p.text))));
+export function setIconLine(element, text, animate = false) {
+  element.replaceChildren(...iconParts(text).map((p) => (p.icon ? iconNode(p.icon, '', animate) : document.createTextNode(p.text))));
 }
 
 // The words alone, without the :name: (e.g. for a log or an aria-label).
@@ -68,6 +69,53 @@ export function fillIcons(root = document) {
 }
 
 // Fills `element` with an icon and a text (the text stays plain text).
-export function setIconText(element, name, text) {
-  element.replaceChildren(iconNode(name), document.createTextNode(` ${text}`));
+export function setIconText(element, name, text, animate = false) {
+  element.replaceChildren(iconNode(name, '', animate), document.createTextNode(` ${text}`));
+}
+
+// ---------- Part 52e (10 Nov 2026): motion, kept calm ----------
+
+// A reward moment: the icons inside `root` do their happy jump (twice), after
+// `delay` ms, then go back to their own small motion. Reduced motion: the CSS
+// switches every animation off, so nothing moves.
+export function cheer(root, delay = 0) {
+  if (!root) return;
+  setTimeout(() => {
+    const icons = root.matches?.('svg.ds-illo') ? [root] : [...root.querySelectorAll('svg.ds-illo')];
+    icons.forEach((svg) => svg.classList.add('cheer'));
+    setTimeout(() => icons.forEach((svg) => svg.classList.remove('cheer')), 1200);
+  }, delay);
+}
+
+// Habiba's rule: never more than 12 icons moving on one screen. Icons in an
+// open pop-up come first (they are on top); every moving icon after the 12th
+// gets "ds-calm" (no motion) until there is room again.
+export const MAX_MOVING = 12;
+
+// Which icons may move: the first `max`, pop-up icons first. No DOM here, so it is tested.
+export function pickMoving(icons, max = MAX_MOVING) {
+  const inPopUp = icons.filter((i) => i.inPopUp);
+  const rest = icons.filter((i) => !i.inPopUp);
+  return new Set([...inPopUp, ...rest].slice(0, max));
+}
+
+function calmExtras() {
+  const icons = [...document.querySelectorAll('svg.ds-illo:not(.still)')]
+    .filter((svg) => svg.getClientRects().length) // hidden icons do not count
+    .map((svg) => ({ svg, inPopUp: !!svg.closest('dialog, [role="dialog"]') }));
+  const moving = pickMoving(icons);
+  icons.forEach((icon) => icon.svg.classList.toggle('ds-calm', !moving.has(icon)));
+}
+
+// Checked again (once per frame at most) whenever the page adds or removes something.
+if (typeof document !== 'undefined' && typeof MutationObserver !== 'undefined') {
+  let queued = false;
+  const check = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; calmExtras(); });
+  };
+  // (Also when a panel is shown or hidden, or a pop-up opens: 'hidden' / 'open'.)
+  new MutationObserver(check).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden', 'open'] });
+  check();
 }

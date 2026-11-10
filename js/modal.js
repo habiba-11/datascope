@@ -63,7 +63,7 @@ function show({ options, resolve }) {
   heading.className = 'modal-title';
   // Part 54b: an illustration name draws our icon; any other text (rooms not
   // changed yet) stays as it was.
-  if (ILLUSTRATIONS[icon]) setIconText(heading, icon, title);
+  if (ILLUSTRATIONS[icon]) setIconText(heading, icon, title, true); // one icon, on top: may move (Part 52e)
   else heading.textContent = icon ? `${icon} ${title}` : title;
   header.append(pip, heading);
 

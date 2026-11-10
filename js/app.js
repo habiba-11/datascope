@@ -197,7 +197,7 @@ function exploreTabsHTML(newTab = null) {
     .map((r) => {
       const isActive = r.id === currentExplorePage;
       const doneMark = done.includes(r.id) ? ` ${iconHTML('check')}<span class="sr-only"> (done)</span>` : '';
-      return `<a class="explore-tab${isActive ? ' active' : ''}${r.id === newTab ? ' step-new' : ''}"${isActive ? ' aria-current="page"' : ''} href="${r.href}">${iconHTML(r.icon)} ${r.label}${doneMark}</a>`;
+      return `<a class="explore-tab${isActive ? ' active' : ''}${r.id === newTab ? ' step-new' : ''}"${isActive ? ' aria-current="page"' : ''} href="${r.href}">${iconHTML(r.icon, '', isActive)} ${r.label}${doneMark}</a>`;
     })
     .join('');
 }
