@@ -28,8 +28,11 @@ const TRI = 'M32 6 L60 52 Q61 56 57 56 H7 Q3 56 4 52Z';
 const BUBBLE = 'M10 8 H54 Q58 8 58 12 V40 Q58 44 54 44 H30 L16 54 V44 H10 Q6 44 6 40 V12 Q6 8 10 8Z';
 const CLOUD = 'M18 50 Q6 50 6 39 Q6 29 16 28 Q18 16 30 16 Q40 16 44 25 Q46 24 48 24 Q58 24 58 37 Q58 50 46 50Z';
 const ARCS = 'M50 26 A19 19 0 0 0 14 25 M14 38 A19 19 0 0 0 50 39';
+const BRAIN = 'M32 10 Q24 4 16 10 Q8 12 8 22 Q4 28 8 36 Q8 46 18 48 Q24 56 32 50 Q40 56 46 48 Q56 46 56 36 Q60 28 56 22 Q56 12 48 10 Q40 4 32 10Z';
+const SPEAKER = 'M8 24 H18 L32 12 V52 L18 40 H8Z';
 // A 3D block: side (dark), top (light), then the front face.
-const blk = (x, y, s, front, top, side) => `<path d="M${x + s} ${y + 2} L${x + s + 4} ${y - 2} V${y + s - 4} L${x + s} ${y + s}Z" fill="${side}" ${ln(2.2)}/><path d="M${x + 2} ${y} L${x + 6} ${y - 4} H${x + s + 4} L${x + s} ${y}Z" fill="${top}" ${ln(2.2)}/><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="3" fill="${front}" ${ln(2.2)}/><path d="M${x + 4} ${y + 4} H${x + 10}" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round"/>`;
+// (The outline is set once on the group, so the drawing stays under 2.5 KB.)
+const blk = (x, y, s, front, top, side) => `<g ${ln(2.2)}><path d="M${x + s} ${y + 2} L${x + s + 4} ${y - 2} V${y + s - 4} L${x + s} ${y + s}Z" fill="${side}"/><path d="M${x + 2} ${y} L${x + 6} ${y - 4} H${x + s + 4} L${x + s} ${y}Z" fill="${top}"/><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="3" fill="${front}"/></g><path d="M${x + 4} ${y + 4} H${x + 10}" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round"/>`;
 
 const ILLUSTRATIONS = {
 die: `<defs>${LG('t', [[0, '#FFD0C7'], [1, '#FF9A8B']], 0, 0, 1, 1)}${LG('l', [[0, '#FF8B7B'], [1, '#F2604F']])}${LG('r', [[0, '#DB5545'], [1, '#B63A2C']])}</defs>
@@ -203,7 +206,64 @@ cloud: `<defs>${RG('c', [[0, '#FFFFFF'], [0.55, '#E3F4FF'], [1, '#9CCDEE']], 0.3
 <rect x="6" y="15" width="56" height="40" rx="6" fill="#8C9AA8" ${ln()}/><rect x="4" y="12" width="56" height="40" rx="6" fill="${U('w')}" ${ln()}/>
 <path d="M4 22 V18 Q4 12 10 12 H54 Q60 12 60 18 V22Z" fill="${U('h')}" ${ln()}/><path d="M10 16.5 H30" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-linecap="round"/>
 <rect x="10" y="27" width="16" height="19" rx="3" fill="${U('p')}" stroke="${O}" stroke-width="2.4"/><circle cx="18" cy="34" r="4" fill="#9A6334"/><path d="M12 45 Q18 38 24 45Z" fill="#9A6334"/>
-<path d="M32 31 H52 M32 38 H48 M32 45 H52" stroke="#9CC6E6" stroke-width="3" stroke-linecap="round"/>`
+<path d="M32 31 H52 M32 38 H48 M32 45 H52" stroke="#9CC6E6" stroke-width="3" stroke-linecap="round"/>`,
+// ---------- Part 52c (10 Nov 2026): batch 2 of the 44, redrawn in 3D ----------
+brain: `<defs>${LG('p', [[0, '#FFD3E0'], [0.5, '#FF9AB5'], [1, '#D9577D']], 0, 0, 1, 1)}</defs>
+<path d="${BRAIN}" fill="#B8456A" transform="translate(2 2.5)" ${ln()}/><path d="${BRAIN}" fill="${U('p')}" ${ln()}/><path d="M32 10 V50" stroke="${O}" stroke-width="2.4"/>
+<path d="M18 22 Q24 20 24 28 M14 34 Q20 32 22 38 M46 22 Q40 20 40 28 M50 34 Q44 32 42 38" fill="none" stroke="${O}" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M14 18 Q18 12 24 12" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="3.4" stroke-linecap="round"/>${shine(40, 15, 3, 1.6, -20, 0.7)}`,
+owl: `<defs>${RG('b', [[0, '#D9A06A'], [0.55, '#9A6334'], [1, '#6B3F1C']], 0.35, 0.3, 0.85)}${LG('t', [[0, '#FFF8E6'], [1, '#F2CF8A']])}${LG('h', GOLD, 0, 0, 1, 1)}</defs>
+<path d="M14 26 L12 10 L26 20Z M50 26 L52 10 L38 20Z" fill="#7A4A22" ${ln()}/><ellipse cx="33.5" cy="42" rx="22" ry="19.5" fill="#5A3416" ${ln()}/><ellipse cx="32" cy="40" rx="22" ry="19.5" fill="${U('b')}" ${ln()}/><ellipse cx="32" cy="45" rx="15" ry="12" fill="${U('t')}" stroke="${O}" stroke-width="2.4"/>
+<circle cx="25" cy="38" r="6.4" fill="#fff" stroke="${O}" stroke-width="2.4"/><circle cx="39" cy="38" r="6.4" fill="#fff" stroke="${O}" stroke-width="2.4"/><g class="il-eyes"><circle cx="26" cy="39" r="3" fill="${O}"/><circle cx="40" cy="39" r="3" fill="${O}"/><circle cx="27" cy="38" r="1" fill="#fff"/><circle cx="41" cy="38" r="1" fill="#fff"/></g>
+<path d="M29 46 H35 L32 51Z" fill="#F59E0B" stroke="${O}" stroke-width="2" stroke-linejoin="round"/>
+<path d="M20 17 Q20 4 32 4 Q44 4 44 17Z" fill="${U('h')}" ${ln()}/><path d="M21 14 Q32 10 43 14" fill="none" stroke="#E2513F" stroke-width="4"/><path d="M8 19 Q32 11 56 19 Q32 25 8 19Z" fill="${U('h')}" ${ln()}/><path d="M25 8 Q27 6 30 6" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="2.4" stroke-linecap="round"/>`,
+'lock-open': `<defs>${LG('bd', [[0, '#B8F2A8'], [0.5, '#4CC26B'], [1, '#2A8F47']])}${LG('sh', [[0, '#FFFFFF'], [0.4, '#D3DFEA'], [1, '#7E91A5']], 0, 0, 1, 0)}</defs>
+<g class="il-shackle"><path d="M34 28 V18 Q34 6 45 6 Q56 6 56 18 V22" fill="none" stroke="${O}" stroke-width="10.5" stroke-linecap="round"/><path d="M34 28 V18 Q34 6 45 6 Q56 6 56 18 V22" fill="none" stroke="${U('sh')}" stroke-width="5.2" stroke-linecap="round"/></g>
+<rect x="8" y="28" width="42" height="30" rx="8" fill="#1F7A39" ${ln()}/><rect x="8" y="27" width="42" height="28" rx="8" fill="${U('bd')}" ${ln()}/><rect x="12" y="31" width="34" height="20" rx="5" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="2"/>
+<circle cx="29" cy="38.5" r="4.6" fill="${O}"/><path d="M26.6 40 H31.4 L32.6 49 H25.4Z" fill="${O}"/><path d="M13 33 H24" stroke="#fff" stroke-opacity=".75" stroke-width="3.2" stroke-linecap="round"/>`,
+door: `<defs>${LG('wd', [[0, '#E9BE7C'], [1, '#A86E2C']], 0, 0, 1, 1)}${LG('pn', [[0, '#F6D79E'], [1, '#C99443']], 0, 0, 1, 1)}${marble('k', '#FFF3A6', '#FFC531', '#D9860B')}</defs>
+<path d="M6 58 H58" stroke="${O}" stroke-width="3" stroke-linecap="round"/><rect x="16" y="6" width="32" height="52" rx="3" fill="#2B4A66" ${ln()}/><path d="M46 10 V55" stroke="#FFE27A" stroke-opacity=".6" stroke-width="3"/>
+<g class="il-leaf"><rect x="16" y="6" width="32" height="52" rx="3" fill="${U('wd')}" ${ln()}/><rect x="21" y="12" width="22" height="16" rx="2" fill="${U('pn')}" stroke="${O}" stroke-width="2"/><rect x="21" y="33" width="22" height="19" rx="2" fill="${U('pn')}" stroke="${O}" stroke-width="2"/><path d="M44.5 9 V55" stroke="#7A4E1A" stroke-opacity=".45" stroke-width="2.4"/><circle cx="41" cy="31" r="3.2" fill="${U('k')}" stroke="${O}" stroke-width="2"/><path d="M24 15 V25 M24 36 V48" stroke="#fff" stroke-opacity=".6" stroke-width="2.6" stroke-linecap="round"/></g>`,
+music: `<defs>${marble('n', '#E3DDFF', '#A596FF', '#6E5BD6')}</defs>
+<path d="M25 46 V14 L53 8 V40" fill="none" stroke="${O}" stroke-width="4.4" stroke-linejoin="round"/><path d="M25 14 L53 8 V17 L25 23Z" fill="${O}"/><path d="M28 16 L50 11.5" stroke="#5B7A99" stroke-width="1.6" stroke-linecap="round"/>
+<ellipse cx="18" cy="47" rx="9.5" ry="7.5" fill="${U('n')}" transform="rotate(-20 18 47)" ${ln()}/><ellipse cx="46" cy="41" rx="9.5" ry="7.5" fill="${U('n')}" transform="rotate(-20 46 41)" ${ln()}/>${shine(15, 44, 3.2, 1.6, -20, 0.85)}${shine(43, 38, 3.2, 1.6, -20, 0.85)}`,
+speaker: `<defs>${LG('s', [[0, '#C4EEFF'], [0.45, '#38B6FF'], [1, '#1C7DB8']], 0, 0, 1, 1)}</defs>
+<path d="${SPEAKER}" fill="#155E8F" transform="translate(1.5 2.5)" ${ln()}/><path d="${SPEAKER}" fill="${U('s')}" ${ln()}/><path d="M12 28 V35 M20 26 L29 18.5" stroke="#fff" stroke-opacity=".7" stroke-width="2.8" stroke-linecap="round"/>
+<path class="il-w1" d="M40 24 Q46 32 40 40" fill="none" stroke="${O}" stroke-width="3.6" stroke-linecap="round"/><path class="il-w1 il-w2" d="M46 17 Q57 32 46 47" fill="none" stroke="${O}" stroke-width="3.6" stroke-linecap="round"/>`,
+'speaker-off': `<defs>${LG('s', [[0, '#E6ECF2'], [0.5, '#AEBBC8'], [1, '#7C8FA3']], 0, 0, 1, 1)}</defs>
+<path d="${SPEAKER}" fill="#5B6B7C" transform="translate(1.5 2.5)" ${ln()}/><path d="${SPEAKER}" fill="${U('s')}" ${ln()}/><path d="M12 28 V35" stroke="#fff" stroke-opacity=".7" stroke-width="2.8" stroke-linecap="round"/>
+<g class="il-mute"><path d="M41 24 L56 40 M56 24 L41 40" stroke="${O}" stroke-width="8.5" stroke-linecap="round"/><path d="M41 24 L56 40 M56 24 L41 40" stroke="#E2513F" stroke-width="4" stroke-linecap="round"/></g>`,
+letters: `<defs>${LG('g', [[0, '#B8F2A8'], [1, '#2E9A4B']], 0, 0, 1, 1)}${LG('p', [[0, '#E3DDFF'], [1, '#7B68E0']], 0, 0, 1, 1)}${LG('r', [[0, '#FFB3A8'], [1, '#E2513F']], 0, 0, 1, 1)}</defs>
+<g class="il-nb">${blk(19, 8, 22, U('g'), '#DDF6E3', '#1F7A39')}<path d="M35 14.5 Q33.5 13 31 13 Q25.5 13 25.5 19 Q25.5 25 31 25 Q33.5 25 35 23.5" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/></g>
+<g class="il-nb il-nb2">${blk(5, 36, 22, U('p'), '#EEEAFF', '#4A3AB0')}<path d="M10.5 54 L16 40 L21.5 54 M12.8 49 H19.2" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g class="il-nb il-nb3">${blk(33, 36, 22, U('r'), '#FFD9D2', '#B63A2C')}<path d="M39.5 40 V54 H45 Q49.5 54 49.5 50.3 Q49.5 46.8 45 46.8 H39.5 M39.5 46.8 H44.3 Q48 46.8 48 43.4 Q48 40 44.3 40 H39.5" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></g>`,
+shoe: `<defs>${LG('u', [[0, '#C4EEFF'], [0.45, '#38B6FF'], [1, '#1C7DB8']], 0, 0, 1, 1)}${LG('s', [[0, '#FFFFFF'], [1, '#C9D6E2']])}</defs>
+<path d="M4 46 H58 Q60 46 60 49 V53 Q60 57 56 57 H8 Q4 57 4 53Z" fill="#9AA9B8" ${ln()}/><path d="M4 46 H58 Q60 46 60 49 V51 Q60 54 56 54 H8 Q4 54 4 51Z" fill="${U('s')}" ${ln()}/>
+<path d="M6 46 Q5 31 12 27 L26 24 Q30 34 40 34 L52 37 Q58 39 58 46Z" fill="${U('u')}" ${ln()}/><path d="M6 46 Q6 36 10 31 L14 46Z" fill="#FF7A6B" stroke="${O}" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M24 29 L30 27 M27 33 L33 31" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M20 42 Q32 37 46 42" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3" stroke-linecap="round"/>${shine(14, 33, 1.8, 4, 30, 0.7)}`,
+ball: `<defs>${RG('w', [[0, '#FFFFFF'], [0.6, '#EEF6FC'], [1, '#A9C4DA']], 0.35, 0.3, 0.8)}${LG('g', [[0, '#FFFFFF', 0.85], [1, '#FFFFFF', 0]])}</defs>
+<circle cx="32" cy="32" r="26" fill="${U('w')}" ${ln(2.8)}/><path d="M32 22 V12 M41.5 29 L51 25.8 M38 40 L43.8 48.2 M26 40 L20.2 48.2 M22.5 29 L13 25.8" stroke="${O}" stroke-width="2.4" stroke-linecap="round"/><path d="M32 22 L41.5 29 L38 40 L26 40 L22.5 29Z" fill="${O}"/>
+<g fill="${O}"><circle cx="32" cy="11.5" r="4.4"/><circle cx="51.5" cy="25.5" r="4.4"/><circle cx="44" cy="48.5" r="4.4"/><circle cx="20" cy="48.5" r="4.4"/><circle cx="12.5" cy="25.5" r="4.4"/></g><circle cx="32" cy="32" r="26" fill="none" ${ln(2.8)}/>
+<ellipse cx="25" cy="18" rx="12" ry="6" transform="rotate(-25 25 18)" fill="${U('g')}"/>`,
+pizza: `<defs>${LG('c', [[0, '#FFF0A0'], [1, '#F2B630']], 0, 0, 1, 1)}${LG('k', [[0, '#F6D79E'], [1, '#B07C2A']])}${marble('p', '#FFB3A8', '#E2513F', '#A8301F')}</defs>
+<path d="M8 13 Q32 3 56 13 L32 60Z" fill="#C57F0C" transform="translate(1.5 2)" ${ln()}/><path d="M8 13 Q32 3 56 13 L32 60Z" fill="${U('c')}" ${ln()}/><path d="M6 13 Q32 0 58 13 L55 21 Q32 9 9 21Z" fill="${U('k')}" ${ln()}/><path d="M12 11.5 Q32 4 52 11.5" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>
+<g fill="${U('p')}" stroke="${O}" stroke-width="2"><circle cx="25" cy="28" r="4.6"/><circle cx="39" cy="30" r="4.2"/><circle cx="31" cy="43" r="3.6"/></g><path d="M17 26 L26 46" stroke="#fff" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/>`,
+shop: `<defs>${LG('w', [[0, '#FFFFFF'], [1, '#DDE8F2']], 0, 0, 1, 1)}${LG('a', [[0, '#FFB3A8'], [1, '#E2513F']])}${LG('g', [[0, '#C9EEFF'], [1, '#38B6FF']], 0, 0, 1, 1)}</defs>
+<path d="M4 58 H60" stroke="${O}" stroke-width="3" stroke-linecap="round"/><path d="M56 27 L60 24 V55 L56 58Z" fill="#9AA9B8" ${ln(2.2)}/><rect x="8" y="26" width="48" height="32" fill="${U('w')}" ${ln()}/>
+<rect x="26" y="38" width="12" height="20" rx="1" fill="${U('g')}" ${ln(2.4)}/><rect x="12" y="34" width="10" height="10" rx="1" fill="${U('g')}" stroke="${O}" stroke-width="2.4"/><rect x="42" y="34" width="10" height="10" rx="1" fill="${U('g')}" stroke="${O}" stroke-width="2.4"/><path d="M14 37 H17 M44 37 H47" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+<g class="il-awn"><path d="M6 14 H58 L56 28 H8Z" fill="${U('a')}"/><path d="M19 14 L18 28 M32 14 V28 M45 14 L46 28" stroke="#fff" stroke-width="4.4"/><path d="M6 14 H58 L56 28 H8Z" fill="none" ${ln()}/><path d="M9 17 H55" stroke="#fff" stroke-opacity=".5" stroke-width="1.6"/></g>`,
+tent: `<defs>${LG('l', [[0, '#B8F2A8'], [1, '#3BAF5C']], 0, 0, 1, 1)}${LG('r', [[0, '#3BAF5C'], [1, '#1F7A39']], 0, 0, 1, 1)}</defs>
+<path d="M2 58 H62" stroke="${O}" stroke-width="3" stroke-linecap="round"/><path d="M5 57 L32 10 V57Z" fill="${U('l')}" ${ln()}/><path d="M32 10 L59 57 H32Z" fill="${U('r')}" ${ln()}/>
+<path d="M24 57 L32 30 L40 57Z" fill="${O}" fill-opacity=".85" ${ln()}/><path d="M20 32 L28 18" stroke="#fff" stroke-opacity=".7" stroke-width="3.4" stroke-linecap="round"/>
+<path class="il-pennant" d="M32 10 V2 L42 5 L32 8.5" fill="#FFC531" stroke="${O}" stroke-width="2" stroke-linejoin="round"/>`,
+tools: `<defs>${LG('m', METAL_H, 0, 0, 1, 1)}${marble('b', '#C9EEFF', '#38B6FF', '#1C7DB8')}</defs>
+<path d="M50 52 L28 30" stroke="${O}" stroke-width="9.5" stroke-linecap="round"/><path d="M50 52 L28 30" stroke="#1C7DB8" stroke-width="5" stroke-linecap="round"/><path d="M49 50 L29 30" stroke="#9FE0FF" stroke-width="1.6" stroke-linecap="round"/><circle cx="21" cy="22" r="11" fill="${U('b')}" ${ln()}/><path d="M12 15 L19 8 L25 14 L18 21Z" fill="#fff" stroke="${O}" stroke-width="2.4" stroke-linejoin="round"/>
+<g class="il-hammer"><path d="M14 52 L38 28" stroke="${O}" stroke-width="9.5" stroke-linecap="round"/><path d="M14 52 L38 28" stroke="#C99443" stroke-width="5" stroke-linecap="round"/><path d="M15 50 L37 28" stroke="#F6D79E" stroke-width="1.6" stroke-linecap="round"/><g transform="rotate(45 45 15)"><rect x="34" y="11" width="24" height="12" rx="3" fill="#5B6B7C" ${ln()}/><rect x="33" y="9" width="24" height="12" rx="3" fill="${U('m')}" ${ln()}/><path d="M36 12 H50" stroke="#fff" stroke-opacity=".8" stroke-width="2" stroke-linecap="round"/></g></g>`,
+'book-green': `<defs>${LG('pg', [[0, '#FFFFFF'], [1, '#DDF6E3']], 0, 0, 1, 0)}${LG('pr', [[0, '#DDF6E3'], [1, '#FFFFFF']], 0, 0, 1, 0)}${LG('cv', [[0, '#7AE08F'], [1, '#23813F']])}</defs>
+<path d="M3 15 Q18 8 32 17 Q46 8 61 15 V53 Q46 50 32 58 Q18 50 3 53Z" fill="${U('cv')}" ${ln(2.8)}/>
+<path d="M7 15 Q19 10 32 18 V54 Q19 47 7 50Z" fill="${U('pg')}" ${ln(2.4)}/><path d="M57 15 Q45 10 32 18 V54 Q45 47 57 50Z" fill="${U('pr')}" ${ln(2.4)}/>
+<path d="M12 22 Q20 21 27 24 M12 30 Q20 29 27 32 M12 38 Q20 37 27 40 M37 24 Q44 21 52 22 M37 32 Q44 29 52 30 M37 40 Q44 37 52 38" fill="none" stroke="#7FCF92" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M9 52 Q19 49 31 56 M33 56 Q45 49 55 52" fill="none" stroke="#9BDDAA" stroke-width="2" stroke-linecap="round"/>`
 };
 // Part 52a: names not drawn in 3D yet use their old flat drawing for now (js/illustrations-flat.js).
 for (const [name, body] of Object.entries(FLAT_STANDINS)) if (!ILLUSTRATIONS[name]) ILLUSTRATIONS[name] = body;
@@ -235,6 +295,7 @@ const EXTRAS = {
   sparkle: '',
   moon: tw(8, 56, 0.8, 0.5),
   key: tw(54, 12, 0.9, 0.4),
+  brain: tw(54, 8, 0.9, 0) + tw(9, 54, 0.7, 0.8),
 };
 const BACK0 = {
   bulb: `<circle class="il-glow" cx="32" cy="26" r="29" fill="#FFE27A"/>`,
@@ -320,6 +381,20 @@ const ILLUSTRATION_CSS = `
 .il-play{animation:il-breathe 2.4s ease-in-out infinite}
 .il-cloud,.il-cloud-off{animation:il-drift 4.5s ease-in-out infinite}
 .il-id-card{transform-origin:32px 54px;animation:il-wobble 3s ease-in-out infinite}
+.il-brain{animation:il-breathe 2.6s ease-in-out infinite}
+.il-owl{transform-origin:32px 60px;animation:il-wobble 3s ease-in-out infinite}
+.il-shackle{animation:il-unlock 2.8s ease-in-out infinite}
+.il-leaf{transform-origin:16px 32px;animation:il-ajar 3.4s ease-in-out infinite}
+.il-music{transform-origin:32px 56px;animation:il-bob 2.2s ease-in-out infinite}
+.il-w1{animation:il-waveout 1.6s ease-in-out infinite}.il-w2{animation-delay:calc(var(--dl,0s) + .3s)}
+.il-mute{transform-origin:48.5px 32px;animation:il-shakeh 3s ease-in-out infinite}
+.il-shoe{transform-origin:32px 56px;animation:il-hop 2.6s ease-in-out infinite}
+.il-ball{transform-origin:32px 58px;animation:il-hop 1.8s ease-in-out infinite}
+.il-pizza{transform-origin:32px 58px;animation:il-wobble 2.8s ease-in-out infinite}
+.il-awn{transform-origin:32px 14px;animation:il-flutter 2.2s ease-in-out infinite}
+.il-pennant{transform-origin:32px 5px;animation:il-wave 1.4s ease-in-out infinite}
+.il-hammer{transform-origin:14px 52px;animation:il-hammer 2s ease-in-out infinite}
+.il-book-green{animation:il-bob 2.8s ease-in-out infinite}
 .ds-illo:hover .il,.ds-illo.cheer .il{animation:il-jump .55s ease-out 2}
 .ds-illo.still *{animation:none!important}
 .ds-paused .ds-illo *{animation-play-state:paused!important}
@@ -364,6 +439,11 @@ const ILLUSTRATION_CSS = `
 @keyframes il-cycle{0%,50%{transform:rotate(0)}85%,100%{transform:rotate(-360deg)}}
 @keyframes il-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 @keyframes il-drift{0%,100%{transform:translate(-2px,0)}50%{transform:translate(2px,-2px)}}
+@keyframes il-unlock{0%,55%,100%{transform:translateY(0)}20%{transform:translateY(-4px)}35%{transform:translateY(0)}}
+@keyframes il-ajar{0%,50%,100%{transform:scaleX(1)}65%,85%{transform:scaleX(.8)}}
+@keyframes il-waveout{0%,100%{opacity:.35;transform:translateX(0)}50%{opacity:1;transform:translateX(2px)}}
+@keyframes il-flutter{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.07)}}
+@keyframes il-hammer{0%,50%,100%{transform:rotate(0)}20%{transform:rotate(-14deg)}30%{transform:rotate(3deg)}}
 @media (prefers-reduced-motion: reduce){.ds-illo *{animation:none!important}}
 `;
 let _installed = false;

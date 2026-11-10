@@ -34,7 +34,16 @@ const SET_1 = {
   book: 'Maths recap, learn', moon: 'Sleep (the story question)', flag: 'Finish, goal reached',
   flame: 'Streak, hot', sparkle: 'Shine, new',
 };
-// Part 52b: batch 1 of the 44 (new 3D drawings, waiting for Habiba's OK).
+// Part 52c: batch 2 of the 44 (new 3D drawings, waiting for Habiba's OK).
+const BATCH_2 = {
+  brain: 'What I learned (thinks, twinkles)', owl: 'Pip, our mascot (wobbles, blinks)',
+  'lock-open': 'Unlocked (shackle pops up)', door: 'Leave the room (door opens a little)',
+  music: 'Music switch (notes bob)', speaker: 'Sound on (waves pulse)', 'speaker-off': 'Sound off (cross shakes)',
+  letters: 'Words, categories (blocks hop)', shoe: 'Shoe sizes (stomps)', ball: 'Games, playground (bounces)',
+  pizza: 'Playground game scenario (wobbles)', shop: 'Shoe shop scenario (awning flutters)',
+  tent: 'Sleep scenario (flag waves)', tools: 'Fix it (hammer taps)', 'book-green': 'Learn, recap (bobs)',
+};
+// Part 52b: batch 1 of the 44 (approved by Habiba, 10 Nov 2026).
 const BATCH_1 = {
   tap: 'Tap here (finger presses, rings flash)', numbers: 'Numbers, Number Lab (blocks hop)',
   'crystal-ball': 'Predict (swirl turns, soft glow)', scales: 'Compare, fair or not (beam tilts)',
@@ -52,10 +61,11 @@ const section = (title, names, notes, isNew) => `<h2>${title} (${names.length})<
   + names.map((n) => card(n, notes[n] || '', isNew)).join('') + '</div>';
 
 installIllustrationStyles();
-const flat = Object.keys(FLAT_STANDINS).filter((n) => !SET_1[n] && !BATCH_1[n]);
+const flat = Object.keys(FLAT_STANDINS).filter((n) => !SET_1[n] && !BATCH_1[n] && !BATCH_2[n]);
 document.getElementById('sheet').innerHTML =
-  section('Batch 1: new in 3D, please check', Object.keys(BATCH_1), BATCH_1, true)
+  section('Batch 2: new in 3D, please check', Object.keys(BATCH_2), BATCH_2, true)
   + section('Habiba\'s set', Object.keys(SET_1), SET_1, false)
+  + section('Batch 1 (approved)', Object.keys(BATCH_1), BATCH_1, false)
   + section('Not redrawn yet (old flat drawing, still used by the app)', flat, {}, false);
 
 let paused = false;
