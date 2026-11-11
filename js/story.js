@@ -82,10 +82,13 @@ export function openStory(words, returnTo) {
       </section>
       <div class="story-cover" id="story-cover">
         <div class="story-cover-pip m-float">${pipSVG()}</div>
-        <h2 class="story-cover-title" id="story-title">${start.title}</h2>
-        <p class="story-cover-sub">${start.sub}</p>
-        <button type="button" class="btn btn-main story-start m-nudge" id="story-start">${start.button}</button>
-        <p class="story-cover-note">${start.soundNote}</p>
+        <!-- 11 Nov 2026 (Habiba: "hard to read"): the words sit on a white panel, not on the picture. -->
+        <div class="story-cover-panel">
+          <h2 class="story-cover-title" id="story-title">${start.title}</h2>
+          <p class="story-cover-sub">${start.sub}</p>
+          <button type="button" class="btn btn-main story-start m-nudge" id="story-start">${start.button}</button>
+          <p class="story-cover-note">${start.soundNote}</p>
+        </div>
       </div>
     </div>`;
   document.body.append(dialog);
