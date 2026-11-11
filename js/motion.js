@@ -217,8 +217,8 @@ export function fireworks({ bursts = 3 } = {}) {
 // recording, repeated for as long as the page is open (she chose "repeat").
 // Each rocket launches RISE_SECONDS before its bang, so it bursts exactly on
 // it (bang times: assets/sounds/fireworks-bangs.json, from dev/firework-bangs.mjs).
-// The sound starts RISE_SECONDS after the show, so even the first bang has
-// its rocket. It rests while the tab is hidden. Reduced motion: the recording
+// The sound starts a moment after the show (lead), so even the first bang
+// has its rocket, and the first rocket rises at once. It rests while the tab is hidden. Reduced motion: the recording
 // once, no rockets. Without the file: the made-up far-off loop as before.
 export const LOOP_GAP_MS = 2200; // the old loop (only without the recording)
 const SHOW = new URL('../assets/sounds/fireworks-bangs.json', import.meta.url);
@@ -237,10 +237,14 @@ export async function fireworksLoop() {
     playRecording(0);
     return () => {};
   }
+  // The sound starts just late enough for the first rocket to launch at once
+  // (11 Nov 2026, Habiba: fireworks immediately): 0.6 - 0.44 = 0.16 s.
+  const lead = Math.max(0, RISE_SECONDS - show.bangs[0]);
   const playShow = () => {
     if (document.hidden) return;
-    playRecording(RISE_SECONDS);
-    for (const bang of show.bangs) rocket(bang, true, false); // launches at `bang`, bursts RISE later = on the sound's bang
+    playRecording(lead);
+    // Each rocket launches RISE_SECONDS before its bang, so it bursts on it.
+    for (const bang of show.bangs) rocket(lead + bang - RISE_SECONDS, true, false);
   };
   playShow();
   const timer = setInterval(playShow, show.duration * 1000);

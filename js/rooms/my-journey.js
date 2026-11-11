@@ -422,13 +422,12 @@ async function init() {
     }
   });
   document.getElementById('journey').append(celebrationNode(journey, code), tabs);
-  // The whole journey is done: the big finale (Part 43b), confetti, then
-  // fireworks popping in the background for as long as the page is open
-  // (Habiba, 6 Nov 2026). With reduced motion: one firework sound only.
-  if (journey.phasesDone === STOPS.length) {
-    confetti();
-    fireworksLoop();
-  }
+  // Fireworks start as soon as My journey opens, for as long as the page is
+  // open (11 Nov 2026, Habiba: before, only when every step was done). With
+  // reduced motion: the recording once, no rockets. The whole journey done:
+  // confetti too (Part 43b).
+  fireworksLoop();
+  if (journey.phasesDone === STOPS.length) confetti();
 }
 
 init();

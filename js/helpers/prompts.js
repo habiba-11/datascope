@@ -166,9 +166,9 @@ export function createAnswerHint(key, room, suggestions, box, { line = '' } = {}
     if (chips.length) return; // already open
     const help = document.createElement('li');
     help.className = 'suggestion-help';
-    setIconText(help, 'tap', line
-      ? `These finish your "${line} …" line. Tap one, or drag it into the box.`
-      : 'Tap one, or drag it into the box. You can change the words.');
+    // 11 Nov 2026 (Habiba): one short line for every hint list, no hand icon
+    // (was: 'These finish your "I think …" line.' for the Evidence Board).
+    help.textContent = 'Tap one, or drag it into the box. You can change the words.';
     list.replaceChildren(help, ...suggestions.map(chipItem));
     // Part 60e: answers already used before a page change stay used.
     chips.forEach((chip, i) => { if (tapped.includes(suggestions[i].text)) chip.disabled = true; });

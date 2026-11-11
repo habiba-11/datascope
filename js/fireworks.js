@@ -38,7 +38,7 @@ function setupCanvas() {
 export function launchFirework(x, y, seed, delay = 0) {
   setupCanvas();
   setTimeout(() => {
-    rockets.push({ x, fromY: innerHeight + 10, toY: y, age: 0, seed });
+    rockets.push({ x, fromY: innerHeight + 10, toY: y, age: 0, launched: performance.now(), seed });
     startDrawing();
   }, delay * 1000);
 }
@@ -58,7 +58,9 @@ function frame(now) {
 
   // Rockets: a bright head with a fading gold trail; at the top, they burst.
   rockets = rockets.filter((r) => {
-    r.age += dt;
+    // By the real clock (11 Nov 2026): a busy page (My journey still loading)
+    // must not slow the rocket down, or it would burst after its bang.
+    r.age = (now - r.launched) / 1000;
     const y = rocketY(r.fromY, r.toY, r.age);
     const trail = ctx.createLinearGradient(r.x, y, r.x, y + 46);
     trail.addColorStop(0, 'rgba(255, 197, 49, 0.95)');
