@@ -257,7 +257,7 @@ export function setPreviewAll(on) {
 export function clearChildData() {
   const sent = getSentIds();
   const notSent = getLogEntries().filter((entry) => !entry.id || !sent.has(entry.id));
-  for (const key of [SCENARIO_KEY, CODE_KEY, LAST_CODE_KEY, LOG_KEY, INTROS_KEY, TUTORIAL_KEY, PROGRESS_KEY, SENT_KEY, WARDROBE_KEY]) {
+  for (const key of [SCENARIO_KEY, CODE_KEY, LAST_CODE_KEY, LOG_KEY, INTROS_KEY, TUTORIAL_KEY, PROGRESS_KEY, SENT_KEY, WARDROBE_KEY, ROOMS_KEY]) {
     memory.delete(key);
     try {
       localStorage.removeItem(key);
@@ -275,12 +275,34 @@ export function startNewInvestigation() {
   const all = readObject(PROGRESS_KEY);
   delete all[getExplorerCode() || 'NO-CODE'];
   writeItem(PROGRESS_KEY, JSON.stringify(all));
+  const rooms = readObject(ROOMS_KEY); // Part 60e: the rooms start empty again too
+  delete rooms[getExplorerCode() || 'NO-CODE'];
+  writeItem(ROOMS_KEY, JSON.stringify(rooms));
   memory.delete(SCENARIO_KEY);
   try {
     localStorage.removeItem(SCENARIO_KEY);
   } catch {
     // Storage is blocked: nothing was stored there anyway.
   }
+}
+
+// Part 60e (Habiba, 11 Nov 2026): where the child was in each room and what
+// they had answered, so going back to a room opens it at the same step with
+// the answers still there: { code: { room: { scenarioId, ...state } } }.
+// A state saved for another scenario is ignored (the room starts afresh).
+// Only in this browser; restoring never logs anything again.
+const ROOMS_KEY = 'datascope:rooms';
+
+export function loadRoomState(room, scenarioId) {
+  const saved = (readObject(ROOMS_KEY)[getExplorerCode() || 'NO-CODE'] || {})[room];
+  return saved && saved.scenarioId === scenarioId ? saved : null;
+}
+
+export function saveRoomState(room, scenarioId, state) {
+  const all = readObject(ROOMS_KEY);
+  const code = getExplorerCode() || 'NO-CODE';
+  all[code] = { ...all[code], [room]: { ...state, scenarioId } };
+  writeItem(ROOMS_KEY, JSON.stringify(all));
 }
 
 // Teacher view with the database switched off: the teacher's tags, stored as

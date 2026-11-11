@@ -10,7 +10,9 @@ import { logEvent, trackMeaningTask, readLog } from '../helpers/log.js';
 import { planPrediction, guessWord, planReminder } from '../helpers/guesses.js';
 import { createAnswerHint, createHint } from '../helpers/prompts.js';
 import { answerFacts, fillSuggestions } from '../helpers/suggestions.js';
-import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
+import {
+  getSelectedScenarioId, getExplorerCode, loadRoomState, saveRoomState,
+} from '../storage/save.js';
 import { cheer, encourage, stagger, countUp } from '../motion.js';
 import { finishPhase } from '../phase-progress.js';
 import { whenIntroClosed } from '../phase-intro.js';
@@ -48,6 +50,9 @@ let bar = null;
 let revealNumbers = () => {};
 let checkBuild = () => {};
 let saveRevision = () => {};
+let showStats = () => {};
+let showRevision = () => {};
+let openChange = () => {};
 let reasonHint = null; // suggested answers for "I changed my guess because..."
 let buildHint = null; // Build it: "write the mean 5 times", then fill it in (Habiba, 6 Nov 2026)
 
@@ -68,6 +73,18 @@ const numberFacts = { guess: null, changedWithReason: false, teaches: '' };
 let word = 'estimate';
 let planGuess = null;
 let fromPlan = false;
+
+// Part 60e (Habiba, 11 Nov 2026): the room remembers where the child was and
+// what they did, so coming back opens the same task with the answers there.
+// `memory` is what is saved (see remember()); restoring logs nothing.
+let restoring = true;
+const memory = {
+  predict: { guess: null, revealed: false, changing: false, revision: null },
+  build: { solvedText: null },
+  solved: {}, // multiple-choice tasks answered right: { 'find-mias-mistake': true, ... }
+  texts: {}, // the "done" messages of the card sorts: { sort: '...', median: '...' }
+};
+const showSolved = {}; // task -> shows that task answered right, quietly (wireRetryChoices)
 
 async function init() {
   recipe = await loadRecipe(getSelectedScenarioId());
@@ -113,7 +130,13 @@ async function init() {
 
   bar = setupActionBar({ back: null, primary: { label: '' } });
   tasks.forEach((task, i) => TASK_SETUP[task](i + 1, data));
-  showTask(1);
+  const saved = loadRoomState('number-lab', recipe.id);
+  if (saved) restore(saved, data);
+  restoring = false;
+  // A typed (or picked) estimate is kept even before the numbers are shown.
+  const predictRow = document.querySelector('.predict-row');
+  if (predictRow) ['input', 'click'].forEach((type) => predictRow.addEventListener(type, remember));
+  showTask(saved ? saved.task : 1);
 
   // The maths recap (Part 18): a button, and the first time it opens by
   // itself, right after the Number Lab intro is closed.
@@ -128,6 +151,7 @@ function showTask(n) {
     el.hidden = Number(el.dataset.task) !== n;
   });
   currentTask = n;
+  remember();
   const task = tasks[n - 1];
   document.getElementById('stepper').innerHTML = miniStepperHTML(tasks.map((t) => STEP_LABELS[t]), n - 1);
   setIconLine(document.querySelector('.task-question'), TASK_TITLES[task]);
@@ -168,6 +192,7 @@ function refreshPrimary() {
 
 function markComplete(taskNum) {
   taskComplete[taskNum] = true;
+  remember();
   if (currentTask === taskNum) refreshPrimary();
   // The room's phase is done when every task is done.
   if (Object.values(taskComplete).every(Boolean)) finishPhase('number', numberFacts);
@@ -226,6 +251,21 @@ function wireRetryChoices(container, feedback, { task, isCorrect, correctText, h
   const tracker = trackMeaningTask('number-lab', task, { scenarioId: recipe.id });
   let solved = false;
 
+  // The right answer: marked, explained, and the task goes on. A restore
+  // (Part 60e) shows it again without logging or cheering.
+  function markSolved(btn, { quiet = false } = {}) {
+    solved = true;
+    buttons.forEach((b) => b.classList.toggle('active', b === btn));
+    show(feedback, correctText);
+    memory.solved[task] = true;
+    if (!quiet) {
+      tracker.solved();
+      cheer(feedback);
+    }
+    onCorrect({ quiet });
+  }
+  showSolved[task] = () => markSolved([...buttons].find((b) => isCorrect(b.dataset.answer)), { quiet: true });
+
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       if (solved) return;
@@ -233,11 +273,7 @@ function wireRetryChoices(container, feedback, { task, isCorrect, correctText, h
       btn.classList.add('active');
 
       if (isCorrect(btn.dataset.answer)) {
-        solved = true;
-        show(feedback, correctText);
-        tracker.solved();
-        cheer(feedback);
-        onCorrect();
+        markSolved(btn);
       } else {
         show(feedback, typeof hintText === 'function' ? hintText() : hintText);
         tracker.wrong();
@@ -446,6 +482,31 @@ const TASK_SETUP = {
     wireChoiceGroup('new-guess');
     const feedback = document.getElementById('predict-feedback');
 
+    // The numbers and what they say about the guess (Part 60e: a restore shows
+    // them again without the drum roll).
+    showStats = (guess, { quiet = false } = {}) => {
+      const box = document.getElementById('stats-box');
+      box.innerHTML = statsHTML(stats);
+      box.hidden = false;
+      if (!quiet) {
+        // The numbers spring in one by one and count up, like a drum roll.
+        stagger(box.querySelectorAll('.stat-card'), { each: 0.15 });
+        box.querySelectorAll('.stat-value').forEach((value) => {
+          const text = value.textContent;
+          if (/^\d+(\.\d+)?$/.test(text)) countUp(value, Number(text), text.includes('.') ? 1 : 0);
+        });
+      }
+      show(feedback, revealMessage(kind, guess, stats));
+      document.querySelectorAll('.predict-row input, .predict-row button').forEach((el) => { el.disabled = true; });
+      document.getElementById('revise-box').hidden = false; // the task completes after the child decides
+      stage.predict = 'revealed';
+      numberFacts.guess = guess;
+      if (kind === 'category') numberFacts.mode = stats.mode;
+      else numberFacts.mean = formatMean(stats.mean);
+      memory.predict.guess = guess;
+      memory.predict.revealed = true;
+    };
+
     revealNumbers = () => {
       // Guess first: the numbers stay hidden until the child has made a guess.
       const guess = readGuess('predict');
@@ -453,33 +514,16 @@ const TASK_SETUP = {
         show(feedback, kind === 'category' ? `Pick your ${word} first!` : `Type your ${word} first!`);
         return;
       }
-      const box = document.getElementById('stats-box');
-      box.innerHTML = statsHTML(stats);
-      box.hidden = false;
-      // The numbers spring in one by one and count up, like a drum roll.
-      stagger(box.querySelectorAll('.stat-card'), { each: 0.15 });
-      box.querySelectorAll('.stat-value').forEach((value) => {
-        const text = value.textContent;
-        if (/^\d+(\.\d+)?$/.test(text)) countUp(value, Number(text), text.includes('.') ? 1 : 0);
-      });
-      show(feedback, revealMessage(kind, guess, stats));
-      document.querySelectorAll('.predict-row input, .predict-row button').forEach((el) => { el.disabled = true; });
+      showStats(guess);
 
-      numberFacts.guess = guess;
       // Part 50: new fields only. planGuess: the Plan prediction beside the
       // estimate; fromPlan: games checked the Plan prediction (no second guess).
       const logged = { about: recipe.question, scenarioId: recipe.id, guess, planGuess, fromPlan };
-      if (kind === 'category') {
-        numberFacts.mode = stats.mode;
-        logged.mode = stats.mode;
-      } else {
-        numberFacts.mean = formatMean(stats.mean);
-        Object.assign(logged, { mean: numberFacts.mean, median: stats.median });
-      }
+      if (kind === 'category') logged.mode = stats.mode;
+      else Object.assign(logged, { mean: numberFacts.mean, median: stats.median });
       logEvent('number-lab', 'prediction', logged);
-      document.getElementById('revise-box').hidden = false; // the task completes after the child decides
-      stage.predict = 'revealed';
       refreshPrimary();
+      remember();
     };
 
     setupRevision(n, () => numberFacts.guess);
@@ -535,6 +579,7 @@ const TASK_SETUP = {
       }
     }
     inputs.forEach((input) => input.addEventListener('input', showTotal));
+    inputs.forEach((input) => input.addEventListener('input', remember));
     showTotal();
 
     // The worked example opens and closes in place.
@@ -575,6 +620,7 @@ const TASK_SETUP = {
         tracker.solved({ allSame: allSameSolved, usedHint: filledByHint });
         cheer(feedback);
         bar.setHint(null);
+        memory.build.solvedText = feedback.textContent;
         markComplete(n);
       } else {
         // The hint shows the idea behind the mean: the total, shared fairly.
@@ -595,15 +641,23 @@ const TASK_SETUP = {
       correctText: ':check: Right! Mia forgot to put the numbers in order first.',
       hintText: ':cross: Not quite. What must we do first to find the median?',
       // Then the child sorts the cards themselves; the task is done once sorted.
-      onCorrect: () => {
+      onCorrect: ({ quiet }) => {
         stage.mistake = 'sort';
         refreshPrimary();
+        const sortFeedback = document.getElementById('sort-feedback');
+        if (quiet && memory.texts.sort) {
+          // Sorted on an earlier visit: the answer, without the cards.
+          sortFeedback.textContent = memory.texts.sort;
+          sortFeedback.hidden = false;
+          return;
+        }
         const box = document.getElementById('sort-box');
         box.hidden = false;
         mountCardSort(box, numbers, (centre) => {
-          const feedback = document.getElementById('sort-feedback');
+          const feedback = sortFeedback;
           setIconLine(feedback, `:check: In order! The one in the centre is ${centre.join(' and ')}. That is the median, not ${miaSays(numbers)}.`);
           feedback.hidden = false;
+          memory.texts.sort = feedback.textContent;
           cheer(feedback);
           // Logged apart from Mia's yes/no answer (that one is logged when it is right).
           logEvent('number-lab', 'cards-sorted', { scenarioId: recipe.id, numbers, centre });
@@ -635,6 +689,12 @@ const TASK_SETUP = {
     // then taps the one in the centre. Logged as before: real-life-median
     // (wrong taps count as tries) and reallife-sorted (now: sorted by the child).
     const feedback = document.getElementById('median-feedback');
+    // Part 60e: answered on an earlier visit: the answer, without the cards.
+    showSolved['real-life-median'] = () => {
+      document.getElementById('median-sort').hidden = true;
+      feedback.textContent = memory.texts.median;
+      feedback.hidden = false;
+    };
     const tracker = trackMeaningTask('number-lab', 'real-life-median', { scenarioId: recipe.id });
     const side = Math.floor(list.length / 2);
     mountCardSort(document.getElementById('median-sort'), list, () => {
@@ -643,6 +703,7 @@ const TASK_SETUP = {
       pickCentre: (index, value, isCentre) => {
         if (isCentre) {
           show(feedback, `:check: Yes! ${value} is in the centre: ${side} cards on each side. It is the median.`);
+          memory.texts.median = feedback.textContent;
           tracker.solved();
           cheer(feedback);
           markComplete(n);
@@ -690,16 +751,22 @@ function setupRevision(n, getOldGuess) {
   const reasonInput = document.getElementById('revise-reason');
   const feedback = document.getElementById('revise-feedback');
 
-  function finish(message) {
+  function finish(message, { quiet = false } = {}) {
     show(feedback, message);
     keepBtn.disabled = true;
     changeBtn.disabled = true;
     form.hidden = true;
     bar.setHint(null);
+    memory.predict.revision = { message, kept: keepBtn.classList.contains('active') };
     markComplete(n);
     // The choice buttons are now locked, so keyboard users jump straight to the next step.
-    document.getElementById('action-primary').focus();
+    if (!quiet) document.getElementById('action-primary').focus();
   }
+  // Part 60e: the decision made on an earlier visit, shown again (not logged).
+  showRevision = ({ message, kept }) => {
+    (kept ? keepBtn : changeBtn).classList.add('active');
+    finish(message, { quiet: true });
+  };
 
   keepBtn.addEventListener('click', () => {
     keepBtn.classList.add('active');
@@ -709,14 +776,20 @@ function setupRevision(n, getOldGuess) {
       : `You kept your ${word}: ${getOldGuess()}. Which number above backs it up?`);
   });
 
-  changeBtn.addEventListener('click', () => {
+  openChange = ({ quiet = false } = {}) => {
     changeBtn.classList.add('active');
     stage.predict = 'changing';
+    memory.predict.changing = true;
     form.hidden = false; // first, so the Hint button can go under the question
+    if (quiet) return;
     bar.setHint(reasonHint.button);
     refreshPrimary();
+    remember();
     form.querySelector('input, button').focus();
-  });
+  };
+  changeBtn.addEventListener('click', () => openChange());
+  form.addEventListener('input', remember);
+  form.addEventListener('click', remember);
 
   saveRevision = () => {
     const newGuess = readGuess('new-guess');
@@ -732,6 +805,87 @@ function setupRevision(n, getOldGuess) {
     });
     finish(`You changed from ${getOldGuess()} to ${newGuess} because ${reason}. Changing your mind with evidence is what data detectives do! :magnifier:`);
   };
+}
+
+// ---------- Part 60e (Habiba, 11 Nov 2026): the room remembers ----------
+
+// The child's guess control as it is now (a number box or a chosen word).
+function guessDraft(prefix) {
+  if (kind === 'category') {
+    const chosen = document.querySelector(`.${prefix}-choice.active`);
+    return chosen ? chosen.dataset.value : null;
+  }
+  const input = document.getElementById(`${prefix}-input`);
+  return input ? input.value : null;
+}
+
+function setGuessDraft(prefix, value) {
+  if (value === null || value === undefined) return;
+  if (kind === 'category') {
+    document.querySelectorAll(`.${prefix}-choice`).forEach((b) => b.classList.toggle('active', b.dataset.value === String(value)));
+    return;
+  }
+  const input = document.getElementById(`${prefix}-input`);
+  if (input) input.value = value;
+}
+
+function remember() {
+  if (restoring) return;
+  saveRoomState('number-lab', recipe.id, {
+    task: currentTask,
+    done: { ...taskComplete },
+    facts: numberFacts,
+    predict: {
+      ...memory.predict,
+      draft: memory.predict.revealed ? null : guessDraft('predict'),
+      newGuess: guessDraft('new-guess'),
+      reason: document.getElementById('revise-reason') ? document.getElementById('revise-reason').value : '',
+      reasonTapped: reasonHint ? reasonHint.tappedAnswers() : [],
+    },
+    build: {
+      ...memory.build,
+      numbers: [...document.querySelectorAll('.build-input')].map((box) => box.value),
+    },
+    solved: memory.solved,
+    texts: memory.texts,
+  });
+}
+
+function restore(saved) {
+  Object.assign(numberFacts, saved.facts);
+  memory.texts = { ...saved.texts };
+  const p = saved.predict || {};
+  // The estimate (or prediction), its reveal, and keep / change.
+  if (p.revealed) {
+    setGuessDraft('predict', p.guess);
+    showStats(p.guess, { quiet: true });
+    if (p.revision) {
+      showRevision(p.revision);
+    } else if (p.changing) {
+      openChange({ quiet: true });
+    }
+  } else {
+    setGuessDraft('predict', p.draft);
+  }
+  setGuessDraft('new-guess', p.newGuess);
+  if (reasonHint) reasonHint.restoreTapped(p.reasonTapped);
+  const reason = document.getElementById('revise-reason');
+  if (reason) reason.value = p.reason || '';
+  // Build it: the 5 numbers, and the answer if it was solved.
+  const b = saved.build || {};
+  const inputs = [...document.querySelectorAll('.build-input')];
+  (b.numbers || []).forEach((value, i) => { if (inputs[i]) inputs[i].value = value; });
+  if (inputs.length) inputs[0].dispatchEvent(new Event('input')); // the live total line
+  if (b.solvedText) {
+    memory.build.solvedText = b.solvedText;
+    const feedback = document.getElementById('build-feedback');
+    feedback.textContent = b.solvedText;
+    feedback.hidden = false;
+  }
+  // The multiple-choice tasks answered right (and their card sorts).
+  Object.keys(saved.solved || {}).forEach((task) => { if (showSolved[task]) showSolved[task](); });
+  if (memory.texts.median && showSolved['real-life-median']) showSolved['real-life-median']();
+  Object.assign(taskComplete, saved.done);
 }
 
 init();

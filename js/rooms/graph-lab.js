@@ -8,7 +8,7 @@ import { loadRecipe, loadPartnerRecipe, loadContent } from '../helpers/scenarios
 import { logEvent } from '../helpers/log.js';
 import { createAnswerHint } from '../helpers/prompts.js';
 import { answerFacts, fillSuggestions } from '../helpers/suggestions.js';
-import { getSelectedScenarioId } from '../storage/save.js';
+import { getSelectedScenarioId, loadRoomState, saveRoomState } from '../storage/save.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
 import { countWords } from '../helpers/feedback.js';
 import { pipSay } from '../pip.js';
@@ -211,6 +211,7 @@ async function init() {
   function renderCharts(type) {
     currentType = type;
     typesTried.add(type);
+    remember();
     setIconLine(document.getElementById('graphs-tried'), triedText(typesTried.size, CHART_TYPES.length));
     charts.forEach((chart) => chart.destroy());
     // Two classes as dot plots: one ABOVE the other on the same number line, so
@@ -342,6 +343,7 @@ async function init() {
 
   function showStep(n) {
     step = n;
+    remember();
     document.getElementById('stepper').innerHTML = miniStepperHTML(STEP_LABELS, n);
     // Step 1 is for trying the 4 kinds; steps 2 and 3 keep the chart the child chose.
     document.getElementById('graph-toolbar').hidden = n > 0;
@@ -392,11 +394,40 @@ async function init() {
     refreshPrimary();
   }
 
+  // ---------- Part 60e (Habiba, 11 Nov 2026): the room remembers ----------
+  // The step, the graph on screen, the kinds tried and both answers (with
+  // their hint answers). Restoring logs nothing.
+  let restoring = true; // nothing is saved while the room is being rebuilt
+  function remember() {
+    if (restoring) return;
+    saveRoomState('graph-lab', recipe.id, {
+      step,
+      chartType: currentType,
+      typesTried: [...typesTried],
+      tell: document.getElementById('tell').value,
+      notTell: document.getElementById('not-tell').value,
+      tellTapped: hints.tell.tappedAnswers(),
+      notTellTapped: hints['not-tell'].tappedAnswers(),
+    });
+  }
+  ['tell', 'not-tell'].forEach((id) => document.getElementById(id).addEventListener('input', remember));
+  const saved = loadRoomState('graph-lab', recipe.id);
+  if (saved) {
+    (saved.typesTried || []).forEach((type) => typesTried.add(type));
+    document.getElementById('tell').value = saved.tell || '';
+    document.getElementById('not-tell').value = saved.notTell || '';
+    hints.tell.restoreTapped(saved.tellTapped);
+    hints['not-tell'].restoreTapped(saved.notTellTapped);
+  }
+
   // A chart is drawn once, on a canvas: wait for the chart font, or the labels
   // stay in a fallback font (Part 36: the fonts are local, so this is quick).
   await document.fonts.load('bold 18px Nunito').catch(() => {});
-  document.querySelector('.kind-tab[data-value="bar"]').click();
-  showStep(0);
+  // The first graph is never logged as a switch (firstChart), so the saved one
+  // can be drawn again the same way.
+  document.querySelector(`.kind-tab[data-value="${saved ? saved.chartType : 'bar'}"]`).click();
+  restoring = false;
+  showStep(saved ? saved.step : 0);
 }
 
 init();

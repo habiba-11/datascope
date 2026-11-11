@@ -170,6 +170,8 @@ export function createAnswerHint(key, room, suggestions, box, { line = '' } = {}
       ? `These finish your "${line} …" line. Tap one, or drag it into the box.`
       : 'Tap one, or drag it into the box. You can change the words.');
     list.replaceChildren(help, ...suggestions.map(chipItem));
+    // Part 60e: answers already used before a page change stay used.
+    chips.forEach((chip, i) => { if (tapped.includes(suggestions[i].text)) chip.disabled = true; });
     logEvent(room, 'hint', { prompt: key, hintNumber: 1 });
     setIconText(button, 'bulb', 'Answers are below');
     button.disabled = true;
@@ -190,5 +192,12 @@ export function createAnswerHint(key, room, suggestions, box, { line = '' } = {}
     return fields;
   }
 
-  return { button, list, open, answerFields };
+  // Part 60e: the room saves which answers came from this hint, and gives them
+  // back when the child returns, so a hint answer is not logged as "own" later.
+  const tappedAnswers = () => [...tapped];
+  function restoreTapped(list = []) {
+    tapped = [...list];
+  }
+
+  return { button, list, open, answerFields, tappedAnswers, restoreTapped };
 }

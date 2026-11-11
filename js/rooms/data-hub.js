@@ -9,7 +9,9 @@ import { planPrediction } from '../helpers/guesses.js';
 import { playSound } from '../sounds.js';
 import { pipReacts, animate } from '../motion.js';
 import { pipSay } from '../pip.js';
-import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
+import {
+  getSelectedScenarioId, getExplorerCode, loadRoomState, saveRoomState,
+} from '../storage/save.js';
 import { finishPhase } from '../phase-progress.js';
 import { taskCardHTML, pipLineHTML, miniStepperHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
@@ -66,6 +68,18 @@ async function init() {
   });
 
   const bar = setupActionBar({ back: { label: 'Back', href: 'question-studio.html' }, primary: { label: '' } });
+
+  // Part 60e (Habiba, 11 Nov 2026): a class already surveyed stays surveyed
+  // when the child comes back (all seats filled at once, nothing logged again),
+  // and the room opens at the step the child was on.
+  const saved = loadRoomState('data-hub', recipe.id);
+  let step = saved ? saved.step : 0;
+  const remember = () => saveRoomState('data-hub', recipe.id, {
+    step, surveyed: classes.filter((c) => c.done).map((c) => c.p),
+  });
+  classes.forEach((c) => {
+    if (saved && saved.surveyed.includes(c.p)) fillAllSeats(c, allKeys);
+  });
   classes.forEach((c) => renderTally(c, allKeys, scaleMax()));
 
   // Collect is done when every class has been surveyed.
@@ -94,6 +108,7 @@ async function init() {
         onProgress: (n) => bar.setPrimary({ label, enabled: false, whyDisabled: `:clock: Asking... ${n} of ${c.data.values.length}` }),
         onDone: () => {
           c.done = true;
+          remember();
           classes.forEach((other) => renderTally(other, allKeys, scaleMax()));
           bar.setPrimary(afterDone);
           if (classes.every((x) => x.done)) finishCollect();
@@ -109,6 +124,8 @@ async function init() {
 
   // Reading minutes: Class A -> Class B -> Compare.
   function showStep(i) {
+    step = i;
+    remember();
     document.getElementById('stepper').innerHTML = miniStepperHTML(steps, i);
     classes.forEach((c, k) => { document.getElementById(`${c.p}-panels`).hidden = k !== i; });
     document.getElementById('compare-panels').hidden = i !== 2;
@@ -127,7 +144,7 @@ async function init() {
       bar.setPrimary(goToGraphs);
     }
   }
-  showStep(0);
+  showStep(step);
 }
 
 // Two panels for one class: the seats (left) and the tally (right).
@@ -212,11 +229,8 @@ function runSurvey(c, allKeys, { onProgress, onDone }) {
     const value = values[i];
     c.answers.push(value);
 
-    const seat = document.getElementById(`${c.p}-seat-${i}`);
-    // The classmate gets a face; the shirt and the answer badge take the bar's colour.
-    seat.innerHTML = `${seatKidSVG(i, true)}<span class="seat-badge" aria-hidden="true">${labels.get(value)}</span><span class="sr-only">Classmate ${i + 1}: ${valueText(value, c.recipe)}</span>`;
-    seat.style.setProperty('--seat', `var(--color-${colourFor(allKeys, value)})`);
-    seat.classList.add('seat--filled', 'm-pop');
+    fillSeat(c, allKeys, labels, i, value);
+    document.getElementById(`${c.p}-seat-${i}`).classList.add('m-pop');
     said.textContent = `Classmate ${i + 1} said: ${valueText(value, c.recipe)}`;
 
     const scale = Math.max(1, ...countAnswers(c.keys, c.answers).values());
@@ -241,6 +255,28 @@ function runSurvey(c, allKeys, { onProgress, onDone }) {
     onDone();
   }
   revealNext();
+}
+
+// One classmate's seat, filled: the classmate gets a face; the shirt and the
+// answer badge take the bar's colour.
+function fillSeat(c, allKeys, labels, i, value) {
+  const seat = document.getElementById(`${c.p}-seat-${i}`);
+  seat.innerHTML = `${seatKidSVG(i, true)}<span class="seat-badge" aria-hidden="true">${labels.get(value)}</span><span class="sr-only">Classmate ${i + 1}: ${valueText(value, c.recipe)}</span>`;
+  seat.style.setProperty('--seat', `var(--color-${colourFor(allKeys, value)})`);
+  seat.classList.add('seat--filled');
+}
+
+// Part 60e: a class surveyed on an earlier visit, shown all at once (no sound,
+// no log: "data-seen" was logged when the survey ran).
+function fillAllSeats(c, allKeys) {
+  const { values } = c.data;
+  const labels = seatLabels(c.keys);
+  values.forEach((value, i) => fillSeat(c, allKeys, labels, i, value));
+  c.answers = [...values];
+  c.done = true;
+  document.getElementById(`${c.p}-fill`).style.transform = 'scaleX(1)';
+  document.getElementById(`${c.p}-text`).textContent = `${values.length} of ${values.length}`;
+  setIconText(document.getElementById(`${c.p}-said`), 'check', `All ${values.length} classmates answered!`);
 }
 
 init();

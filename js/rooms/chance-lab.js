@@ -4,7 +4,7 @@ import { createAnswerHint } from '../helpers/prompts.js';
 import { chanceAnswers } from '../helpers/suggestions.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
 import { loadContent, loadSharedAnswers } from '../helpers/scenarios.js';
-import { getSelectedScenarioId } from '../storage/save.js';
+import { getSelectedScenarioId, loadRoomState, saveRoomState } from '../storage/save.js';
 import { toPct, theoryText, theoryWords, outcomeRows, trialMessage } from '../helpers/chance.js';
 import { certaintyButtonsHTML } from '../helpers/certainty.js';
 import { pipSay } from '../pip.js';
@@ -44,12 +44,17 @@ let selectedDevice = null;
 // The last trial run for the selected device, so feedback can honestly say
 // whether a bigger run came out closer to the theory or not.
 let previousRun = null;
+// Part 60e: the last test, as shown (so it can be shown again after a page change).
+let lastRun = null;
+let scenarioId = null;
+let restoring = true; // nothing is saved while the room is being rebuilt
 // What the child did, for the feedback card at the end (Part 16).
 const chanceFacts = { rating: '', target: '', runSizes: [], pct500: null, theoryText: '' };
 
 async function init() {
   // Only the story follows the scenario; the 4 devices stay the same for everyone.
-  const { chanceLab } = await loadContent(getSelectedScenarioId());
+  scenarioId = getSelectedScenarioId();
+  const { chanceLab } = await loadContent(scenarioId);
   whyWords = (await loadSharedAnswers()).chanceWhy;
 
   story = chanceLab.story;
@@ -131,7 +136,11 @@ async function init() {
   setupDevicePicker();
   setupPredict();
   setupTrials();
-  showTask(1);
+  // Part 60e: back in this room? The same step, with the answers still there.
+  const saved = loadRoomState('chance-lab', scenarioId);
+  if (saved) restore(saved);
+  restoring = false;
+  showTask(saved ? saved.task : 1);
 }
 
 const TASK_QUESTIONS = [':die: Pick a chance game', '', ':repeat: Test it many times'];
@@ -141,6 +150,7 @@ function showTask(n) {
     el.hidden = Number(el.dataset.task) !== n;
   });
   currentTask = n;
+  remember();
   document.getElementById('stepper').innerHTML = miniStepperHTML(STEP_LABELS, n - 1);
   let question = TASK_QUESTIONS[n - 1];
 
@@ -210,6 +220,12 @@ function withYourWork() {
 
 function setupDevicePicker() {
   wireChoiceCards(document.getElementById('device-grid'), '.device-card', (card) => {
+    // Part 60e (bug): tapping the game already chosen (after Back) wiped the
+    // child's test results. The same game keeps everything.
+    if (DEVICES[card.dataset.key] === selectedDevice) {
+      markComplete(1);
+      return;
+    }
     const reasonBox = document.getElementById('predict-reason');
     // Another device means another question, so its answers and its "why" start afresh.
     if (DEVICES[card.dataset.key] !== selectedDevice) {
@@ -219,6 +235,7 @@ function setupDevicePicker() {
     }
     selectedDevice = DEVICES[card.dataset.key];
     previousRun = null;
+    lastRun = null;
     chanceFacts.runSizes = []; // a new device starts a new experiment
     chanceFacts.pct500 = null;
 
@@ -266,16 +283,16 @@ function setupPredict() {
   const buttons = document.querySelectorAll('.certainty-btn');
   const reasonInput = document.getElementById('predict-reason');
   const feedback = document.getElementById('predict-feedback');
-  let chosen = null;
+  // Part 60e: the module's `rating` (was a copy here), so a restored room has it.
 
   function checkComplete() {
-    if (!chosen) return;
+    if (!rating) return;
     if (!reasonInput.value.trim()) {
       setIconLine(feedback, 'Now say why you think so!');
       feedback.hidden = false;
       return;
     }
-    setIconLine(feedback, `You think ${selectedDevice.target} is "${chosen.toLowerCase()}". Let's test it!`);
+    setIconLine(feedback, `You think ${selectedDevice.target} is "${rating.toLowerCase()}". Let's test it!`);
     feedback.hidden = false;
     markComplete(2);
   }
@@ -283,9 +300,9 @@ function setupPredict() {
   // Logged when a rating is picked (if a reason exists) or when the child
   // leaves the reason box, so a changed mind shows up as a new entry.
   function logCertainty() {
-    if (!chosen || !reasonInput.value.trim()) return;
+    if (!rating || !reasonInput.value.trim()) return;
     logEvent('chance-lab', 'certainty', {
-      device: selectedDevice.label, outcome: selectedDevice.target, rating: chosen, reason: reasonInput.value.trim(), ...hint.answerFields(),
+      device: selectedDevice.label, outcome: selectedDevice.target, rating, reason: reasonInput.value.trim(), ...hint.answerFields(),
     });
   }
 
@@ -293,16 +310,16 @@ function setupPredict() {
     btn.addEventListener('click', () => {
       buttons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
-      chosen = btn.dataset.word; // the word only, without the small gloss
-      rating = chosen;
-      chanceFacts.rating = chosen;
+      rating = btn.dataset.word; // the word only, without the small gloss
+      chanceFacts.rating = rating;
       refreshPrimary();
       checkComplete();
       logCertainty();
+      remember();
     });
   });
 
-  reasonInput.addEventListener('input', () => { checkComplete(); refreshPrimary(); });
+  reasonInput.addEventListener('input', () => { checkComplete(); refreshPrimary(); remember(); });
   reasonInput.addEventListener('change', logCertainty);
 }
 
@@ -358,8 +375,6 @@ function setupTrials() {
   document.getElementById('run-btn').addEventListener('click', () => runTrials());
   dials.querySelector('.size-dial[data-value="10"]').click();
 
-  const rows = document.getElementById('outcome-rows');
-  const feedback = document.getElementById('trial-feedback');
   const result = document.getElementById('trial-result');
 
   runTrials = () => {
@@ -382,27 +397,19 @@ function setupTrials() {
     result.textContent = '…';
     playDevice(document.getElementById('trial-device'), device, lastOutcome).then(() => {
       running = false;
-      result.textContent = /^[1-6]$/.test(lastOutcome) ? `You rolled a ${lastOutcome}!` : `${lastOutcome}!`;
-
-      // For 10, 50 and 500 trials one decimal place is always exact, so these add up to 100%.
-      rows.innerHTML = outcomeRows(device.outcomes, device.weights, results, count)
-        .map((row) => outcomeCardHTML(device, row, true)).join('');
-      growBars();
-      document.getElementById('compare-empty').hidden = true;
-      // The last results as small tokens, each with its name for screen readers.
-      document.getElementById('recent').innerHTML = `<span class="recent-label">Last ${Math.min(count, RECENT_SHOWN)}:</span>${order.slice(-RECENT_SHOWN)
-        .map((o, i) => `<span class="recent-token" style="--i: ${i}">${tokenHTML(o)}<span class="sr-only">${o}</span></span>`).join('')}`;
-
       const targetIndex = device.outcomes.indexOf(device.target);
       const timesHit = results.get(device.target);
       const experimentPct = toPct(timesHit, count);
       const gap = Math.abs(timesHit / count - device.weights[targetIndex] / totalWeight);
 
-      setIconLine(feedback, trialMessage({
+      const message = trialMessage({
         count, verb: device.verb, target: device.target, timesHit,
         pct: experimentPct, theory: theoryWords(device.weights[targetIndex], totalWeight), previous: previousRun, gap,
-      }));
-      feedback.hidden = false;
+      });
+      lastRun = {
+        count, results: Object.fromEntries(results), recent: order.slice(-RECENT_SHOWN), lastOutcome, message,
+      };
+      showRun(device, lastRun);
       logEvent('chance-lab', 'trials', {
         device: device.label, outcome: device.target, trials: count, timesHit,
         experimentalPct: experimentPct, theory: theoryText(device.weights[targetIndex], totalWeight),
@@ -415,8 +422,71 @@ function setupTrials() {
 
       markComplete(3);
       refreshPrimary();
+      remember();
     });
   };
+}
+
+// The results of a test on the lab table (Part 60e: also used to show the last
+// test again when the child comes back).
+function showRun(device, run) {
+  const { count, recent, lastOutcome } = run;
+  const results = new Map(Object.entries(run.results));
+  document.getElementById('trial-result').textContent = /^[1-6]$/.test(lastOutcome) ? `You rolled a ${lastOutcome}!` : `${lastOutcome}!`;
+  // For 10, 50 and 500 trials one decimal place is always exact, so these add up to 100%.
+  document.getElementById('outcome-rows').innerHTML = outcomeRows(device.outcomes, device.weights, results, count)
+    .map((row) => outcomeCardHTML(device, row, true)).join('');
+  growBars();
+  document.getElementById('compare-empty').hidden = true;
+  // The last results as small tokens, each with its name for screen readers.
+  document.getElementById('recent').innerHTML = `<span class="recent-label">Last ${Math.min(count, RECENT_SHOWN)}:</span>${recent
+    .map((o, i) => `<span class="recent-token" style="--i: ${i}">${tokenHTML(o)}<span class="sr-only">${o}</span></span>`).join('')}`;
+  const feedback = document.getElementById('trial-feedback');
+  setIconLine(feedback, run.message);
+  feedback.hidden = false;
+}
+
+// ---------- Part 60e (Habiba, 11 Nov 2026): the room remembers ----------
+// The game, the step, "how likely" and why (with its hint answers), and the
+// tests so far. Restoring logs nothing.
+function remember() {
+  if (restoring) return;
+  const deviceKey = Object.keys(DEVICES).find((key) => DEVICES[key] === selectedDevice) || null;
+  saveRoomState('chance-lab', scenarioId, {
+    task: currentTask,
+    done: { ...taskComplete },
+    deviceKey,
+    rating,
+    reason: document.getElementById('predict-reason').value,
+    reasonTapped: hint ? hint.tappedAnswers() : [],
+    runSize,
+    lastRun,
+    previousRun,
+    facts: chanceFacts,
+  });
+}
+
+function restore(saved) {
+  if (!saved.deviceKey) return;
+  // Choosing the card the normal way builds the outcomes, the hint and the lab table.
+  document.querySelector(`.device-card[data-key="${saved.deviceKey}"]`).click();
+  hint.restoreTapped(saved.reasonTapped);
+  document.getElementById('predict-reason').value = saved.reason || '';
+  rating = saved.rating || null;
+  document.querySelectorAll('.certainty-btn').forEach((b) => b.classList.toggle('active', b.dataset.word === rating));
+  if (rating && saved.reason) {
+    const feedback = document.getElementById('predict-feedback');
+    setIconLine(feedback, `You think ${selectedDevice.target} is "${rating.toLowerCase()}". Let's test it!`);
+    feedback.hidden = false;
+  }
+  Object.assign(taskComplete, saved.done);
+  Object.assign(chanceFacts, saved.facts);
+  previousRun = saved.previousRun || null;
+  document.querySelector(`.size-dial[data-value="${saved.runSize || 10}"]`).click();
+  if (saved.lastRun) {
+    lastRun = saved.lastRun;
+    showRun(selectedDevice, lastRun);
+  }
 }
 
 init();

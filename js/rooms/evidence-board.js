@@ -12,7 +12,9 @@ import { createAnswerHint } from '../helpers/prompts.js';
 import { answerFacts, fillSuggestions, becauseText } from '../helpers/suggestions.js';
 import { playSound } from '../sounds.js';
 import { animate, pipReacts, confetti, stamp, MOTION } from '../motion.js';
-import { getSelectedScenarioId, getExplorerCode } from '../storage/save.js';
+import {
+  getSelectedScenarioId, getExplorerCode, loadRoomState, saveRoomState,
+} from '../storage/save.js';
 import { finishPhase, isPhaseDone } from '../phase-progress.js';
 import { whenIntroClosed } from '../phase-intro.js';
 import { countWords } from '../helpers/feedback.js';
@@ -154,7 +156,11 @@ async function init() {
   setupClaim();
   setupEvidence();
   setupCertainty();
-  showTask(1);
+  // Part 60e: back in this room? The same step, with the answers still there.
+  const saved = loadRoomState('evidence-board', scenarioId);
+  if (saved) restore(saved);
+  showTask(saved ? saved.task : 1);
+  document.querySelector('.evidence-panels').addEventListener('input', remember);
 
   // "My findings": the child's own numbers and words, so they don't have to
   // remember them while writing the claim. Opens by itself after the intro
@@ -181,6 +187,7 @@ function showTask(n) {
     el.hidden = Number(el.dataset.task) !== n;
   });
   currentTask = n;
+  remember();
   const step = STEPS[n - 1];
   document.getElementById('stepper').innerHTML = miniStepperHTML(STEPS.map((x) => x.label), n - 1);
   setIconLine(document.querySelector('.task-question'), step.question);
@@ -298,6 +305,7 @@ function setupEvidence() {
       if (selectedEvidence.size > 0) markComplete(2);
       else taskComplete[2] = false;
       refreshPrimary();
+      remember();
     });
   });
 }
@@ -320,6 +328,7 @@ function setupCertainty() {
       selectedCertainty = btn.dataset.value;
       showSure();
       refreshPrimary();
+      remember();
     });
   });
   reasonInput.addEventListener('input', () => { showSure(); refreshPrimary(); });
@@ -331,22 +340,75 @@ function makeCard() {
   renderCard();
   cardMade = true;
   // A "Checked!" stamp thumps onto the card (in words, not only a picture).
-  const card = document.getElementById('evidence-card');
-  card.querySelector('.card-stamp')?.remove();
-  const mark = document.createElement('span');
-  mark.className = 'card-stamp';
-  setIconText(mark, 'check', 'Checked!');
-  card.append(mark);
+  const mark = putStamp();
   stamp(mark);
   // The thud and the confetti come when the stamp lands (stamp() takes MOTION.medium).
   setTimeout(() => {
     playSound('stamp');
     confetti(); // fireworks only on My journey (Habiba, 8 Nov 2026)
   }, reduceMotion() ? 0 : MOTION.medium * 1000);
-  animate(card, 'cheer');
+  animate(document.getElementById('evidence-card'), 'cheer');
   pipReacts('hop');
   markComplete(3);
   refreshPrimary();
+  remember();
+}
+
+function putStamp() {
+  const card = document.getElementById('evidence-card');
+  card.querySelector('.card-stamp')?.remove();
+  const mark = document.createElement('span');
+  mark.className = 'card-stamp';
+  setIconText(mark, 'check', 'Checked!');
+  card.append(mark);
+  return mark;
+}
+
+// ---------- Part 60e (Habiba, 11 Nov 2026): the room remembers ----------
+// Saved at every change; given back when the child returns (nothing is logged
+// again, and hint answers stay hint answers for the thesis).
+function remember() {
+  if (!scenarioId) return;
+  saveRoomState('evidence-board', scenarioId, {
+    task: currentTask,
+    done: { ...taskComplete },
+    claim: document.getElementById('claim-subject').value,
+    because: document.getElementById('claim-reason').value,
+    claimTapped: claimHint.tappedAnswers(),
+    becauseTapped: becauseHint.tappedAnswers(),
+    evidence: [...selectedEvidence],
+    certainty: selectedCertainty,
+    sureWhy: document.getElementById('certainty-reason').value,
+    sureTapped: hints[3].tappedAnswers(),
+    cardMade,
+    lastLoggedClaim,
+  });
+}
+
+function restore(saved) {
+  Object.assign(taskComplete, saved.done);
+  claimHint.restoreTapped(saved.claimTapped);
+  becauseHint.restoreTapped(saved.becauseTapped);
+  hints[3].restoreTapped(saved.sureTapped);
+  document.getElementById('claim-subject').value = saved.claim || '';
+  document.getElementById('claim-reason').value = saved.because || '';
+  document.getElementById('claim-subject').dispatchEvent(new Event('input')); // fills the card's slot
+  document.querySelectorAll('.evidence-chip').forEach((chip) => {
+    if (!(saved.evidence || []).includes(chip.dataset.id)) return;
+    chip.classList.add('active');
+    selectedEvidence.add(chip.dataset.id);
+  });
+  fillSlot('slot-proof', [...document.querySelectorAll('.evidence-chip.active')].map((c) => c.textContent).join(' · '));
+  selectedCertainty = saved.certainty || null;
+  document.querySelectorAll('.certainty-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.value === selectedCertainty));
+  const sureWhy = document.getElementById('certainty-reason');
+  sureWhy.value = saved.sureWhy || '';
+  sureWhy.dispatchEvent(new Event('input')); // fills the "How sure" slot
+  lastLoggedClaim = saved.lastLoggedClaim || null; // the same card is never logged twice
+  if (saved.cardMade) {
+    cardMade = true;
+    putStamp();
+  }
 }
 
 // Logs the finished card. Making the card again (after a change) logs it again

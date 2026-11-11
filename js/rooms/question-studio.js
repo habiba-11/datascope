@@ -6,7 +6,9 @@ import { createHint } from '../helpers/prompts.js';
 import {
   PICKABLE_SCENARIOS, loadRecipe, loadContent, loadSharedAnswers,
 } from '../helpers/scenarios.js';
-import { setSelectedScenarioId, getExplorerCode } from '../storage/save.js';
+import {
+  setSelectedScenarioId, getSelectedScenarioId, getExplorerCode, loadRoomState, saveRoomState,
+} from '../storage/save.js';
 import { finishedScenarios } from '../helpers/progress.js';
 import { cheer, encourage } from '../motion.js';
 import { pipSay } from '../pip.js';
@@ -50,6 +52,10 @@ let missionScenarioId = null;
 const clearState = { 'fixit-1': false, 'fixit-2': false };
 // The Hint button of each fix-it (it sits in the action bar while that fix-it is on screen).
 const hintButtons = {};
+// Part 60e: Fix 1 already answered right (shown again, without a log, on return).
+let fix1Solved = false;
+let showFix1Solved = () => {};
+let restoring = true; // nothing is saved while the room is being rebuilt
 
 async function init() {
   // The numbers come from the recipe; the child-facing words from the content file.
@@ -140,14 +146,20 @@ async function init() {
     setSelectedScenarioId(card.dataset.id);
     selectedScenario = scenarios.find((s) => s.id === card.dataset.id);
     refreshPrimary();
+    remember();
   });
   setupFixIt();
   setupBonus();
-  showStep(0);
+  // Part 60e: back in this room? The same step, with the answers still there.
+  const saved = loadRoomState('question-studio', getSelectedScenarioId());
+  if (saved) restore(saved);
+  restoring = false;
+  showStep(saved ? saved.step : 0);
 }
 
 function showStep(n) {
   step = n;
+  remember();
   if (n === 1 || n === 2) renderFixIts();
   if (n === 3) offerBonus();
   if (n === 4) renderPredictTask();
@@ -223,6 +235,14 @@ function offerBonus() {
   logEvent('question-studio', 'bonus-seen', { scenarioId: selectedScenario.id });
 }
 
+// The child's own question box (Part 60e: also when the room is restored).
+function openBonus() {
+  bonusTaken = true;
+  document.getElementById('bonus-offer').hidden = true;
+  document.getElementById('bonus-write').hidden = false;
+  renderChecker(document.getElementById('own-question'), null, 'own');
+}
+
 function resetBonus() {
   bonusTaken = false;
   bonusSeenFor = null;
@@ -234,13 +254,10 @@ function resetBonus() {
 function setupBonus() {
   document.getElementById('bonus-yes').addEventListener('click', () => {
     logEvent('question-studio', 'bonus-choice', { scenarioId: selectedScenario.id, taken: true });
-    bonusTaken = true;
-    document.getElementById('bonus-offer').hidden = true;
-    document.getElementById('bonus-write').hidden = false;
-    const box = document.getElementById('own-question');
-    renderChecker(box, null, 'own');
-    box.focus();
+    openBonus();
+    document.getElementById('own-question').focus();
     refreshPrimary();
+    remember();
   });
   document.getElementById('bonus-no').addEventListener('click', () => {
     logEvent('question-studio', 'bonus-choice', { scenarioId: selectedScenario.id, taken: false });
@@ -297,6 +314,7 @@ function renderChoice({ flawed, fix, choice }) {
   const feedback = document.getElementById('fixit-choice-feedback');
   const options = choice.goodFirst ? [fix, flawed] : [flawed, fix];
   clearState['fixit-1'] = false;
+  fix1Solved = false;
   feedback.hidden = true;
   feedback.classList.remove('fixit-why');
   let tries = 0;
@@ -314,21 +332,10 @@ function renderChoice({ flawed, fix, choice }) {
       });
       feedback.hidden = false;
       if (right) {
-        button.classList.add('correct');
-        box.querySelectorAll('button').forEach((b) => { b.disabled = true; });
-        // 3 rows: the answer, what WHEN is, what pushy is (helpers/fixit-words.js).
-        feedback.replaceChildren(...choiceExplanation(choice).map(({ label, text }) => {
-          const row = Object.assign(document.createElement('span'), { className: 'fixit-why-line' });
-          const strong = document.createElement('strong');
-          setIconLine(strong, label);
-          row.append(strong);
-          if (text) row.append(` ${text}`);
-          return row;
-        }));
-        feedback.classList.add('fixit-why');
-        clearState['fixit-1'] = true;
+        markRight(button);
         cheer(feedback);
         refreshPrimary();
+        remember();
       } else {
         button.classList.add('wrong');
         button.disabled = true;
@@ -338,6 +345,26 @@ function renderChoice({ flawed, fix, choice }) {
     });
     return button;
   }));
+
+  // The right answer, with its 3 rows: the answer, what WHEN is, what pushy is
+  // (helpers/fixit-words.js).
+  function markRight(button) {
+    button.classList.add('correct');
+    box.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+    feedback.hidden = false;
+    feedback.replaceChildren(...choiceExplanation(choice).map(({ label, text }) => {
+      const row = Object.assign(document.createElement('span'), { className: 'fixit-why-line' });
+      const strong = document.createElement('strong');
+      setIconLine(strong, label);
+      row.append(strong);
+      if (text) row.append(` ${text}`);
+      return row;
+    }));
+    feedback.classList.add('fixit-why');
+    clearState['fixit-1'] = true;
+    fix1Solved = true;
+  }
+  showFix1Solved = () => markRight(box.querySelectorAll('button')[options.indexOf(fix)]);
 }
 
 // Builds the guess for the selected scenario. If the child went back and
@@ -394,6 +421,7 @@ function savePrediction(guess) {
   });
   guessSaved = true;
   refreshPrimary();
+  remember();
   finishPhase('plan', { guessText: String(shown) });
 }
 
@@ -403,7 +431,7 @@ function savePrediction(guess) {
 // ticks that turn green as the question gets better. Each tick has a word and
 // a mark (✓ or ○), so colour is never the only signal. `suffix` names the tip
 // and the list ('2' for Fix 2, 'own' for the bonus); `trackId` is null for the bonus.
-function renderChecker(textarea, trackId, suffix) {
+function renderChecker(textarea, trackId, suffix, { quiet = false } = {}) {
   // Fix 2 must also stay on the scenario's topic (8 Nov 2026); the bonus can be about anything.
   const options = suffix === '2' ? { topicWords: selectedScenario.content.fixIts[1].topicWords } : {};
   const tip = firstTip(textarea.value, options);
@@ -445,7 +473,7 @@ function renderChecker(textarea, trackId, suffix) {
 
   if (trackId) {
     // Cheer once, at the moment the flawed question becomes clear (not on every key).
-    if (clear && !clearState[trackId]) cheer(list);
+    if (clear && !clearState[trackId] && !quiet) cheer(list);
     clearState[trackId] = clear;
     refreshPrimary();
   }
@@ -453,9 +481,67 @@ function renderChecker(textarea, trackId, suffix) {
 
 function setupFixIt() {
   const textarea = document.getElementById('fixit-2');
-  textarea.addEventListener('input', () => renderChecker(textarea, 'fixit-2', '2'));
+  textarea.addEventListener('input', () => { renderChecker(textarea, 'fixit-2', '2'); remember(); });
   const ownTextarea = document.getElementById('own-question');
-  ownTextarea.addEventListener('input', () => renderChecker(ownTextarea, null, 'own'));
+  ownTextarea.addEventListener('input', () => { renderChecker(ownTextarea, null, 'own'); remember(); });
+  // A typed prediction is kept even before it is saved.
+  document.getElementById('predict-row').addEventListener('input', remember);
+}
+
+// ---------- Part 60e (Habiba, 11 Nov 2026): the room remembers ----------
+// The question picked, Fix 1, Fix 2, the bonus and the prediction, and the
+// step. Restoring logs nothing and shows no Mission card again.
+function remember() {
+  if (restoring || !selectedScenario) return;
+  const typed = document.getElementById('predict-input');
+  const picked = document.querySelector('.predict-choice.active');
+  let guess = null;
+  if (typed) guess = typed.value;
+  else if (picked) guess = picked.dataset.value;
+  saveRoomState('question-studio', selectedScenario.id, {
+    step,
+    fix1Solved,
+    fix2: fixitScenarioId === selectedScenario.id ? document.getElementById('fixit-2').value : null,
+    bonusSeen: bonusSeenFor === selectedScenario.id,
+    bonusTaken,
+    own: document.getElementById('own-question').value,
+    guess,
+    guessSaved,
+  });
+}
+
+function restore(saved) {
+  const card = document.querySelector(`.scenario-card[data-id="${saved.scenarioId}"]`);
+  if (!card) return;
+  card.click(); // chooses it the normal way (the radio look, the scenario)
+  missionScenarioId = saved.scenarioId; // the Mission card was seen already
+  if (saved.step >= 1) {
+    renderFixIts();
+    if (saved.fix1Solved) showFix1Solved();
+    if (saved.fix2 !== null) {
+      const fix2 = document.getElementById('fixit-2');
+      fix2.value = saved.fix2;
+      renderChecker(fix2, 'fixit-2', '2', { quiet: true });
+    }
+  }
+  if (saved.bonusSeen) bonusSeenFor = saved.scenarioId; // "bonus-seen" is not logged twice
+  if (saved.bonusTaken) {
+    document.getElementById('own-question').value = saved.own || '';
+    openBonus();
+  }
+  if (saved.step === 4 || saved.guessSaved) {
+    renderPredictTask();
+    const typed = document.getElementById('predict-input');
+    if (typed && saved.guess !== null) typed.value = saved.guess;
+    document.querySelectorAll('.predict-choice').forEach((b) => b.classList.toggle('active', b.dataset.value === saved.guess));
+    if (saved.guessSaved) {
+      guessSaved = true;
+      const shown = selectedScenario.recipe.answerType === 'number' ? saved.guess : `"${saved.guess}"`;
+      const feedback = document.getElementById('predict-feedback');
+      feedback.textContent = `Your prediction: ${shown}. Now let's collect the data!`;
+      feedback.hidden = false;
+    }
+  }
 }
 
 init();
