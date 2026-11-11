@@ -16,7 +16,13 @@
   font-weight: 800;
   font-size: 34px;
   color: var(--color-navy);
-  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
+  /* Part 60c/60d (Habiba): on a white pill, like in the rooms, so the word
+     can be read over the tree and the sky. */
+  background: rgba(255, 255, 255, 0.94);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 999px;
+  padding: 4px 20px 4px 10px;
+  box-shadow: var(--shadow-card);
 }
 
 .welcome-top .logo-accent {
