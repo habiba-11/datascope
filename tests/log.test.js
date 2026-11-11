@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   normalizeCode, isValidCode, makeEntry, logEvent, readLog, meaningTaskResult, trackMeaningTask,
 } from '../js/helpers/log.js';
-import { setExplorerCode, getExplorerCode, clearChildData, getLogEntries } from '../js/storage/save.js';
+import { setExplorerCode, getExplorerCode, clearChildData, getLogEntries, addSentIds } from '../js/storage/save.js';
 
 test('codes are tidied: spaces removed, capital letters', () => {
   assert.equal(normalizeCode('  owl-07 '), 'OWL-07');
@@ -73,9 +73,12 @@ test('a tapped or dragged answer can be logged (hint-picked)', () => {
   assert.equal(entry.how, 'tap');
 });
 
-test('clearing a shared device removes the code and the log', () => {
+// Part 60d: only work that was already sent goes; the rest waits to be sent
+// (save.test.js tests the "not sent yet" side).
+test('clearing a shared device removes the code and the sent log', () => {
   setExplorerCode('OWL-07');
   logEvent('number-lab', 'revision', { changed: true, oldGuess: 7, newGuess: 9, reason: 'most kids said 9' });
+  addSentIds(getLogEntries().map((entry) => entry.id));
   clearChildData();
   assert.equal(getExplorerCode(), null);
   assert.deepEqual(getLogEntries(), []);

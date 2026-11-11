@@ -22,6 +22,7 @@ import { pipSVG, pipMoodFor } from '../pip.js';
 import { confetti, fireworksLoop } from '../motion.js';
 import { taskCardHTML } from '../task-card.js';
 import { setupActionBar } from '../action-bar.js';
+import { setupFinishButton } from '../exit-button.js';
 import { setIconLine } from '../icon-text.js';
 import { illustration } from '../illustrations.js';
 import { openWardrobe } from '../wardrobe.js';
@@ -85,6 +86,12 @@ function celebrationNode(journey, code) {
     dress.addEventListener('click', () => openWardrobe());
     line.append(dress);
   }
+  // Part 60d (Habiba): the end of the trail is where a child is most likely
+  // done; "I'm finished" clears this computer for the next child (after a warning).
+  const finish = el('button', ":flag: I'm finished", 'btn j-finish');
+  finish.type = 'button';
+  setupFinishButton(finish);
+  line.append(finish);
   return line;
 }
 

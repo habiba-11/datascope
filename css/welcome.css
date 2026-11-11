@@ -140,6 +140,37 @@ html.is-loading body {
   font-size: 22px;
 }
 
+/* Part 60d: the label and, on the same line, "I already have a code". */
+.code-label-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px 12px;
+}
+
+/* Quiet link-looking buttons: words, underlined, still 48px tall to tap. */
+.code-have,
+.code-put-back {
+  min-height: 48px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--color-navy);
+  text-decoration: underline 2px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.code-put-back {
+  min-height: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
 /* The box and the green tick that pops in when the code is right. */
 .code-box {
   position: relative;

@@ -1,7 +1,8 @@
-// Welcome page: the child types the anonymous code their teacher gave them.
+// Welcome page: the child makes an anonymous explorer code (Part 60d), or
+// types the code they already have to come back.
 import { normalizeCode, isValidCode } from './helpers/log.js';
 import {
-  getExplorerCode, setExplorerCode, hasSeenTutorial, markTutorialSeen,
+  getExplorerCode, setExplorerCode, getLastCode, hasSeenTutorial, markTutorialSeen,
   hasSeenWardrobeIntro, markWardrobeIntroSeen,
 } from './storage/save.js';
 import { pipSVG } from './pip.js';
@@ -13,6 +14,7 @@ import { fillIcons, setIconText } from './icon-text.js';
 import { openModal } from './modal.js';
 import { openWardrobe } from './wardrobe.js';
 import { FEATURES } from './config.js';
+import { makeCode } from './helpers/code-maker.js';
 
 // Part 59g: the school yard behind the page (scenes off: plain; Part 43a sky as a fallback).
 if (!mountScene('welcome')) mountSky('welcome');
@@ -26,10 +28,7 @@ document.getElementById('logo').innerHTML = `${LOGO_SVG}<span>Data<span class="l
 const form = document.getElementById('code-form');
 const input = document.getElementById('code-input');
 const help = document.getElementById('code-help');
-
-// Coming back on the same device: the code is already filled in.
-const savedCode = getExplorerCode();
-if (savedCode) input.value = savedCode;
+const mainButton = document.getElementById('code-main');
 
 // The story (Part 44, Round 4; it replaced the film of Part 34): by itself the
 // first time in this browser, then from "Watch the story again" under the
@@ -58,19 +57,77 @@ function showCodeState(state, icon, text) {
   else help.textContent = text;
 }
 
-// Typing again: back to the calm help line.
-input.addEventListener('input', () => showCodeState('', '', HELP_TEXT));
+// ---------- Part 60d (Habiba, 11 Nov 2026): the child makes the code ----------
+// ONE green button: "Make me a code" while the box is empty, then "Start exploring".
+const boxIsEmpty = () => normalizeCode(input.value) === '';
+function showMainButton() {
+  mainButton.textContent = boxIsEmpty() ? 'Make me a code' : 'Start exploring →';
+}
+
+function makeNewCode() {
+  const code = makeCode();
+  input.value = code;
+  setExplorerCode(code); // saved at once: it is also the "last code" from now on
+  showMainButton();
+  showCodeState('good', '', `Your code is ${code}. Write it on paper now! You need it to come back.`);
+  box.classList.remove('m-pop');
+  void box.offsetWidth; // restart the pop
+  box.classList.add('m-pop');
+}
+
+// The box was emptied (by accident?): say what the code was, with a button to
+// put it back. Otherwise the calm help line.
+function showEmptiedHelp() {
+  const last = getLastCode();
+  if (!last) {
+    showCodeState('', '', HELP_TEXT);
+    return;
+  }
+  showCodeState('', '', `Your code was ${last}. `);
+  const putBack = document.createElement('button');
+  putBack.type = 'button';
+  putBack.className = 'code-put-back';
+  putBack.textContent = 'Put it back';
+  putBack.addEventListener('click', () => {
+    input.value = last;
+    showMainButton();
+    showCodeState('good', '', `Welcome back, explorer ${last}!`);
+  });
+  help.append(putBack);
+}
+
+input.addEventListener('input', () => {
+  showMainButton();
+  if (boxIsEmpty()) showEmptiedHelp();
+  else showCodeState('', '', 'Tap Start exploring when your code is in the box.');
+});
+
+// Coming back on this device (after Exit, or the window was closed): the code
+// is in the box again. Only "I'm finished" makes the device forget it.
+const savedCode = getExplorerCode() || getLastCode();
+if (savedCode) {
+  input.value = savedCode;
+  showCodeState('good', '', `Welcome back, explorer ${savedCode}! Is this your code? Tap Start exploring.`);
+}
+showMainButton();
+
+// "I already have a code": the child types the code from their paper.
+document.getElementById('have-code').addEventListener('click', () => {
+  input.placeholder = 'e.g. FOX-4725';
+  showCodeState('', '', 'Type the code from your paper. Never your name!');
+  input.focus();
+  input.select();
+});
 
 // The code in the box, saved; or null (then the child is told what to fix).
-function takeCode(message = 'Hmm, that code does not look right. Check each letter and number, then try again.') {
+function takeCode(emptyMessage = 'Tap Make me a code first.') {
   const code = normalizeCode(input.value);
   if (!code) {
-    showCodeState('bad', 'warning', 'Type your code first. It is on the card from your teacher.');
-    input.focus();
+    showCodeState('bad', 'warning', emptyMessage);
     return null;
   }
   if (!isValidCode(code)) {
-    showCodeState('bad', 'warning', message);
+    showCodeState('bad', 'warning', 'Hmm, that code does not look right. Check each letter and number on your paper.');
     input.focus();
     return null;
   }
@@ -81,6 +138,10 @@ function takeCode(message = 'Hmm, that code does not look right. Check each lett
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault(); // stay in our app; we move to the next page ourselves
+  if (boxIsEmpty()) {
+    makeNewCode(); // the first tap makes the code; the next tap starts
+    return;
+  }
   if (!takeCode()) return;
 
   // Part 58e (Habiba): the first time, a pop-up introduces Pip's Wardrobe,
@@ -105,7 +166,7 @@ if (FEATURES.wardrobe) {
   dress.className = 'btn pip-dress-btn pip-dress-btn--big';
   dress.textContent = 'Dress Pip'; // Part 60b (Habiba): bigger, words only
   dress.addEventListener('click', () => {
-    if (takeCode('Type your explorer code first, so Pip can remember his outfit!')) openWardrobe();
+    if (takeCode('Make your code first (the green button), so Pip can remember his outfit!')) openWardrobe();
   });
   document.getElementById('dress-slot').append(dress);
 }

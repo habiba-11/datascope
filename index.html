@@ -33,13 +33,18 @@
       <h1 class="welcome-title">Become a Data <span>Detective!</span></h1>
       <p class="welcome-lead">Ask a question. Collect answers. Find out what the data says.</p>
       <form id="code-form" class="code-form">
-        <label for="code-input"><span data-icon="key"></span> Type your explorer code</label>
+        <!-- Part 60d (Habiba): the child makes their own code with the green button;
+             "I already have a code" is for coming back with the code from their paper. -->
+        <div class="code-label-row">
+          <label for="code-input"><span data-icon="key"></span> Your explorer code</label>
+          <button class="code-have" id="have-code" type="button">I already have a code</button>
+        </div>
         <div class="code-box" id="code-box">
-          <input id="code-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. OWL-07" aria-describedby="code-help">
+          <input id="code-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Tap the green button" aria-describedby="code-help">
           <span class="code-ok" aria-hidden="true">✓</span>
         </div>
-        <p class="code-help" id="code-help" role="status">Your teacher gives you this code. Please don't type your name!</p>
-        <button class="btn btn-main" type="submit">Start exploring →</button>
+        <p class="code-help" id="code-help" role="status">Tap the green button to get your own code. Never type your name!</p>
+        <button class="btn btn-main" id="code-main" type="submit">Make me a code</button>
         <button class="btn btn-secondary" id="see-how" type="button"><span data-icon="play"></span> Watch the story again</button>
       </form>
       <a class="btn btn-quiet teacher-btn" href="teacher/index.html"><span data-icon="chart"></span> Teacher's view</a>

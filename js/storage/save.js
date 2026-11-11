@@ -2,6 +2,7 @@
 
 const SCENARIO_KEY = 'datascope:selectedScenarioId';
 const CODE_KEY = 'datascope:explorerCode';
+const LAST_CODE_KEY = 'datascope:lastCode'; // Part 60d: shown again after Exit
 const LOG_KEY = 'datascope:log';
 const DEFAULT_SCENARIO_ID = 'sleep-hours';
 
@@ -42,6 +43,14 @@ export function getExplorerCode() {
 
 export function setExplorerCode(code) {
   writeItem(CODE_KEY, code);
+  writeItem(LAST_CODE_KEY, code);
+}
+
+// Part 60d (Habiba): the last code used on this device. Exit keeps it, so the
+// start page shows it again (and "Your code was ..." if the box is emptied);
+// only "I'm finished" (clearChildData) removes it.
+export function getLastCode() {
+  return readItem(LAST_CODE_KEY);
 }
 
 // "Exit": this device forgets the code (the log itself is kept until sent).
@@ -239,11 +248,16 @@ export function setPreviewAll(on) {
   writeItem(PREVIEW_KEY, on ? 'on' : 'off');
 }
 
-// For shared devices: removes the child's code, chosen scenario, reasoning
-// log, seen pop-ups, tutorial, progress and Pip's outfit from THIS device, so the next child
-// starts clean. Teacher data is kept.
+// For shared devices ("I'm finished", and the teacher's "Clear this device"):
+// removes the child's code, last code, chosen scenario, reasoning log, seen
+// pop-ups, tutorial, progress and Pip's outfit from THIS device, so the next
+// child starts clean. Teacher data is kept.
+// Part 60d: log entries NOT yet sent stay, so they still go to the database
+// later (each entry carries its own code); they are invisible to the next child.
 export function clearChildData() {
-  for (const key of [SCENARIO_KEY, CODE_KEY, LOG_KEY, INTROS_KEY, TUTORIAL_KEY, PROGRESS_KEY, SENT_KEY, WARDROBE_KEY]) {
+  const sent = getSentIds();
+  const notSent = getLogEntries().filter((entry) => !entry.id || !sent.has(entry.id));
+  for (const key of [SCENARIO_KEY, CODE_KEY, LAST_CODE_KEY, LOG_KEY, INTROS_KEY, TUTORIAL_KEY, PROGRESS_KEY, SENT_KEY, WARDROBE_KEY]) {
     memory.delete(key);
     try {
       localStorage.removeItem(key);
@@ -251,6 +265,7 @@ export function clearChildData() {
       // Storage is blocked: nothing was stored there anyway.
     }
   }
+  if (notSent.length) setLogEntries(notSent);
 }
 
 // "Start a new investigation" (My journey): this child's trail starts again

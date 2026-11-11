@@ -1,11 +1,12 @@
 // Shell layer, Part 60c (Habiba, 11 Nov 2026): the "Settings" menu beside the
 // logo replaces the strip under the card. One gear button opens a small panel
-// with the child's code, "Saved online?", Sound, Music and Exit. The buttons
+// with the child's code, "Saved online?", Sound, Music, Exit and (Part 60d)
+// "I'm finished". The buttons
 // keep their ids, so celebrate.js (sound), music.js and exit-button.js work as before.
 import { getExplorerCode } from './storage/save.js';
 import { backendReady } from './config.js';
 import { STATUS_TEXT } from './storage/sync.js';
-import { EXIT_BUTTON_HTML } from './exit-button.js';
+import { EXIT_BUTTON_HTML, FINISH_BUTTON_HTML, setupFinishButton } from './exit-button.js';
 import { iconHTML, setIconText } from './icon-text.js';
 
 export function settingsMenuHTML() {
@@ -25,6 +26,7 @@ export function settingsMenuHTML() {
         <button class="btn btn-quiet sound-toggle" id="sound-toggle" type="button" aria-pressed="true">${iconHTML('speaker')} Sound: on</button>
         <button class="btn btn-quiet sound-toggle" id="music-toggle" type="button" aria-pressed="true">${iconHTML('music')} Music: on</button>
         ${EXIT_BUTTON_HTML}
+        ${FINISH_BUTTON_HTML}
       </div>
     </div>`;
 }
@@ -40,6 +42,7 @@ export function setupSettingsMenu() {
     button.setAttribute('aria-expanded', String(open));
   };
   button.addEventListener('click', () => setOpen(panel.hidden));
+  setupFinishButton(); // Part 60d: "I'm finished" sits under Exit
   document.addEventListener('pointerdown', (e) => {
     if (!panel.hidden && !menu.contains(e.target)) setOpen(false);
   });

@@ -139,6 +139,45 @@
   color: var(--color-navy);
 }
 
+/* Part 60d: "I'm finished" (Settings menu, My journey): white with a coral
+   border, so it does not look like the main button. */
+.finish-btn,
+.j-finish {
+  background: var(--color-card-bg);
+  border-color: var(--color-ask);
+  color: var(--color-navy);
+}
+
+/* The big warning before the device forgets the child: the code, very big. */
+.finish-warning p {
+  margin: 0 0 10px;
+}
+
+.finish-code-label {
+  font-weight: 800;
+}
+
+.finish-code {
+  display: inline-block;
+  padding: 6px 20px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 40px;
+  letter-spacing: 3px;
+  color: var(--color-navy);
+  background: var(--color-plan-light);
+  border: var(--border-width) solid var(--color-navy);
+  border-radius: 16px;
+}
+
+.finish-must {
+  padding: 10px 14px;
+  font-weight: 800;
+  background: var(--color-ask-light);
+  border: 2px solid var(--color-ask);
+  border-radius: 12px;
+}
+
 /* Between laptop and tablet the left column is narrow: the gear alone (its
    name stays for screen readers). */
 @media (max-width: 1239px) {
