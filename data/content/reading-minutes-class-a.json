@@ -10,7 +10,7 @@
   "planPrompt": "Predict! How many minutes did most kids read?",
   "graphLab": {
     "tell": "What do the two graphs tell us?",
-    "notTell": "What can't these graphs tell us?",
+    "notTell": "What can NOT these graphs tell us?",
     "tellAnswers": [
       "Class A's answers are close together, from {min} to {max}.",
       "Class B's answers are spread out, from {minB} to {maxB}.",

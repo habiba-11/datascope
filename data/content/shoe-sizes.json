@@ -10,7 +10,7 @@
   "planPrompt": "Predict! Which shoe size do most kids wear?",
   "graphLab": {
     "tell": "What does this graph tell us about our shoe sizes?",
-    "notTell": "What can't this graph tell us?",
+    "notTell": "What can NOT this graph tell us?",
     "tellAnswers": [
       "{top} are most common, with {topCount} each.",
       "Fewer kids wear {low}, only {lowCount} each.",

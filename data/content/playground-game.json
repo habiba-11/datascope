@@ -11,7 +11,7 @@
   "planPrompt": "Predict! Which game will most kids pick?",
   "graphLab": {
     "tell": "What does this graph tell us about recess games?",
-    "notTell": "What can't this graph tell us?",
+    "notTell": "What can NOT this graph tell us?",
     "noLine": "Games have no order. A line between them could fool you. So we show dots on sticks instead.",
     "tellAnswers": [
       "{top} is the most common answer, with {topCount}.",

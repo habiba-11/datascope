@@ -10,7 +10,7 @@
   "planPrompt": "Predict! How many hours did most kids sleep?",
   "graphLab": {
     "tell": "What does this graph tell us about our sleep?",
-    "notTell": "What can't this graph tell us?",
+    "notTell": "What can NOT this graph tell us?",
     "tellAnswers": [
       "{top} is the most common answer, with {topCount}.",
       "Only {lowCount} slept {low}.",
