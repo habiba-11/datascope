@@ -83,14 +83,17 @@ const DIE = `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><elli
   <g transform="matrix(22 -12 0 24 32 30)"><ellipse cx=".3" cy=".3" rx=".09" ry=".085"/><ellipse cx=".5" cy=".5" rx=".09" ry=".085"/><ellipse cx=".7" cy=".7" rx=".09" ry=".085"/></g></g></svg>`;
 
 // The story's graph (the same numbers as before: the centre number is 9).
+// 11 Nov 2026 (Habiba: "they overlap"): 13 px per kid (was 15), so "6 kids"
+// fits inside the green box; the hour labels sit lower, under the box.
+const PX_PER_KID = 13;
 const BARS = [[3, 1, '#FF7A6B'], [7, 2, '#38B6FF'], [8, 5, '#4CC26B'], [9, 6, '#4CC26B'], [10, 3, '#38B6FF']];
 function graph() {
   const bars = BARS.map(([hours, kids, colour], i) => {
     const x = 452 + i * 84;
-    const h = kids * 15;
+    const h = kids * PX_PER_KID;
     return `<g transform="translate(${x} ${222 - h})"><rect class="st-bar" style="animation-delay: ${0.3 + i * 0.12}s" width="52" height="${h}" rx="6" fill="${colour}" stroke="${NAVY}" stroke-width="2.6"/></g>
       ${T(x + 26, 214 - h, 16, NAVY, `${kids} ${kids === 1 ? 'kid' : 'kids'}`, 'middle', "'Nunito', sans-serif")}
-      ${T(x + 26, 244, 16, NAVY, `${hours} hours`, 'middle', "'Nunito', sans-serif")}`;
+      ${T(x + 26, 248, 16, NAVY, `${hours} hours`, 'middle', "'Nunito', sans-serif")}`;
   }).join('');
   return `
     <rect x="430" y="74" width="196" height="28" rx="14" fill="#D3EEFF" stroke="${NAVY}" stroke-width="2.6"/>${T(528, 94, 15, NAVY, 'WHAT: hours of sleep', 'middle', "'Nunito', sans-serif")}
@@ -139,22 +142,23 @@ const SCENES = {
   graph: () => `
     ${sara('point', 150, 0.85)}
     ${svg(graph())}
-    ${part('data-line="1"', svg(pop(`<rect x="610" y="112" width="156" height="120" rx="14" fill="none" stroke="#217A3B" stroke-width="3.4" stroke-dasharray="9 7"/>
+    ${part('data-line="1"', svg(pop(`<rect x="610" y="112" width="156" height="116" rx="14" fill="none" stroke="#217A3B" stroke-width="3.4" stroke-dasharray="9 7"/>
       <g transform="translate(688 294)"><rect x="-56" y="-14" width="112" height="28" rx="14" fill="#217A3B" stroke="${NAVY}" stroke-width="3"/>${T(0, 6, 17, '#fff', 'Most kids!')}</g>
-      <g transform="translate(478 172)"><rect x="-46" y="-14" width="92" height="28" rx="14" fill="#FF7A6B" stroke="${NAVY}" stroke-width="3"/>${T(0, 6, 17, NAVY, 'Only 1!')}</g>`)))}
+      <g transform="translate(478 160)"><rect x="-46" y="-14" width="92" height="28" rx="14" fill="#FF7A6B" stroke="${NAVY}" stroke-width="3"/>${T(0, 6, 17, NAVY, 'Only 1!')}</g>`)))}
     ${part('data-line="2"', pip(800, 120))}`,
 
   // The centre number and the mean; then Sara's guess; then how sure, and a die rolls.
+  // (11 Nov 2026: the how-sure bar and its words sit higher, off the marker tray.)
   numbers: () => `
     ${part('data-before="1"', sara('point', 150, 0.85))}
     ${part('data-line="1"', sara('think', 150, 0.85))}
     ${svg(numCard(416, 82, '#FFC531', 'Centre number', '9', 0.1) + numCard(552, 82, '#38B6FF', 'Mean', '7.8', 0.3))}
     ${part('data-line="1"', svg(numCard(688, 82, '#A596FF', "Sara's guess", '8')))}
     ${part('data-line="1"', pip(800, 120))}
-    ${part('data-line="2"', svg(pop(`<g transform="translate(430 226)">
+    ${part('data-line="2"', svg(pop(`<g transform="translate(430 214)">
       <rect width="430" height="14" rx="7" fill="#E1EEF8" stroke="${NAVY}" stroke-width="2.6"/><rect width="300" height="14" rx="7" fill="#4CC26B" opacity=".9"/>
       <circle cx="300" cy="7" r="11" fill="#fff" stroke="${NAVY}" stroke-width="3.4"/>
-      ${T(0, 36, 15, '#4A6580', 'Not sure', 'start', "'Nunito', sans-serif")}${T(430, 36, 15, '#4A6580', 'Very sure', 'end', "'Nunito', sans-serif")}</g>`)) + '<div class="st-die"><div class="st-die-roll">' + DIE + '</div></div>')}`,
+      ${T(0, 32, 15, '#4A6580', 'Not sure', 'start', "'Nunito', sans-serif")}${T(430, 32, 15, '#4A6580', 'Very sure', 'end', "'Nunito', sans-serif")}</g>`)) + '<div class="st-die"><div class="st-die-roll">' + DIE + '</div></div>')}`,
 
   // The Evidence Card; then the LIKELY! stamp; then the class claps under confetti.
   conclude: () => `

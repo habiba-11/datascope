@@ -46,6 +46,14 @@
   pointer-events: none;
 }
 
+/* 11 Nov 2026 (Habiba: "they overlap"): the place and the characters sit
+   16 px lower, so the trail at the top no longer covers the classroom's window
+   and whiteboard (the place is drawn taller than the stage, so no edge shows). */
+.story-scene,
+.st-place {
+  transform: translateY(16px);
+}
+
 .st-place-picture {
   position: absolute;
   display: block;
@@ -61,7 +69,7 @@
 .story-top {
   position: absolute;
   inset: 0 0 auto;
-  height: 72px;
+  height: 64px; /* 11 Nov 2026: was 72; the trail sits higher, clear of the room */
   padding: 0 28px;
   display: flex;
   align-items: center;
@@ -288,7 +296,7 @@
 .story-card {
   position: absolute;
   left: 28px;
-  top: 436px;
+  top: 446px; /* 11 Nov 2026: was 436, follows the characters down (feet on the card) */
   width: 904px;
   height: 140px;
   box-sizing: border-box;

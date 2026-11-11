@@ -28,6 +28,7 @@ export function afterAllModals(fn) {
 // Opens a pop-up, or puts it in line if one is already open.
 // Returns a promise with the `value` of the button pressed ('close' for ✕ or Esc).
 //   icon:        the name of an illustration next to the title (js/illustrations.js)
+//   pip:         false = no small Pip in the title bar (default: true)
 //   title:       short heading (plain text)
 //   body:        plain text, or a DOM node built by our own code
 //   buttons:     [{ label, value, main, icon }]; `main` makes it the big green button;
@@ -46,7 +47,7 @@ export function openModal(options) {
 
 function show({ options, resolve }) {
   const {
-    icon = '', title, body, accent = 'collect', dismissible = true,
+    icon = '', title, body, accent = 'collect', dismissible = true, pip: showPip = true,
     buttons = [{ label: 'OK!', value: 'ok', main: true }], className = '', onOpen, beforeClose,
   } = options;
 
@@ -74,7 +75,10 @@ function show({ options, resolve }) {
   // changed yet) stays as it was.
   if (ILLUSTRATIONS[icon]) setIconText(heading, icon, title, true); // one icon, on top: may move (Part 52e)
   else heading.textContent = icon ? `${icon} ${title}` : title;
-  header.append(pip, heading);
+  // `pip: false` (11 Nov 2026): no small Pip in the title bar, for a pop-up
+  // that already shows Pip big in its body (Pip's Wardrobe intro).
+  if (showPip) header.append(pip);
+  header.append(heading);
 
   if (dismissible) {
     const closeBtn = document.createElement('button');

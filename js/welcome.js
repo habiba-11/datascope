@@ -192,13 +192,15 @@ function introduceWardrobe() {
     list.append(item);
   }
   body.append(list);
+  // 11 Nov 2026 (Habiba): no owl in the title bar (Pip is big in the body) and
+  // no owl icon on "Dress Pip now".
   return openModal({
-    icon: 'owl',
+    pip: false,
     title: "New: Pip's Wardrobe!",
     body,
     accent: 'plan',
     buttons: [
-      { label: 'Dress Pip now', value: 'dress', icon: 'owl' },
+      { label: 'Dress Pip now', value: 'dress' },
       { label: 'Start exploring →', value: 'start', main: true },
     ],
   });
