@@ -115,15 +115,6 @@
   animation-play-state: paused;
 }
 
-/* The quiet status line under the card sits on the floor picture: a white
-   box keeps its small words readable. */
-.has-scene .status-line {
-  background: rgba(255, 255, 255, 0.94);
-  border: var(--border-width) solid var(--color-navy);
-  border-radius: 18px;
-  padding: var(--space-1) var(--space-3);
-}
-
 /* ---------- the left column: big Pip, the main character (Habiba, 10 Nov 2026) ----------
    Only on laptop screens (1240px and wider), like big Pip (Part 43c).
    Narrower: no column; the small Pip in the card talks instead. */
@@ -133,11 +124,9 @@
     width: 230px;
   }
 
-  /* The card, its button bar and the status line move right, centred in the
-     space beside Pip (328px from the left at 1366). */
+  /* The card and its button bar move right, centred in the space beside Pip. */
   .has-cast .room-content.card-layout,
-  .has-cast .action-bar,
-  .has-cast .status-line {
+  .has-cast .action-bar {
     margin-left: max(290px, calc(50% - 355px));
     margin-right: auto;
   }

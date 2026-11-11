@@ -240,7 +240,7 @@
   bottom: 0;
   z-index: 20;
   max-width: 1000px;
-  margin: var(--space-2) auto 0;
+  margin: var(--space-2) auto var(--space-3); /* Part 60c: room under it at the page end (the strip is gone) */
   padding: 10px var(--space-3);
   display: flex;
   justify-content: space-between;
@@ -274,72 +274,6 @@ html:has(.action-bar) {
 
 .action-primary {
   min-width: 180px;
-}
-
-/* Quiet, under a dashed line, so it never looks like the task's own buttons.
-   Left: what is true (code, saved online?) as flat labels, no border or shadow.
-   Right: what you can do (sound, exit) as real buttons; Exit is coral, "leave". */
-.status-line {
-  max-width: 1000px;
-  margin: var(--space-3) auto 120px;
-  padding: var(--space-2) var(--space-3) 0;
-  border-top: var(--border-width) dashed var(--color-line);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: 15px;
-}
-
-.status-info,
-.status-tools {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-1) var(--space-2);
-}
-
-.status-info .code-badge,
-.status-info .sync-status {
-  margin: 0;
-  padding: 0;
-  background: none;
-  border: 0;
-  box-shadow: none;
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--color-muted-text);
-}
-
-/* Not sent yet / offline: it stands out (yellow AND the warning / offline icons and words). */
-.status-info .sync-status[data-status="error"],
-.status-info .sync-status[data-status="offline"] {
-  padding: 2px 12px;
-  background: var(--color-plan-light);
-  border: 2px solid var(--color-plan);
-  border-radius: 999px;
-  color: var(--color-navy);
-}
-
-/* No code yet: still a link to tap, so it keeps its look. */
-.status-info .code-badge.missing {
-  padding: 8px 16px;
-  background: var(--color-plan);
-  border: 2px solid var(--color-navy);
-  color: var(--color-navy);
-}
-
-.status-line .sound-toggle,
-.status-line .exit-btn {
-  min-height: 48px;
-  font-size: 16px;
-}
-
-.status-line .exit-btn {
-  background: var(--color-ask-light);
-  border-color: var(--color-ask);
-  color: var(--color-navy);
 }
 
 /* The Explore rooms as tabs filling the card's header strip (Number Lab,
@@ -472,8 +406,7 @@ html:has(.action-bar) {
     flex-basis: 100%;
   }
 
-  .action-bar,
-  .status-line {
+  .action-bar {
     padding-left: var(--space-2);
     padding-right: var(--space-2);
   }

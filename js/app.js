@@ -7,7 +7,7 @@ import { pipReacts, enterRoom, float, unlockStep, confetti } from './motion.js';
 import { pipSVG, pipSay } from './pip.js';
 import { lineIcon, LOGO_SVG } from './icons.js';
 import { watchPressedState } from './pressed-state.js';
-import { startSync, STATUS_TEXT } from './storage/sync.js';
+import { startSync } from './storage/sync.js';
 import { backendReady } from './config.js';
 import { EXIT_BUTTON_HTML, setupExitButton } from './exit-button.js';
 import { mountSky } from './ambient.js';
@@ -16,7 +16,8 @@ import { mountPipStand } from './pip-stand.js';
 import { startHelperPointers } from './helper-pointer.js';
 import { setupMusic } from './music.js';
 import { playSound } from './sounds.js';
-import { iconHTML, setIconText } from './icon-text.js';
+import { iconHTML } from './icon-text.js';
+import { settingsMenuHTML, setupSettingsMenu, showSyncStatus } from './settings-menu.js';
 
 // `icon` is a line icon from icons.js (step bar).
 const STEPS = [
@@ -59,7 +60,10 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
 
   root.innerHTML = `
     <header class="shell-header">
-      <a class="logo" href="../index.html">${LOGO_SVG}<span>Data<span class="logo-accent">Scope</span></span></a>
+      <div class="header-left">
+        <a class="logo" href="../index.html">${LOGO_SVG}<span>Data<span class="logo-accent">Scope</span></span></a>
+        ${layout === 'card' ? settingsMenuHTML() : ''}
+      </div>
       <nav class="step-bar" aria-label="Investigation steps">${stepBarHTML()}</nav>
       <div class="header-actions">
         <span class="room-tools" id="room-tools"></span>
@@ -116,13 +120,11 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   setupAboutTab();
   watchPressedState();
   setupExitButton();
+  setupSettingsMenu();
+  if (layout === 'card') centreStepBarOverCard();
   // Part 22: send the log to the online database (only when it is switched on).
-  startSync((status) => {
-    const label = document.getElementById('sync-status');
-    if (!label) return;
-    setIconText(label, STATUS_TEXT[status].icon, STATUS_TEXT[status].text);
-    label.dataset.status = status;
-  });
+  // Part 60c: the status is shown in the Settings menu.
+  startSync(showSyncStatus);
   if (layout !== 'card') {
     enterRoom(root.querySelector('.room-content'));
     float(root.querySelector('.pip-mascot .pip'));
@@ -170,25 +172,38 @@ function stepBarHTML(newStep = null) {
   return stops.join('');
 }
 
-// Zone 2 and zone 3 of the card layout: the room's task card, the action bar
-// (filled by the room with setupActionBar), and a quiet status line: on the
-// left what is TRUE (the child's code, saved online?), as flat labels; on the
-// right what you can DO (sound, exit), as buttons (Habiba, 4 Nov 2026).
+// Zone 2 and zone 3 of the card layout: the room's task card and the action
+// bar (filled by the room with setupActionBar). Part 60c (Habiba, 11 Nov 2026):
+// the status strip under them is gone; the code, "Saved online?", Sound, Music
+// and Exit are in the Settings menu beside the logo (js/settings-menu.js).
 function cardBodyHTML(accent, contentHTML) {
   return `
     <main class="room-content card-layout" style="--accent: var(--color-${accent})">${contentHTML}</main>
-    <nav class="action-bar" id="action-bar" aria-label="What to do next"></nav>
-    <footer class="status-line">
-      <div class="status-info">
-        ${codeBadge()}
-        ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}
-      </div>
-      <div class="status-tools">
-        <button class="btn btn-quiet sound-toggle" id="sound-toggle" type="button" aria-pressed="true">${iconHTML('speaker')} Sound: on</button>
-        <button class="btn btn-quiet sound-toggle" id="music-toggle" type="button" aria-pressed="true">${iconHTML('music')} Music: on</button>
-        ${EXIT_BUTTON_HTML}
-      </div>
-    </footer>`;
+    <nav class="action-bar" id="action-bar" aria-label="What to do next"></nav>`;
+}
+
+// Part 60c (Habiba): on laptop screens big Pip pushes the card to the right,
+// so the step bar moves right too, until its centre is over the card's centre.
+// It stops 16px before the buttons on the right, so it never covers them
+// (at 1366 that is almost the whole way; on narrower laptops a bit less).
+function centreStepBarOverCard() {
+  const header = document.querySelector('.shell-header');
+  const bar = header.querySelector('.step-bar');
+  const actions = header.querySelector('.header-actions');
+  const card = document.querySelector('.room-content.card-layout');
+  const wide = window.matchMedia('(min-width: 1240px)'); // same as css/scenes.css
+  const place = () => {
+    bar.style.translate = '';
+    if (!wide.matches || !document.documentElement.classList.contains('has-cast')) return;
+    const b = bar.getBoundingClientRect();
+    const c = card.getBoundingClientRect();
+    const wanted = (c.left + c.width / 2) - (b.left + b.width / 2);
+    const room = actions.getBoundingClientRect().left - 16 - b.right;
+    bar.style.translate = `${Math.round(Math.max(0, Math.min(wanted, room)))}px 0`;
+  };
+  // Again whenever the window, the trail (a new step) or the buttons change size.
+  const watch = new ResizeObserver(place);
+  [header, bar, actions].forEach((el) => watch.observe(el));
 }
 
 // The Explore rooms open one after another; only the open ones are shown.
