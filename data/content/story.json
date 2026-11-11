@@ -56,11 +56,23 @@
       ]
     },
     {
+      "id": "calc",
+      "step": 3,
+      "chip": "Step 4: Explore, median and mean",
+      "lines": [
+        { "who": "sara", "text": "First the median. I put all 10 answers in order." },
+        { "who": "sara", "text": "The two cards in the middle are both 9. The median is 9!" },
+        { "who": "sara", "text": "Now the mean. I add them all up: 82." },
+        { "who": "sara", "text": "Then I share 82 fairly by 10 kids. The mean is 8.2!" },
+        { "who": "pip", "text": "The one kid with only 3 hours pulls the mean down." }
+      ]
+    },
+    {
       "id": "numbers",
       "step": 3,
       "chip": "Step 4: Explore, numbers and chance",
       "lines": [
-        { "who": "sara", "text": "Now numbers! The centre number is 9 and the mean is 7.8." },
+        { "who": "sara", "text": "So the centre number is 9 and the mean is 8.2." },
         { "who": "pip", "text": "Sara guessed 8 hours. That was very close!" },
         { "who": "pip", "text": "Chance tells us how SURE we can be. Watch the die roll!" }
       ]

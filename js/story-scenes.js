@@ -1,4 +1,5 @@
-// Shell layer: the pictures of the story's 7 scenes. Part 59s (10 Nov 2026,
+// Shell layer: the pictures of the story's 8 scenes (7 until 11 Nov 2026,
+// when "How Sara found them", the median and the mean worked out, came in). Part 59s (10 Nov 2026,
 // Habiba): the look of docs/design/datascope-story-ui-v2.html, with the same
 // 7 scenes and words (data/content/story.json). Each scene has a PLACE (the
 // school yard or the classroom of the rooms, js/scenes/) drawn on the stage,
@@ -82,11 +83,16 @@ const DIE = `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><elli
   <g transform="matrix(22 12 0 24 10 18)"><ellipse cx=".3" cy=".28" rx=".09" ry=".085"/><ellipse cx=".7" cy=".28" rx=".09" ry=".085"/><ellipse cx=".3" cy=".72" rx=".09" ry=".085"/><ellipse cx=".7" cy=".72" rx=".09" ry=".085"/></g>
   <g transform="matrix(22 -12 0 24 32 30)"><ellipse cx=".3" cy=".3" rx=".09" ry=".085"/><ellipse cx=".5" cy=".5" rx=".09" ry=".085"/><ellipse cx=".7" cy=".7" rx=".09" ry=".085"/></g></g></svg>`;
 
-// The story's graph (the same numbers as before: the centre number is 9).
-// 11 Nov 2026 (Habiba: "they overlap"): 13 px per kid (was 15), so "6 kids"
-// fits inside the green box; the hour labels sit lower, under the box.
-const PX_PER_KID = 13;
-const BARS = [[3, 1, '#FF7A6B'], [7, 2, '#38B6FF'], [8, 5, '#4CC26B'], [9, 6, '#4CC26B'], [10, 3, '#38B6FF']];
+// The story's pretend class (Habiba chose 10 kids, 11 Nov 2026: before, the
+// graph had 17 kids and Sara said "the mean is 7.8", but their mean was 8.3).
+// 10 answers: the centre number (median) is 9 (the two middle cards are both 9),
+// the total is 82 and the mean 82 / 10 = 8.2 (dividing by 10 is easy at Grade 5).
+// The one kid with 3 hours pulls the mean below the median: the sleep lesson.
+export const STORY_CLASS = [3, 7, 8, 8, 9, 9, 9, 9, 10, 10];
+// The graph shows the same 10 answers, so the graph and the sums agree (tested).
+// 20 px per kid, so "4 kids" stays inside the green box (11 Nov 2026).
+const PX_PER_KID = 20;
+const BARS = [[3, 1, '#FF7A6B'], [7, 1, '#38B6FF'], [8, 2, '#4CC26B'], [9, 4, '#4CC26B'], [10, 2, '#38B6FF']];
 function graph() {
   const bars = BARS.map(([hours, kids, colour], i) => {
     const x = 452 + i * 84;
@@ -99,6 +105,17 @@ function graph() {
     <rect x="430" y="74" width="196" height="28" rx="14" fill="#D3EEFF" stroke="${NAVY}" stroke-width="2.6"/>${T(528, 94, 15, NAVY, 'WHAT: hours of sleep', 'middle', "'Nunito', sans-serif")}
     <rect x="640" y="74" width="160" height="28" rx="14" fill="#FFF0C2" stroke="${NAVY}" stroke-width="2.6"/>${T(720, 94, 15, NAVY, 'HOW MANY: kids', 'middle', "'Nunito', sans-serif")}
     <path d="M440 222 H872" stroke="${NAVY}" stroke-width="3" stroke-linecap="round"/>${bars}`;
+}
+
+// "How Sara found them": the 10 answers as small cards, in order.
+const CARD_W = 38;
+const CARD_GAP = 6;
+const CARD_X = (i) => 434 + i * (CARD_W + CARD_GAP);
+const sum = (list) => list.reduce((a, b) => a + b, 0);
+function calcCards() {
+  return [...STORY_CLASS].sort((a, b) => a - b).map((value, i) => pop(`<g transform="translate(${CARD_X(i)} 80)">
+    <rect x="2" y="4" width="${CARD_W}" height="44" rx="8" fill="${NAVY}" opacity=".16"/>
+    <rect width="${CARD_W}" height="44" rx="8" fill="#fff" stroke="${NAVY}" stroke-width="2.6"/>${T(CARD_W / 2, 31, 22, NAVY, value)}</g>`, i * 0.08)).join('');
 }
 
 const SCENES = {
@@ -147,12 +164,24 @@ const SCENES = {
       <g transform="translate(478 160)"><rect x="-46" y="-14" width="92" height="28" rx="14" fill="#FF7A6B" stroke="${NAVY}" stroke-width="3"/>${T(0, 6, 17, NAVY, 'Only 1!')}</g>`)))}
     ${part('data-line="2"', pip(800, 120))}`,
 
+  // 11 Nov 2026 (Habiba): how Sara found the median and the mean. The 10
+  // answers in order; the two middle cards are both 9 (the median); the sum
+  // 82; shared fairly by 10 kids: 8.2 (the mean); then Pip.
+  calc: () => `
+    ${sara('point', 150, 0.85)}
+    ${svg(calcCards())}
+    ${part('data-line="1"', svg(pop(`<rect x="${CARD_X(4) - 6}" y="72" width="${2 * CARD_W + CARD_GAP + 12}" height="60" rx="12" fill="none" stroke="#217A3B" stroke-width="3.4" stroke-dasharray="8 6"/>
+      <g transform="translate(${CARD_X(5) - CARD_GAP / 2} 152)"><rect x="-70" y="-15" width="140" height="30" rx="15" fill="#FFC531" stroke="${NAVY}" stroke-width="3"/>${T(0, 7, 18, NAVY, 'Median = 9')}</g>`)))}
+    ${part('data-line="2"', svg(pop(T(651, 196, 19, NAVY, `${STORY_CLASS.join(' + ')} = ${sum(STORY_CLASS)}`, 'middle', "'Nunito', sans-serif"))))}
+    ${part('data-line="3"', svg(pop(`<g transform="translate(651 228)"><rect x="-112" y="-16" width="224" height="32" rx="16" fill="#38B6FF" stroke="${NAVY}" stroke-width="3"/>${T(0, 7, 18, NAVY, `Mean = ${sum(STORY_CLASS)} ÷ ${STORY_CLASS.length} = ${sum(STORY_CLASS) / STORY_CLASS.length}`)}</g>`)))}
+    ${part('data-line="4"', pip(800, 120))}`,
+
   // The centre number and the mean; then Sara's guess; then how sure, and a die rolls.
   // (11 Nov 2026: the how-sure bar and its words sit higher, off the marker tray.)
   numbers: () => `
     ${part('data-before="1"', sara('point', 150, 0.85))}
     ${part('data-line="1"', sara('think', 150, 0.85))}
-    ${svg(numCard(416, 82, '#FFC531', 'Centre number', '9', 0.1) + numCard(552, 82, '#38B6FF', 'Mean', '7.8', 0.3))}
+    ${svg(numCard(416, 82, '#FFC531', 'Centre number', '9', 0.1) + numCard(552, 82, '#38B6FF', 'Mean', '8.2', 0.3))}
     ${part('data-line="1"', svg(numCard(688, 82, '#A596FF', "Sara's guess", '8')))}
     ${part('data-line="1"', pip(800, 120))}
     ${part('data-line="2"', svg(pop(`<g transform="translate(430 214)">

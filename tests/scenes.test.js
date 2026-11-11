@@ -2,6 +2,8 @@
 // (still pictures, no slow filters, shared gradients that really exist).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { mean, median } from '../js/helpers/stats.js';
 import { ROOM_SCENES } from '../js/scenes/index.js';
 import { SCENE_DEFS } from '../js/scenes/defs.js';
 import { saraSVG, SARA_MOODS, seatKidSVG, KIDS } from '../js/characters.js';
@@ -98,6 +100,31 @@ test("the story's graph agrees with Sara's words: the centre number is 9", async
   const hours = [...sceneHTML('graph').matchAll(/(\d+) hours</g)].map((m) => Number(m[1]));
   const values = hours.flatMap((h, i) => Array(counts[i]).fill(h));
   assert.equal(values[Math.floor(values.length / 2)], 9);
+});
+
+// 11 Nov 2026: the story's class is 10 kids. The graph, "How Sara found them"
+// and Sara's words must all tell the same, correct numbers.
+test("the story's sums are right: graph, median 9, total 82, mean 8.2", async () => {
+  const { sceneHTML, STORY_CLASS } = await import('../js/story-scenes.js');
+  const story = JSON.parse(readFileSync(new URL('../data/content/story.json', import.meta.url), 'utf8'));
+  const counts = [...sceneHTML('graph').matchAll(/(\d+) kids?</g)].map((m) => Number(m[1]));
+  const hours = [...sceneHTML('graph').matchAll(/(\d+) hours</g)].map((m) => Number(m[1]));
+  const fromGraph = hours.flatMap((h, i) => Array(counts[i]).fill(h));
+  const sorted = [...STORY_CLASS].sort((a, b) => a - b);
+  assert.deepEqual(fromGraph, sorted, 'the graph shows the same 10 answers');
+  assert.equal(median(STORY_CLASS), 9);
+  const total = STORY_CLASS.reduce((a, b) => a + b, 0);
+  assert.equal(total, 82);
+  assert.equal(mean(STORY_CLASS), 8.2);
+  const calc = sceneHTML('calc');
+  assert.ok(calc.includes(`${sorted.join(' + ')} = 82`), 'the sum, in order');
+  assert.match(calc, /Median = 9/);
+  assert.match(calc, /Mean = 82 ÷ 10 = 8\.2/);
+  assert.match(sceneHTML('numbers'), />8\.2</);
+  const words = story.scenes.flatMap((sc) => sc.lines.map((l) => l.text)).join(' ');
+  assert.match(words, /median is 9/);
+  assert.match(words, /mean is 8\.2/);
+  assert.doesNotMatch(words, /7\.8/, 'the old, wrong mean is gone');
 });
 
 test('Sara is only in the story: never in a room scene or on the start page (Habiba, 10 Nov 2026)', async () => {

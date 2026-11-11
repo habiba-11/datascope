@@ -13,9 +13,10 @@ const story = JSON.parse(readFileSync(new URL('../data/content/story.json', impo
 const { scenes, buttons } = story;
 const STORY_JS = readFileSync(new URL('../js/story.js', import.meta.url), 'utf8');
 
-test('7 scenes: Ask, Plan, Collect, Explore graph, Explore numbers and chance, Conclude, Your mission', () => {
-  assert.deepEqual(scenes.map((s) => s.id), ['ask', 'plan', 'collect', 'graph', 'numbers', 'conclude', 'mission']);
-  assert.deepEqual(scenes.map((s) => s.step), [0, 1, 2, 3, 3, 4, 5]);
+// 11 Nov 2026 (Habiba): "calc", how Sara found the median and the mean, after the graph.
+test('8 scenes: Ask, Plan, Collect, Explore graph, median and mean, numbers and chance, Conclude, Your mission', () => {
+  assert.deepEqual(scenes.map((s) => s.id), ['ask', 'plan', 'collect', 'graph', 'calc', 'numbers', 'conclude', 'mission']);
+  assert.deepEqual(scenes.map((s) => s.step), [0, 1, 2, 3, 3, 3, 4, 5]);
   for (const s of scenes) {
     assert.ok(s.chip && s.lines.length >= 2, s.id);
     for (const line of s.lines) assert.ok(['pip', 'sara', 'kids'].includes(line.who), `${s.id}: ${line.who}`);
@@ -35,7 +36,8 @@ test('honest about the pretend class, and never a wrong class size (Habiba, 6 No
 test('Next goes line by line, then scene by scene, and stops at the very end', () => {
   assert.deepEqual(nextPosition(scenes, { scene: 0, line: 0 }), { scene: 0, line: 1 });
   assert.deepEqual(nextPosition(scenes, { scene: 0, line: 2 }), { scene: 1, line: 0 });
-  assert.equal(nextPosition(scenes, { scene: 6, line: 2 }), null);
+  const last = scenes.length - 1; // the mission
+  assert.equal(nextPosition(scenes, { scene: last, line: scenes[last].lines.length - 1 }), null);
 });
 
 test('Back goes to the line before, across scenes, and stays on the very first line', () => {
@@ -44,13 +46,14 @@ test('Back goes to the line before, across scenes, and stays on the very first l
 });
 
 test('Skip goes to the mission, so a child who skips still sees it', () => {
-  assert.deepEqual(skipPosition(scenes), { scene: 6, line: 0 });
+  assert.deepEqual(skipPosition(scenes), { scene: scenes.length - 1, line: 0 });
 });
 
 test('the green button says Next, Next scene, then Start mission', () => {
   assert.equal(nextLabel(scenes, { scene: 0, line: 0 }, buttons), 'Next');
   assert.equal(nextLabel(scenes, { scene: 0, line: 2 }, buttons), 'Next scene');
-  assert.equal(nextLabel(scenes, { scene: 6, line: 2 }, buttons), 'Start mission');
+  const last = scenes.length - 1;
+  assert.equal(nextLabel(scenes, { scene: last, line: scenes[last].lines.length - 1 }, buttons), 'Start mission');
 });
 
 test('the trail lights up the step of each scene; the mission has every step done', () => {
