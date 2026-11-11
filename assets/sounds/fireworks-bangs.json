@@ -1,0 +1,14 @@
+{
+  "file": "assets/sounds/fireworks.mp3",
+  "duration": 6.02,
+  "bangs": [
+    0.44,
+    1.33,
+    1.67,
+    1.8,
+    2.78,
+    3.74,
+    3.91,
+    4.16
+  ]
+}

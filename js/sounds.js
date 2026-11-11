@@ -296,6 +296,43 @@ export function playFirework(at = 0, far = false) {
   }
 }
 
+// ---------- Part 61b (Habiba, 11 Nov 2026): her fireworks recording ----------
+// My journey's fireworks play a real recording (assets/sounds/fireworks.mp3).
+// It is loaded and decoded once; motion.js times each rocket to its bang
+// (the bang times: assets/sounds/fireworks-bangs.json, made by
+// dev/firework-bangs.mjs). The Sound switch still silences it.
+let recording = null;
+
+export async function loadRecording(url) {
+  const c = audioContext();
+  if (!c) return null;
+  try {
+    const bytes = await (await fetch(url)).arrayBuffer();
+    recording = await c.decodeAudioData(bytes);
+    return recording;
+  } catch {
+    return null; // no file or no decoder: the fireworks still show
+  }
+}
+
+// Plays the recording `at` seconds from now (once). Skipped, never late, if
+// sound is off or the browser has not allowed sound yet (no tap on this page).
+export function playRecording(at = 0) {
+  if (!recording || !getSoundOn()) return;
+  const c = audioContext();
+  if (!c) return;
+  if (c.state !== 'running') {
+    c.resume().catch(() => {});
+    return;
+  }
+  const source = c.createBufferSource();
+  source.buffer = recording;
+  const gain = c.createGain();
+  gain.gain.value = 0.7; // a little softer than the file: it is a background show
+  source.connect(gain).connect(c.destination);
+  source.start(c.currentTime + at);
+}
+
 // Returns { stop() }: a sound whose picture goes away early (the stars of a
 // card closed before they popped in) can be stopped, so no note is heard
 // after its motion is gone (scan of 7 Nov 2026).

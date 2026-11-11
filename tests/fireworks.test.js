@@ -53,3 +53,17 @@ test('the rocket climbs in RISE_SECONDS, and the boom of the sound is timed to t
   assert.ok(rocketY(600, 100, RISE_SECONDS / 2) < 350, 'fast at first, slower near the top');
   assert.equal(FIREWORK_RISE, RISE_SECONDS);
 });
+
+// Part 61b (Habiba, 11 Nov 2026): My journey's fireworks follow her recording.
+test('the fireworks recording and its bang times fit together', async () => {
+  const { readFileSync, statSync } = await import('node:fs');
+  const show = JSON.parse(readFileSync(new URL('../assets/sounds/fireworks-bangs.json', import.meta.url), 'utf8'));
+  const file = new URL(`../${show.file}`, import.meta.url);
+  assert.ok(statSync(file).size > 1000, 'the recording is in the app (works offline)');
+  assert.ok(statSync(file).size < 500 * 1024, 'small enough for a school laptop');
+  assert.ok(show.bangs.length >= 1);
+  show.bangs.forEach((bang, i) => {
+    assert.ok(bang >= 0 && bang < show.duration, `bang ${bang} is inside the recording`);
+    if (i) assert.ok(bang > show.bangs[i - 1], 'in order');
+  });
+});

@@ -4,7 +4,10 @@
 // GSAP (js/vendor/gsap.min.js, loaded by each room page): they also do nothing
 // with reduced motion, and if GSAP is missing the page still works, just still.
 // The sounds still follow the sound toggle.
-import { playSound, playFirework } from './sounds.js';
+import {
+  playSound, playFirework, loadRecording, playRecording,
+} from './sounds.js';
+import { RISE_SECONDS } from './helpers/fireworks.js';
 import { launchFirework } from './fireworks.js';
 import { blastConfetti } from './confetti.js';
 import { pipMoodFor } from './pip.js';
@@ -192,12 +195,13 @@ const BURST_ZONES = [
 let burstCount = 0;
 
 // One rocket, `delay` seconds from now, in the next zone; returns nothing.
-function rocket(delay, far) {
+// `sound`: false when the recording already has its bang (Part 61b).
+function rocket(delay, far, sound = true) {
   const zone = BURST_ZONES[burstCount % BURST_ZONES.length];
   const between = ([from, to]) => from + Math.random() * (to - from);
   const seed = burstCount;
   burstCount += 1;
-  playFirework(delay, far);
+  if (sound) playFirework(delay, far);
   if (!reduceMotion()) launchFirework((between(zone.x) / 100) * innerWidth, (between(zone.y) / 100) * innerHeight, seed, delay);
 }
 
@@ -209,12 +213,42 @@ export function fireworks({ bursts = 3 } = {}) {
   for (let b = 0; b < bursts; b++) rocket(b * BURST_GAP, false);
 }
 
-// The finale on My journey: a far-off show, one rocket about every 2.2 s, for
-// as long as the page is open; quieter and duller, so it never gets in the way.
-// It rests while the tab is hidden. Returns a function that stops it.
-export const LOOP_GAP_MS = 2200;
+// The finale on My journey. Part 61b (Habiba, 11 Nov 2026): her fireworks
+// recording, repeated for as long as the page is open (she chose "repeat").
+// Each rocket launches RISE_SECONDS before its bang, so it bursts exactly on
+// it (bang times: assets/sounds/fireworks-bangs.json, from dev/firework-bangs.mjs).
+// The sound starts RISE_SECONDS after the show, so even the first bang has
+// its rocket. It rests while the tab is hidden. Reduced motion: the recording
+// once, no rockets. Without the file: the made-up far-off loop as before.
+export const LOOP_GAP_MS = 2200; // the old loop (only without the recording)
+const SHOW = new URL('../assets/sounds/fireworks-bangs.json', import.meta.url);
 
-export function fireworksLoop() {
+export async function fireworksLoop() {
+  let show = null;
+  try {
+    show = await (await fetch(SHOW)).json();
+    // show.file is from the site's root; this file is in js/, one folder down.
+    if (!(await loadRecording(new URL(`../${show.file}`, import.meta.url)))) show = null;
+  } catch {
+    show = null;
+  }
+  if (!show) return madeUpLoop();
+  if (reduceMotion()) {
+    playRecording(0);
+    return () => {};
+  }
+  const playShow = () => {
+    if (document.hidden) return;
+    playRecording(RISE_SECONDS);
+    for (const bang of show.bangs) rocket(bang, true, false); // launches at `bang`, bursts RISE later = on the sound's bang
+  };
+  playShow();
+  const timer = setInterval(playShow, show.duration * 1000);
+  return () => clearInterval(timer);
+}
+
+// Before Part 61b: one made-up firework about every 2.2 s, far off and quiet.
+function madeUpLoop() {
   if (reduceMotion()) {
     playFirework(0, true);
     return () => {};
