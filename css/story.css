@@ -1,5 +1,5 @@
 /* The start-page story (Part 44, js/story.js), from the approved design
-   docs/design/frames/datascope-story-ui.html. A 960 x 600 stage, scaled to fit
+   the first story design (frames/datascope-story-ui.html, removed 12 Nov 2026; in Git history). A 960 x 600 stage, scaled to fit
    the window. Colours and fonts come from theme.css. Reduced motion: base.css
    switches every animation off, so each scene simply shows. */
 

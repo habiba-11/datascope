@@ -1,6 +1,6 @@
 // Helper layer: the background music's score (Part 43d, Round 4 pilot
 // feedback). The same calm, happy loop as the approved story design
-// (docs/design/frames/datascope-story-ui.html): 8 bars of C - Am - F - G at
+// (frames/datascope-story-ui.html, removed 12 Nov 2026; in Git history): 8 bars of C - Am - F - G at
 // about 104 beats a minute, with a melody, soft pad chords, a bass and a very
 // light beat. No DOM and no sound here (js/music.js plays it), so it is tested.
 

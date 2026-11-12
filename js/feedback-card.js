@@ -1,5 +1,5 @@
 // Shell layer: the end-of-phase summary card (Part 16; design f7b,
-// docs/design/frames/f7b-phase-summary.html). One pop-up after each of the 7
+// frame f7b-phase-summary, removed 12 Nov 2026; in Git history). One pop-up after each of the 7
 // phases: big stars with words, the child's own work, the wins, one tip, one
 // thing learned, the 7-stop trail and ONE button. Content: helpers/feedback.js.
 // Text goes in with textContent only (a child's answer is shown here); the SVG

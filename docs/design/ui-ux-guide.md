@@ -1,19 +1,17 @@
 # DataScope UI/UX guide: structure and motion (round 2)
 
-**Goal:** every screen feels calm and clear, never crowded, and motion helps the child understand what is happening. The look stays Explorer's Toolkit (see `explorer-ui.html` and `CLAUDE.md`).
+**Goal:** every screen feels calm and clear, never crowded, and motion helps the child understand what is happening. The look stays Explorer's Toolkit (`CLAUDE.md`).
 
-**Reference frames:** `docs/design/frames/`. Open `index.html` with Live Server and reload a frame to replay its motion. They are **references**: port the patterns into the real files. Do not copy them in whole, and keep the real texts from the content files (Part 17).
+**Reference designs (current):** in this folder, `datascope-rooms-ui.html` (the rooms),
+`datascope-story-ui-v2.html` (the story), `datascope-welcome-ui.html` (the start page),
+`pip-wardrobe-ui.html` (Pip's Wardrobe) and `illustration-sheet.html` (the icons). Open them
+with Live Server. They are **references**: port the patterns into the real files, and keep
+the real texts from the content files (Part 17).
 
-| Frame | Screen | Main idea |
-|-------|--------|-----------|
-| f1-start | Welcome / code | One big action, Pip waving, title letters bounce in |
-| f2-phaseintro | Phase intro pop-up (Part 14) | 3 short bullets that appear one by one, one button |
-| f3-ask | Ask: pick a question | 4 big choice cards; the chosen one lifts and gets a check |
-| f4-collect | Data Hub | Classmates "take their seats"; seat colours match bar colours; bars grow |
-| f5-numberlab | Number Lab | Explore sub-rooms as tabs; a mini stepper; cards slide into order and the middle lights up |
-| f6-chancelab | Chance Lab | Spinner with easing; dashed "should" bars next to solid "did" bars |
-| f7-phasefeedback | Phase-end feedback (Part 16) | Stars pop one by one, 2 wins, 1 nudge, the lock opens on the next phase |
-| f8-evidenceboard | Evidence Board | Clue tray beside a 3-slot card; a clue flies in; a "Ready to share!" stamp |
+The early design frames (f0 to f13, the first story design, `explorer-ui.html`,
+`badges-demo.html`) and the before/after screenshots of Part 59 were removed on
+12 Nov 2026 (Habiba: "so I don't get lost"). Their patterns are in the app; the files are
+in Git history (`docs/project-notes.md`, section 8).
 
 ---
 

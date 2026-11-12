@@ -1,7 +1,7 @@
 // Shell layer: the start-page story (Part 44, Round 4). It replaces the old
 // film (Part 34). Pip shows Sara, an original young investigator, solving a
 // mystery in 7 scenes (Ask, Plan, Collect, Explore x2, Conclude), then it is
-// the child's turn. Approved design: docs/design/frames/datascope-story-ui.html.
+// the child's turn. Approved design: the first story design (frames/datascope-story-ui.html, removed 12 Nov 2026; in Git history).
 // Nothing moves on by itself (Habiba: no timer): the child taps Next or Back,
 // or the arrow keys. The first "Start the story" tap also lets the browser
 // play sound. Words: data/content/story.json; rules: helpers/story.js (tested).

@@ -1,5 +1,6 @@
 // Shell layer: the story's scene sound effects (Part 44c), from the approved
-// design (docs/design/frames/datascope-story-ui.html): pops as things appear,
+// first story design (frames/datascope-story-ui.html, removed 12 Nov 2026;
+// in Git history): pops as things appear,
 // a ding, Sara writing, a yawn, the bars growing, the die rattling, the stamp,
 // a fanfare, claps and a chime. Which line gets which: STORY_EFFECTS in
 // helpers/story.js (tested). They follow the sound switch like every sound.

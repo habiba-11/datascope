@@ -2,11 +2,10 @@
 
 Belongs to **Part 21b (Progress and rewards)** in `docs/round-2-plan.md`. It uses the pop-up component from **Part 13** (`js/ui/modal.js`).
 
-**Reference files in this folder:**
-- `badges-demo.html`: a working demo of the badge pop-up, the flight into the backpack, and the backpack shelf. Open it with Live Server and use the DEMO buttons.
-- `explorer-ui.html`: the chosen look (Direction 3, Explorer's Toolkit) as one static screen.
+The demo files (`badges-demo.html`, `explorer-ui.html`) were removed on 12 Nov 2026; they are
+in Git history. The badges are built: `js/badge-art.js`, `js/badge-popup.js`, `js/badge-shelf.js`.
 
-These are references. **Port the ideas into the real app's files and do not copy them in whole.** Visual values go into `css/theme.css` variables.
+These were references. **Port the ideas into the real app's files and do not copy them in whole.** Visual values go into `css/theme.css` variables.
 
 ---
 
@@ -51,7 +50,7 @@ Earn rules must be **pure functions** (for example `js/helpers/badges.js` → `c
 - **Locked:** a grey patch (#C9D6E2, inner #EEF3F7), a lock icon, a dashed "Locked" ribbon and the "how" text underneath.
 - **Name ribbon:** a white pill with a navy outline and a small colour dot. Navy text on white is used for contrast; never put navy text on the violet badge colour.
 - **Mystery back** (shown before the flip): a navy circle with a gold dashed ring and a big gold "?".
-- Icon SVG paths are in `ICONS` inside `badges-demo.html`. All art is original. Pip is our own owl.
+- The icons are our own illustrations (`js/illustrations.js`). All art is original. Pip is our own owl.
 
 ## 4. The pop-up animation (total about 2 seconds, then the button pulses gently)
 
