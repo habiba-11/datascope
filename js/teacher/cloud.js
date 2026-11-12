@@ -1,7 +1,7 @@
 // Teacher dashboard: talks to the online database (Part 22), with plain fetch().
 // The teacher logs in with email + password (Supabase Auth). The database only
 // shows children's work to a logged-in account listed in "teachers"
-// (backend/schema.sql), so this login is real protection, unlike the PIN.
+// (backend/schema.sql), so this login is real protection.
 import { BACKEND } from '../config.js';
 import { fromRow, groupByCode, tagsByCode } from '../helpers/outbox.js';
 

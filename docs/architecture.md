@@ -286,7 +286,7 @@ The stack comes from your project overview. It is deliberately small so a beginn
 ### 9.2 Changes to earlier decisions
 
 - **Evidence Board:** the audience and form task was removed (26 Oct 2026, Habiba): it had no purpose for the child. It is now Claim + Evidence + How sure and why (Paper 17's three parts).
-- **Teacher view:** not hidden. A button on the start page; with the database on, an email + password login checked by the database; with it off, a PIN (stored only as a hash; the PIN itself is not written in the docs), which is a speed bump, not security.
+- **Teacher view:** not hidden. A button on the start page; with the database on, an email + password login checked by the database; with it off, the teacher view does not open (the PIN for that case was removed on 12 Nov 2026, Habiba).
 - **No files when the database is on:** children's work goes online by itself and the teacher sees it on the dashboard. "Save my work" files and "Import files" only appear when the database is switched off (fallback).
 - **Time per phase** is recorded for the teacher only and never shown to the child.
 - **Libraries added:** GSAP 3.15.0 (local copy in `js/vendor/`) for motion; `playwright-core` as a developer tool only (screenshots and checks, never shipped to children).
@@ -359,7 +359,7 @@ Teacher's browser ── email + password login ──► reads log_entries, tea
 
 - **The database is on** for the live site: children's work goes online by itself, and the teacher logs in with the email and password in the database.
 - **No files:** the child's "Save my work" files and the teacher's file import are removed. The browser keeps each moment only until it is sent (offline-first, so a dropped connection loses nothing).
-- **The teacher PIN stays** as it is, stored only as a hash; it is only asked when the database is switched off.
+- **No teacher PIN** (removed 12 Nov 2026, Habiba): the teacher view needs the online database.
 - Fonts and Chart.js are stored with the app; a deploy check and a path test guard every push (`docs/project-notes.md`, section 2).
 
 ### 10.5 Still open

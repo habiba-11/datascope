@@ -156,7 +156,7 @@ Final deliverables: source code on GitHub, a live GitHub Pages link, a recorded 
 - **Mean task:** keep 5 numbers, with a worked example beside the question. All-same answers are correct and logged as `allSame`.
 - **Room summary:** a "📖 About this room" tab on the task card. The pop-up still opens once, and the (i) button is removed.
 - **Checker:** accepts specific and regular time phrases, and vague words still ask "When?" (Paper 28).
-- **Live site (changed 4 Nov 2026):** the database is ON (Prof and the ethics check agreed). The teacher logs in with the email + password in the database. The PIN stays as it is, stored only as a hash; it is only asked when the database is off. Claude commits and pushes; Habiba switches on GitHub Pages herself. The repo stays public.
+- **Live site (changed 4 Nov 2026):** the database is ON (Prof and the ethics check agreed). The teacher logs in with the email + password in the database. **The PIN was removed on 12 Nov 2026 (Habiba):** with the database off, the teacher view only says how to switch it on. Claude commits and pushes; Habiba switches on GitHub Pages herself. The repo stays public.
 
 ## Round 4 (pilot feedback, 5 Nov 2026)
 - Real Grade 5 children tried DataScope. Their feedback (purpose unclear, "boring", several unclear screens) is fixed in Parts 42 to 51. Every part's date and commit is in `docs/project-notes.md`, section 9. This overrides "only fix real bugs during the pilot".

@@ -265,7 +265,7 @@ html.is-loading body {
   font-size: 20px;
 }
 
-/* "Teacher's view": quiet, under the card (it asks for a password or PIN). */
+/* "Teacher's view": quiet, under the card (it asks for an email and password). */
 .teacher-btn {
   margin-top: 10px;
   background: rgba(255, 255, 255, 0.85);

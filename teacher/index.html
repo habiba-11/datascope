@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Teacher dashboard (Part 20). With the online database on (Part 22) the
        teacher logs in with email + password (real protection, checked by the
-       database). With it off, a PIN keeps children out: a speed bump only.
+       database). The PIN for a switched-off database was removed on
+       12 Nov 2026 (Habiba): the teacher view needs the database.
        Layout (27 Oct 2026): a top bar, then 4 tabs, one job each. -->
   <title>Teacher dashboard · DataScope</title>
   <link rel="stylesheet" href="../css/fonts.css">
@@ -19,18 +20,8 @@
   <main class="teacher card">
     <a class="back-link" href="../index.html">← Back to DataScope</a>
 
-    <!-- ---------- Getting in (one of these two is shown) ---------- -->
-    <section class="gate" id="pin-gate">
-      <h1><span data-icon="chart"></span> Teacher dashboard</h1>
-      <form id="pin-form" class="gate-form">
-        <label for="pin-input"><span data-icon="lock"></span> Teacher PIN</label>
-        <input type="password" id="pin-input" autocomplete="off">
-        <button class="btn btn-main" type="submit">Open the dashboard</button>
-      </form>
-      <p class="feedback" id="pin-message" aria-live="polite" hidden></p>
-    </section>
-
-    <section class="gate" id="login-gate" hidden>
+    <!-- ---------- Getting in: email + password (js/teacher/gate.js) ---------- -->
+    <section class="gate" id="login-gate">
       <h1><span data-icon="chart"></span> Teacher dashboard</h1>
       <form id="login-form" class="gate-form">
         <label for="login-email"><span data-icon="email"></span> Email</label>

@@ -1,10 +1,8 @@
 // Teacher dashboard: who may come in. The dashboard code is only loaded after
-// the teacher is let in.
-// - Online database ON (Part 22): email + password login (cloud.js). The
-//   database itself refuses children's data to anyone not logged in.
-// - Online database OFF: the PIN (a speed bump only; the data is on this device).
-// Both are remembered until the browser tab is closed (sessionStorage).
-import { checkPin } from '../helpers/pin.js';
+// the teacher is let in: email + password login (cloud.js, Part 22). The
+// database itself refuses children's data to anyone not logged in.
+// The PIN for a switched-off database was removed on 12 Nov 2026 (Habiba):
+// with the database off, the page says how to switch it on.
 import { backendReady } from '../config.js';
 import { isLoggedIn, logIn } from './cloud.js';
 import './calm-icons.js'; // first: only warning icons in the teacher view
@@ -12,26 +10,7 @@ import { setIconLine, fillIcons } from '../icon-text.js';
 
 fillIcons(); // the page's <span data-icon> icons (Part 54h)
 
-const UNLOCK_KEY = 'datascope:teacherUnlocked';
-
-function isUnlocked() {
-  try {
-    return sessionStorage.getItem(UNLOCK_KEY) === 'yes';
-  } catch {
-    return false; // storage blocked: just ask for the PIN each time
-  }
-}
-
-function rememberUnlock() {
-  try {
-    sessionStorage.setItem(UNLOCK_KEY, 'yes');
-  } catch {
-    // storage blocked: the PIN is asked again next time
-  }
-}
-
 async function openDashboard() {
-  document.getElementById('pin-gate').hidden = true;
   document.getElementById('login-gate').hidden = true;
   document.getElementById('dashboard').hidden = false;
   await import('./dashboard.js');
@@ -44,8 +23,6 @@ function showMessage(id, text) {
 }
 
 function setupLogin() {
-  document.getElementById('pin-gate').hidden = true;
-  document.getElementById('login-gate').hidden = false;
   const form = document.getElementById('login-form');
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -67,22 +44,11 @@ function setupLogin() {
   else document.getElementById('login-email').focus();
 }
 
-function setupPin() {
-  const form = document.getElementById('pin-form');
-  const input = document.getElementById('pin-input');
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    if (await checkPin(input.value)) {
-      rememberUnlock();
-      openDashboard();
-    } else {
-      showMessage('pin-message', ':lock: That PIN is not right. Try again.');
-      input.select();
-    }
-  });
-  if (isUnlocked()) openDashboard();
-  else input.focus();
+// The database is switched off (js/config.js): there is nothing to log in to.
+function explainNoDatabase() {
+  document.getElementById('login-form').hidden = true;
+  showMessage('login-message', ':cloud-off: The teacher view needs the online database. Switch it on in js/config.js (enabled: true).');
 }
 
 if (backendReady()) setupLogin();
-else setupPin();
+else explainNoDatabase();

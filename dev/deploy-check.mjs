@@ -13,11 +13,11 @@ const failed = tests.stdout.match(/ℹ fail (\d+)/)?.[1];
 if (tests.status !== 0) problems.push(`Tests: ${failed} failing. Run "npm test" to see which.`);
 else notes.push(`Tests: all ${passed} pass.`);
 
-// The teacher logs in with email + password while the database is on. The PIN
-// (kept as a hash, Habiba's decision 4 Nov 2026) is only asked when it is off.
+// The teacher logs in with email + password; with the database off the
+// teacher view cannot open (the PIN was removed on 12 Nov 2026, Habiba).
 notes.push(BACKEND.enabled
   ? 'Database: ON. Children\'s work goes online; the teacher logs in with email + password.'
-  : 'Database: OFF. Work stays in each browser, and the teacher can only see DEMO data.');
+  : 'Database: OFF. Work stays in each browser, and the teacher view cannot open.');
 
 const git = spawnSync('git', ['status', '--porcelain'], { encoding: 'utf8' });
 if (git.stdout.trim()) problems.push('Git: there are changes that are not committed yet. Commit them first.');
