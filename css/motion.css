@@ -31,13 +31,6 @@
   pointer-events: none;
 }
 
-/* Bars grow up from the bottom (scaleY), so the layout never jumps. */
-.m-grow {
-  transform-origin: 50% 100%;
-  animation: m-grow var(--duration-slow) var(--ease-spring) both;
-  animation-delay: calc(var(--i, 0) * var(--stagger));
-}
-
 /* "Press me": the ready green button hops a little and sends out a yellow
    ring every 2.4 s (Habiba, 4 Nov 2026: a hint to tap it, e.g. "Run survey").
    It rests while the button is pressed, so the press-down still feels real.
@@ -67,11 +60,6 @@
   animation: m-float 3s ease-in-out infinite;
 }
 
-/* A small wobble: a lock before it opens, or a gentle "try again". Never a punishment. */
-.m-shake {
-  animation: m-shake 0.45s ease-in-out;
-}
-
 /* Loops rest while the tab is hidden (js/app.js sets the class). */
 .tab-hidden .m-ring::after,
 .tab-hidden .m-nudge,
@@ -83,12 +71,10 @@
 @keyframes m-rise { from { opacity: 0; transform: translateY(18px); } }
 @keyframes m-pop { from { opacity: 0; transform: scale(0.6); } }
 @keyframes m-ring { 0% { opacity: 0.9; transform: scale(0.9); } 100% { opacity: 0; transform: scale(1.25); } }
-@keyframes m-grow { from { transform: scaleY(0); } }
 @keyframes m-nudge { 0%, 70%, 86%, 100% { transform: translateY(0); } 78% { transform: translateY(-7px); } 92% { transform: translateY(-3px); } }
 @keyframes m-nudge-ring { 0%, 70% { opacity: 0; transform: scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: scale(1.15); } }
 @keyframes m-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
 @keyframes m-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-@keyframes m-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
 /* Reduced motion: the ready button keeps a still yellow ring instead. */
 @media (prefers-reduced-motion: reduce) {

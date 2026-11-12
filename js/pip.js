@@ -124,8 +124,8 @@ export function pipMoodFor(mood, ms = 1400) {
   moodTimer = setTimeout(() => setPipMood('happy'), ms);
 }
 
-// Pip says something: in the sidebar bubble (old layout) or in the Pip line
-// of the task card (new layout). Both are marked with data-pip-text.
+// Pip says something: in the Pip line of the task card (marked with
+// data-pip-text; big Pip beside the card follows it, js/pip-stand.js).
 // `icon` (Part 54b): the name of an illustration shown before the words.
 // Habiba, 11 Nov 2026: Pip's lines are words only (Pip stands right there).
 export function pipSay(text) {

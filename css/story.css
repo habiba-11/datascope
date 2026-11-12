@@ -172,7 +172,6 @@
 /* A part that pops in from a certain line: it adds no box of its own. */
 .st-part { display: contents; }
 .st-part[hidden] { display: none; }
-.st-defs { position: absolute; }
 
 /* Part 59s: the people and props of a scene, placed on the 960 x 600 stage. */
 .st-char {

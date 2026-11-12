@@ -63,7 +63,6 @@ async function init() {
     accent: 'explore',
     explorePage: 'chance',
     phase: 'chance',
-    layout: 'card',
     contentHTML: taskCardHTML({
       tabsHTML: exploreCardTabsHTML(),
       bodyHTML: `

@@ -101,33 +101,6 @@
   box-sizing: border-box;
 }
 
-.checker-list {
-  list-style: none;
-  margin: 8px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-width: 500px;
-}
-
-.checker-list li {
-  border-radius: 10px;
-  padding: 6px 10px;
-  font-weight: 700;
-  font-size: 18px;
-}
-
-.checker-list li.warn {
-  background: #FFF1D6;
-  border: 2px solid var(--color-plan);
-}
-
-.checker-list li.ok {
-  background: #E4F7E8;
-  border: 2px solid var(--color-btn-main-bg);
-}
-
 /* ---------- Part 45 (Round 4): clearer fix-its ---------- */
 /* Fix 1: two big answer buttons, A and B, each with its letter in a circle. */
 .fixit-choices {

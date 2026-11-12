@@ -183,12 +183,6 @@ h1 {
   border-color: var(--color-line);
 }
 
-/* Shared by several rooms, so they live here (every page loads base.css). */
-.room-question {
-  font-weight: 700;
-  margin: 4px 0 16px;
-}
-
 .predict-unit {
   font-weight: 700;
 }
@@ -210,30 +204,12 @@ h1 {
   background: var(--color-explore);
 }
 
-/* The big "go to the next room" link at the end of a room. */
-.next-room-btn {
-  margin-top: 16px;
-}
-
 /* Colour is never the only signal (CLAUDE.md): anything chosen also gets a ✓.
    .active / .selected are the classes the rooms already add when a child picks something. */
 .choice-btn.active::before,
 .certainty-btn.active::before {
   content: '✓ ';
   font-weight: 800;
-}
-
-/* The Explore tab you are on gets a pin, not a ✓ (a ✓ means "picked", and a
-   finished room already shows its check). Part 54f: our pin icon (js/illustrations.js
-   'pin'), built in as a data: image, so it works offline with no file. */
-.explore-tab.active::before {
-  content: '';
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  margin-right: 0.3em;
-  vertical-align: -0.15em;
-  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20class%3D%27ds-illo%27%20width%3D%2716%27%20height%3D%2716%27%20viewBox%3D%270%200%2064%2064%27%20aria-hidden%3D%27true%27%20focusable%3D%27false%27%3E%3Cellipse%20cx%3D%2732%27%20cy%3D%2758%27%20rx%3D%2711%27%20ry%3D%273.5%27%20fill%3D%27%239CC6E6%27%20stroke%3D%27%2317324D%27%20stroke-width%3D%272%27%2F%3E%3Cpath%20d%3D%27M32%2057%20C32%2057%2012%2037%2012%2024%20A20%2020%200%200%201%2052%2024%20C52%2037%2032%2057%2032%2057Z%27%20fill%3D%27%23FF7A6B%27%20stroke%3D%27%2317324D%27%20stroke-width%3D%273%27%20stroke-linejoin%3D%27round%27%20stroke-linecap%3D%27round%27%2F%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%2724%27%20r%3D%277.5%27%20fill%3D%27%23fff%27%20stroke%3D%27%2317324D%27%20stroke-width%3D%272.5%27%2F%3E%3Cpath%20d%3D%27M18%2021%20Q20%2013%2027%2010%27%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-opacity%3D%27.7%27%20stroke-width%3D%273.5%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E") center / contain no-repeat;
 }
 
 .scenario-card.selected,
@@ -256,11 +232,6 @@ h1 {
   align-items: center;
   justify-content: center;
   font-weight: 800;
-}
-
-/* "Need a hint?" under an open question (js/helpers/prompts.js). */
-.hint-box {
-  margin: 6px 0 12px;
 }
 
 .hint-btn {
@@ -348,11 +319,6 @@ h1 {
 .drop-ready {
   outline: 5px dashed var(--color-btn-main-bg);
   outline-offset: 2px;
-}
-
-.btn-run {
-  background: var(--color-btn-run-bg);
-  color: var(--color-btn-run-text);
 }
 
 /* Two soft round hills at the bottom of every child page (decoration only). */

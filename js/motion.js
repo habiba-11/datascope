@@ -99,21 +99,6 @@ export function pulse(element) {
   gsap.fromTo(element, { scale: 1 }, { scale: 1.08, duration: MOTION.fast, yoyo: true, repeat: 3, ease: 'sine.inOut', clearProps: 'scale' });
 }
 
-// A slow, endless float up and down (e.g. Pip waiting). Returns the tween so
-// it can be stopped; nothing with reduced motion.
-export function float(element) {
-  const gsap = gsapOrNull();
-  if (!gsap || !element) return null;
-  return gsap.to(element, { y: -6, duration: 1.6, yoyo: true, repeat: -1, ease: 'sine.inOut' });
-}
-
-// The room's content slides in when a page opens.
-export function enterRoom(element) {
-  const gsap = gsapOrNull();
-  if (!gsap || !element) return;
-  gsap.from(element, { y: 24, opacity: 0, duration: MOTION.medium, ease: MOTION.out, clearProps: 'all' });
-}
-
 // A step (or Explore tab) opens: it springs in while a lock shakes, becomes a key,
 // turns, becomes an open lock and floats away (Part 21b). Without motion it just appears.
 export function unlockStep(element) {
@@ -137,25 +122,11 @@ export function unlockStep(element) {
     .fromTo(holder, { scale: 1 }, { scale: 1.25, duration: 0.18, yoyo: true, repeat: 1, clearProps: 'scale' }, '<');
 }
 
-// A progress bar grows from `fromPct` to its own width (e.g. the level bar).
-export function growBar(fill, fromPct) {
-  const gsap = gsapOrNull();
-  if (!gsap || !fill) return;
-  gsap.from(fill, { width: `${fromPct}%`, duration: MOTION.slow, ease: MOTION.out });
-}
-
 // Cards flip in, one after another (e.g. earned badges on the shelf).
 export function flipIn(elements) {
   const gsap = gsapOrNull();
   if (!gsap || !elements.length) return;
   gsap.from(elements, { rotationY: 180, opacity: 0, duration: MOTION.slow, ease: MOTION.spring, stagger: 0.12, clearProps: 'all' });
-}
-
-// A bar bounces up from the bottom (e.g. a tally bar that just grew).
-export function bounceBar(element) {
-  const gsap = gsapOrNull();
-  if (!gsap || !element) return;
-  gsap.from(element, { scaleY: 0.6, transformOrigin: '50% 100%', duration: MOTION.medium, ease: 'elastic.out(1, 0.5)', clearProps: 'transform' });
 }
 
 // A rubber stamp thumps down onto a card (e.g. the finished Evidence Card).

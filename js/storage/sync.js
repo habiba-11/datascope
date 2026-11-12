@@ -90,7 +90,7 @@ export async function sendWaiting() {
 }
 
 // Starts sending, once per page: now, a moment after each new log entry, and
-// as soon as the internet comes back. `onStatus(status)` updates the sidebar.
+// as soon as the internet comes back. `onStatus(status)` updates the Settings menu.
 let started = false;
 export function startSync(onStatus) {
   if (!backendReady()) return;

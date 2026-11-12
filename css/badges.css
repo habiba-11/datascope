@@ -7,7 +7,6 @@
 .patch-gold { fill: var(--color-gold); stroke: var(--color-navy); }
 .patch-stitch { fill: none; stroke: #FFFFFF; }
 .patch-inner { fill: var(--patch-light); stroke: var(--color-navy); }
-.patch-icon { fill: none; stroke: var(--color-navy); color: var(--color-navy); }
 
 .mystery-back { fill: var(--color-navy); }
 .mystery-ring { fill: none; stroke: var(--color-gold); }
@@ -239,7 +238,6 @@
 /* The backpack bumps and its counter pops when a badge lands. */
 .bp-bump { animation: bp-bump 0.5s var(--ease-spring); }
 .bp-count-pop { animation: bp-count 0.45s var(--ease-spring); }
-.bp-slot-new svg { animation: bp-slot 0.7s var(--ease-spring) both; }
 
 /* ---------- My Explorer Backpack (js/badge-shelf.js) ---------- */
 .badge-shelf {

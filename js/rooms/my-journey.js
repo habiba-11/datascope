@@ -397,7 +397,6 @@ async function init() {
   mountShell({
     step: 'conclude',
     accent: 'conclude',
-    layout: 'card',
     contentHTML: taskCardHTML({
       title: `:map: My journey · :${scenarioIcon}: ${cardTitle}`,
       bodyHTML: '<div class="j-body" id="journey"></div>',

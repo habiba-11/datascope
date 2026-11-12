@@ -55,7 +55,6 @@ async function init() {
     step: 'collect',
     phase: 'collect',
     accent: 'collect',
-    layout: 'card',
     contentHTML: taskCardHTML({
       title: ':clipboard: Collect · Data Hub',
       pill: PRETEND_PILL,

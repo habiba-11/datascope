@@ -92,7 +92,6 @@ async function init() {
     accent: 'explore',
     explorePage: 'graph',
     phase: 'graph',
-    layout: 'card',
     contentHTML: taskCardHTML({
       tabsHTML: exploreCardTabsHTML(),
       bodyHTML: `

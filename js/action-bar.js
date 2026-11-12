@@ -1,7 +1,7 @@
 // Shell layer: the action bar under the task card (UI guide, zone 3). Always in
 // the same place: Back (quiet) on the left, the ONE primary button (green) on
 // the right. The Hint button sits under the question (setHint).
-// mountShell({ layout: 'card' }) makes the empty bar; each room fills it with setupActionBar().
+// mountShell() makes the empty bar; each room fills it with setupActionBar().
 import { setIconLine, withoutIcons } from './icon-text.js';
 
 // back:    { label, href } or { label, onClick }, or null for no Back

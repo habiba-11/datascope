@@ -32,11 +32,6 @@ export function loadWardrobeItems() {
   return loading;
 }
 
-// The items if they are already loaded (for the badge pop-up, which cannot wait).
-export function wardrobeItemsNow() {
-  return loaded;
-}
-
 // The item a badge opens, if any (for the "New for Pip" line in the badge pop-up).
 export function itemForBadge(badgeId) {
   if (!FEATURES.wardrobe || !loaded) return null;

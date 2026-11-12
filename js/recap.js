@@ -6,7 +6,7 @@ import { openModal } from './modal.js';
 import { addTitleButton } from './app.js';
 import { logEvent } from './helpers/log.js';
 import { recapCardIds, exampleLines } from './helpers/recap.js';
-import { hasSeenIntro, markIntroSeen } from './storage/save.js';
+import { hasSeenIntro, markIntroSeen } from './storage/save.js';
 import { setIconText } from './icon-text.js';
 
 let recapPromise = null;
@@ -114,7 +114,7 @@ export function autoOpenRecap(kind) {
 
 // Adds a "Maths recap" button (book icon) next to the room title.
 export function addRecapButton(kind, room) {
-  const button = el('button', '', 'btn title-btn');
+  const button = el('button', '', 'btn');
   setIconText(button, 'book', 'Maths recap');
   button.type = 'button';
   button.addEventListener('click', () => openRecap({ kind, auto: false, room }));

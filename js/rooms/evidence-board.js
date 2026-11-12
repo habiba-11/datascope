@@ -83,7 +83,6 @@ async function init() {
     step: 'conclude',
     phase: 'conclude',
     accent: 'conclude',
-    layout: 'card',
     contentHTML: taskCardHTML({
       title: ':flag: Conclude · Evidence Board',
       bodyHTML: `

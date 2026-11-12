@@ -1,15 +1,14 @@
-import { getExplorerCode, getDonePhases, getPreviewAll } from './storage/save.js';
+import { getDonePhases, getPreviewAll } from './storage/save.js';
 import { countBadges, counterHTML, backpackLabel, setupCelebrations } from './celebrate.js';
 import { setupAboutTab } from './phase-intro.js';
 import { guardPage, enterPhase } from './phase-progress.js';
 import { visibleSteps, isStepDone, isUnlocked, hasMoreSteps } from './helpers/progress.js';
-import { pipReacts, enterRoom, float, unlockStep, confetti } from './motion.js';
-import { pipSVG, pipSay } from './pip.js';
+import { pipReacts, unlockStep, confetti } from './motion.js';
+import { pipSay } from './pip.js';
 import { lineIcon, LOGO_SVG } from './icons.js';
 import { watchPressedState } from './pressed-state.js';
 import { startSync } from './storage/sync.js';
-import { backendReady } from './config.js';
-import { EXIT_BUTTON_HTML, setupExitButton } from './exit-button.js';
+import { setupExitButton } from './exit-button.js';
 import { mountSky } from './ambient.js';
 import { mountScene } from './scenes/index.js';
 import { mountPipStand } from './pip-stand.js';
@@ -36,33 +35,33 @@ const EXPLORE_ROOMS = [
   { id: 'chance', icon: 'die', label: 'Chance Lab', href: 'chance-lab.html' },
 ];
 
-const LOCKED_MESSAGE = `${iconHTML('lock')} That room is still locked. Finish this step first, then it opens!`;
+const LOCKED_MESSAGE = 'That room is still locked. Finish this step first, then it opens!';
 
 let currentStep = null;
 let currentExplorePage = null;
 
 // `phase` is this page's phase (see helpers/progress.js), e.g. 'collect' or
 // 'graph'. It drives the route guard, the phase-start log and the intro pop-up.
-// `layout`: 'card' = the 3-zone layout of the UI guide (top bar, ONE task card,
-// action bar; Pip lives in the card). Rooms move to it one at a time; the
-// others keep the 'sidebar' layout until then.
-export function mountShell({ step, accent, pipMessage, contentHTML, explorePage, phase, layout = 'sidebar' }) {
+// Every room has the 3-zone layout of the UI guide: the top bar, ONE task card,
+// the action bar. (The old "sidebar" layout was removed on 12 Nov 2026.)
+export function mountShell({ step, accent, contentHTML, explorePage, phase }) {
   const root = document.getElementById('shell');
   currentStep = step;
   currentExplorePage = explorePage;
 
-  // Sent here from a locked room? Pip explains, and the address is tidied up.
-  const params = new URLSearchParams(location.search);
-  if (params.has('locked')) {
-    pipMessage = LOCKED_MESSAGE;
+  // Sent here from a locked room? Pip explains (after the room has said its
+  // own first line), and the address is tidied up. (12 Nov 2026: this message
+  // was only drawn in the old sidebar, so the card layout never showed it.)
+  if (new URLSearchParams(location.search).has('locked')) {
     history.replaceState(null, '', location.pathname);
+    setTimeout(() => pipSay(LOCKED_MESSAGE), 0);
   }
 
   root.innerHTML = `
     <header class="shell-header">
       <div class="header-left">
         <a class="logo" href="../index.html">${LOGO_SVG}<span>Data<span class="logo-accent">Scope</span></span></a>
-        ${layout === 'card' ? settingsMenuHTML() : ''}
+        ${settingsMenuHTML()}
       </div>
       <nav class="step-bar" aria-label="Investigation steps">${stepBarHTML()}</nav>
       <div class="header-actions">
@@ -71,24 +70,11 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
       </div>
     </header>
     ${getPreviewAll() ? `<p class="preview-banner">${iconHTML('magnifier')} Teacher preview: all rooms are open on this device</p>` : ''}
-    ${layout === 'card' ? cardBodyHTML(accent, contentHTML) : `<div class="shell-body">
-      <aside class="sidebar">
-        <div class="speech-bubble" data-pip-text>${pipMessage}</div>
-        <div class="pip-mascot">${pipSVG()}</div>
-        ${codeBadge()}
-        <button class="btn sound-toggle" id="sound-toggle" type="button" aria-pressed="true">${iconHTML('speaker')} Sound: on</button>
-        ${EXIT_BUTTON_HTML}
-        ${backendReady() ? '<p class="sync-status" id="sync-status" role="status"></p>' : ''}
-      </aside>
-      <main class="room-content" style="--accent: var(--color-${accent})">
-        ${step === 'explore' ? `<nav class="explore-subnav" aria-label="Explore rooms">${exploreTabsHTML()}</nav>` : ''}
-        ${contentHTML}
-      </main>
-    </div>`}
+    ${cardBodyHTML(accent, contentHTML)}
   `;
 
-  // Card layout: the Explore tabs were built before this page's room was
-  // known, so they are drawn again now with the right one marked.
+  // The Explore tabs were built before this page's room was known, so they
+  // are drawn again now with the right one marked.
   const cardTabs = root.querySelector('.task-card-tabs');
   if (cardTabs) cardTabs.innerHTML = exploreCardTabsHTML();
 
@@ -121,14 +107,10 @@ export function mountShell({ step, accent, pipMessage, contentHTML, explorePage,
   watchPressedState();
   setupExitButton();
   setupSettingsMenu();
-  if (layout === 'card') centreStepBarOverCard();
+  centreStepBarOverCard();
   // Part 22: send the log to the online database (only when it is switched on).
   // Part 60c: the status is shown in the Settings menu.
   startSync(showSyncStatus);
-  if (layout !== 'card') {
-    enterRoom(root.querySelector('.room-content'));
-    float(root.querySelector('.pip-mascot .pip'));
-  }
   // Looping motions rest while the tab is hidden (css/motion.css).
   document.addEventListener('visibilitychange', () => {
     document.documentElement.classList.toggle('tab-hidden', document.hidden);
@@ -206,19 +188,6 @@ function centreStepBarOverCard() {
   [header, bar, actions].forEach((el) => watch.observe(el));
 }
 
-// The Explore rooms open one after another; only the open ones are shown.
-function exploreTabsHTML(newTab = null) {
-  const done = getDonePhases();
-  return EXPLORE_ROOMS
-    .filter((r) => getPreviewAll() || isUnlocked(r.id, done))
-    .map((r) => {
-      const isActive = r.id === currentExplorePage;
-      const doneMark = done.includes(r.id) ? ` ${iconHTML('check')}<span class="sr-only"> (done)</span>` : '';
-      return `<a class="explore-tab${isActive ? ' active' : ''}${r.id === newTab ? ' step-new' : ''}"${isActive ? ' aria-current="page"' : ''} href="${r.href}">${iconHTML(r.icon, '', isActive)} ${r.label}${doneMark}</a>`;
-    })
-    .join('');
-}
-
 // The Explore rooms as tabs on the task card's header (card layout, UI guide):
 // done rooms get a ✓, the current room is white, then ONE "More soon" tab (a lock)
 // while a room is still locked (its name stays hidden, Prof's comment 2).
@@ -247,16 +216,8 @@ function showUnlocked() {
   const newStep = visibleSteps(getDonePhases()).find((id) => !before.includes(id)) || null;
   bar.innerHTML = stepBarHTML(newStep);
 
-  const subnav = document.querySelector('.explore-subnav');
+  // The Explore rooms are tabs on the task card.
   let newTab = null;
-  if (subnav) {
-    const tabsBefore = subnav.querySelectorAll('.explore-tab').length;
-    const open = EXPLORE_ROOMS.filter((r) => isUnlocked(r.id, getDonePhases()));
-    if (open.length > tabsBefore) newTab = open[open.length - 1];
-    subnav.innerHTML = exploreTabsHTML(newTab && newTab.id);
-  }
-
-  // Card layout: the Explore rooms are tabs on the task card.
   const cardTabs = document.querySelector('.task-card-tabs');
   if (cardTabs) {
     const before = cardTabs.querySelectorAll('.card-tab:not(.locked)').length;
@@ -270,17 +231,8 @@ function showUnlocked() {
   if (name) {
     pipSay(`Hoo-hoo! You unlocked ${name}!`, 'lock-open');
     pipReacts('hop');
-    unlockStep(document.querySelector('.step-bar .step-new, .explore-subnav .step-new, .task-card-tabs .step-new'));
+    unlockStep(document.querySelector('.step-bar .step-new, .task-card-tabs .step-new'));
   }
-}
-
-// Shows whose work this is (by code only). Without a code, the work can't be
-// matched to a child later, so we point them back to the start page.
-function codeBadge() {
-  const code = getExplorerCode();
-  return code
-    ? `<div class="code-badge">${iconHTML('key')} ${code}</div>`
-    : `<a class="code-badge missing" href="../index.html">${iconHTML('key')} No code yet: tap here</a>`;
 }
 
 // Moves the step-bar highlight without rebuilding the shell.
@@ -296,24 +248,9 @@ export function setCurrentStep(stepId) {
   });
 }
 
-// Puts a room's own tool (e.g. "Maths recap") next to its title, so it
-// never crowds the task text underneath. In the card layout it goes into the
-// top bar instead (UI guide: at most 3 buttons there).
+// Puts a room's own tool (e.g. "Maths recap") in the top bar, so it never
+// crowds the task text (UI guide: at most 3 buttons there).
 export function addTitleButton(button) {
-  const tools = document.getElementById('room-tools');
-  if (document.querySelector('.card-layout') && tools) {
-    button.classList.remove('title-btn');
-    button.classList.add('btn-secondary', 'room-tool');
-    tools.append(button);
-    return;
-  }
-  const title = document.querySelector('.room-title');
-  let row = title.parentElement;
-  if (!row.classList.contains('room-title-row')) {
-    row = document.createElement('div');
-    row.className = 'room-title-row';
-    title.before(row);
-    row.append(title);
-  }
-  row.append(button);
+  button.classList.add('btn-secondary', 'room-tool');
+  document.getElementById('room-tools').append(button);
 }

@@ -112,10 +112,6 @@ export function ambientStyle(a) {
   return style;
 }
 
-export function hasScene(room) {
-  return FEATURES.richScenes && Boolean(ROOM_SCENES[room]);
-}
-
 // Puts the scene on the page. Returns true when the page needs nothing else
 // behind the card (a scene, or the plain background when scenes are off);
 // false means "this room has no scene yet: draw the old sky".

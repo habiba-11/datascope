@@ -117,7 +117,6 @@ async function init() {
     accent: 'explore',
     explorePage: 'number',
     phase: 'number',
-    layout: 'card',
     contentHTML: taskCardHTML({
       tabsHTML: exploreCardTabsHTML(),
       bodyHTML: `

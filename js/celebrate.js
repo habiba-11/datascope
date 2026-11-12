@@ -33,7 +33,7 @@ export function backpackLabel(count) {
   return `My backpack: ${count} badge${count === 1 ? '' : 's'}. ${levelFor(count).name}.`;
 }
 
-// Called once by mountShell(), after the sidebar exists.
+// Called once by mountShell(), after the top bar exists.
 export function setupCelebrations() {
   const code = getExplorerCode();
   setupSoundToggle();

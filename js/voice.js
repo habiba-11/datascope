@@ -66,9 +66,3 @@ export function stopSpeaking() {
     // No read-aloud in this browser.
   }
 }
-
-// The name of the voice a speaker gets on this device (for the teacher and the thesis).
-export function voiceNameFor(who) {
-  const voice = pickVoice(ranked, who);
-  return voice ? voice.name : 'none';
-}

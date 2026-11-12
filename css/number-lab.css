@@ -211,8 +211,6 @@
   font-weight: 800;
 }
 
-.build-reminder { margin: 4px 0; font-weight: 700; }
-
 .build-box {
   display: grid;
   justify-items: center;

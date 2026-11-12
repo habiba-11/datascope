@@ -73,7 +73,6 @@ async function init() {
     step: 'ask',
     accent: 'ask',
     phase: 'ask',
-    layout: 'card',
     contentHTML: taskCardHTML({
       title: STRIP.ask,
       bodyHTML: `
