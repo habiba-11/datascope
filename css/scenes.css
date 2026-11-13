@@ -2,16 +2,6 @@
    behind the task card and Sara beside big Pip. Only transform and opacity
    move; reduced motion stops everything (css/base.css); a hidden tab pauses it. */
 
-/* FEATURES.richScenes = false: a plain colour background, nothing moving. */
-.scenes-off .hills {
-  display: none;
-}
-
-/* A room with a scene does not need the Round 4 hills. */
-.has-scene .hills {
-  display: none;
-}
-
 /* The scene covers the window like a photo: always full width and full
    height, keeping its shape, standing on the bottom edge (the floor shows,
    the top of the wall may be cut). */

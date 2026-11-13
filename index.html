@@ -16,6 +16,47 @@
   <link rel="stylesheet" href="css/wardrobe.css">
   <!-- Part 60b: if js/welcome.js ever fails, the hidden page still shows after 1.5 s. -->
   <script>setTimeout(function () { document.documentElement.classList.remove('is-loading'); }, 1500);</script>
+  <!-- preload:start (made by dev/preload.mjs: do not edit by hand) -->
+  <link rel="modulepreload" href="js/ambient.js">
+  <link rel="modulepreload" href="js/art/pip-outfits.js">
+  <link rel="modulepreload" href="js/characters.js">
+  <link rel="modulepreload" href="js/config.js">
+  <link rel="modulepreload" href="js/helpers/ambient.js">
+  <link rel="modulepreload" href="js/helpers/badges.js">
+  <link rel="modulepreload" href="js/helpers/code-maker.js">
+  <link rel="modulepreload" href="js/helpers/fireworks.js">
+  <link rel="modulepreload" href="js/helpers/log.js">
+  <link rel="modulepreload" href="js/helpers/modal-queue.js">
+  <link rel="modulepreload" href="js/helpers/music-score.js">
+  <link rel="modulepreload" href="js/helpers/story.js">
+  <link rel="modulepreload" href="js/helpers/voice.js">
+  <link rel="modulepreload" href="js/helpers/wardrobe.js">
+  <link rel="modulepreload" href="js/icon-text.js">
+  <link rel="modulepreload" href="js/icons.js">
+  <link rel="modulepreload" href="js/illustrations.js">
+  <link rel="modulepreload" href="js/modal.js">
+  <link rel="modulepreload" href="js/music.js">
+  <link rel="modulepreload" href="js/pip.js">
+  <link rel="modulepreload" href="js/scenes/classroom.js">
+  <link rel="modulepreload" href="js/scenes/defs.js">
+  <link rel="modulepreload" href="js/scenes/funfair.js">
+  <link rel="modulepreload" href="js/scenes/index.js">
+  <link rel="modulepreload" href="js/scenes/lab.js">
+  <link rel="modulepreload" href="js/scenes/office.js">
+  <link rel="modulepreload" href="js/scenes/parts.js">
+  <link rel="modulepreload" href="js/scenes/schoolyard.js">
+  <link rel="modulepreload" href="js/scenes/studio.js">
+  <link rel="modulepreload" href="js/scenes/workshop.js">
+  <link rel="modulepreload" href="js/sounds.js">
+  <link rel="modulepreload" href="js/storage/save.js">
+  <link rel="modulepreload" href="js/story-characters.js">
+  <link rel="modulepreload" href="js/story-scenes.js">
+  <link rel="modulepreload" href="js/story-sounds.js">
+  <link rel="modulepreload" href="js/story.js">
+  <link rel="modulepreload" href="js/voice.js">
+  <link rel="modulepreload" href="js/wardrobe.js">
+  <link rel="modulepreload" href="js/welcome.js">
+  <!-- preload:end -->
 </head>
 <body>
   <header class="welcome-top">
@@ -51,11 +92,5 @@
     </section>
   </main>
   <script type="module" src="js/welcome.js"></script>
-  <div class="hills" aria-hidden="true">
-    <svg viewBox="0 0 1280 220" preserveAspectRatio="none">
-      <ellipse class="hill-back" cx="200" cy="250" rx="480" ry="150"></ellipse>
-      <ellipse class="hill-front" cx="1040" cy="270" rx="560" ry="170"></ellipse>
-    </svg>
-  </div>
 </body>
 </html>

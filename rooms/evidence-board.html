@@ -19,15 +19,79 @@
   <link rel="stylesheet" href="../css/evidence-board.css">
   <!-- GSAP 3.15.0, a local copy (works without internet). In the head, so the page is read before it is first drawn: the fade from the last room then finishes (scan, 7 Nov 2026). Standard no-charge license: https://gsap.com/standard-license -->
   <script src="../js/vendor/gsap.min.js"></script>
+  <!-- preload:start (made by dev/preload.mjs: do not edit by hand) -->
+  <link rel="modulepreload" href="../js/action-bar.js">
+  <link rel="modulepreload" href="../js/ambient.js">
+  <link rel="modulepreload" href="../js/app.js">
+  <link rel="modulepreload" href="../js/art/pip-outfits.js">
+  <link rel="modulepreload" href="../js/badge-art.js">
+  <link rel="modulepreload" href="../js/badge-popup.js">
+  <link rel="modulepreload" href="../js/badge-shelf.js">
+  <link rel="modulepreload" href="../js/celebrate.js">
+  <link rel="modulepreload" href="../js/confetti.js">
+  <link rel="modulepreload" href="../js/config.js">
+  <link rel="modulepreload" href="../js/exit-button.js">
+  <link rel="modulepreload" href="../js/feedback-card.js">
+  <link rel="modulepreload" href="../js/findings-popup.js">
+  <link rel="modulepreload" href="../js/fireworks.js">
+  <link rel="modulepreload" href="../js/helper-pointer.js">
+  <link rel="modulepreload" href="../js/helpers/ambient.js">
+  <link rel="modulepreload" href="../js/helpers/badges.js">
+  <link rel="modulepreload" href="../js/helpers/certainty.js">
+  <link rel="modulepreload" href="../js/helpers/charts.js">
+  <link rel="modulepreload" href="../js/helpers/confetti.js">
+  <link rel="modulepreload" href="../js/helpers/feedback.js">
+  <link rel="modulepreload" href="../js/helpers/findings.js">
+  <link rel="modulepreload" href="../js/helpers/fireworks.js">
+  <link rel="modulepreload" href="../js/helpers/generator.js">
+  <link rel="modulepreload" href="../js/helpers/journey.js">
+  <link rel="modulepreload" href="../js/helpers/log.js">
+  <link rel="modulepreload" href="../js/helpers/mission.js">
+  <link rel="modulepreload" href="../js/helpers/modal-queue.js">
+  <link rel="modulepreload" href="../js/helpers/music-score.js">
+  <link rel="modulepreload" href="../js/helpers/number-tasks.js">
+  <link rel="modulepreload" href="../js/helpers/outbox.js">
+  <link rel="modulepreload" href="../js/helpers/pip-lines.js">
+  <link rel="modulepreload" href="../js/helpers/pointers.js">
+  <link rel="modulepreload" href="../js/helpers/progress.js">
+  <link rel="modulepreload" href="../js/helpers/prompts.js">
+  <link rel="modulepreload" href="../js/helpers/scenarios.js">
+  <link rel="modulepreload" href="../js/helpers/stats.js">
+  <link rel="modulepreload" href="../js/helpers/stepper.js">
+  <link rel="modulepreload" href="../js/helpers/suggestions.js">
+  <link rel="modulepreload" href="../js/helpers/wardrobe.js">
+  <link rel="modulepreload" href="../js/icon-text.js">
+  <link rel="modulepreload" href="../js/icons.js">
+  <link rel="modulepreload" href="../js/illustrations.js">
+  <link rel="modulepreload" href="../js/modal.js">
+  <link rel="modulepreload" href="../js/motion.js">
+  <link rel="modulepreload" href="../js/music.js">
+  <link rel="modulepreload" href="../js/phase-intro.js">
+  <link rel="modulepreload" href="../js/phase-progress.js">
+  <link rel="modulepreload" href="../js/pip-stand.js">
+  <link rel="modulepreload" href="../js/pip.js">
+  <link rel="modulepreload" href="../js/pressed-state.js">
+  <link rel="modulepreload" href="../js/rooms/evidence-board.js">
+  <link rel="modulepreload" href="../js/scenes/classroom.js">
+  <link rel="modulepreload" href="../js/scenes/defs.js">
+  <link rel="modulepreload" href="../js/scenes/funfair.js">
+  <link rel="modulepreload" href="../js/scenes/index.js">
+  <link rel="modulepreload" href="../js/scenes/lab.js">
+  <link rel="modulepreload" href="../js/scenes/office.js">
+  <link rel="modulepreload" href="../js/scenes/parts.js">
+  <link rel="modulepreload" href="../js/scenes/schoolyard.js">
+  <link rel="modulepreload" href="../js/scenes/studio.js">
+  <link rel="modulepreload" href="../js/scenes/workshop.js">
+  <link rel="modulepreload" href="../js/settings-menu.js">
+  <link rel="modulepreload" href="../js/sounds.js">
+  <link rel="modulepreload" href="../js/storage/save.js">
+  <link rel="modulepreload" href="../js/storage/sync.js">
+  <link rel="modulepreload" href="../js/task-card.js">
+  <link rel="modulepreload" href="../js/wardrobe.js">
+  <!-- preload:end -->
 </head>
 <body>
   <div id="shell"></div>
-  <div class="hills" aria-hidden="true">
-    <svg viewBox="0 0 1280 220" preserveAspectRatio="none">
-      <ellipse class="hill-back" cx="200" cy="250" rx="480" ry="150"></ellipse>
-      <ellipse class="hill-front" cx="1040" cy="270" rx="560" ry="170"></ellipse>
-    </svg>
-  </div>
   <script type="module" src="../js/rooms/evidence-board.js"></script>
 </body>
 </html>
